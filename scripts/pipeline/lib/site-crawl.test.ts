@@ -115,6 +115,18 @@ describe("Ausschlüsse", () => {
     expect(neverCandidate("https://www.fz-sued.de/termine.ics", scope)).toBe(false);
     expect(neverCandidate("https://www.nuernberg.de/internet/c/kurse", scope)).toBe(false);
   });
+
+  it("nie Kandidat: Gottesdienst-, Kontakt- und Anfahrtsseiten (Stichprobe S0); Krabbelgottesdienst und Download schon", () => {
+    expect(neverCandidate("https://www.fz-sued.de/gottesdienste/gottesdienste-im-norden", scope)).toBe(true);
+    expect(neverCandidate("https://www.fz-sued.de/kontakt/", scope)).toBe(true);
+    expect(neverCandidate("https://www.fz-sued.de/anfahrt.html", scope)).toBe(true);
+    expect(neverCandidate("https://www.fz-sued.de/so-finden-sie-uns/kontakt-und-anfahrt", scope)).toBe(true);
+    expect(neverCandidate("https://www.fz-sued.de/gottesdienste/krabbelgottesdienst", scope)).toBe(false);
+    expect(neverCandidate("https://www.fz-sued.de/familiengottesdienst.html", scope)).toBe(false);
+    expect(neverCandidate("https://www.fz-sued.de/kontaktgruppe-babys", scope)).toBe(false);
+    // Downloadseiten nicht pauschal: Programmhefte liegen oft dort, der Ertragsbeweis entscheidet
+    expect(neverCandidate("https://www.fz-sued.de/aktuelles/download", scope)).toBe(false);
+  });
 });
 
 describe("pageSignals und futureDates", () => {

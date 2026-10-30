@@ -163,7 +163,14 @@ export function neverVisit(url: string, label = ""): boolean {
   return IMAGE.test(u.pathname) || EXCLUDED.test(u.pathname) || EXCLUDED.test(label.trim());
 }
 
-/** Nie Kandidat (E1): Sammelkalender, Seiten des Katalogs, Einzeltermin-`.ics` */
+/**
+ * Gottesdienst-, Kontakt- und Anfahrtsseite (Stichprobe S0): nur das letzte Pfadsegment, ganze Wörter. So bleiben
+ * „krabbelgottesdienst“ und „kontaktgruppe“ Kandidaten. Besucht wird die Seite weiter (Kontaktseiten braucht die
+ * Ortsprüfung). Downloadseiten bleiben Kandidaten, denn dort liegen oft die Programmhefte.
+ */
+const NOT_PROGRAMME = /(^|[_\-.])(gottesdienste?|kontakt|anfahrt)([_\-.]|$)/i;
+
+/** Nie Kandidat (E1): Sammelkalender, Seiten des Katalogs, Einzeltermin-`.ics`, Gottesdienst/Kontakt/Anfahrt */
 export function neverCandidate(url: string, scope: CrawlScope): boolean {
   const n = normalizeUrl(url);
   const h = hostOf(url);
@@ -172,6 +179,7 @@ export function neverCandidate(url: string, scope: CrawlScope): boolean {
   if (scope.aggregatorPrefixes.some((p) => n.startsWith(p))) return true;
   if (scope.known.has(n)) return true;
   const path = parseUrl(url)?.pathname ?? "";
+  if (NOT_PROGRAMME.test(path.split("/").filter(Boolean).at(-1) ?? "")) return true;
   return /\.ics$/i.test(path) && SINGLE_ICS.test(`${path}${parseUrl(url)?.search ?? ""}`);
 }
 

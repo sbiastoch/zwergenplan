@@ -360,7 +360,11 @@ Wegwerf-Skript im Job-Verzeichnis auf `lib/site-crawl.ts` und `io/site-crawl.ts`
   - eigene Seiten, die die Adresse nur auf der Kontaktseite nennen (`studioherzschlag.de`, `mutherstudio.com`, `zentrum-koberger.de`, die FamilienBox).
   - Behoben im Code schon vor der Zählung: Klammerzusätze („(Hinterhaus)“), Zusätze nach Gedankenstrich und Artikel am Ortsnamen.
 - **Folge:** Nachtrag 1 (unten) zur Ortsprüfung, vor `lib/pflege.ts`.
-- **Von Hand:** 20 Kandidaten (jeder dritte der nach Anbieter sortierten Liste) prüft der Nutzer: echte Programmseite des Anbieters ja/nein. Ergebnis hier, dann die Schwellen von `pageSignals`.
+- **Von Hand:** 20 Kandidaten (jeder dritte der nach Anbieter sortierten Liste) hat der Nutzer geprüft (2026-10-30): echte Programmseite des Anbieters ja/nein.
+  - **ja (11):** Programm Familien (CVJM), Zumbini (FamilienBox), FenKid-Kurse (famalie), Babymassage und Rückbildung (gugelrund), Rückbildung (hebanne-schulz), Musikspielerei (Zukunftsmusik), Programm-PDF der Elternschule (Martha-Maria), Eltern-Kind-Kurse (Musikschule Fürth), Mutter-Vater-Kind-Schwimmen (nuebad-flipper), Kinderseite des Stadtteilhauses Fisch.
+  - **nein (5):** zwei Startseiten mit Teasern (CVJM Gostenhof, nuebad-flipper), Gottesdienstliste (Stadtkirche), Downloadseite (St. Martin), „Drill Baby Drill“ (Staatstheater).
+  - **unsicher (4):** Gemeindebrief als PDF (Langwasser), Kursprogramm „Gesundheit“ der FBS (viele Kurse für Erwachsene), Kopie einer Rückbildungsseite (happy-bellies), interkulturelle Angebote (Mütterzentrum Fürth).
+  - **Folge:** Gottesdienst-, Kontakt- und Anfahrtsseiten werden nie Kandidat (`neverCandidate`, letztes Pfadsegment als ganzes Wort, damit Krabbel- und Familiengottesdienste bleiben); besucht werden sie weiter. **Downloadseiten nicht pauschal** (Nutzer): dort liegen oft die Programmhefte, wie beim Gemeindebrief. Startseiten-Teaser, „Baby“ im Titel und die unsicheren Fälle fängt der Ertragsbeweis (E2: abgedeckt, also `deckungsgleich`, oder kein neues Angebot mit künftigem Termin und `age.minMonths` ≤ 36); die Schwellen von `pageSignals` bleiben.
 
 ### S1, Teil 1 – Umsetzung (2026-10-30)
 
