@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel live seit `dde68a2`; Nachtrag 5 Token-Bremse je Modell)
+Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel live seit `dde68a2`; Nachtrag 5 Token-Bremse je Modell; S3 Abruf mit Schalter `alt`, Messung offen)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -560,6 +560,23 @@ Wegwerf-Skripte unter `runs/s0-0048/` (gitignored): `s0.ts` (Abruf, Einheiten na
 **Weitere Befunde aus S0:**
 - **Einheit `kandidaten`** scheiterte im Build-Probelauf am gekürzten Auszug (E3, Nachtrag 1).
 - **Zeichensatz:** Die Kalender-API von `nuernberg.de` (`sternenhaus-kuf`) meldet `charset=ISO-8859-1`, liefert aber UTF-8; `charsetOf` in `scripts/pipeline/io/http.ts` folgt dem Header, der Text enthält „ErzÃ¤hlt“. Behoben als Kleinänderung `72c42d6` (2026-10-26).
+
+### S3 – Umsetzung (2026-10-30)
+
+- **Schalter:** `--abruf alt|neu` für jeden Befehl mit Abruf, Standard `alt`; Eingabe `abruf` in `nightly.yml` (`alt`, `neu`, `beide`). `setAbruf` in `io/http.ts` ist Zustand des Prozesses, also eines Laufs, wie der Cache der robots.txt.
+- **Neu:** User-Agent `BOT_UA`; vor jedem Sprung in `fetchFollowing` die robots.txt des Origins (`io/robots.ts`, Regeln in `lib/robots.ts`). Damit sind `fetchTask`, PDFs, `request`-Seiten und die Sammelkalender (`fetchJson`) erfasst. `withFollowPages` gibt es auf `main` nicht mehr.
+  - Ausgenommen: `ROBOTS_EXEMPT_HOSTS` (Nominatim, OpenHolidays) mit Begründung im Code und Test; GTFS lädt `io/gtfs.ts` ohne `http.ts`.
+  - Gesperrt: `RobotsError` mit `klasse: gesperrt`, nicht erreichbar (5xx, 429, Netzfehler): `voruebergehend`; keine Wiederholung. `fetch-inputs.ts` übernimmt die Klasse.
+  - Browser: Die Kette löst `resolvePageUrl` vorher auf (jede Station geprüft, Status egal, auch eine 403 für Skripte), dann `goto(finalUrl)`. **Abweichung:** Weicht `page.url()` ab (Weiterleitung per Skript), wird die neue Adresse geprüft; Fehler nur, wenn robots.txt sie sperrt. Grund: Nicht jede Abweichung ist ein Verstoß, und die Messung soll keine Seiten verlieren, die erlaubt sind.
+- **Messung:** Modus `messen` mit `abruf: beide` ruft den Katalog erst alt, dann neu ab (`pnpm pipeline fetch --abruf beide`). `report.md` bekommt den Abschnitt „Abruf alt gegen neu“ (`compareAbruf`: gesperrt, nur neu gescheitert, nur alt gescheitert, Länge ±20 %, Sammelkalender je Adapter). Hashes und Texte bleiben die des alten Abrufs (Cache der Vornacht). `hashes.json` trägt dazu je gescheiterter Seite die `klasse`.
+  - Lokale Probe 2026-10-30 (`die-familienbox`, `geburtshaus-nuernberger-nest`, 12 Seiten samt Browser, 3 Sammelkalender): keine Sperre, keine Abweichung.
+- **Abweichung Ort der Prüfung:** zentral in `fetchFollowing` für jeden Abruf über `http.ts`, Ausnahme per Hostliste, statt „nur bei Seitenabrufen“. Cache je Origin (RFC 9309, 2.3), nicht je Host.
+- **Umfang im Browser:** Geprüft wird das Dokument oben, nicht Iframes und XHR der Seite (etwa eingebettete Widgets). ADR 0033, Punkt 1 lässt offen, ob eingebettete Ressourcen ein Seitenabruf sind; zu entscheiden mit N1.
+- **RFC-Details:** robots.txt ohne Wiederholung (nicht erreichbar gilt für den Lauf); mehr als 5 Weiterleitungen gelten als nicht vorhanden, also alles erlaubt; Muster ohne RegExp (kein Hänger an fremden Mustern). Scheitert vor dem Browser schon die Auflösung, steht im Grund „Vorab-Auflösung:“, und die Messung weist das getrennt aus.
+- **Workflow:** Mit `abruf: neu` im Modus `messen` werden die Hashes nicht als Vornacht gespeichert.
+- **Arch-Review (2026-10-30):** kein Blocker, kein Major; alle acht Minors eingearbeitet.
+- **Abweichung Impressum:** Der Absatz zum Abruf kommt mit dem Commit, der `neu` zum Standard macht (nach N1). Solange `alt` gilt, stimmte „beachtet robots.txt“ nicht.
+- **Offen:** Messung im Runner per `workflow_dispatch` (`modus: messen`, `abruf: beide`), Ergebnis hier, dann N1; danach Standard `neu`, Impressum, `/browser-review`, Schalter und `UA` entfallen.
 
 ### Restpunkte (kommen bei S5 nach `docs/ideas.md`)
 

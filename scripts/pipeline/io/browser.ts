@@ -4,8 +4,9 @@
  * ersten Abruf; Links werden nie verfolgt, nur die angegebene Seite geladen.
  */
 import { type Browser, chromium } from "@playwright/test";
+import { RESOLVE_PREFIX } from "../lib/fetch.ts";
 import type { FetchedPage } from "../lib/html-extract.ts";
-import { UA } from "./http.ts";
+import { checkPageUrl, RobotsError, resolvePageUrl, robotsActive, userAgent } from "./http.ts";
 
 const GOTO_TIMEOUT_MS = 45_000;
 /**
@@ -19,6 +20,20 @@ const SETTLE_TICK_MS = 1000;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const isTimeout = (e: unknown) => e instanceof Error && e.name === "TimeoutError";
 
+async function resolveFirst(url: string): Promise<string> {
+  try {
+    return await resolvePageUrl(url);
+  } catch (e) {
+    if (e instanceof RobotsError) throw e;
+    throw new Error(`${RESOLVE_PREFIX}${e instanceof Error ? e.message : String(e)}`, { cause: e });
+  }
+}
+
+/** Nach dem Laden: Ist der Browser woanders gelandet, gilt robots.txt auch dort (Abweichung von E8, siehe S3) */
+export async function checkLanding(target: string, landed: string, check: (url: string) => Promise<void>) {
+  if (landed !== target) await check(landed);
+}
+
 export interface BrowserSession {
   /** Seite rendern; 2 Wiederholungen bei Zeitüberschreitung, andere Fehler werfen sofort. */
   render(url: string): Promise<FetchedPage>;
@@ -29,12 +44,23 @@ export function browserSession(): BrowserSession {
   let browser: Promise<Browser> | undefined;
   const once = async (url: string): Promise<FetchedPage> => {
     browser ??= chromium.launch();
+    // `page.route` sieht nur die erste Anfrage, Weiterleitungen folgt der Browser selbst: Mit robots.txt löst
+    // `http.ts` die Kette vorher auf und prüft jede Station (Plan 0048, E8)
+    const target = robotsActive() ? await resolveFirst(url) : url;
     // Ohne festen UA meldet sich Headless-Chromium als „HeadlessChrome“, und eversports zeigt nur die
     // Cloudflare-Sperrseite (Probe 2026-10-11: 9 von 17 Browser-Abrufen); mit UA kommen die Kurse.
-    const context = await (await browser).newContext({ locale: "de-DE", timezoneId: "Europe/Berlin", userAgent: UA });
+    const context = await (await browser).newContext({
+      locale: "de-DE",
+      timezoneId: "Europe/Berlin",
+      userAgent: userAgent(),
+    });
     try {
       const page = await context.newPage();
-      const res = await page.goto(url, { waitUntil: "domcontentloaded", timeout: GOTO_TIMEOUT_MS });
+      const res = await page.goto(target, { waitUntil: "domcontentloaded", timeout: GOTO_TIMEOUT_MS });
+      // Landet der Browser woanders (Weiterleitung per Skript, Cookie), gilt robots.txt auch dort. Abweichung vom
+      // Plan: nicht jede Abweichung ist ein Fehler, nur eine gesperrte. Geprüft wird nur das Dokument oben, nicht
+      // Iframes und XHR der Seite (Umfang in Plan 0048, S3; Arch-Review S3, m7)
+      if (robotsActive()) await checkLanding(target, page.url(), checkPageUrl);
       const deadline = Date.now() + SETTLE_TIMEOUT_MS;
       await page.waitForLoadState("networkidle", { timeout: SETTLE_TIMEOUT_MS }).catch(() => undefined);
       let last = -1;

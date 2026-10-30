@@ -65,6 +65,8 @@ const PageResult = z.object({
   /** Ziel nach Redirects, falls anders: erlaubte `sourceUrl` auch für `pipeline extract --from` (E4) */
   finalUrl: z.string().optional(),
   ms: z.number(),
+  /** Fehlerklasse (Plan 0048, E8); für den Vergleich der Abrufe in S3 */
+  klasse: z.enum(["dauerhaft", "gesperrt", "voruebergehend"]).optional(),
 });
 
 const ProviderFetch = z.object({
@@ -108,7 +110,7 @@ export function assembleProvider(input: {
     ({ url, art, ok, ms, ...rest }): z.infer<typeof PageResult> =>
       "text" in rest
         ? { url, art, ok, ms, chars: rest.text.length, ...(rest.finalUrl ? { finalUrl: rest.finalUrl } : {}) }
-        : { url, art, ok, ms, reason: rest.reason },
+        : { url, art, ok, ms, reason: rest.reason, klasse: rest.klasse },
   );
   const base = { chars: 0, candidates: input.candidates.length, pages };
   const failed = input.pages.flatMap((p) => (p.ok ? [] : [p]));
@@ -284,6 +286,94 @@ export function renderFetchMarkdown(input: {
     for (const [id, e] of failed) out.push(`- ${id} (${e.art ?? "?"}): ${e.reason ?? ""}`);
   }
   return `${out.join("\n")}\n`;
+}
+
+/** Präfix im Grund, wenn schon die Auflösung vor dem Browser scheitert (`io/browser.ts`); in der Messung getrennt */
+export const RESOLVE_PREFIX = "Vorab-Auflösung: ";
+
+interface AbrufFall {
+  id: string;
+  url: string;
+  reason: string;
+}
+export interface AbrufVergleich {
+  pages: number;
+  /** neuer Abruf: robots.txt verbietet die Seite */
+  gesperrt: AbrufFall[];
+  /** nur mit dem neuen Abruf gescheitert (User-Agent abgewiesen, Bot-Schutz, robots.txt nicht erreichbar) */
+  nurNeuFehler: AbrufFall[];
+  /** nur neu gescheitert, schon beim Auflösen vor dem Browser: sagt nichts über den User-Agent im Browser */
+  vorab: AbrufFall[];
+  nurAltFehler: AbrufFall[];
+  /** beide ok, Länge weicht um mehr als 20 % ab */
+  laenge: AbrufFall[];
+}
+
+/** Abweichung der Länge, ab der eine Seite mit dem neuen User-Agent als anders gilt (Plan 0048, S3) */
+const LENGTH_TOLERANCE = 0.2;
+
+/**
+ * Derselbe Katalog einmal mit altem, einmal mit neuem Abruf (Plan 0048, S3, Modus `messen`): gesperrte Seiten, Seiten,
+ * die nur mit einem der beiden scheitern, und Seiten, deren Text um mehr als 20 % abweicht.
+ */
+export function compareAbruf(alt: HashesFile, neu: HashesFile): AbrufVergleich {
+  const r: AbrufVergleich = { pages: 0, gesperrt: [], nurNeuFehler: [], vorab: [], nurAltFehler: [], laenge: [] };
+  for (const [id, e] of Object.entries(neu)) {
+    const before = new Map((alt[id]?.pages ?? []).map((p) => [p.url, p]));
+    for (const p of e.pages) {
+      const a = before.get(p.url);
+      if (!a) continue;
+      r.pages++;
+      const fall = (reason: string) => ({ id, url: p.url, reason });
+      if (!p.ok && p.klasse === "gesperrt") r.gesperrt.push(fall(p.reason ?? ""));
+      else if (a.ok && !p.ok)
+        (p.reason?.startsWith(RESOLVE_PREFIX) ? r.vorab : r.nurNeuFehler).push(fall(p.reason ?? ""));
+      else if (!a.ok && p.ok) r.nurAltFehler.push(fall(a.reason ?? ""));
+      else if (a.ok && p.ok && a.chars !== undefined && p.chars !== undefined && a.chars > 0) {
+        const change = (p.chars - a.chars) / a.chars;
+        if (Math.abs(change) > LENGTH_TOLERANCE) {
+          const pct = `${change > 0 ? "+" : "−"}${Math.round(Math.abs(change) * 100)} %`;
+          r.laenge.push(fall(`${de(a.chars)} → ${de(p.chars)} Zeichen (${pct})`));
+        }
+      }
+    }
+  }
+  return r;
+}
+
+/** Abschnitt für `report.md` im Modus `messen` mit `--abruf beide` */
+export function renderAbrufVergleich(
+  v: AbrufVergleich,
+  adapters: { alt: Readonly<Record<string, AdapterOutcome>>; neu: Readonly<Record<string, AdapterOutcome>> },
+): string {
+  const status = (a: AdapterOutcome | undefined) =>
+    !a ? "–" : a.status === "ok" ? `ok, ${a.candidates} Kandidaten` : `fehler: ${a.reason ?? ""}`;
+  const list = (title: string, fs: readonly AbrufFall[]) =>
+    fs.length === 0
+      ? []
+      : ["", `### ${title} (${fs.length})`, "", ...fs.map((f) => `- ${f.id}: ${f.url} · ${f.reason}`)];
+  const names = [...new Set([...Object.keys(adapters.alt), ...Object.keys(adapters.neu)])].sort();
+  return [
+    "## Abruf alt gegen neu (Plan 0048, S3)",
+    "",
+    `Seiten: ${v.pages} verglichen, ${v.gesperrt.length} von robots.txt gesperrt, ${v.nurNeuFehler.length} nur neu ` +
+      `gescheitert (dazu ${v.vorab.length} schon bei der Vorab-Auflösung), ${v.nurAltFehler.length} nur alt ` +
+      `gescheitert, ${v.laenge.length} mit mehr als ±20 % Länge`,
+    ...(names.length > 0
+      ? [
+          "",
+          "| Sammelkalender | alt | neu |",
+          "|---|---|---|",
+          ...names.map((n) => `| ${n} | ${status(adapters.alt[n])} | ${status(adapters.neu[n])} |`),
+        ]
+      : []),
+    ...list("Von robots.txt gesperrt", v.gesperrt),
+    ...list("Nur mit dem neuen Abruf gescheitert", v.nurNeuFehler),
+    ...list("Vorab-Auflösung vor dem Browser gescheitert", v.vorab),
+    ...list("Nur mit dem alten Abruf gescheitert", v.nurAltFehler),
+    ...list("Länge mehr als ±20 % anders", v.laenge),
+    "",
+  ].join("\n");
 }
 
 /**

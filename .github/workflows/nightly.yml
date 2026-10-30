@@ -43,6 +43,11 @@ on:
       umstellen:
         description: "Umstellung auf V2 erzwingen, nach Prüfung (Plan 0048, E7; Komma-Liste)"
         default: ""
+      abruf:
+        description: "Abruf (Plan 0048, E8): alt | neu (User-Agent zwergenplan, robots.txt) | beide (nur messen)"
+        type: choice
+        options: [alt, neu, beide]
+        default: alt
 
 permissions:
   contents: read
@@ -121,19 +126,23 @@ jobs:
       - name: Abruf
         env:
           OUT: runs/${{ steps.datum.outputs.datum }}/fetch
-        run: pnpm pipeline fetch --out "$OUT" --compare .cache/nightly-prev/hashes.json
+          ABRUF: ${{ inputs.abruf || 'alt' }}
+        run: pnpm pipeline fetch --out "$OUT" --compare .cache/nightly-prev/hashes.json --abruf "$ABRUF"
       - name: Bericht
         if: always()
         env:
           OUT: runs/${{ steps.datum.outputs.datum }}/fetch
         run: cat "$OUT/report.md" >> "$GITHUB_STEP_SUMMARY" || echo "kein Bericht" >> "$GITHUB_STEP_SUMMARY"
+      # mit abruf neu wäre die Vornacht ein anderer Abruf; die nächste Nacht (alt) meldete Scheinänderungen (S3, m8)
       - name: Hashes für die nächste Nacht
+        if: inputs.abruf != 'neu'
         env:
           OUT: runs/${{ steps.datum.outputs.datum }}/fetch
         run: |
           mkdir -p .cache/nightly-prev
           cp "$OUT/hashes.json" .cache/nightly-prev/hashes.json
       - uses: actions/cache/save@v4
+        if: inputs.abruf != 'neu'
         with:
           path: .cache/nightly-prev
           key: nightly-hashes-${{ github.run_id }}
@@ -189,6 +198,7 @@ jobs:
           ONLY: ${{ inputs.only }}
           UMSTELLEN: ${{ inputs.umstellen }}
           TIMEOUT: ${{ inputs.timeout || '90' }}
+          ABRUF: ${{ inputs.abruf || 'alt' }}
         run: |
           [[ "$ONLY" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::only enthält unerlaubte Zeichen"; exit 1; }
           [[ "$UMSTELLEN" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::umstellen enthält unerlaubte Zeichen"; exit 1; }
@@ -201,7 +211,8 @@ jobs:
           args=()
           [[ -n "$ONLY" ]] && args+=(--only "$ONLY")
           [[ -n "$UMSTELLEN" ]] && args+=(--umstellen "$UMSTELLEN")
-          pnpm pipeline nightly "${args[@]}"
+          # `beide` nur im Modus messen; die CLI lehnt es hier ab (Plan 0048, E8)
+          pnpm pipeline nightly "${args[@]}" --abruf "$ABRUF"
       - name: Gates (data:validate, check:fast)
         id: gates
         run: pnpm data:validate && pnpm check:fast

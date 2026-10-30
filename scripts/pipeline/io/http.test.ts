@@ -1,5 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { fetchPage } from "./http.ts";
+import { afterEach, describe, expect, it } from "vitest";
+import {
+  BOT_UA,
+  fetchJson,
+  fetchPage,
+  ROBOTS_EXEMPT_HOSTS,
+  RobotsError,
+  resolvePageUrl,
+  setAbruf,
+  UA,
+} from "./http.ts";
 
 /** Fake-Server: Antwort je URL; protokolliert URL, Methode, Body und `redirect` jedes Aufrufs */
 function fakeFetch(routes: Record<string, () => Response>) {
@@ -152,5 +161,112 @@ describe("fetchPage: Zeichensatz", () => {
     });
     const page = await fetchPage("https://a.example.net/", { fetchImpl: f.impl });
     expect(page.body).toBe("Erzählt für Kinder");
+  });
+});
+
+describe("Abruf neu: User-Agent und robots.txt (Plan 0048, E8)", () => {
+  afterEach(() => setAbruf("alt"));
+  const robots = (txt: string) => () => new Response(txt, { status: 200, headers: { "content-type": "text/plain" } });
+
+  it("alt: Browser-UA, keine robots.txt", async () => {
+    const f = fakeFetch({ "https://a.example.net/kurse": ok("Kurse") });
+    await fetchPage("https://a.example.net/kurse", { fetchImpl: f.impl });
+    expect(f.log.map((l) => l.url)).toEqual(["https://a.example.net/kurse"]);
+    expect(f.log[0]?.headers["user-agent"]).toBe(UA);
+  });
+
+  it("neu: eigener User-Agent auch für robots.txt, robots.txt einmal je Origin und Lauf", async () => {
+    setAbruf("neu");
+    const f = fakeFetch({
+      "https://a.example.net/robots.txt": robots("User-agent: *\nDisallow: /intern/\n"),
+      "https://a.example.net/kurse": ok("Kurse"),
+      "https://a.example.net/termine": ok("Termine"),
+    });
+    await fetchPage("https://a.example.net/kurse", { fetchImpl: f.impl });
+    await fetchPage("https://a.example.net/termine", { fetchImpl: f.impl });
+    expect(f.log.map((l) => l.url)).toEqual([
+      "https://a.example.net/robots.txt",
+      "https://a.example.net/kurse",
+      "https://a.example.net/termine",
+    ]);
+    expect(f.log.every((l) => l.headers["user-agent"] === BOT_UA)).toBe(true);
+    expect(BOT_UA).toContain("zwergenplan/1.0");
+  });
+
+  it("gesperrt: RobotsError mit klasse gesperrt, ohne Abruf der Seite und ohne Wiederholung", async () => {
+    setAbruf("neu");
+    const f = fakeFetch({
+      "https://a.example.net/robots.txt": robots("User-agent: zwergenplan\nDisallow: /intern/\n"),
+    });
+    const err = await fetchPage("https://a.example.net/intern/kurse?x=1", { fetchImpl: f.impl }).catch((e) => e);
+    expect(err).toBeInstanceOf(RobotsError);
+    expect(err).toMatchObject({ message: "robots.txt sperrt /intern/kurse?x=1", klasse: "gesperrt" });
+    expect(f.log.map((l) => l.url)).toEqual(["https://a.example.net/robots.txt"]);
+  });
+
+  it("jede Station einer Weiterleitung wird geprüft, robots.txt selbst wird weitergeleitet", async () => {
+    setAbruf("neu");
+    const f = fakeFetch({
+      "https://a.example.net/robots.txt": robots(""),
+      "https://a.example.net/alt": redirect(301, "https://b.example.net/intern/neu"),
+      "https://b.example.net/robots.txt": redirect(301, "https://www.b.example.net/robots.txt"),
+      "https://www.b.example.net/robots.txt": robots("User-agent: *\nDisallow: /intern/\n"),
+    });
+    await expect(fetchPage("https://a.example.net/alt", { fetchImpl: f.impl })).rejects.toThrow(
+      "robots.txt sperrt /intern/neu",
+    );
+    expect(f.log.map((l) => l.url)).not.toContain("https://b.example.net/intern/neu");
+  });
+
+  it("robots.txt nicht erreichbar (5xx): klasse voruebergehend; 404 erlaubt alles", async () => {
+    setAbruf("neu");
+    const f = fakeFetch({
+      "https://a.example.net/robots.txt": () => new Response("weg", { status: 503 }),
+      "https://b.example.net/robots.txt": () => new Response("fehlt", { status: 404 }),
+      "https://b.example.net/kurse": ok("Kurse"),
+    });
+    const err = await fetchPage("https://a.example.net/kurse", { fetchImpl: f.impl, retries: 0 }).catch((e) => e);
+    expect(err).toMatchObject({ klasse: "voruebergehend" });
+    expect(String(err.message)).toMatch(/^robots\.txt nicht erreichbar \(HTTP 503\)/);
+    await expect(fetchPage("https://b.example.net/kurse", { fetchImpl: f.impl })).resolves.toMatchObject({
+      body: "Kurse",
+    });
+    // robots.txt ohne Wiederholung: ein Abruf je Origin
+    expect(f.log.filter((l) => l.url === "https://a.example.net/robots.txt")).toHaveLength(1);
+  });
+
+  it("robots.txt mit mehr als 5 Weiterleitungen gilt als nicht vorhanden: alles erlaubt (RFC 9309, 2.3.1.2)", async () => {
+    setAbruf("neu");
+    const routes: Record<string, () => Response> = { "https://a.example.net/kurse": ok("Kurse") };
+    routes["https://a.example.net/robots.txt"] = redirect(302, "/r0");
+    for (let i = 0; i < 7; i++) routes[`https://a.example.net/r${i}`] = redirect(302, `/r${i + 1}`);
+    const f = fakeFetch(routes);
+    await expect(fetchPage("https://a.example.net/kurse", { fetchImpl: f.impl })).resolves.toMatchObject({
+      body: "Kurse",
+    });
+  });
+
+  it("Nominatim und OpenHolidays ohne robots-Prüfung", async () => {
+    setAbruf("neu");
+    expect(ROBOTS_EXEMPT_HOSTS).toEqual(["nominatim.openstreetmap.org", "openholidaysapi.org"]);
+    const f = fakeFetch({
+      "https://nominatim.openstreetmap.org/search?q=x": () => new Response("[]", { status: 200 }),
+      "https://openholidaysapi.org/PublicHolidays": () => new Response("[]", { status: 200 }),
+    });
+    await fetchJson("https://nominatim.openstreetmap.org/search?q=x", { fetchImpl: f.impl });
+    await fetchJson("https://openholidaysapi.org/PublicHolidays", { fetchImpl: f.impl });
+    expect(f.log.map((l) => l.url).some((u) => u.endsWith("/robots.txt"))).toBe(false);
+  });
+
+  it("resolvePageUrl: Ziel nach Weiterleitungen, jede Station geprüft, Status egal", async () => {
+    setAbruf("neu");
+    const f = fakeFetch({
+      "https://a.example.net/robots.txt": robots(""),
+      "https://a.example.net/widget": redirect(302, "/widget/neu"),
+      "https://a.example.net/widget/neu": () => new Response("Bot-Schutz", { status: 403 }),
+    });
+    expect(await resolvePageUrl("https://a.example.net/widget", { fetchImpl: f.impl })).toBe(
+      "https://a.example.net/widget/neu",
+    );
   });
 });

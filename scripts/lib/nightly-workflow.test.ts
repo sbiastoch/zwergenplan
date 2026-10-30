@@ -10,7 +10,7 @@ const yml = readFileSync(new URL("../../.github/workflows/nightly.yml", import.m
 const workflow: {
   permissions: Record<string, string>;
   env: Record<string, string>;
-  on: { workflow_dispatch: { inputs: Record<string, { default: string }> } };
+  on: { workflow_dispatch: { inputs: Record<string, { default: string; options?: string[] }> } };
   jobs: Record<
     string,
     {
@@ -21,6 +21,7 @@ const workflow: {
       permissions?: Record<string, string>;
       steps: Array<{
         name?: string;
+        if?: string;
         uses?: string;
         run?: string;
         env?: Record<string, string>;
@@ -46,6 +47,23 @@ describe("nightly.yml (Plan 0048, E7)", () => {
     expect(step?.run).toContain("+ 40 > TIMEOUT");
     // budget_min und timeout nur als Zahl in die Arithmetik (Arch-Review m4)
     expect(step?.run).toContain('[[ "${RUN_BUDGET_MIN:-50}" =~ ^[0-9]+$ && "$TIMEOUT" =~ ^[0-9]+$ ]]');
+  });
+
+  it("abruf als Auswahl, beim Zeitplan alt, an nightly und fetch weitergegeben (Plan 0048, E8)", () => {
+    expect(workflow.on.workflow_dispatch.inputs["abruf"]).toMatchObject({
+      options: ["alt", "neu", "beide"],
+      default: "alt",
+    });
+    expect(step?.env).toMatchObject({ ABRUF: "${{ inputs.abruf || 'alt' }}" });
+    expect(step?.run).toContain('--abruf "$ABRUF"');
+    const fetchStep = workflow.jobs["fetch"]?.steps.find((s) => s.name === "Abruf");
+    expect(fetchStep?.env).toMatchObject({ ABRUF: "${{ inputs.abruf || 'alt' }}" });
+    expect(fetchStep?.run).toContain('--abruf "$ABRUF"');
+    // mit neu keine Vornacht aus dem anderen Abruf (Arch-Review S3, m8)
+    const save = workflow.jobs["fetch"]?.steps.filter(
+      (s) => s.name === "Hashes für die nächste Nacht" || s.uses?.startsWith("actions/cache/save"),
+    );
+    expect(save?.map((s) => s.if)).toEqual(["inputs.abruf != 'neu'", "inputs.abruf != 'neu'"]);
   });
 
   it("Modell und Effort: Nachtlauf Haiku high, Entdecken Opus high (Plan 0048, Nachtrag 4)", () => {

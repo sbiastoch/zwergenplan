@@ -24,7 +24,7 @@ import type { FetchedProvider, FetchedUnit } from "../lib/refresh.ts";
 import type { FetchPlan, PageTask } from "../lib/select.ts";
 import { KANDIDATEN, unitIdOf, unitsOf } from "../lib/units.ts";
 import { browserSession } from "./browser.ts";
-import { fetchBytes, fetchPage } from "./http.ts";
+import { fetchBytes, fetchPage, RobotsError } from "./http.ts";
 import { fetchSource } from "./sources.ts";
 
 const LIMITS = { total: 4, perKey: 2 };
@@ -165,7 +165,8 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
             ...(finalUrl && finalUrl !== task.url ? { finalUrl } : {}),
           };
         } catch (e) {
-          const klasse = failureClassOf(e instanceof HttpError ? e.status : undefined);
+          const klasse =
+            e instanceof RobotsError ? e.klasse : failureClassOf(e instanceof HttpError ? e.status : undefined);
           return { url: task.url, art: artOf(task), ok: false, reason: reasonOf(e), ms: ms(), klasse };
         }
       },

@@ -6,7 +6,10 @@
  *                                               Abruf aller Eingaben nach Katalog, normalisiert und gehasht (Plan 0032,
  *                                               E3, S1.2): DIR (Standard runs/<heute>/fetch/) bekommt <id>.txt,
  *                                               hashes.json und report.md; --compare = hashes.json der Vornacht.
- *                                               Kein Modell, nichts nach data/.
+ *                                               Kein Modell, nichts nach data/. --abruf beide ruft alles zweimal ab
+ *                                               (alt, dann neu) und vergleicht (Plan 0048, S3); Hashes aus alt.
+ *   --abruf alt|neu                             für jeden Befehl mit Abruf (Plan 0048, E8): alt (Standard) mit
+ *                                               Browser-UA, neu mit User-Agent zwergenplan und robots.txt.
  *   extract ID [--from DIR]                     Probe der Extraktion eines Anbieters mit dem Modell (Plan 0032, E4):
  *                                               Eingabe aus DIR (Ausgabe von `fetch`), sonst frisch abgerufen;
  *                                               Ergebnis und Aufrufe nach runs/<heute>/extract/<id>.json, nichts nach data/.
@@ -107,7 +110,7 @@ import {
 import { checkFaelle, createGeocoder, GeocodeFaelle, recordingKey } from "./io/geocode.ts";
 import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays } from "./io/holidays.ts";
-import { fetchPage } from "./io/http.ts";
+import { fetchPage, setAbruf } from "./io/http.ts";
 import { liveStatus } from "./io/live.ts";
 import { EFFORTS } from "./io/llm.ts";
 import { DEFAULT_BUDGET_MIN, runBuildOnly, runNightly } from "./io/nightly.ts";
@@ -119,7 +122,7 @@ import { selectTerms } from "./lib/discover-terms.ts";
 import { DiscoverEvalSchema, evalRegions, freshRunDir, modelEnv, UrteileSchema } from "./lib/eval-discover.ts";
 import { promptHash } from "./lib/eval-score.ts";
 import { inputsFromFetch } from "./lib/extract.ts";
-import { compareHashes, HashesFile, renderFetchMarkdown } from "./lib/fetch.ts";
+import { compareAbruf, compareHashes, HashesFile, renderAbrufVergleich, renderFetchMarkdown } from "./lib/fetch.ts";
 import {
   extractTimetable,
   feedModified,
@@ -164,9 +167,17 @@ const { positionals, values } = parseArgs({
     venue: { type: "string" },
     faelle: { type: "boolean", default: false },
     aufzeichnen: { type: "boolean", default: false },
+    abruf: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
+// Schalter des Abrufs (Plan 0048, E8), vorübergehend bis N1; `beide` nur für `fetch`
+const abrufValue = values.abruf ?? "alt";
+if (!(abrufValue === "alt" || abrufValue === "neu" || (abrufValue === "beide" && command === "fetch"))) {
+  console.error(`✗ --abruf: alt oder neu erwartet${command === "fetch" ? " (oder beide)" : ""}, nicht ${abrufValue}`);
+  process.exit(1);
+}
+setAbruf(abrufValue === "neu" ? "neu" : "alt");
 
 const today = () => {
   const { year, month, day } = berlinDate(new Date());
@@ -212,6 +223,17 @@ async function fetchCmd() {
       `Sammelkalender ${plan.adapters.map((a) => a.adapter).join(", ") || "keine"}`,
   );
   const result = await fetchInputs(plan, catalog, date);
+  let vergleich = "";
+  if (abrufValue === "beide") {
+    // derselbe Katalog mit dem neuen Abruf; Texte und Hashes bleiben die des alten (Cache der Vornacht)
+    setAbruf("neu");
+    print("Abruf neu (User-Agent zwergenplan, robots.txt) zum Vergleich");
+    const neu = await fetchInputs(plan, catalog, date);
+    vergleich = renderAbrufVergleich(compareAbruf(result.providers, neu.providers), {
+      alt: result.adapters,
+      neu: neu.adapters,
+    });
+  }
   mkdirSync(out, { recursive: true });
   for (const [id, text] of Object.entries(result.texts)) writeFileSync(join(out, `${id}.txt`), `${text}\n`);
   writeJson(join(out, "hashes.json"), result.providers);
@@ -223,8 +245,9 @@ async function fetchCmd() {
     skipped: plan.skipped,
     comparison: previous ? compareHashes(previous, result.providers) : undefined,
   });
-  writeFileSync(join(out, "report.md"), report);
-  print(report);
+  const full = `${report}${vergleich === "" ? "" : `\n${vergleich}`}`;
+  writeFileSync(join(out, "report.md"), full);
+  print(full);
   print(`✓ ${out}`);
 }
 

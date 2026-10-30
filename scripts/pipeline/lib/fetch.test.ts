@@ -4,11 +4,13 @@ import {
   adapterFailureFor,
   assembleProvider,
   botWall,
+  compareAbruf,
   compareHashes,
   failureClassOf,
   type HashesFile,
   MAX_INPUT_CHARS,
   programmeText,
+  renderAbrufVergleich,
   renderFetchMarkdown,
   runLimited,
 } from "./fetch.ts";
@@ -268,5 +270,61 @@ describe("runLimited (Höflichkeit: 4 parallel, 2 je Host)", () => {
     expect(out).toEqual(items.map((x) => x.i));
     expect(maxActive).toBe(4);
     expect(maxPerHost).toBe(2);
+  });
+});
+
+describe("compareAbruf: alter gegen neuen Abruf (Plan 0048, S3)", () => {
+  const ok = (url: string, chars: number) => ({ url, art: "html" as const, ok: true, chars, ms: 1 });
+  const fail = (url: string, reason: string, klasse?: "gesperrt" | "voruebergehend") => ({
+    url,
+    art: "html" as const,
+    ok: false,
+    reason,
+    ms: 1,
+    ...(klasse ? { klasse } : {}),
+  });
+  const entry = (pages: HashesFile[string]["pages"]): HashesFile[string] => ({
+    status: "ok",
+    chars: 0,
+    candidates: 0,
+    pages,
+  });
+  const alt: HashesFile = {
+    a: entry([ok("https://a.example/1", 1000), ok("https://a.example/2", 1000), ok("https://a.example/3", 1000)]),
+    b: entry([ok("https://b.example/1", 1000), fail("https://b.example/2", "HTTP 503")]),
+    c: entry([ok("https://c.example/w", 1000)]),
+  };
+  const neu: HashesFile = {
+    a: entry([
+      fail("https://a.example/1", "robots.txt sperrt /1", "gesperrt"),
+      ok("https://a.example/2", 1190),
+      ok("https://a.example/3", 700),
+    ]),
+    b: entry([fail("https://b.example/1", "Bot-Schutz (Cloudflare), HTTP 403"), ok("https://b.example/2", 900)]),
+    c: entry([fail("https://c.example/w", "Vorab-Auflösung: Zeitüberschreitung")]),
+  };
+
+  it("ordnet jede abweichende Seite ein; ±20 % Länge zählt nicht", () => {
+    expect(compareAbruf(alt, neu)).toEqual({
+      pages: 6,
+      gesperrt: [{ id: "a", url: "https://a.example/1", reason: "robots.txt sperrt /1" }],
+      nurNeuFehler: [{ id: "b", url: "https://b.example/1", reason: "Bot-Schutz (Cloudflare), HTTP 403" }],
+      vorab: [{ id: "c", url: "https://c.example/w", reason: "Vorab-Auflösung: Zeitüberschreitung" }],
+      nurAltFehler: [{ id: "b", url: "https://b.example/2", reason: "HTTP 503" }],
+      laenge: [{ id: "a", url: "https://a.example/3", reason: "1.000 → 700 Zeichen (−30 %)" }],
+    });
+  });
+
+  it("Sammelkalender: Status je Adapter", () => {
+    const r = renderAbrufVergleich(compareAbruf(alt, neu), {
+      alt: { "stadt-vk": { status: "ok", candidates: 40, matched: 5, warnings: [] } },
+      neu: {
+        "stadt-vk": { status: "fehler", reason: "robots.txt sperrt /x", candidates: 0, matched: 0, warnings: [] },
+      },
+    });
+    expect(r).toContain("## Abruf alt gegen neu (Plan 0048, S3)");
+    expect(r).toContain("Seiten: 6 verglichen, 1 von robots.txt gesperrt, 1 nur neu gescheitert (dazu 1 schon");
+    expect(r).toContain("| stadt-vk | ok, 40 Kandidaten | fehler: robots.txt sperrt /x |");
+    expect(r).toContain("- a: https://a.example/1 · robots.txt sperrt /1");
   });
 });
