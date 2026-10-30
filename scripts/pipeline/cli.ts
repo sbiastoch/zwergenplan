@@ -7,9 +7,9 @@
  *                                               E3, S1.2): DIR (Standard runs/<heute>/fetch/) bekommt <id>.txt,
  *                                               hashes.json und report.md; --compare = hashes.json der Vornacht.
  *                                               Kein Modell, nichts nach data/. --abruf beide ruft alles zweimal ab
- *                                               (alt, dann neu) und vergleicht (Plan 0048, S3); Hashes aus alt.
- *   --abruf alt|neu                             für jeden Befehl mit Abruf (Plan 0048, E8): alt (Standard) mit
- *                                               Browser-UA, neu mit User-Agent zwergenplan und robots.txt.
+ *                                               (alt, dann neu) und vergleicht (Plan 0048, S3); Hashes aus neu.
+ *   --abruf alt|neu                             für jeden Befehl mit Abruf (Plan 0048, E8): neu (Standard seit N1) mit
+ *                                               User-Agent zwergenplan und robots.txt, alt (Rückfall) mit Browser-UA.
  *   extract ID [--from DIR]                     Probe der Extraktion eines Anbieters mit dem Modell (Plan 0032, E4):
  *                                               Eingabe aus DIR (Ausgabe von `fetch`), sonst frisch abgerufen;
  *                                               Ergebnis und Aufrufe nach runs/<heute>/extract/<id>.json, nichts nach data/.
@@ -172,7 +172,7 @@ const { positionals, values } = parseArgs({
 });
 const [command, ...args] = positionals;
 // Schalter des Abrufs (Plan 0048, E8), vorübergehend bis N1; `beide` nur für `fetch`
-const abrufValue = values.abruf ?? "alt";
+const abrufValue = values.abruf ?? "neu";
 if (!(abrufValue === "alt" || abrufValue === "neu" || (abrufValue === "beide" && command === "fetch"))) {
   console.error(`✗ --abruf: alt oder neu erwartet${command === "fetch" ? " (oder beide)" : ""}, nicht ${abrufValue}`);
   process.exit(1);
@@ -222,18 +222,16 @@ async function fetchCmd() {
     `Abruf: ${plan.providers.length} Anbieter, ${plan.providers.reduce((s, p) => s + p.pages.length, 0)} Seiten, ` +
       `Sammelkalender ${plan.adapters.map((a) => a.adapter).join(", ") || "keine"}`,
   );
-  const result = await fetchInputs(plan, catalog, date);
-  let vergleich = "";
-  if (abrufValue === "beide") {
-    // derselbe Katalog mit dem neuen Abruf; Texte und Hashes bleiben die des alten (Cache der Vornacht)
+  // bei `beide` zuerst alt; Texte und Hashes sind die des neuen Abrufs (Standard, Cache der Vornacht)
+  const alt = abrufValue === "beide" ? await fetchInputs(plan, catalog, date) : undefined;
+  if (alt) {
     setAbruf("neu");
     print("Abruf neu (User-Agent zwergenplan, robots.txt) zum Vergleich");
-    const neu = await fetchInputs(plan, catalog, date);
-    vergleich = renderAbrufVergleich(compareAbruf(result.providers, neu.providers), {
-      alt: result.adapters,
-      neu: neu.adapters,
-    });
   }
+  const result = await fetchInputs(plan, catalog, date);
+  const vergleich = alt
+    ? renderAbrufVergleich(compareAbruf(alt.providers, result.providers), { alt: alt.adapters, neu: result.adapters })
+    : "";
   mkdirSync(out, { recursive: true });
   for (const [id, text] of Object.entries(result.texts)) writeFileSync(join(out, `${id}.txt`), `${text}\n`);
   writeJson(join(out, "hashes.json"), result.providers);

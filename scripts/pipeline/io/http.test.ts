@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   BOT_UA,
   fetchJson,
@@ -35,6 +35,9 @@ function fakeFetch(routes: Record<string, () => Response>) {
   }) as typeof fetch;
   return { impl, log };
 }
+
+// Mechanik von Weiterleitung und Zeichensatz ohne robots.txt; die Tests zu `neu` schalten selbst um (Plan 0048, N1)
+beforeEach(() => setAbruf("alt"));
 
 const redirect = (status: number, location: string) => () => new Response(null, { status, headers: { location } });
 const ok = (text: string) => () => new Response(text, { status: 200, headers: { "content-type": "text/html" } });
@@ -169,6 +172,7 @@ describe("Abruf neu: User-Agent und robots.txt (Plan 0048, E8)", () => {
   const robots = (txt: string) => () => new Response(txt, { status: 200, headers: { "content-type": "text/plain" } });
 
   it("alt: Browser-UA, keine robots.txt", async () => {
+    setAbruf("alt");
     const f = fakeFetch({ "https://a.example.net/kurse": ok("Kurse") });
     await fetchPage("https://a.example.net/kurse", { fetchImpl: f.impl });
     expect(f.log.map((l) => l.url)).toEqual(["https://a.example.net/kurse"]);

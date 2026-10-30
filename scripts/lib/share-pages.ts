@@ -371,6 +371,7 @@ export function imprintPage(): string {
 <div class="text">
 <p><strong>Anbieter.</strong> Der Zwergenplan führt eine Liste von Anbietern aus der Region, etwa Familienzentren, Bibliotheken, Museen und Vereine. Einmal pro Woche sucht eine KI im Internet nach weiteren. Ein neuer Anbieter kommt nur dazu, wenn auf seiner Website mindestens ein Angebot für Kinder unter 3 Jahren steht.</p>
 <p><strong>Angebote.</strong> Jede Nacht ruft ein Programm die Veranstaltungs- und Kursseiten dieser Anbieter ab. Eine KI (Claude von Anthropic) liest daraus Termine, Ort, Alter, Kosten und Anmeldung aus und schreibt die kurzen Beschreibungen. Programme prüfen das Ergebnis auf Form und Plausibilität, ein Mensch liest es nicht gegen.</p>
+<p><strong>Abruf.</strong> Das Programm meldet sich bei den Websites als „zwergenplan“ mit einem Link auf diese Seite, beachtet deren robots.txt und ruft die Veranstaltungsseiten einmal pro Nacht ab. Wer nicht abgerufen werden möchte, sperrt „zwergenplan“ in der robots.txt oder schreibt an die Adresse oben.</p>
 <p><strong>Wegzeiten</strong> rechnet der Zwergenplan selbst, aus dem Fahrplan des VGN oder aus der Luftlinie. Sie sind Richtwerte.</p>
 </div>
 <h2>Hinweise</h2>

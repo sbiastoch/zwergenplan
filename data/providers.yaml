@@ -932,6 +932,7 @@
     - url: https://kinder-salzundpfeffer.reservix.de/events
       kind: html
       use: termine
+      blocked: { reason: "robots.txt sperrt die Seite für zwergenplan (Plan 0048, N1; Messung 2026-10-30)", since: 2026-10-30 }
       hint: Alter als 'N Jahre ± 2' (z. B. Heidi '5 Jahre ± 2' = ab ca. 3)
     - url: https://salzundpfeffer-theater.de/
       kind: html
@@ -941,6 +942,9 @@
     how: Reservix-Liste zeigt 'Tickets' (buchbar) oder 'Buchungen über das Theater'; ausverkauft/Restplätze erst in der Reservix-Eventseite
     system: Reservix
   verified: 2026-10-04
+  skipCrawl:
+    reason: robots.txt sperrt den Reservix-Spielplan, die eigene Website nennt keine Termine (Plan 0048, N1)
+    since: 2026-10-30
   notes:
     - Kein Angebot unter 3 Jahren. Aufgenommen, weil die jüngste Stufe (5 ± 2) Dreijährige einschließt. Familienvorstellungen Sa/So 15 Uhr, ab 9 €.
     - "[kinder-salzundpfeffer.reservix.de/events] Reservix-Shop Kinderprogramm = faktischer Spielplan; Alter als 'N Jahre ± 2' (z. B. Heidi '5 Jahre ± 2' = ab ca. 3). Gruppenvorstellungen (vormittags) sind nur telefonisch buchbar."
@@ -2162,6 +2166,7 @@
       kind: html
       render: browser
       use: termine
+      blocked: { reason: "robots.txt sperrt die Seite für zwergenplan (Plan 0048, N1; Messung 2026-10-30)", since: 2026-10-30 }
     - url: https://mutherstudio.com/mamababyyoga
       kind: html
       use: termine
@@ -2767,6 +2772,7 @@
       kind: html
       render: browser
       use: termine
+      blocked: { reason: "robots.txt sperrt die Seite für zwergenplan (Plan 0048, N1; Messung 2026-10-30)", since: 2026-10-30 }
   availability:
     shown: teilweise
     how: Turnseite schreibt pro Gruppe 'Kurs komplett ausgebucht!' bzw. 'Anmeldung per Mail'
@@ -3131,16 +3137,21 @@
     - url: https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1115067&min_date={von}&max_date={bis}&page_size=200
       kind: json-api
       use: termine
+      blocked: { reason: "robots.txt sperrt die Seite für zwergenplan (Plan 0048, N1; Messung 2026-10-30)", since: 2026-10-30 }
       hint: "„Reformer Mums & Babies“: Pilates mit Baby (ca. 6 Wochen–6 Monate), Englisch, ärztliche Freigabe nötig. Termine aus date_start als dates, full=true = ausgebucht, url https://imiluv.de/schedule"
     - url: https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1125443&min_date={von}&max_date={bis}&page_size=200
       kind: json-api
       use: termine
+      blocked: { reason: "robots.txt sperrt die Seite für zwergenplan (Plan 0048, N1; Messung 2026-10-30)", since: 2026-10-30 }
       hint: "„Barre Baby Luv“: Barre mit Baby (ca. 6–12 Monate) in der Trage, Deutsch/Englisch, ärztliche Freigabe nötig. Termine aus date_start als dates, full=true = ausgebucht, url https://imiluv.de/schedule"
   availability:
     shown: teilweise
     how: Buchung nur in der IMILUV-App (bsport); die Termin-API zeigt nur, ob ein Termin ausgebucht ist (full)
     system: bsport
   verified: 2026-10-18
+  skipCrawl:
+    reason: robots.txt sperrt die bsport-API; Termine nur noch als Kandidaten aus frankenkids (Plan 0048, N1)
+    since: 2026-10-30
   notes:
     - Aus frankenkids aufgenommen. Barre und Reformer Pilates für Mamas mit Babys (6 Wochen–12 Monate), 14-täglich laut frankenkids, Anmeldung über die IMILUV-App. Ärztliche Freigabe nach der Geburt erforderlich.
     - "2026-10-18: coveredBy frankenkids-eventkalender entfernt. Seit 11.10. scheiterte jeder Nachtlauf am Build-Probelauf (der entfernt coveredBy und verlangt dann eine Terminseite). Der Stundenplan imiluv.de/schedule ist ein bsport-Widget (Firma 2795); die öffentliche bsport-API liefert je Kurs (activity) alle Termine, wöchentlich statt 14-täglich wie bei frankenkids. Ändert das Studio die activity-ID, die API ohne activity abrufen und nach activity_name suchen."

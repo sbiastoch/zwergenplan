@@ -12,12 +12,12 @@ export const UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, li
 export const BOT_UA = "Mozilla/5.0 (compatible; zwergenplan/1.0; +https://zwergenplan.app/impressum/)";
 
 /**
- * Abruf (Plan 0048, E8): `alt` wie bisher mit Browser-UA ohne robots.txt; `neu` mit `BOT_UA` und robots.txt vor jedem
- * Sprung. Vorübergehender Schalter für die Messung in S3 (`--abruf`); nach N1 bleibt `neu`, und der Schalter
- * entfällt. Zustand des Prozesses, also eines Laufs, wie der Cache der robots.txt.
+ * Abruf (Plan 0048, E8): `neu` (Standard seit N1, 2026-10-30) mit `BOT_UA` und robots.txt vor jedem Sprung; `alt` mit
+ * Browser-UA ohne robots.txt nur noch als Rückfall für eine Woche (`--abruf alt`), dann entfällt der Schalter (S5).
+ * Zustand des Prozesses, also eines Laufs, wie der Cache der robots.txt.
  */
 export type Abruf = "alt" | "neu";
-let abruf: Abruf = "alt";
+let abruf: Abruf = "neu";
 let robots: RobotsCache = robotsCache();
 export function setAbruf(a: Abruf): void {
   abruf = a;

@@ -44,10 +44,10 @@ on:
         description: "Umstellung auf V2 erzwingen, nach Prüfung (Plan 0048, E7; Komma-Liste)"
         default: ""
       abruf:
-        description: "Abruf (Plan 0048, E8): alt | neu (User-Agent zwergenplan, robots.txt) | beide (nur messen)"
+        description: "Abruf (Plan 0048, E8): neu (User-Agent zwergenplan, robots.txt; Standard) | alt (Rückfall) | beide (nur messen)"
         type: choice
-        options: [alt, neu, beide]
-        default: alt
+        options: [neu, alt, beide]
+        default: neu
 
 permissions:
   contents: read
@@ -126,23 +126,23 @@ jobs:
       - name: Abruf
         env:
           OUT: runs/${{ steps.datum.outputs.datum }}/fetch
-          ABRUF: ${{ inputs.abruf || 'alt' }}
+          ABRUF: ${{ inputs.abruf || 'neu' }}
         run: pnpm pipeline fetch --out "$OUT" --compare .cache/nightly-prev/hashes.json --abruf "$ABRUF"
       - name: Bericht
         if: always()
         env:
           OUT: runs/${{ steps.datum.outputs.datum }}/fetch
         run: cat "$OUT/report.md" >> "$GITHUB_STEP_SUMMARY" || echo "kein Bericht" >> "$GITHUB_STEP_SUMMARY"
-      # mit abruf neu wäre die Vornacht ein anderer Abruf; die nächste Nacht (alt) meldete Scheinänderungen (S3, m8)
+      # mit abruf alt wäre die Vornacht ein anderer Abruf; die nächste Nacht (neu) meldete Scheinänderungen (S3, m8)
       - name: Hashes für die nächste Nacht
-        if: inputs.abruf != 'neu'
+        if: inputs.abruf != 'alt'
         env:
           OUT: runs/${{ steps.datum.outputs.datum }}/fetch
         run: |
           mkdir -p .cache/nightly-prev
           cp "$OUT/hashes.json" .cache/nightly-prev/hashes.json
       - uses: actions/cache/save@v4
-        if: inputs.abruf != 'neu'
+        if: inputs.abruf != 'alt'
         with:
           path: .cache/nightly-prev
           key: nightly-hashes-${{ github.run_id }}
@@ -198,7 +198,7 @@ jobs:
           ONLY: ${{ inputs.only }}
           UMSTELLEN: ${{ inputs.umstellen }}
           TIMEOUT: ${{ inputs.timeout || '90' }}
-          ABRUF: ${{ inputs.abruf || 'alt' }}
+          ABRUF: ${{ inputs.abruf || 'neu' }}
         run: |
           [[ "$ONLY" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::only enthält unerlaubte Zeichen"; exit 1; }
           [[ "$UMSTELLEN" =~ ^[a-z0-9,-]*$ ]] || { echo "::error::umstellen enthält unerlaubte Zeichen"; exit 1; }

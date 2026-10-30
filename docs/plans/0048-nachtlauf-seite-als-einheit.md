@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel live seit `dde68a2`; Nachtrag 5 Token-Bremse je Modell; S3 Abruf live seit `b8bcd4a` mit Schalter `alt`, Messung im Runner fertig, N1 offen)
+Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel live seit `dde68a2`; Nachtrag 5 Token-Bremse je Modell; S3 Abruf live seit `b8bcd4a`, N1 entschieden: Standard `neu`)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -473,7 +473,7 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected` (Daten und Schem
 
 ## Nutzerentscheide (offen)
 
-- **N1 – Seiten, die robots.txt sperrt oder die den neuen User-Agent abweisen** (nach der Messung in S3). Empfehlung: robots.txt achten. Eine gesperrte Seite bekommt `blocked` mit Grund, und der Anbieter wird über den Seitenfinder (Plan 0049) oder von Hand anders erschlossen. Alternative: eine Ausnahme je Seite im Katalog mit Begründung. Zu entscheiden nur, wenn die Messung Seiten findet.
+- **N1 – Seiten, die robots.txt sperrt oder die den neuen User-Agent abweisen** (nach der Messung in S3). **Entschieden 2026-10-30: robots.txt achten** (umgesetzt, siehe „S3 – Umsetzung“). Empfehlung war: robots.txt achten. Eine gesperrte Seite bekommt `blocked` mit Grund, und der Anbieter wird über den Seitenfinder (Plan 0049) oder von Hand anders erschlossen. Alternative: eine Ausnahme je Seite im Katalog mit Begründung. Zu entscheiden nur, wenn die Messung Seiten findet.
 - **N2 – Entfernte Seite nach 14 Tagen** (ADR 0033, Punkt 3). Empfehlung: ja, wie im ADR. Alternative: Bestand bleibt unbegrenzt wie heute, und nur der Wächter meldet. **Umgesetzt wie im ADR** (angenommen vom Nutzer am 2026-10-26); wirksam frühestens 14 Tage nach der Umstellung, S2 (Wächter) soll vorher live sein. Widerspricht der Nutzer, wird `REMOVED_AFTER_DAYS` (`scripts/pipeline/lib/refresh.ts`) zum Schalter.
 - **N3 – `sternenhaus-kuf` mit Opus: entschieden am 2026-10-26** (Nutzer: Empfehlung angenommen). Haiku hatte 54 `einmalig`-Events (97 Angebote) mit dem Katalogalter 24–36 Monate übernommen; die Kalender-API nennt kein Alter. Das Familienprogramm 2026 (`nuernberg.de/…/2026_sternenhaus_familienprogramm.pdf`) weist je Stück ein Alter aus: nur „WiWaWaldtraum“ (Purzeltraumtheater) und „Schneeflocken, wippediwapp“ (Lucia Ruf) sind 2+, alle übrigen 3+ bis 8+ (auch „Baby Dronte“, laut Theater Mummpitz 4+). Umgesetzt im Katalog: `hint` der API-Seite nennt genau diese zwei Stücke, `verified` 2026-10-26, Notiz zur jährlichen Pflege. Trockenlauf mit Haiku (zweiter Versuch Sonnet) und mit Opus: je genau diese zwei Stücke; der Einbruchschutz hält das eine Nacht als `pending` und übernimmt es in der zweiten. ~~Damit braucht die Umstellung für diesen Anbieter kein `--umstellen`.~~ Berichtigt in der S1-Abnahme: E7 übernimmt einen Einbruch nie von selbst (anders als `pending` im alten Format), die Umstellung läuft deshalb mit `umstellen=sternenhaus-kuf`.
 
@@ -580,7 +580,12 @@ Wegwerf-Skripte unter `runs/s0-0048/` (gitignored): `s0.ts` (Abruf, Einheiten na
   - **Von robots.txt gesperrt (5 Seiten, 4 Anbieter):** `theater-salz-pfeffer` (`kinder-salzundpfeffer.reservix.de/events`), `mutherstudio` (`canva.com/design/…`), `tsv-1846-nuernberg` (`tsv1846nuernberg.kurabu.com/de/events/club`), `imiluv-studio` (zwei Seiten der API `api.production.bsport.io/book/v1/offer/`).
   - **Nur neu gescheitert (3 Seiten, 1 Anbieter):** `studio-herzschlag`, drei Seiten auf `mamalea-familienbegleitung.de`: „robots.txt nicht erreichbar (fetch failed)“. Der Netzfehler trifft nur den Abruf der robots.txt; ob vorübergehend, zeigt eine zweite Messung oder der erste Lauf mit `neu` (Wächter).
   - Lokal (S0 von Plan 0049) sperrte robots.txt zusätzlich Seiten, die der Katalog nicht nennt (Buchung der Schwimmschule Ohana, Detailseiten von `zoff-harmonie.de` und `st-martin-nuernberg.de`).
-- **Offen:** N1 (Nutzer), danach Standard `neu`, `blocked` für die gesperrten Seiten, Impressum, `/browser-review`; Schalter und `UA` entfallen.
+- **N1 entschieden (Nutzer, 2026-10-30): robots.txt achten.** Umgesetzt:
+  - Standard `neu` in `io/http.ts`, `cli.ts` und `nightly.yml` (Eingabe `abruf`, Zeitplan `neu`); bei `beide` gelten die Hashes des neuen Abrufs, mit `alt` werden keine Vornacht-Hashes gespeichert.
+  - `blocked` mit Grund und Datum für die fünf gesperrten Seiten. `theater-salz-pfeffer` (nur der Reservix-Spielplan, die eigene Website nennt keine Termine) und `imiluv-studio` (nur die bsport-API; Kandidaten aus frankenkids bleiben) bekommen `skipCrawl` mit Grund, weil keine Terminseite übrig bleibt (`data:validate`). Den Spielplan von Salz+Pfeffer soll der Seitenfinder (Plan 0049) später auf der eigenen Website suchen.
+  - `mamalea-familienbegleitung.de` (studio-herzschlag): robots.txt antwortete am Morgen danach mit 200; der Ausfall bei der Messung war vorübergehend.
+  - Impressum: Absatz „Abruf“ (User-Agent `zwergenplan`, robots.txt, einmal pro Nacht, Widerspruch per robots.txt oder Mail), Test in `share-pages.test.ts`, `/browser-review`.
+  - **Abweichung:** Der Schalter `--abruf alt` bleibt eine Woche als Rückfall; er und `UA` entfallen mit S5.
 
 ### Restpunkte (kommen bei S5 nach `docs/ideas.md`)
 

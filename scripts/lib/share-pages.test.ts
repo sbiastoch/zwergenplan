@@ -320,6 +320,9 @@ describe("Impressum und Datenschutz (Plan 0034, E1, E2, E7)", () => {
       "OpenFreeMap",
       "GitHub Pages",
       "Prüfsumme (Hash)",
+      // Abruf mit User-Agent und robots.txt (Plan 0048, E8, N1)
+      "meldet sich bei den Websites als „zwergenplan“",
+      "beachtet deren robots.txt",
       `href="${BASE}"`,
     ]) {
       expect(html).toContain(text);
