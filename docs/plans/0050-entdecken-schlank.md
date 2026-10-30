@@ -1,6 +1,6 @@
 # Plan 0050 – Entdecken: wenige gute Quellen, Seitenfinder, keine technischen Verluste
 
-Status: in Umsetzung (S0, S1, S2 live; Ausgangswert gemessen, Prüfung der Region nach Gemeinde vor S3)
+Status: in Umsetzung (S0, S1, S2 live; Ausgangswert gemessen; S2c Region nach Gemeinde vor S3)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`):
@@ -17,7 +17,7 @@ Bezug:
 
 ## Voraussetzungen
 
-- **Rebase von `plan-0039` (Review 4, M3):** `plan-0039` ändert dieselben Dateien wie S1. Beim Rebase gilt: `geocode.ts` aus S1, darauf `municipality` und Gemeinde-Prüfung aus `plan-0039`; ein Treffer aus dem Katalog übernimmt die Gemeinde des Katalog-Orts bzw. seiner Region und fällt nicht als „Gemeinde unbekannt“ durch; Einträge in `orte` und im Lauf-Cache ohne `municipality` werden für Regionen mit Gemeinde-Prüfung neu angefragt (Review 5, M6); der Cache-Name ist `geocode-v3.json` (`geocode-v2.json` von `plan-0039` entfällt); `discover.ts` aus S1, darauf `--netz` und die Gemeinde-Verwerfung; `discover.yml` aus S1 (ohne Wochen-Crons), der Samstags-Cron von `plan-0039` entfällt, `--netz` kommt in den `workflow_dispatch`-Aufruf.
+- **Rebase von `plan-0039` (Review 4, M3):** `plan-0039` ändert dieselben Dateien wie S1. Beim Rebase gilt: `geocode.ts` aus S1 und S2c (Gebiet je Region, `GeoResult.municipality`, `territoryStatus`; S2c ersetzt das optionale `Region.municipality` von `plan-0039` durch das Pflichtfeld `territory`, Düsseldorf bekommt `{ label: "Stadt Düsseldorf", municipalities: ["Düsseldorf"] }`, und eine unbekannte Gemeinde macht einen Klärfall statt einer Verwerfung); was `plan-0039` darüber hinaus zur Gemeinde bringt, entfällt; ein Treffer aus dem Katalog übernimmt die Gemeinde des Katalog-Orts bzw. seiner Region und fällt nicht als „Gemeinde unbekannt“ durch; Einträge in `orte` und im Lauf-Cache ohne `municipality` werden für Regionen mit Gemeinde-Prüfung neu angefragt (Review 5, M6); der Cache-Name ist `geocode-v3.json` (`geocode-v2.json` von `plan-0039` entfällt); `discover.ts` aus S1, darauf `--netz` und die Gemeinde-Verwerfung; `discover.yml` aus S1 (ohne Wochen-Crons), der Samstags-Cron von `plan-0039` entfällt, `--netz` kommt in den `workflow_dispatch`-Aufruf.
 
 - **Branch-Basis `main`.** `plan-0039` (Düsseldorf) geht erst nach Plan 0044 live (Plan 0042, N6), und vorher darf von dort nichts nach `main`. Deshalb:
   - Umgesetzt wird auf einem Branch von `main`; jeder Schritt kann für Nürnberg und Fürth live gehen.
@@ -170,7 +170,7 @@ Ein Lauf hat vier Phasen:
 
   Der User-Agent folgt Plan 0048, E8. Die Schnittstelle wird `geocode(address, { region, venueName? })`; die CLI `pipeline geocode` (`cli.ts`) zieht mit: `--region` mit Standard `nuernberg`, Skill (Abschnitt Katalogpflege, `references/catalog.md`) nennt `--region` und die 15 s Abstand.
 
-  **Gemeinde (Review 4, M3):** Auf `main` prüft das Entdecken wie heute nur die bbox; `GeoResult.municipality` und die Gemeinde-Prüfung gibt es erst auf `plan-0039`. S1 bringt `municipality` nicht auf `main`. Beim Rebase übernimmt `plan-0039` die neue `geocode.ts` aus S1 und setzt `municipality` (aus `addressdetails`, alle drei Stufen fragen mit `addressdetails=1`) und die Gemeinde-Prüfung darauf.
+  **Gemeinde (Review 4, M3; neu gefasst mit S2c, 2026-10-30):** S1 prüfte nur die bbox. Seit S2c prüft das Entdecken auf `main` auch das Gebiet je Region (`territory`, `GeoResult.municipality`). `plan-0039` übernimmt beim Rebase `geocode.ts` aus S1 und S2c und trägt für Düsseldorf nur noch das `territory` ein (siehe „Voraussetzungen“).
 - **Nominatim nach seiner Policy:**
   - **Bekannte Orte zuerst:** Stimmt die normalisierte Adresse mit einem Ort im Katalog **des Laufs** überein, gilt dessen Lage ohne Anfrage. Im Eval ist das der Katalog nach dem Ausblenden der Stichprobe (`hideProviders`); deren Orte gehen so durch den Geocoder, sonst mäße S2 den Kern von S1 nicht (Review 4, M1; Test).
   - **Rate:** höchstens 4 Anfragen pro Minute in jedem Lauf der Pipeline, ob geplant, Eval oder lokal (Policy: regelmäßig laufende Skripte), also mindestens 15 s Abstand. Die Policy zählt den Verkehr aller Läufe zusammen: Ein lokales Eval und ein Lauf in Actions laufen nie gleichzeitig (Skill, Abschnitt 1).
@@ -474,6 +474,123 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`, bei Daten mit `
 
 - **Zu Minor 6 (abgelehnt):** Die Spaltenzahl von `evals/results.md` gegen `resultsRow` testen hieße, `.md` aus Code zu lesen. Das verbietet `change-class.test.ts` („Doku liest niemand“, Stufe 0 bliebe sonst nicht sicher). Die Spalten stehen deshalb an beiden Stellen in derselben Reihenfolge, der Bericht liefert die Zeile fertig.
 
+### S2c – Region nach Gemeinde (Nachtrag 2026-10-30)
+
+**Anlass:** Ziel 3 verfehlt (vhs Erlangen für Nürnberg aufgenommen, S2 – Befunde). Zwei Ursachen:
+- Der Prompt nennt nur „Region: Nürnberg“, und `prompt/discover-search.md` zählt „direkt angrenzende Orte“ ausdrücklich mit.
+- Der Code prüft nur die bbox (`entryFromAssessment`, `io/geocode.ts`). Die bbox von Nürnberg ist `NUERNBERG_BBOX` und enthält Erlangen, Schwabach und den Landkreis Fürth.
+
+**Nutzerentscheid (2026-10-29):**
+- Nürnberg ist die Stadt Nürnberg.
+- Fürth ist die Stadt Fürth plus der Landkreis Fürth (Stein, Seukendorf und Cadolzburg zählen dazu).
+- Erlangen gehört zu keiner Region.
+- Der Katalog hält das heute schon ein: 112 Orte unter Nürnberg, alle in Nürnberg; 9 unter Fürth, davon 8 in Fürth und 1 in Cadolzburg (gezählt 2026-10-30).
+
+**Gemessen (Nominatim, `addressdetails`, 2026-10-30):** `county` ist uneinheitlich.
+
+| Ort | `city` | `town` | `village` | `county` |
+|---|---|---|---|---|
+| Nürnberg (auch Ortsteil Kraftshof) | Nürnberg | – | ggf. Ortsteil | fehlt |
+| Fürth | Fürth | – | – | Fürth |
+| Erlangen | Erlangen | – | – | Erlangen |
+| Wachendorf (Ortsteil von Cadolzburg) | – | Cadolzburg | Wachendorf | Landkreis Fürth |
+
+Die Gemeinde ist deshalb `city ?? town ?? municipality ?? village`. Die Reihenfolge weicht von ADR 0032 ab (`village` vor `municipality`), weil `village` auch einen Ortsteil nennen kann. Den Landkreis liefert nur `county`.
+
+**Änderung:**
+
+1. **Gebiet je Region.** `src/domain/regions.ts`, Pflichtfeld `territory` an jeder Region:
+   - Felder `{ label, municipalities, counties? }`.
+   - Nürnberg: `{ label: "Stadt Nürnberg", municipalities: ["Nürnberg"] }`.
+     Nürnberg hängt allein an `city`; Nominatim liefert dort kein `county`, also nie `counties: ["Nürnberg"]` ergänzen.
+   - Fürth: `{ label: "Stadt Fürth und angrenzender Landkreis Fürth (Zirndorf, Oberasbach, Stein, Cadolzburg, Veitsbronn, Seukendorf)", municipalities: ["Fürth"], counties: ["Landkreis Fürth"] }`.
+     - Das Label nennt nur den Teil des Landkreises in `FUERTH_BBOX` (minLon 10,85, minLat 49,40). Langenzenn, Wilhermsdorf, Großhabersdorf, Puschendorf und Roßtal liegen außerhalb und fallen weiter weg. Grund dafür ist „kein Ort in der Region“.
+     - Eine größere bbox ändert ADR 0029, Punkt 1, und kommt nur bei Bedarf (`docs/ideas.md`).
+   - Dazu die reine Funktion `territoryStatus(territory, { municipality?, county? })` mit dem Ergebnis `"drin" | "draussen" | "unbekannt"`.
+     - Zuerst der Kreis: Steht `county` in `counties`, gilt `drin`. Das gilt auch ohne Gemeinde, zum Beispiel für einen Ort ohne `village`.
+     - Danach die Gemeinde: Steht sie in `municipalities`, gilt `drin`.
+     - Ist eine Gemeinde oder ein Kreis bekannt, gilt sonst `draussen`.
+     - Ohne beides gilt `unbekannt`.
+   - Das verallgemeinert `municipality` aus ADR 0032, Punkt 2. Für Plan 0039 wird daraus `territory: { label: "Stadt Düsseldorf", municipalities: ["Düsseldorf"] }`.
+   - Nachträge kommen in ADR 0032, Punkt 2, und ADR 0029, Punkt 1. Für Nürnberg und Fürth gilt nicht mehr „Stadt plus Nachbarorte“, sondern das Gebiet.
+   - Kopf und `FUERTH_BBOX`-Kommentar in `regions.ts` ziehen mit.
+   - Die bbox bleibt als zweite Bedingung, und das Schema prüft weiter nur sie.
+2. **Geocoder** (`io/geocode.ts`):
+   - **Felder:** `GeoResult` bekommt `municipality?: string | null` und `county?: string`, beide aus `addressdetails`.
+     - `municipality` ist `city ?? town ?? municipality ?? village`; `null` heißt, Nominatim liefert keine Gemeinde.
+     - Dazu kommt `catalogRegion?: RegionId` für Treffer aus dem Katalog.
+   - **Gespeichertes `Ort`** (`lib/discover-state.ts`, deutsche Datenfelder wie `adresse`): Es bekommt optional `gemeinde: string | null` und `landkreis: string`.
+   - **Veraltete Einträge:** Ein Eintrag in `orte` oder im Lauf-Cache ohne das Feld `gemeinde` gilt als veraltet und wird neu angefragt.
+     - So steht es schon in der Rebase-Regel (Review 5, M6), jetzt für alle Regionen.
+     - Der Cache-Name bleibt `geocode-v3.json`; `data/discover/*.json` hat heute keine `orte`.
+   - **Stufen:** Jede Stufe sucht zuerst einen Treffer in der bbox **und im Gebiet**, und mit dem ersten solchen endet die Kette.
+     - Findet eine Stufe nur Treffer in der bbox außerhalb des Gebiets, merkt sie sich den ersten, und die nächste Stufe läuft weiter wie nach einem Fehlschlag.
+     - Findet keine Stufe einen Treffer im Gebiet, gilt der gemerkte. Beim Aufnehmen ist er `draussen`.
+     - So wählt eine mehrdeutige Adresse die Nürnberger Variante, wenn Stufe 2 oder 3 sie findet. Das kostet höchstens die Anfragen, die ein Fehlschlag heute auch kostet.
+     - `unbekannt` zählt wie „im Gebiet“ und beendet die Kette.
+   - **Katalog-Orte:** `knownPlaces` liefert je normalisierter Adresse die Orte aller Regionen mit `catalogRegion`.
+     - Bei gleicher Adresse in zwei Regionen gilt die Region der Anfrage, sonst der erste Eintrag.
+     - Ein Katalog-Treffer gilt nur für `catalogRegion === region` als `drin`, sonst als `draussen`, ohne Gemeinde-Prüfung.
+   - **Koordinaten als Eingabe** ergeben `municipality: null`, also `unbekannt`. Bisher galten sie als drin.
+   - **`pipeline geocode`** gibt Gemeinde und Kreis mit aus.
+3. **Aufnehmen** (`entryFromAssessment`):
+   - `ctx.geos` hat den Typ `ReadonlyArray<GeoResult | null>`, ein Typ statt der heutigen Inline-Form. Die Regel steht in einer Funktion `venueStatus(geo, region)` in `lib/discover.ts`.
+     - `drin` gilt, wenn der Ort in der bbox liegt und das Gebiet passt; maßgeblich ist der Katalog-Treffer oder `territoryStatus`.
+     - Außerhalb der bbox gilt `draussen`.
+     - Sonst gilt der Status des Gebiets.
+   - **`draussen`:** Der Ort fällt wie bisher mit Hinweis weg. Der Hinweis nennt die Gemeinde („Ort außerhalb der Region weggelassen: Bad Roth, Badstraße 1, 91154 Roth (Roth)“).
+   - **`unbekannt`:** Der Ort fällt mit eigenem Hinweis weg („Ort mit unbekannter Gemeinde weggelassen: …“). Er zählt wie „kein Treffer“: Bleibt kein Ort drin, wird der Kandidat ein Klärfall und nicht still verworfen, denn es ist eine Datenlücke.
+     - Das weicht von ADR 0032, Punkt 2 („Gemeinde unbekannt“ verwirft), ab und steht im Nachtrag.
+   - **Kein Ort drin, alle `draussen`:** verworfen. Das trifft die vhs Erlangen: kein Ort in der Region, verworfen, kein Klärfall.
+   - Ein Kandidat mit Fürther Orten, der unter Nürnberg gefunden wurde, wird dort jetzt verworfen. Die Fürther Suche läuft zuerst (`REGION_IDS`) und findet ihn in der Regel selbst.
+     - In den Läufen 1 und 2 kamen sofa-stein und swimmerfirst über die Region Fürth.
+     - Die Zuordnung zur anderen Region kommt nach `docs/ideas.md`.
+4. **Prompt:**
+   - `searchMessage(term, region: RegionId)` und `assessMessage(…, region: RegionId, …)` bekommen die Region-ID statt des Namens. `deps.search(term, region, signal)` in `io/discover.ts` und seine Test-Fakes ziehen mit.
+   - Die Nachrichten schreiben `Region: Nürnberg (Gebiet: Stadt Nürnberg)`, und die Suchanfrage nutzt weiter den Namen.
+   - `prompt/discover-search.md` ersetzt „(Stadt und direkt angrenzende Orte)“ durch „(das genannte Gebiet; Nachbarorte außerhalb gehören nicht dazu)“.
+   - `prompt/discover-assess.md` sagt bei „an mindestens einem Ort in der Region“ dasselbe und nennt beim Verwerfen „außerhalb der Region (Gebiet)“.
+   - Prompt und Code prüfen damit beide; der Code bleibt das Gate.
+
+**Tests (test-first):**
+- `regions.test.ts`:
+  - `territoryStatus` liefert für Nürnberg „Nürnberg“ → drin und „Erlangen“ → draussen.
+  - Für Fürth liefert es „Fürth“ → drin, „Cadolzburg“ mit Landkreis Fürth → drin und „Nürnberg“ → draussen.
+  - Nur Landkreis Fürth ohne Gemeinde liefert drin; ohne Gemeinde und Kreis liefert es unbekannt.
+  - Jede Region hat ein nicht leeres `label` und nicht leere `municipalities`.
+- `lib/discover.test.ts`:
+  - Prüffall vhs-Erlangen: Ein Ort in Erlangen (in der bbox von Nürnberg, Gemeinde Erlangen) wird für Nürnberg verworfen mit „kein Ort in der Region“, ohne Klärfall.
+  - Ein Ort in Nürnberg bleibt, ein Ort in Erlangen neben einem in Nürnberg fällt mit Hinweis weg.
+  - Unbekannte Gemeinde: Der Ort fällt mit Hinweis weg; sind alle Orte unbekannt, wird es ein Klärfall.
+  - Koordinaten als Eingabe zählen als unbekannt.
+  - Ein Katalog-Ort derselben Region bleibt, einer anderen Region zählt als draußen.
+  - Die vorhandenen Fixtures bekommen `municipality: "Nürnberg"`.
+  - Die Nachrichten nennen das Gebiet.
+- `io/geocode.test.ts`:
+  - Aus `addressdetails` entstehen `municipality` und `county` (Wachendorf: Cadolzburg, Landkreis Fürth; Kraftshof: Nürnberg, nicht der Ortsteil).
+  - Liefert Stufe 1 nur einen Erlanger Treffer, fragt Stufe 2. Findet sie einen Nürnberger, gilt der.
+  - Findet keine Stufe einen im Gebiet, gilt der Erlanger.
+  - Ein Cache- oder `orte`-Eintrag ohne `gemeinde` wird neu angefragt, einer mit `gemeinde` nicht.
+  - `knownPlaces` mit gleicher Adresse in zwei Regionen liefert die Region der Anfrage.
+  - Die Prüffälle aus `geocode-faelle.json` bleiben grün.
+  - Ein echter Fürther Prüffall (Seukendorf, swimmerfirst, `region: fuerth`) kommt nach `geocode-faelle.json`. `pnpm pipeline geocode --faelle --aufzeichnen` nimmt alle Fälle neu auf, mit `addressdetails` aus der Live-Antwort. `checkFaelle` prüft optional `gemeinde` als erwartete Gemeinde.
+- `io/discover.test.ts`: Die Fakes des Geocoders und von `search` ziehen mit.
+
+**Prüfen:**
+- `pnpm verify`.
+- `pnpm e2e:local --affected`, weil `src/domain/regions.ts` sich ändert.
+- `/arch-review`, weil sich das Schema von `DiscoverState.orte` und die Domäne ändern.
+- Push auf den Branch und CI, dann Fast-Forward nach `main`.
+
+**Doku:**
+- `docs/architecture.md` (Entdecken: bbox und Gebiet).
+- Nachträge in ADR 0032, Punkt 2, und ADR 0029, Punkt 1.
+- Rebase-Notizen: Die Regel unter „Voraussetzungen“ und der Absatz „Gemeinde (Review 4, M3)“ in E5 werden neu gefasst. Plan 0039 bekommt eine Notiz: `municipality` → `territory`, Pflichtfeld.
+
+**Nicht hier:**
+- Die Gemeinde in `data/providers.yaml` prüft `pnpm data:validate` nicht; es geocodiert nicht, und den Katalog verantwortet die Katalogpflege.
+- Ein neuer Eval-Lauf misst den Effekt erst zusammen mit S3, es sei denn, der Nutzer will ihn früher.
+
 ## Nutzerentscheide
 
 Entschieden am 2026-10-29: **N1 ≥ 90 % gefunden, N2 ja, N3 ja** (jeweils die Empfehlung).
@@ -622,3 +739,28 @@ Unabhängiger Durchgang auf die Lösungen von Review 4. Kein Blocker. M1 (Katalo
 **Minor**, übernommen: Wartezeit in S1/S2 seriell, Jobs je Region nacheinander (7); `--region` für `pipeline geocode` samt Skill (8); `subject` und Schlüssel `klaerfall#<hash8>`, `cli.ts` in „Dateien“ (9); Lauf-Gründe erhöhen `anzahl` nicht (10); `--eval` immer für Nürnberg und Fürth, ersetzt `--hide` (11); Ziehungsskript in „Dateien“ (12); Sonntags-Cron in Architektur und Skill schon in S1 (13); ADR-Nachtrag vor S5 (14); `orte.adresse` aus `addressdetails` (15).
 
 Damit ist der Plan freigegeben.
+
+## Review 6 (2026-10-30, Nachtrag S2c) – Verdict: Freigabe mit Änderungen
+
+Kein Blocker. Übernommen sind alle Majors:
+- **M1, Ablauf der Stufen:** Liefert eine Stufe nur einen Treffer außerhalb des Gebiets, läuft die nächste Stufe. Der Treffer außerhalb gilt erst ganz am Ende. Dazu ein Test.
+- **M2, Schnittstelle:**
+  - `GeoResult.municipality`, `county` und `catalogRegion`.
+  - `ctx.geos: GeoResult | null`.
+  - `venueStatus` als Funktion.
+  - `knownPlaces` je Region.
+- **M3, alle Orte mit unbekannter Gemeinde:** ein Klärfall statt einer Verwerfung, mit Test. Das weicht von ADR 0032 ab und steht im Nachtrag.
+- **M4, Rebase-Regeln:** „Voraussetzungen“ und E5 sind neu gefasst, Plan 0039 hat eine Notiz. `GeoResult` hat englische Felder; das gespeicherte `Ort` behält deutsche Datenfelder wie `adresse`.
+- **M5:** Nachtrag auch in ADR 0029, Punkt 1; die Kommentare in `regions.ts` ziehen mit.
+- **M6, Label von Fürth:** Es nennt nur den Teil des Landkreises in der bbox. Der Westen des Landkreises bleibt bewusst draußen.
+- **M7:** Prüfen mit `pnpm verify`, `e2e:local --affected` und `/arch-review`.
+
+Übernommen sind auch die Minors:
+- Der Kreis wird vor der Gemeinde geprüft.
+- Ein echter Fürther Prüffall kommt dazu.
+- `searchMessage` und `assessMessage` bekommen die Region-ID.
+- Ein Test für Koordinaten als Eingabe.
+- Ein Satz zu Nürnberg ohne `county`.
+- Ein Test für ein nicht leeres `territory`.
+
+Den Minor „Kandidaten mit Fürther Orten unter Nürnberg“ habe ich geprüft: sofa-stein und swimmerfirst kamen in den Läufen 1 und 2 über die Region Fürth. Die Umhängung in die andere Region kommt nach `docs/ideas.md`.

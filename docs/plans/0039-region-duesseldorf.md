@@ -2,6 +2,7 @@
 
 Status: in Umsetzung
 Datum: 2026-10-18
+Rebase-Notiz (2026-10-30): Plan 0050, S2c, ersetzt das optionale `Region.municipality` durch das Pflichtfeld `territory` für alle Regionen. Für Düsseldorf gilt `{ label: "Stadt Düsseldorf", municipalities: ["Düsseldorf"] }`. Eine unbekannte Gemeinde macht dort einen Klärfall. Es gelten die Regeln unter „Voraussetzungen“ in Plan 0050.
 Bezug:
 - ADR 0025 (Katalog regionsfähig; Punkt 1 „Weitere Region-Felder (Ferienland, ÖPNV, Kamera) kommen mit der zweiten Region“), ADR 0029 (Fürth; Punkt 1 „jede Region-bbox liegt in `NUERNBERG_BBOX`“, Punkt 5 „Stadtwahl bleibt ungespeichert“)
 - ADR 0011 (Wegzeit-Tabelle aus VGN-GTFS; Punkt 4 Fahrplanauszug, Punkt 5 Lizenz, Punkt 6 Laden und Privatsphäre), ADR 0014 (Push, Punkt 4), ADR 0017 (Startpunkt gespeichert, Punkt 5), ADR 0008 (Kamera-Regel), ADR 0012 (Startbudget)
