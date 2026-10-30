@@ -517,7 +517,7 @@ Die Gemeinde ist deshalb `city ?? town ?? municipality ?? village`. Die Reihenfo
    - Die bbox bleibt als zweite Bedingung, und das Schema prüft weiter nur sie.
 2. **Geocoder** (`io/geocode.ts`):
    - **Felder:** `GeoResult` bekommt `municipality?: string | null` und `county?: string`, beide aus `addressdetails`.
-     - `municipality` ist `city ?? town ?? municipality ?? village`; `null` heißt, Nominatim liefert keine Gemeinde.
+     - `municipality` ist `city ?? town ?? municipality ?? village`. Ein `municipality` mit „(VGem)“ zählt nicht, denn das ist eine Verwaltungsgemeinschaft (gemessen bei Seukendorf: „Veitsbronn (VGem)“). `null` heißt, Nominatim liefert keine Gemeinde.
      - Dazu kommt `catalogRegion?: RegionId` für Treffer aus dem Katalog.
    - **Gespeichertes `Ort`** (`lib/discover-state.ts`, deutsche Datenfelder wie `adresse`): Es bekommt optional `gemeinde: string | null` und `landkreis: string`.
    - **Veraltete Einträge:** Ein Eintrag in `orte` oder im Lauf-Cache ohne das Feld `gemeinde` gilt als veraltet und wird neu angefragt.
@@ -573,7 +573,7 @@ Die Gemeinde ist deshalb `city ?? town ?? municipality ?? village`. Die Reihenfo
   - Ein Cache- oder `orte`-Eintrag ohne `gemeinde` wird neu angefragt, einer mit `gemeinde` nicht.
   - `knownPlaces` mit gleicher Adresse in zwei Regionen liefert die Region der Anfrage.
   - Die Prüffälle aus `geocode-faelle.json` bleiben grün.
-  - Ein echter Fürther Prüffall (Seukendorf, swimmerfirst, `region: fuerth`) kommt nach `geocode-faelle.json`. `pnpm pipeline geocode --faelle --aufzeichnen` nimmt alle Fälle neu auf, mit `addressdetails` aus der Live-Antwort. `checkFaelle` prüft optional `gemeinde` als erwartete Gemeinde.
+  - Ein echter Fürther Prüffall (Seukendorf, swimmerfirst, `region: fuerth`) kommt nach `geocode-faelle.json`. `pnpm pipeline geocode --faelle --aufzeichnen` nimmt alle Fälle neu auf, mit `addressdetails` aus der Live-Antwort. `checkFaelle` prüft optional `gebiet` (`drin`/`draussen`). Ein Gemeindename taugt dafür nicht: Für Seukendorf liefert Nominatim nur VGem und Ortsteil. Ein Test zeigt, dass ein falsches `gebiet` den Fall rot macht.
 - `io/discover.test.ts`: Die Fakes des Geocoders und von `search` ziehen mit.
 
 **Prüfen:**
@@ -586,6 +586,11 @@ Die Gemeinde ist deshalb `city ?? town ?? municipality ?? village`. Die Reihenfo
 - `docs/architecture.md` (Entdecken: bbox und Gebiet).
 - Nachträge in ADR 0032, Punkt 2, und ADR 0029, Punkt 1.
 - Rebase-Notizen: Die Regel unter „Voraussetzungen“ und der Absatz „Gemeinde (Review 4, M3)“ in E5 werden neu gefasst. Plan 0039 bekommt eine Notiz: `municipality` → `territory`, Pflichtfeld.
+
+**Umsetzung (2026-10-30):** Arch-Review ohne Blocker und ohne Major. Alle vier Minors sind nachgezogen: VGem-Regel in ADR und Kommentar, überholte Abhilfe in ADR 0029, `gebiet` in den Prüffällen samt Test, Kommentare in `regions.ts`.
+- Die Live-Aufnahme der Prüffälle zeigt die Stufenfolge: Für die vhs Erlangen fragte nach Stufe 1 auch Stufe 2.
+- Seukendorf ist nur über den Kreis drin (Nominatim: „Veitsbronn (VGem)“, Ortsteil Hiltmannsdorf).
+- Lokal grün: `pnpm verify`, `e2e:local --affected` (72 Tests).
 
 **Nicht hier:**
 - Die Gemeinde in `data/providers.yaml` prüft `pnpm data:validate` nicht; es geocodiert nicht, und den Katalog verantwortet die Katalogpflege.

@@ -85,7 +85,13 @@ describe("Stufen (Plan 0050, E5)", () => {
     expect(r).toEqual({
       kind: "treffer",
       stufe: 1,
-      geo: { lat: 49.45, lon: 11.07, display: "Musterstraße 3, 90402 Nürnberg", district: "Altstadt" },
+      geo: {
+        lat: 49.45,
+        lon: 11.07,
+        display: "Musterstraße 3, 90402 Nürnberg",
+        district: "Altstadt",
+        municipality: "Nürnberg",
+      },
     });
     expect(f.calls).toHaveLength(1);
     expect(f.calls[0]?.params.get("q")).toBe("Musterstraße 3, 90402 Nürnberg");
@@ -152,6 +158,72 @@ describe("Stufen (Plan 0050, E5)", () => {
     ]);
   });
 
+  it("Gemeinde und Kreis aus addressdetails: Gemeinde vor Ortsteil (Plan 0050, S2c)", async () => {
+    const wachendorf = { village: "Wachendorf", town: "Cadolzburg", county: "Landkreis Fürth", postcode: "90556" };
+    const kraftshof = { ...street("Kraftshofer Hauptstraße", "170"), village: "Kraftshof" };
+    const f = fake((p) => [
+      {
+        lat: "49.46",
+        lon: "10.88",
+        display_name: "x",
+        address: p.get("q")?.includes("Wachendorf") ? wachendorf : kraftshof,
+      },
+    ]);
+    const g = geocoder(f);
+    expect(await g.geocode("Wachendorf, 90556 Cadolzburg", { region: "fuerth" })).toMatchObject({
+      geo: { municipality: "Cadolzburg", county: "Landkreis Fürth" },
+    });
+    const vgem = { village: "Hiltmannsdorf", municipality: "Veitsbronn (VGem)", county: "Landkreis Fürth" };
+    const f2 = fake(() => [{ lat: "49.4875", lon: "10.8732", display_name: "x", address: vgem }]);
+    // die Verwaltungsgemeinschaft ist keine Gemeinde; drin ist der Ort über den Kreis
+    expect(await geocoder(f2).geocode("Langenzennerstr. 82, 90556 Seukendorf", { region: "fuerth" })).toMatchObject({
+      geo: { municipality: "Hiltmannsdorf", county: "Landkreis Fürth" },
+    });
+    const r = await g.geocode("Kraftshofer Hauptstraße 170, 90402 Nürnberg", q);
+    expect(r).toMatchObject({ geo: { municipality: "Nürnberg" } });
+    expect(r.kind === "treffer" && r.geo.county).toBeUndefined();
+    expect(Object.values(g.newOrte("fuerth"))[0]).toMatchObject({
+      gemeinde: "Cadolzburg",
+      landkreis: "Landkreis Fürth",
+    });
+  });
+
+  describe("Treffer im Gebiet vor Treffer nur in der bbox (Plan 0050, S2c)", () => {
+    const ERLANGEN = {
+      lat: "49.5960",
+      lon: "11.0040",
+      display_name: "Erlangen",
+      address: { road: "Musterstraße", house_number: "3", postcode: "91054", city: "Erlangen", county: "Erlangen" },
+    };
+
+    it("Stufe 1 nur Erlangen: Stufe 2 fragt weiter, ihr Nürnberger Treffer gilt", async () => {
+      const f = fake((p) =>
+        p.has("street") ? [{ ...IN, display_name: "x", address: street("Musterstraße", "3") }] : [ERLANGEN],
+      );
+      const r = await geocoder(f).geocode("Musterstraße 3, Nürnberg", q);
+      expect(r).toMatchObject({ kind: "treffer", stufe: 2, geo: { municipality: "Nürnberg" } });
+    });
+
+    it("im selben Ergebnis geht der Nürnberger dem früheren Erlanger vor", async () => {
+      const f = fake(() => [ERLANGEN, { ...IN, display_name: "x", address: street("Musterstraße", "3") }]);
+      expect(await geocoder(f).geocode("Musterstraße 3, Nürnberg", q)).toMatchObject({
+        stufe: 1,
+        geo: { municipality: "Nürnberg" },
+      });
+      expect(f.calls).toHaveLength(1);
+    });
+
+    it("keine Stufe findet einen im Gebiet: der erste Erlanger gilt (beim Aufnehmen draußen)", async () => {
+      const f = fake(() => [ERLANGEN]);
+      expect(await geocoder(f).geocode("Turnhalle, Musterstraße 3, Nürnberg", q)).toMatchObject({
+        kind: "treffer",
+        stufe: 1,
+        geo: { municipality: "Erlangen", county: "Erlangen" },
+      });
+      expect(f.calls.length).toBeGreaterThan(1);
+    });
+  });
+
   it("429 ist ein Ausfall, kein „kein Treffer“, und wird nicht gespeichert", async () => {
     const f = fake(() => 429);
     const g = geocoder(f);
@@ -178,6 +250,23 @@ describe("Prüffälle gegen die Aufzeichnungen (Plan 0050, S1)", () => {
   });
 });
 
+describe("checkFaelle prüft das Gebiet (Plan 0050, S2c)", () => {
+  it("ein Erlanger Treffer mit erwartet gebiet „drin“ für Nürnberg ist rot", async () => {
+    const hit = {
+      lat: "49.5957",
+      lon: "11.0076",
+      display_name: "x",
+      address: { city: "Erlangen", county: "Erlangen" },
+    };
+    const fall = { anbieter: "a", eingabe: "Friedrichstraße 19, 91054 Erlangen", region: "nuernberg" as const };
+    const erwartet = { lat: 49.5957, lon: 11.0076 };
+    const run = (gebiet: "drin" | "draussen") =>
+      checkFaelle({ toleranzM: 300, faelle: [{ ...fall, erwartet, gebiet }] }, geocoder(fake(() => [hit])));
+    expect((await run("drin"))[0]?.ok).toBe(false);
+    expect((await run("draussen"))[0]?.ok).toBe(true);
+  });
+});
+
 describe("Policy: Rate und Caches", () => {
   it(`höchstens 4 Anfragen pro Minute (Abstand ≥ ${MIN_GAP_MS} ms), Wartezeit im Zähler`, async () => {
     const f = fake(() => []);
@@ -191,10 +280,37 @@ describe("Policy: Rate und Caches", () => {
 
   it("Adresse eines Katalog-Orts: keine Anfrage", async () => {
     const f = fake(() => []);
-    const known = new Map([["Musterstraße 3, 90402 Nürnberg", { lat: 49.4, lon: 11.1, display: "Katalog" }]]);
+    const known = new Map([
+      [
+        "Musterstraße 3, 90402 Nürnberg",
+        [{ lat: 49.4, lon: 11.1, display: "Katalog", catalogRegion: "nuernberg" as const }],
+      ],
+    ]);
     const r = await geocoder(f, { known }).geocode("Haus X, Musterstr. 3, 90402 Nürnberg", q);
-    expect(r).toMatchObject({ kind: "treffer", geo: { display: "Katalog" } });
+    expect(r).toMatchObject({ kind: "treffer", geo: { display: "Katalog", catalogRegion: "nuernberg" } });
     expect(f.calls).toHaveLength(0);
+  });
+
+  it("gleiche Katalog-Adresse in zwei Regionen: die Region der Anfrage gilt (Plan 0050, S2c)", async () => {
+    const at = (catalogRegion: "fuerth" | "nuernberg") => ({ lat: 49.4, lon: 11.1, display: "K", catalogRegion });
+    const known = new Map([["Musterstraße 3, 90402 Nürnberg", [at("fuerth"), at("nuernberg")]]]);
+    const g = geocoder(
+      fake(() => []),
+      { known },
+    );
+    expect(await g.geocode("Musterstraße 3, 90402 Nürnberg", q)).toMatchObject({
+      geo: { catalogRegion: "nuernberg" },
+    });
+    expect(await g.geocode("Musterstraße 3, 90402 Nürnberg", { region: "fuerth" })).toMatchObject({
+      geo: { catalogRegion: "fuerth" },
+    });
+  });
+
+  it("Koordinaten als Eingabe: Gemeinde unbekannt (null)", async () => {
+    expect(await geocoder(fake(() => [])).geocode("49.45, 11.07", q)).toMatchObject({
+      stufe: 0,
+      geo: { municipality: null },
+    });
   });
 
   it("Treffer landen in newOrte und im Lauf-Cache; ein zweiter Geocoder fragt nicht neu", async () => {
@@ -217,6 +333,7 @@ describe("Policy: Rate und Caches", () => {
       lon: 11.07,
       adresse: "Musterstraße 3, 90402 Nürnberg",
       stufe: 2,
+      gemeinde: "Nürnberg",
       datum: "2026-01-01",
     };
     const f = fake(() => [{ ...IN, display_name: "x", address: street("Musterstraße", "3") }]);
@@ -228,6 +345,19 @@ describe("Policy: Rate und Caches", () => {
     });
     await old.geocode("Musterstraße 3, 90402 Nürnberg", q);
     expect(f.calls).toHaveLength(1);
+  });
+
+  it("orte und Lauf-Cache ohne gemeinde gelten als veraltet und werden neu gefragt (Plan 0050, S2c)", async () => {
+    const key = "Musterstraße 3, 90402 Nürnberg";
+    const ort: Ort = { lat: 49.45, lon: 11.07, adresse: key, stufe: 1, datum: "2026-10-01" };
+    const f = fake(() => [{ ...IN, display_name: "x", address: street("Musterstraße", "3") }]);
+    await geocoder(f, { orte: { nuernberg: { [key]: ort } } }).geocode(key, q);
+    expect(f.calls).toHaveLength(1);
+    const cacheDir = tempDir();
+    writeFileSync(join(cacheDir, "geocode-v3.json"), JSON.stringify({ nuernberg: { [key]: { treffer: ort } } }));
+    const r = await geocoder(f, { cacheDir }).geocode(key, q);
+    expect(f.calls).toHaveLength(2);
+    expect(r).toMatchObject({ geo: { municipality: "Nürnberg" } });
   });
 
   it("„kein Treffer“ im Lauf nur einmal gefragt, über Läufe 30 Tage im Lauf-Cache, nie in orte", async () => {

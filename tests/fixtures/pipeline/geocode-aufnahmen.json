@@ -2,7 +2,7 @@
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Turnhalle Volksschule Fürreuthweg, Nürnberg-Eibach": [],
   "addressdetails=1&bounded=1&city=Nürnberg&countrycodes=de&format=jsonv2&limit=5&street=Fürreuthweg&viewbox=10.85,49.65,11.3,49.3": [
     {
-      "place_id": 125211792,
+      "place_id": 127319388,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "way",
       "osm_id": 23440510,
@@ -32,7 +32,7 @@
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Hallenbad Ebensee, Nürnberg": [],
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Theodor-Billroth-Schule, Nürnberg": [
     {
-      "place_id": 126602178,
+      "place_id": 126799198,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "way",
       "osm_id": 363006962,
@@ -64,7 +64,7 @@
   ],
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Sportzentrum Nordost, Nürnberg": [
     {
-      "place_id": 126932806,
+      "place_id": 126338727,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "way",
       "osm_id": 846905584,
@@ -93,7 +93,7 @@
       "boundingbox": ["49.4831855", "49.4837780", "11.1242182", "11.1251459"]
     },
     {
-      "place_id": 127431477,
+      "place_id": 126635788,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "way",
       "osm_id": 233674981,
@@ -124,7 +124,7 @@
   ],
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Ritterbad, Nürnberg": [
     {
-      "place_id": 126169824,
+      "place_id": 126597614,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "node",
       "osm_id": 2158310564,
@@ -156,7 +156,7 @@
   ],
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Ingolstädter Straße 255, 90461 Nürnberg": [
     {
-      "place_id": 126975306,
+      "place_id": 126797599,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "node",
       "osm_id": 7727215495,
@@ -186,7 +186,7 @@
   ],
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Rosenaustraße 7, 90429 Nürnberg": [
     {
-      "place_id": 128169404,
+      "place_id": 126771782,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "node",
       "osm_id": 2299243205,
@@ -246,7 +246,7 @@
   ],
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Siemensplatz 2, Nürnberg": [
     {
-      "place_id": 126813441,
+      "place_id": 127042213,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "way",
       "osm_id": 31910297,
@@ -274,7 +274,7 @@
       "boundingbox": ["49.4400059", "49.4403042", "11.0754358", "11.0761355"]
     },
     {
-      "place_id": 126722036,
+      "place_id": 126822330,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "node",
       "osm_id": 3226276384,
@@ -303,7 +303,7 @@
   ],
   "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Reutersbrunnenstraße 12, 90429 Nürnberg": [
     {
-      "place_id": 127184634,
+      "place_id": 126169437,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "way",
       "osm_id": 1134519282,
@@ -331,7 +331,7 @@
       "boundingbox": ["49.4529080", "49.4536879", "11.0569388", "11.0593352"]
     },
     {
-      "place_id": 127010472,
+      "place_id": 126177281,
       "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
       "osm_type": "way",
       "osm_id": 34576728,
@@ -356,6 +356,98 @@
         "country_code": "de"
       },
       "boundingbox": ["49.4529345", "49.4535183", "11.0577291", "11.0592598"]
+    }
+  ],
+  "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Langenzennerstraße 82, 90556 Seukendorf": [
+    {
+      "place_id": 126486380,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "way",
+      "osm_id": 23278119,
+      "lat": "49.4875004",
+      "lon": "10.8731883",
+      "category": "highway",
+      "type": "residential",
+      "place_rank": 26,
+      "importance": 0.053371202410925425,
+      "addresstype": "residential",
+      "name": "Langenzenner Straße",
+      "display_name": "Langenzenner Straße, Kohlersmühle, Hiltmannsdorf, Seukendorf, Veitsbronn (VGem), Landkreis Fürth, Bayern, 90556, Deutschland",
+      "address": {
+        "road": "Langenzenner Straße",
+        "hamlet": "Kohlersmühle",
+        "village": "Hiltmannsdorf",
+        "municipality": "Veitsbronn (VGem)",
+        "county": "Landkreis Fürth",
+        "state": "Bayern",
+        "ISO3166-2-lvl4": "DE-BY",
+        "postcode": "90556",
+        "country": "Deutschland",
+        "country_code": "de"
+      },
+      "boundingbox": ["49.4871557", "49.4879189", "10.8696086", "10.8767921"]
+    }
+  ],
+  "addressdetails=1&countrycodes=de&format=jsonv2&limit=5&q=Friedrichstraße 19, 91054 Erlangen": [
+    {
+      "place_id": 126547023,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 1204132647,
+      "lat": "49.5956624",
+      "lon": "11.0076059",
+      "category": "shop",
+      "type": "fabric",
+      "place_rank": 30,
+      "importance": 0.00006749904631108595,
+      "addresstype": "shop",
+      "name": "Der Nähladen",
+      "display_name": "Der Nähladen, 19, Friedrichstraße, Innenstadt, Erlangen, Bayern, 91054, Deutschland",
+      "address": {
+        "shop": "Der Nähladen",
+        "house_number": "19",
+        "road": "Friedrichstraße",
+        "suburb": "Innenstadt",
+        "city": "Erlangen",
+        "county": "Erlangen",
+        "state": "Bayern",
+        "ISO3166-2-lvl4": "DE-BY",
+        "postcode": "91054",
+        "country": "Deutschland",
+        "country_code": "de"
+      },
+      "boundingbox": ["49.5956124", "49.5957124", "11.0075559", "11.0076559"]
+    }
+  ],
+  "addressdetails=1&bounded=1&city=Erlangen&countrycodes=de&format=jsonv2&limit=5&postalcode=91054&street=Friedrichstraße 19&viewbox=10.85,49.65,11.3,49.3": [
+    {
+      "place_id": 126547023,
+      "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+      "osm_type": "node",
+      "osm_id": 1204132647,
+      "lat": "49.5956624",
+      "lon": "11.0076059",
+      "category": "shop",
+      "type": "fabric",
+      "place_rank": 30,
+      "importance": 0.00006749904631108595,
+      "addresstype": "shop",
+      "name": "Der Nähladen",
+      "display_name": "Der Nähladen, 19, Friedrichstraße, Innenstadt, Erlangen, Bayern, 91054, Deutschland",
+      "address": {
+        "shop": "Der Nähladen",
+        "house_number": "19",
+        "road": "Friedrichstraße",
+        "suburb": "Innenstadt",
+        "city": "Erlangen",
+        "county": "Erlangen",
+        "state": "Bayern",
+        "ISO3166-2-lvl4": "DE-BY",
+        "postcode": "91054",
+        "country": "Deutschland",
+        "country_code": "de"
+      },
+      "boundingbox": ["49.5956124", "49.5957124", "11.0075559", "11.0076559"]
     }
   ]
 }

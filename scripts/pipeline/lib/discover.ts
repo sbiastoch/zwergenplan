@@ -11,7 +11,7 @@ import { z } from "zod";
 import { validateDataset } from "../../../src/domain/dataset.ts";
 import { haversineMeters, inBounds } from "../../../src/domain/geo.ts";
 import { nextPublicId, SHORT_ID_PATTERN, slug } from "../../../src/domain/ids.ts";
-import { REGIONS, type RegionId } from "../../../src/domain/regions.ts";
+import { REGIONS, type RegionId, type TerritoryStatus, territoryStatus } from "../../../src/domain/regions.ts";
 import { type Anbieter, type Offer, type Provider, Provider as ProviderSchema } from "../../../src/domain/schema.ts";
 import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
 import { normalizeAddress } from "./address.ts";
@@ -274,9 +274,12 @@ export function directoryFinds(dir: Provider, links: ReadonlyArray<{ label: stri
   return [...out.values()];
 }
 
-/** Nachricht an die Websuche (E7.2) */
-export const searchMessage = (term: string, regionName: string): string =>
-  `Suchbegriff: ${searchQuery(term, regionName)}\nRegion: ${regionName}`;
+/** „Nürnberg (Gebiet: Stadt Nürnberg)“: Region mit Gebiet für die Nachrichten ans Modell (Plan 0050, S2c) */
+const regionLine = (region: RegionId) => `Region: ${REGIONS[region].name} (Gebiet: ${REGIONS[region].territory.label})`;
+
+/** Nachricht an die Websuche (E7.2); die Suchanfrage nennt nur den Namen */
+export const searchMessage = (term: string, region: RegionId): string =>
+  `Suchbegriff: ${searchQuery(term, REGIONS[region].name)}\n${regionLine(region)}`;
 
 /** Text der abgerufenen Seite fürs Bewerten (der Abruf kürzt nur hier, das Bewerten braucht nicht alles) */
 const ASSESS_MAX_CHARS = 30_000;
@@ -342,7 +345,7 @@ export function contactLinks(page: FetchedFind): string[] {
 export function assessMessage(
   find: Find,
   page: FetchedFind,
-  regionName: string,
+  region: RegionId,
   extra: ReadonlyArray<{ url: string; text: string }> = [],
 ): string {
   const links = page.links
@@ -350,7 +353,7 @@ export function assessMessage(
     .slice(0, ASSESS_MAX_LINKS)
     .map((l) => `${l.label.replace(/\s+/g, " ").slice(0, 80)} -> ${l.url}`);
   return [
-    `Region: ${regionName}`,
+    regionLine(region),
     `Kandidat: ${find.name} (gefunden über ${find.quelle}: ${find.warum})`,
     `Abgerufene Seite: ${page.finalUrl}`,
     `## TEXT\n${page.text.slice(0, ASSESS_MAX_CHARS)}${page.text.length > ASSESS_MAX_CHARS ? "\n[… gekürzt]" : ""}`,
@@ -463,6 +466,26 @@ export function catalogId(
   for (let i = 2; ; i++) if (!taken.has(`${base}-${i}`)) return `${base}-${i}`;
 }
 
+/** Lage eines Orts aus dem Geocoder, wie `GeoResult` in `io/geocode.ts` (Plan 0050, S2c) */
+export interface VenueGeo {
+  lat: number;
+  lon: number;
+  district?: string | undefined;
+  /** `null` oder fehlend: Gemeinde unbekannt */
+  municipality?: string | null | undefined;
+  county?: string | undefined;
+  /** Treffer aus dem Katalog: gilt nur in dieser Region, ohne Gemeinde-Prüfung */
+  catalogRegion?: RegionId | undefined;
+}
+
+/** Ort in der Region: in der bbox und im Gebiet (Gemeinde, Kreis) bzw. Katalog-Ort derselben Region (Plan 0050, S2c) */
+function venueStatus(g: VenueGeo, region: RegionId): TerritoryStatus {
+  const { bbox, territory } = REGIONS[region];
+  if (!inBounds(g, bbox)) return "draussen";
+  if (g.catalogRegion) return g.catalogRegion === region ? "drin" : "draussen";
+  return territoryStatus(territory, g);
+}
+
 /**
  * Katalogeintrag aus der Bewertung (E7.4, E7.7). IDs, `publicId`, Region, `verified` und Notiz setzt der Code.
  * Programmseiten nur, wenn ihre URL auf der abgerufenen Seite steht (Schutz vor Prompt-Injection: der Abruf folgt
@@ -470,7 +493,8 @@ export function catalogId(
  * `null` = kein Treffer).
  *
  * Plan 0050, E5: Orte außerhalb und ohne Treffer fallen weg, die Terminseiten bekommen einen `hint`, der nur sie nennt.
- * Verworfen wird nur, wenn alle Orte außerhalb liegen; bleibt sonst keiner übrig, passt der `hint` nicht in 200
+ * „Außerhalb“ heißt außerhalb der bbox oder des Gebiets (`venueStatus`, S2c); eine unbekannte Gemeinde zählt wie „kein
+ * Treffer“. Verworfen wird nur, wenn alle Orte außerhalb liegen; bleibt sonst keiner übrig, passt der `hint` nicht in 200
  * Zeichen oder steht eine Programmseite schon im Katalog (E4.6), wird der Kandidat ein Klärfall.
  */
 export function entryFromAssessment(
@@ -483,7 +507,7 @@ export function entryFromAssessment(
     /** zurückgenommene Katalog-IDs und publicIds (`reservedIds`), gelten als belegt */
     reserved?: { ids: ReadonlySet<string>; publicIds: ReadonlySet<string> };
     today: string;
-    geos: ReadonlyArray<{ lat: number; lon: number; district?: string | undefined } | null>;
+    geos: ReadonlyArray<VenueGeo | null>;
     allowedUrls: readonly string[];
   },
 ): { ok: true; entry: Anbieter; notes: string[] } | { ok: false; grund: string; klaerfall?: true; dublette?: true } {
@@ -503,27 +527,37 @@ export function entryFromAssessment(
   const owner = programme.map((g) => knownPages.get(normalizeUrl(g.url) ?? "")).find(Boolean);
   if (owner)
     return { ok: false, grund: `Dublette von ${owner}? (gleiche Programmseite)`, klaerfall: true, dublette: true };
-  const { bbox } = REGIONS[ctx.region];
   if (ctx.geos.length !== a.venues.length) return { ok: false, grund: "Orte ohne Koordinaten" };
   // Orte außerhalb der Region fallen weg (Nutzerentscheid 2026-10-11, wie „musikfuechse nur Nürnberg“), ebenso Orte
-  // ohne Treffer (Plan 0050, E5); verworfen wird nur, wenn alle außerhalb liegen
+  // ohne Treffer (Plan 0050, E5) oder mit unbekannter Gemeinde (S2c); verworfen wird nur, wenn alle außerhalb liegen
   const located = a.venues.map((v, i) => ({ v, g: ctx.geos[i] ?? null }));
-  const inside = located.flatMap((x) => (x.g && inBounds(x.g, bbox) ? [{ v: x.v, g: x.g }] : []));
-  const outside = located.filter((x) => x.g && !inBounds(x.g, bbox));
+  const status = (g: VenueGeo | null) => (g ? venueStatus(g, ctx.region) : "kein-treffer");
+  const inside = located.flatMap((x) => (x.g && status(x.g) === "drin" ? [{ v: x.v, g: x.g }] : []));
+  const outside = located.filter((x) => status(x.g) === "draussen");
+  const unknown = located.filter((x) => status(x.g) === "unbekannt");
   const missing = located.filter((x) => x.g === null);
-  if (inside.length === 0 && missing.length === 0)
+  const where = (x: (typeof located)[number]) =>
+    `${x.v.address}${x.g?.municipality && !x.g.catalogRegion ? ` (${x.g.municipality})` : ""}`;
+  if (inside.length === 0 && missing.length === 0 && unknown.length === 0)
     return {
       ok: false,
-      grund: `kein Ort in der Region ${REGIONS[ctx.region].name} (außerhalb: ${outside.map((x) => x.v.address).join("; ")})`,
+      grund: `kein Ort in der Region ${REGIONS[ctx.region].name} (außerhalb: ${outside.map(where).join("; ")})`,
     };
   if (inside.length === 0)
     return {
       ok: false,
-      grund: `Geocoder ohne Treffer für ${missing.map((x) => x.v.address).join("; ")}${outside.length > 0 ? ", übrige Orte außerhalb" : ""}`,
+      grund: [
+        missing.length > 0 ? `Geocoder ohne Treffer für ${missing.map((x) => x.v.address).join("; ")}` : "",
+        unknown.length > 0 ? `Gemeinde unbekannt für ${unknown.map((x) => x.v.address).join("; ")}` : "",
+        outside.length > 0 ? "übrige Orte außerhalb" : "",
+      ]
+        .filter(Boolean)
+        .join(", "),
       klaerfall: true,
     };
-  for (const x of outside) notes.push(`Ort außerhalb der Region weggelassen: ${x.v.name}, ${x.v.address}`);
+  for (const x of outside) notes.push(`Ort außerhalb der Region weggelassen: ${x.v.name}, ${where(x)}`);
   for (const x of missing) notes.push(`Ort ohne Treffer im Geocoder weggelassen: ${x.v.name}, ${x.v.address}`);
+  for (const x of unknown) notes.push(`Ort mit unbekannter Gemeinde weggelassen: ${x.v.name}, ${x.v.address}`);
   const omitted = located.filter((x) => !inside.some((i) => i.v === x.v)).map((x) => x.v.name);
   // nennt nur die weggelassenen Orte, sonst landeten deren Termine am ersten Ort (prompt/extract.md, „Hauptort“)
   const omittedHint =

@@ -86,7 +86,7 @@ export interface StepReply {
 
 /** Was der Lauf von außen braucht; Tests ersetzen alles mit Netz, Modell oder Geocoder. */
 export interface DiscoverDeps {
-  search(term: string, regionName: string, signal: AbortSignal): Promise<StepReply>;
+  search(term: string, region: RegionId, signal: AbortSignal): Promise<StepReply>;
   assess(find: Find, message: string, signal: AbortSignal): Promise<StepReply>;
   fetchPage(url: string, opts?: { timeoutMs?: number; retries?: number }): Promise<FetchedPage>;
   /** Text eines PDF über `pdftotext` wie im Abruf des Nachtlaufs (`io/fetch-inputs.ts`) */
@@ -96,7 +96,7 @@ export interface DiscoverDeps {
    * Ausblenden), `orte` die Treffer aus `data/discover/`, auch im Trockenlauf gelesen
    */
   geocoder(init: {
-    known: ReadonlyMap<string, GeoResult>;
+    known: ReadonlyMap<string, readonly GeoResult[]>;
     orte: Partial<Record<RegionId, Readonly<Record<string, Ort>>>>;
   }): Geocoder;
   extractor: Extractor;
@@ -196,10 +196,10 @@ export function createDiscoverModel(
     };
   };
   return {
-    search: (term, regionName, signal) =>
+    search: (term, region, signal) =>
       step("search", `suche:${term}`, {
         systemPromptFile: SEARCH_PROMPT,
-        user: searchMessage(term, regionName),
+        user: searchMessage(term, region),
         tools: "web",
         schema: searchResponseSchema(),
         maxTurns: SEARCH_MAX_TURNS,
@@ -374,7 +374,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
     // 2. Websuche (Modell, tools: web), ein Aufruf je Suchbegriff
     for (const term of o.terms) {
       if (halted()) break;
-      const r = await o.deps.search(term, regionName, controller.signal);
+      const r = await o.deps.search(term, region, controller.signal);
       calls.push(r.call);
       if (r.abort) {
         stop(r.abort);
@@ -455,7 +455,7 @@ export async function runDiscover(o: DiscoverOptions): Promise<DiscoverReport> {
           // ohne diese Seite bewerten
         }
       }
-      const a = await o.deps.assess(find, assessMessage(find, fetchedFind, regionName, extra), controller.signal);
+      const a = await o.deps.assess(find, assessMessage(find, fetchedFind, region, extra), controller.signal);
       calls.push(a.call);
       if (a.abort) {
         stop(a.abort);

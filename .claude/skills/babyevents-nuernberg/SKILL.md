@@ -109,7 +109,7 @@ Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `e
 
 ## 6. Region starten
 
-Eine neue Region ist ein eigener Plan (Muster: Plan 0036 Fürth, ADR 0029). Code-Teil: Eintrag in `src/domain/regions.ts` mit bbox (in `NUERNBERG_BBOX`), Einwohnern mit Quelle, `kreis` (Startgebiet der Wegzeit) und Platz in `REGION_IDS` (spezifischere Region vor der umfassenden, denn in dieser Reihenfolge läuft das Entdecken); Stadtteile in `src/domain/districts.ts` (jeder braucht einen Zugangshalt, `pnpm data:build` prüft das); Texte. Außerhalb Bayerns oder des VGN zusätzlich Ferien und Fahrplan (`docs/ideas.md`). Steht sie in `REGION_IDS`, füllt das Entdecken ihren Katalog:
+Eine neue Region ist ein eigener Plan (Muster: Plan 0036 Fürth, ADR 0029). Code-Teil: Eintrag in `src/domain/regions.ts` mit bbox (in `NUERNBERG_BBOX`), Einwohnern mit Quelle, `kreis` (Startgebiet der Wegzeit), `territory` (Gebiet fürs Entdecken: Gemeinden und Kreise laut Nominatim, Label für den Prompt; Plan 0050, S2c) und Platz in `REGION_IDS` (spezifischere Region vor der umfassenden, denn in dieser Reihenfolge läuft das Entdecken); Stadtteile in `src/domain/districts.ts` (jeder braucht einen Zugangshalt, `pnpm data:build` prüft das); Texte. Außerhalb Bayerns oder des VGN zusätzlich Ferien und Fahrplan (`docs/ideas.md`). Steht sie in `REGION_IDS`, füllt das Entdecken ihren Katalog:
 
 ```
 pnpm pipeline discover --region <id> --bootstrap --dry-run          # lokal, Bericht unter runs/<heute>/discover/
@@ -118,7 +118,7 @@ gh workflow run discover.yml -f region=<id> -f bootstrap=true -f modus=trocken
 
 `--bootstrap` hebt G3 auf `MAX_NEW` (Standard 30, Eingabe `max_new`); die Bremsen setzen `max_calls` und `max_tokens`. Erst nach Abnahme des Trockenlaufs durch den Nutzer mit `-f modus=live`. Neue Anbieter landen erst mit dem nächsten Nachtlauf in `data/offers.json`; danach also `gh workflow run nightly.yml -f modus=live`.
 
-Regionen überlappen (Fürth liegt in der Nürnberger bbox). Ein neuer Anbieter gehört zur Region des Laufs, der ihn aufnimmt. Hat er beim Aufnehmen einen Ort außerhalb der bbox seiner Region verloren (Hinweis im Commit-Text), `region` auf die umfassende Region setzen (etwa `nuernberg`; `region` ist keine ID) und den Ort von Hand ergänzen. Dazu an den Terminseiten den `hint` „Nur Termine an …; Termine an … weglassen (außerhalb der Region)“ entfernen bzw. anpassen, sonst lässt der Extraktor die Termine am ergänzten Ort weiter weg.
+Regionen überlappen in der bbox (Fürth liegt in der Nürnberger bbox), ihr Gebiet nicht: Nürnberg ist die Stadt Nürnberg, Fürth die Stadt plus der Landkreis Fürth, Erlangen gehört zu keiner (Nutzerentscheid 2026-10-29). Das Entdecken nimmt nur Orte in bbox **und** Gebiet auf. Ein neuer Anbieter gehört zur Region des Laufs, der ihn aufnimmt. Hat er beim Aufnehmen einen Ort verloren (Hinweis im Commit-Text) und liegt der Ort im Gebiet seiner oder einer anderen Region, den Ort von Hand ergänzen und bei Bedarf `region` auf die Region setzen, deren Gebiet alle Orte enthält (`region` ist keine ID); ein Ort außerhalb jedes Gebiets (Erlangen) bleibt weg. Dazu an den Terminseiten den `hint` „Nur Termine an …; Termine an … weglassen (außerhalb der Region)“ entfernen bzw. anpassen, sonst lässt der Extraktor die Termine am ergänzten Ort weiter weg.
 
 ## 7. Fahrplan erneuern
 

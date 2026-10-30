@@ -11,7 +11,7 @@
  */
 import { z } from "zod";
 import { type BBox, haversineMeters, inBounds } from "../../../src/domain/geo.ts";
-import { REGION_IDS, REGIONS, type RegionId } from "../../../src/domain/regions.ts";
+import { REGION_IDS, REGIONS, type RegionId, territoryStatus } from "../../../src/domain/regions.ts";
 import type { Provider } from "../../../src/domain/schema.ts";
 import { addDays } from "../../../src/domain/time.ts";
 import { normalizeAddress, placeKey } from "../lib/address.ts";
@@ -25,6 +25,11 @@ export interface GeoResult {
   district?: string;
   /** Adresse aus `addressdetails` („Straße Nr, PLZ Ort“ bzw. „Name, PLZ Ort“), beim Katalog dessen Adresse */
   display: string;
+  /** Gemeinde aus `addressdetails` (Plan 0050, S2c); `null`: keine geliefert oder Koordinaten als Eingabe */
+  municipality?: string | null;
+  county?: string;
+  /** Treffer aus dem Katalog: dessen Region statt Gemeinde und Kreis */
+  catalogRegion?: RegionId;
 }
 
 export type GeoOutcome =
@@ -46,8 +51,8 @@ interface GeocodeQuery {
 export interface GeocoderOptions {
   /** YYYY-MM-DD, für Alter der Cache-Einträge und `datum` neuer Orte */
   today: string;
-  /** Orte des Katalogs im Lauf, Schlüssel `normalizeAddress(adresse).text` (im Eval nach dem Ausblenden) */
-  known?: ReadonlyMap<string, GeoResult>;
+  /** Orte des Katalogs im Lauf je Region, Schlüssel `normalizeAddress(adresse).text` (im Eval nach dem Ausblenden) */
+  known?: ReadonlyMap<string, readonly GeoResult[]>;
   /** `orte` aus `data/discover/<region>.json`, auch im Trockenlauf und im Eval gelesen */
   orte?: Partial<Record<RegionId, Readonly<Record<string, Ort>>>>;
   /** Standard `~/.cache/zwergenplan` (`io/cache.ts`) */
@@ -117,6 +122,18 @@ function readRunCache(dir: string): RunCache {
 }
 
 const fresh = (datum: string, today: string, days: number) => addDays(datum, days) > today;
+/** vor S2c gespeichert, ohne Gemeinde: neu anfragen (Plan 0050, S2c) */
+const usable = (o: Ort, today: string) => o.gemeinde !== undefined && fresh(o.datum, today, HIT_DAYS);
+
+/**
+ * Gemeinde vor Ortsteil: `village` nennt auch Ortsteile (Kraftshof in Nürnberg, Wachendorf in Cadolzburg).
+ * `municipality` ist im Landkreis oft die Verwaltungsgemeinschaft („Veitsbronn (VGem)“ für Seukendorf), keine Gemeinde.
+ */
+function municipalityOf(hit: Hit): string | null {
+  const a = hit.address ?? {};
+  const municipality = a["municipality"]?.endsWith("(VGem)") ? undefined : a["municipality"];
+  return a["city"] ?? a["town"] ?? municipality ?? a["village"] ?? null;
+}
 
 function addressOf(hit: Hit): string | undefined {
   const a = hit.address ?? {};
@@ -130,12 +147,15 @@ function addressOf(hit: Hit): string | undefined {
 const toOrt = (hit: Hit, stufe: 1 | 2 | 3, today: string, fallback: string): Ort => {
   const a = hit.address ?? {};
   const district = a["suburb"] ?? a["city_district"] ?? a["quarter"];
+  const county = a["county"];
   return {
     lat: hit.lat,
     lon: hit.lon,
     adresse: addressOf(hit) ?? fallback,
     stufe,
     ...(district ? { district } : {}),
+    gemeinde: municipalityOf(hit),
+    ...(county ? { landkreis: county } : {}),
     datum: today,
   };
 };
@@ -145,6 +165,8 @@ const toGeo = (o: Ort): GeoResult => ({
   lon: o.lon,
   display: o.adresse,
   ...(o.district ? { district: o.district } : {}),
+  ...(o.gemeinde !== undefined ? { municipality: o.gemeinde } : {}),
+  ...(o.landkreis ? { county: o.landkreis } : {}),
 });
 
 const viewbox = (b: BBox) => `${b.minLon},${b.maxLat},${b.maxLon},${b.minLat}`;
@@ -181,21 +203,33 @@ export function createGeocoder(o: GeocoderOptions): Geocoder {
   }
 
   async function nominatim(address: string, q: GeocodeQuery): Promise<Ort | undefined> {
-    const { bbox, name: regionName } = REGIONS[q.region];
+    const { bbox, name: regionName, territory } = REGIONS[q.region];
     const a = normalizeAddress(address);
     const city = a.city ?? regionName;
     // „Nürnberg-Eibach“: Nominatim kennt nur die Stadt als `city`
     const structuredCity = city.startsWith(`${regionName}-`) ? regionName : city;
     const inRegion = (h: Hit) => inBounds(h, bbox);
+    // Plan 0050, S2c: je Stufe gilt der erste Treffer im Gebiet (unbekannte Gemeinde zählt dazu). Liegt einer nur in der
+    // bbox (Erlangen für Nürnberg), läuft die nächste Stufe; gilt erst, wenn keine einen im Gebiet findet
+    let outside: Ort | undefined;
+    const pick = (hits: Hit[], stufe: 1 | 2 | 3, fallback: string): Ort | undefined => {
+      const inBox = hits.filter(inRegion);
+      const hit = inBox.find(
+        (h) =>
+          territoryStatus(territory, { municipality: municipalityOf(h), county: h.address?.["county"] }) !== "draussen",
+      );
+      if (!hit && inBox[0]) outside ??= toOrt(inBox[0], stufe, o.today, fallback);
+      return hit && toOrt(hit, stufe, o.today, fallback);
+    };
     const asked = new Set<string>();
-    const freeText = async (text: string, accept: (h: Hit) => boolean) => {
-      if (asked.has(text)) return undefined;
+    const freeText = async (text: string, accept: (h: Hit) => boolean): Promise<Hit[]> => {
+      if (asked.has(text)) return [];
       asked.add(text);
-      return (await request({ q: text, limit: 5 })).find((h) => inRegion(h) && accept(h));
+      return (await request({ q: text, limit: 5 })).filter(accept);
     };
 
-    const one = await freeText(a.city ? a.text : `${a.text}, ${regionName}`, () => true);
-    if (one) return toOrt(one, 1, o.today, a.text);
+    const one = pick(await freeText(a.city ? a.text : `${a.text}, ${regionName}`, () => true), 1, a.text);
+    if (one) return one;
     // auch ein Straßenname ohne Hausnummer aus dem Namen (Turnhalle am Fürreuthweg, Prüffall djk-eibach)
     const street = a.street ?? a.streetName;
     if (street) {
@@ -207,29 +241,35 @@ export function createGeocoder(o: GeocoderOptions): Geocoder {
         bounded: 1,
         limit: 5,
       };
-      const two = (await request(params)).find(inRegion);
-      if (two) return toOrt(two, 2, o.today, a.text);
+      const two = pick(await request(params), 2, a.text);
+      if (two) return two;
     }
     // ein Name in der Adresse geht vor; der Ortsname des Modells ist oft allgemein („Kursraum“) und kommt danach
     for (const name of new Set([a.name, q.venueName].filter((n): n is string => Boolean(n)))) {
-      const three = await freeText(`${name}, ${city}`, (h) => NAMED_PLACES.has(`${h.category}=${h.type}`));
-      if (three) return toOrt(three, 3, o.today, `${name}, ${city}`);
+      const hits = await freeText(`${name}, ${city}`, (h) => NAMED_PLACES.has(`${h.category}=${h.type}`));
+      const three = pick(hits, 3, `${name}, ${city}`);
+      if (three) return three;
     }
-    return undefined;
+    return outside;
   }
 
   async function lookup(address: string, q: GeocodeQuery): Promise<GeoOutcome> {
     const m = COORD.exec(address);
-    if (m) return { kind: "treffer", stufe: 0, geo: { lat: Number(m[1]), lon: Number(m[2]), display: address } };
+    if (m)
+      return {
+        kind: "treffer",
+        stufe: 0,
+        geo: { lat: Number(m[1]), lon: Number(m[2]), display: address, municipality: null },
+      };
     const known = o.known?.get(normalizeAddress(address).text);
-    if (known) return { kind: "treffer", stufe: 0, geo: known };
+    const atKnown = known?.find((g) => g.catalogRegion === q.region) ?? known?.[0];
+    if (atKnown) return { kind: "treffer", stufe: 0, geo: atKnown };
     const key = placeKey(address, q.venueName);
     const inState = found[q.region]?.[key] ?? o.orte?.[q.region]?.[key];
-    if (inState && fresh(inState.datum, o.today, HIT_DAYS))
-      return { kind: "treffer", stufe: inState.stufe, geo: toGeo(inState) };
+    if (inState && usable(inState, o.today)) return { kind: "treffer", stufe: inState.stufe, geo: toGeo(inState) };
     if (misses.has(`${q.region}|${key}`)) return { kind: "kein-treffer" };
     const cached = runCache[q.region]?.[key];
-    if (cached && "treffer" in cached && fresh(cached.treffer.datum, o.today, HIT_DAYS)) {
+    if (cached && "treffer" in cached && usable(cached.treffer, o.today)) {
       found[q.region] = { ...found[q.region], [key]: cached.treffer };
       return { kind: "treffer", stufe: cached.treffer.stufe, geo: toGeo(cached.treffer) };
     }
@@ -273,6 +313,8 @@ export const GeocodeFaelle = z.strictObject({
       region: z.enum(REGION_IDS),
       /** `null`: richtig ist „kein Treffer“ (Ort ohne Namen in OSM) */
       erwartet: z.strictObject({ lat: z.number(), lon: z.number() }).nullable(),
+      /** erwarteter Status im Gebiet der Region (Plan 0050, S2c); der Gemeindename ist dafür zu unzuverlässig (VGem) */
+      gebiet: z.enum(["drin", "draussen"]).optional(),
       notiz: z.string().optional(),
     }),
   ),
@@ -299,7 +341,12 @@ export async function checkFaelle(file: GeocodeFaelle, geocoder: Geocoder): Prom
       eingabe: f.eingabe,
       outcome,
       ...(abstandM === undefined ? {} : { abstandM }),
-      ok: f.erwartet === null ? outcome.kind === "kein-treffer" : abstandM !== undefined && abstandM <= file.toleranzM,
+      ok:
+        (f.erwartet === null
+          ? outcome.kind === "kein-treffer"
+          : abstandM !== undefined && abstandM <= file.toleranzM) &&
+        (f.gebiet === undefined ||
+          (outcome.kind === "treffer" && territoryStatus(REGIONS[f.region].territory, outcome.geo) === f.gebiet)),
     });
   }
   return out;
@@ -313,8 +360,8 @@ export const recordingKey = (url: string): string =>
     .join("&");
 
 /** Orte des Katalogs als `known` (Schlüssel: normalisierte Adresse) */
-export function knownPlaces(catalog: readonly Provider[]): Map<string, GeoResult> {
-  const out = new Map<string, GeoResult>();
+export function knownPlaces(catalog: readonly Provider[]): Map<string, GeoResult[]> {
+  const out = new Map<string, GeoResult[]>();
   for (const p of catalog)
     for (const v of p.role === "anbieter" ? p.venues : []) {
       const geo = {
@@ -322,8 +369,10 @@ export function knownPlaces(catalog: readonly Provider[]): Map<string, GeoResult
         lon: v.geo.lon,
         display: v.address,
         ...(v.district ? { district: v.district } : {}),
+        catalogRegion: p.region,
       };
-      out.set(normalizeAddress(v.address).text, geo);
+      const key = normalizeAddress(v.address).text;
+      out.set(key, [...(out.get(key) ?? []), geo]);
     }
   return out;
 }

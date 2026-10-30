@@ -29,5 +29,21 @@ Status: angenommen (2026-10-12), mit Plan 0036. **Ändert** ADR 0011, Punkt 2 un
 
 - Die Wegzeit-Tabelle wächst von 556 auf 747 Zeilen (51,8 kB gzip von 64 kB).
 - Das Entdecken braucht je Woche etwa doppelt so viel Zeit und Geld; reißt das Zeitbudget, fehlt der zweite Teil (Nürnberg) bis zur nächsten Woche.
-- Ein Fürther Anbieter mit einem Ort außerhalb der Fürther bbox verliert diesen beim Aufnehmen; Abhilfe ist Katalogpflege: `region` auf `nuernberg`, Ort ergänzen und den `hint` „… weglassen (außerhalb der Region)“ an den Terminseiten entfernen bzw. anpassen.
+- Ein Fürther Anbieter mit einem Ort außerhalb der Fürther bbox verliert diesen beim Aufnehmen. Die Abhilfe hier ist überholt, siehe Nachtrag 2026-10-30: `region` kommt nur auf die Region, deren Gebiet alle Orte enthält. Bisher hieß es: Katalogpflege, `region` auf `nuernberg`, Ort ergänzen und den `hint` „… weglassen (außerhalb der Region)“ an den Terminseiten entfernen bzw. anpassen.
 - Eine weitere Region braucht: Eintrag in `regions.ts` (mit `kreis`, Reihenfolge), Stadtteile, Prüfung des Zugangshalt-Gates; außerhalb Bayerns oder des VGN zusätzlich Ferienland und Fahrplan (`docs/ideas.md`).
+
+## Nachtrag (2026-10-30, Plan 0050, S2c): Gebiet nach Gemeinde
+
+Punkt 1 lautete „Fürth: Stadt plus direkt angrenzende Orte“. Für das Entdecken gilt jetzt mehr als die bbox, nämlich das Gebiet je Region (`territory` in `src/domain/regions.ts`, Nutzerentscheid 2026-10-29):
+
+- Nürnberg ist die Stadt Nürnberg.
+- Fürth ist die Stadt Fürth plus der Landkreis Fürth.
+- Erlangen gehört zu keiner Region.
+
+Ein Ort muss in der bbox **und** im Gebiet liegen. Gebiet heißt: Gemeinde oder Kreis aus Nominatim `addressdetails` passen.
+
+Anlass war die vhs Erlangen. Sie lag in der bbox von Nürnberg und wurde in einem Eval-Lauf für Nürnberg aufgenommen.
+
+Die bboxen bleiben, wie sie sind. Der Westen des Landkreises Fürth (Langenzenn, Wilhermsdorf, Roßtal) liegt außerhalb von `FUERTH_BBOX` und fällt weiter weg. Eine größere bbox wäre eine neue Änderung an diesem Punkt.
+
+Das Schema prüft weiter nur die bbox.

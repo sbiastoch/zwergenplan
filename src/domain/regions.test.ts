@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { type BBox, inBounds, NUERNBERG_BBOX } from "./geo.ts";
-import { REGION_IDS, REGIONS, type Region, regionList } from "./regions.ts";
+import { REGION_IDS, REGIONS, type Region, regionList, territoryStatus } from "./regions.ts";
 
 const corners = ({ minLat, maxLat, minLon, maxLon }: BBox) => [
   { lat: minLat, lon: minLon },
@@ -69,5 +69,34 @@ describe("zweite Region (Plan 0036, E1–E3)", () => {
     const r = (name: string, population: number): Region => ({ ...REGIONS.fuerth, name, population });
     expect(regionList({ a: r("A", 3000), c: r("C", 1000), b: r("B", 2000) })).toBe("A, B und C");
     expect(regionList({ a: r("A", 3000) })).toBe("A");
+  });
+});
+
+describe("Gebiet je Region (Plan 0050, S2c)", () => {
+  it("jede Region hat ein Label und mindestens eine Gemeinde", () => {
+    for (const id of REGION_IDS) {
+      expect(REGIONS[id].territory.label).not.toBe("");
+      expect(REGIONS[id].territory.municipalities.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("Nürnberg ist nur die Stadt: Erlangen liegt in der bbox, aber draußen", () => {
+    const t = REGIONS.nuernberg.territory;
+    expect(territoryStatus(t, { municipality: "Nürnberg" })).toBe("drin");
+    expect(territoryStatus(t, { municipality: "Erlangen", county: "Erlangen" })).toBe("draussen");
+    expect(territoryStatus(t, { municipality: "Stein", county: "Landkreis Fürth" })).toBe("draussen");
+  });
+
+  it("Fürth ist Stadt plus Landkreis, der Kreis zählt auch ohne Gemeinde", () => {
+    const t = REGIONS.fuerth.territory;
+    expect(territoryStatus(t, { municipality: "Fürth", county: "Fürth" })).toBe("drin");
+    expect(territoryStatus(t, { municipality: "Cadolzburg", county: "Landkreis Fürth" })).toBe("drin");
+    expect(territoryStatus(t, { municipality: null, county: "Landkreis Fürth" })).toBe("drin");
+    expect(territoryStatus(t, { municipality: "Nürnberg" })).toBe("draussen");
+  });
+
+  it("ohne Gemeinde und Kreis: unbekannt", () => {
+    expect(territoryStatus(REGIONS.nuernberg.territory, {})).toBe("unbekannt");
+    expect(territoryStatus(REGIONS.fuerth.territory, { municipality: null })).toBe("unbekannt");
   });
 });

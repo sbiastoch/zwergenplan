@@ -63,3 +63,15 @@ Status: angenommen (2026-10-18), mit Plan 0039 (`docs/plans/0039-region-duesseld
 - **Nachbarstädte:** Ein Fehler des Geocodings ließe einen Ort aus Neuss durch oder einen Düsseldorfer Ort wegfallen; Abhilfe sind `abgelehnt` und Katalogpflege.
 - **Bewusste Lücken** (`docs/ideas.md`): Die allgemeine Fassung der Wochen-Nachricht (iOS ohne Zuschnitt) zählt die neuen Angebote beider Netze. Kachelbild und `GENERIC_ALT` sagen weiter „in Nürnberg“. Merkliste und Deep-Links filtern nicht nach Netz.
 - **Eine weitere Region** in einem bestehenden Netz ist ein Eintrag in `regions.ts` samt Stadtteilen; in einem neuen Netz zusätzlich ein Eintrag in `NETWORKS` (bbox, `home`, `holidays`, `transitSource`), ein Feed in `FEEDS`, ein Auszug, Budgets je Netz und ein Cron im Entdecken (Skill `babyevents-nuernberg`, Abschnitt 6). Ein Verbund über eine Landesgrenze braucht einen eigenen Plan.
+
+## Nachtrag (2026-10-30, Plan 0050, S2c): Gebiet für alle Regionen
+
+Punkt 2 sah ein optionales Feld `municipality` nur für Düsseldorf vor. Jetzt gilt für alle Regionen das Pflichtfeld `territory: { label, municipalities, counties? }` in `src/domain/regions.ts`, dazu `territoryStatus`. Für Düsseldorf wird daraus `{ label: "Stadt Düsseldorf", municipalities: ["Düsseldorf"] }`. Der Satz „Nürnberg und Fürth … bleiben bei ‚Stadt plus Nachbarorte‘“ entfällt (Nutzerentscheid 2026-10-29). Siehe auch den Nachtrag in ADR 0029.
+
+Abweichungen von Punkt 2:
+
+- **Gemeinde:** Sie kommt aus `city ?? town ?? municipality ?? village`. `village` steht zuletzt, weil es auch einen Ortsteil nennen kann (Kraftshof in Nürnberg, Wachendorf in Cadolzburg). `municipality` zählt nicht, wenn es eine Verwaltungsgemeinschaft ist („Veitsbronn (VGem)“ für Seukendorf). Ein solcher Ort gehört dann nur über `counties` zum Gebiet. Für Düsseldorf ohne Landkreis spielt das keine Rolle.
+- **Kreis:** `county` zählt zusätzlich, für einen Landkreis als Teil des Gebiets. Er wird vor der Gemeinde geprüft.
+- **Unbekannte Gemeinde:** Der Ort fällt mit Hinweis weg und zählt wie „kein Treffer“. Bleibt kein Ort übrig, wird der Kandidat ein Klärfall und nicht verworfen, weil das eine Datenlücke ist. Das gilt auch für Koordinaten als Eingabe.
+- **Katalog-Treffer:** Ein Treffer aus dem Katalog gilt nur in seiner eigenen Region.
+- **Cache:** Er heißt weiter `geocode-v3.json`. Einträge ohne `gemeinde` werden neu angefragt.

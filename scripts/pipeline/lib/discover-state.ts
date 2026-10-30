@@ -10,7 +10,9 @@ const IsoDate = z.iso.date();
 
 /**
  * Lage eines Orts aus dem Geocoder (Plan 0050, E5). `adresse` ist bei jeder Stufe die aus `addressdetails`
- * gebaute Adresse, nicht die Eingabe; `stufe` 1 Freitext, 2 strukturiert, 3 benannter Ort.
+ * gebaute Adresse, nicht die Eingabe; `stufe` 1 Freitext, 2 strukturiert, 3 benannter Ort. `gemeinde` und `landkreis`
+ * prüfen das Gebiet der Region (Plan 0050, S2c); `gemeinde: null` heißt, Nominatim liefert keine. Ein Eintrag ohne das
+ * Feld `gemeinde` stammt von vor S2c und wird neu angefragt (`io/geocode.ts`).
  */
 export const Ort = z.strictObject({
   lat: z.number(),
@@ -18,6 +20,8 @@ export const Ort = z.strictObject({
   adresse: z.string().min(1),
   stufe: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   district: z.string().optional(),
+  gemeinde: z.string().min(1).nullable().optional(),
+  landkreis: z.string().min(1).optional(),
   datum: IsoDate,
 });
 export type Ort = z.infer<typeof Ort>;

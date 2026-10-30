@@ -326,13 +326,18 @@ describe("contactLinks (Adresse für das Bewerten)", () => {
 
 describe("Nachrichten an das Modell", () => {
   it("Bewerten bekommt weitere Seiten (Kontakt) als eigene Abschnitte", () => {
-    const m = assessMessage(find(), { finalUrl: "https://k.example.net/", text: "Kurse", links: [] }, "Nürnberg", [
+    const m = assessMessage(find(), { finalUrl: "https://k.example.net/", text: "Kurse", links: [] }, "nuernberg", [
       { url: "https://k.example.net/kontakt", text: "Kernstraße 3, 90429 Nürnberg" },
     ]);
     expect(m).toMatch(/## WEITERE SEITE: https:\/\/k\.example\.net\/kontakt\nKernstraße 3/);
   });
-  it("Suche nennt Begriff mit Region", () => {
-    expect(searchMessage("PEKiP", "Nürnberg")).toBe("Suchbegriff: PEKiP Nürnberg\nRegion: Nürnberg");
+  it("Suche nennt Begriff mit Region und das Gebiet (Plan 0050, S2c)", () => {
+    expect(searchMessage("PEKiP", "nuernberg")).toBe(
+      "Suchbegriff: PEKiP Nürnberg\nRegion: Nürnberg (Gebiet: Stadt Nürnberg)",
+    );
+    expect(searchMessage("PEKiP", "fuerth")).toMatch(
+      /^Suchbegriff: PEKiP Fürth\nRegion: Fürth \(Gebiet: Stadt Fürth und /,
+    );
   });
   it("Bewerten: Text gekürzt, Links mit Ziel; erlaubt sind Fund-URL, Seite und Links", () => {
     const page = {
@@ -340,8 +345,8 @@ describe("Nachrichten an das Modell", () => {
       text: "x".repeat(40_000),
       links: [{ label: "Kurse", url: "https://k.example.net/kurse" }],
     };
-    const m = assessMessage(find(), page, "Nürnberg");
-    expect(m).toMatch(/Region: Nürnberg/);
+    const m = assessMessage(find(), page, "nuernberg");
+    expect(m).toMatch(/^Region: Nürnberg \(Gebiet: Stadt Nürnberg\)\n/);
     expect(m).toMatch(/\[… gekürzt\]/);
     expect(m).toMatch(/Kurse -> https:\/\/k\.example\.net\/kurse/);
     expect(allowedUrlsOf(find(), page)).toEqual([find().url, "https://k.example.net/", "https://k.example.net/kurse"]);
@@ -447,7 +452,7 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
     region: "nuernberg" as const,
     catalog,
     today,
-    geos: [{ lat: 49.449, lon: 11.06, district: "Gostenhof" }],
+    geos: [{ lat: 49.449, lon: 11.06, district: "Gostenhof", municipality: "Nürnberg" }],
     allowedUrls: ["https://krabbelzwerge.example.net/kurse", "https://krabbelzwerge.example.net/"],
   };
 
@@ -496,7 +501,10 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
       ...assessed,
       venues: [...assessed.venues, { name: "Turnhalle", address: "Turnweg 1, 90429 Nürnberg" }],
     };
-    const r = entryFromAssessment(two, { ...ctx, geos: [...ctx.geos, { lat: 49.45, lon: 11.05 }] });
+    const r = entryFromAssessment(two, {
+      ...ctx,
+      geos: [...ctx.geos, { lat: 49.45, lon: 11.05, municipality: "Nürnberg" }],
+    });
     expect(r.ok && r.entry.venues.map((v) => v.id)).toEqual(["krabbelzwerge-gostenhof", "krabbelzwerge-gostenhof-2"]);
   });
 
@@ -550,7 +558,7 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
         { name: "Bad Roth", address: "Badstraße 1, 91154 Roth" },
       ],
     };
-    const inside = { lat: 49.449, lon: 11.06 };
+    const inside = { lat: 49.449, lon: 11.06, municipality: "Nürnberg" };
     const outside = { lat: 49.24, lon: 11.09 };
 
     it("ein Ort ohne Treffer fällt weg; Hinweis, und der hint nennt nur die weggelassenen", () => {
@@ -587,6 +595,55 @@ describe("entryFromAssessment (E7.4, E7.7)", () => {
       const r = entryFromAssessment(assessed, { ...ctx, geos: [outside] });
       expect(r.ok).toBe(false);
       expect(r).not.toHaveProperty("klaerfall");
+    });
+  });
+
+  describe("Gebiet der Region (Plan 0050, S2c)", () => {
+    // in NUERNBERG_BBOX, aber Gemeinde Erlangen (Eval-Lauf 2: vhs Erlangen für Nürnberg aufgenommen)
+    const erlangen = { lat: 49.596, lon: 11.004, municipality: "Erlangen", county: "Erlangen" };
+    const vhs = { ...assessed, venues: [{ name: "vhs", address: "Friedrichstraße 19, 91054 Erlangen" }] };
+
+    it("Prüffall vhs-Erlangen: einziger Ort in Erlangen, für Nürnberg verworfen, kein Klärfall", () => {
+      expect(entryFromAssessment(vhs, { ...ctx, geos: [erlangen] })).toEqual({
+        ok: false,
+        grund: "kein Ort in der Region Nürnberg (außerhalb: Friedrichstraße 19, 91054 Erlangen (Erlangen))",
+      });
+    });
+
+    it("Erlangen neben Nürnberg: Erlangen fällt mit Hinweis samt Gemeinde weg", () => {
+      const two = { ...assessed, venues: [...assessed.venues, ...vhs.venues] };
+      const r = entryFromAssessment(two, { ...ctx, geos: [...ctx.geos, erlangen] });
+      if (!r.ok) throw new Error(r.grund);
+      expect(r.entry.venues.map((v) => v.name)).toEqual(["Gemeindehaus Gostenhof"]);
+      expect(r.notes).toContain(
+        "Ort außerhalb der Region weggelassen: vhs, Friedrichstraße 19, 91054 Erlangen (Erlangen)",
+      );
+    });
+
+    it("Gemeinde unbekannt: Ort fällt mit Hinweis weg; alle unbekannt (auch Koordinaten): Klärfall", () => {
+      const two = { ...assessed, venues: [...assessed.venues, { name: "Halle", address: "49.45, 11.07" }] };
+      const unknown = { lat: 49.45, lon: 11.07, municipality: null };
+      const r = entryFromAssessment(two, { ...ctx, geos: [...ctx.geos, unknown] });
+      if (!r.ok) throw new Error(r.grund);
+      expect(r.notes).toContain("Ort mit unbekannter Gemeinde weggelassen: Halle, 49.45, 11.07");
+      expect(entryFromAssessment(assessed, { ...ctx, geos: [unknown] })).toMatchObject({ ok: false, klaerfall: true });
+      expect(entryFromAssessment(assessed, { ...ctx, geos: [{ lat: 49.45, lon: 11.07 }] })).toMatchObject({
+        klaerfall: true,
+      });
+    });
+
+    it("Katalog-Ort: zählt in der eigenen Region, in einer anderen als draußen", () => {
+      const at = (catalogRegion: "fuerth" | "nuernberg") => [{ lat: 49.449, lon: 11.06, catalogRegion }];
+      expect(entryFromAssessment(assessed, { ...ctx, geos: at("nuernberg") }).ok).toBe(true);
+      const r = entryFromAssessment(assessed, { ...ctx, geos: at("fuerth") });
+      expect(r).toMatchObject({ ok: false, grund: expect.stringMatching(/^kein Ort in der Region Nürnberg/) });
+      expect(r).not.toHaveProperty("klaerfall");
+    });
+
+    it("Fürth: Ort im Landkreis (Seukendorf) bleibt", () => {
+      const seukendorf = { lat: 49.488, lon: 10.88, municipality: "Seukendorf", county: "Landkreis Fürth" };
+      const r = entryFromAssessment(assessed, { ...ctx, region: "fuerth", geos: [seukendorf] });
+      expect(r.ok).toBe(true);
     });
   });
 });

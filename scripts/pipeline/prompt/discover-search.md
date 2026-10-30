@@ -7,7 +7,7 @@ Die Nachricht nennt den **Suchbegriff** und die **Region**. Suche mit dem Begrif
 ## Wer dazugehört
 
 - Ein Kandidat ist ein **Veranstalter** mit eigener Website: ein Verein, eine Praxis, eine Schwimmschule, eine Gemeinde, ein Familienzentrum.
-- Er liegt in der Region (Stadt und direkt angrenzende Orte) und veröffentlicht Angebote mit Terminen für 0–3 Jahre oder hat eine Seite mit Kursen.
+- Er liegt in der Region, also im Gebiet, das die Nachricht in Klammern nennt (Nachbarorte außerhalb des Gebiets gehören nicht dazu), und veröffentlicht Angebote mit Terminen für 0–3 Jahre oder hat eine Seite mit Kursen.
 - Nicht dazu: Sammelkalender, Branchenbücher, Bewertungsportale, Vermittler und Buchungsportale für viele Anbieter, Zeitungsartikel, Seiten in sozialen Netzwerken, Anbieter nur für ältere Kinder, Kurse für Eltern ohne Kind (Geburtsvorbereitung, Elternabende).
 
 ## Antwort

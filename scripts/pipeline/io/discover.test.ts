@@ -148,12 +148,12 @@ interface Fakes {
   empty?: string[];
 }
 
-const GOSTENHOF: GeoResult = { lat: 49.449, lon: 11.06, display: "x", district: "Gostenhof" };
+const GOSTENHOF: GeoResult = { lat: 49.449, lon: 11.06, display: "x", district: "Gostenhof", municipality: "Nürnberg" };
 
 /** Fake des Geocoders aus einer Funktion je Adresse; `seen` hält die Orte des Katalogs, die der Lauf übergab */
 function fakeGeocoder(
   geocode: Fakes["geocode"],
-  seen?: { known?: ReadonlyMap<string, GeoResult> },
+  seen?: { known?: ReadonlyMap<string, readonly GeoResult[]> },
 ): DiscoverDeps["geocoder"] {
   return (init) => {
     if (seen) seen.known = init.known;
@@ -384,8 +384,8 @@ describe("runDiscover (Plan 0032, E7)", () => {
       },
       geocode: async (address: string) =>
         address.includes("Fürth")
-          ? { lat: 49.476, lon: 10.989, display: "x", district: "Innenstadt" }
-          : { lat: 49.46, lon: 11.13, display: "x", district: "Mögeldorf" },
+          ? { lat: 49.476, lon: 10.989, display: "x", district: "Innenstadt", municipality: "Fürth", county: "Fürth" }
+          : { lat: 49.46, lon: 11.13, display: "x", district: "Mögeldorf", municipality: "Nürnberg" },
     } satisfies Fakes;
     // jede Fund-Seite verlinkt ihre Kursseite (Programmseiten nur aus den Links der Fund-Seite)
     const fetchPage: DiscoverDeps["fetchPage"] = async (url) =>
@@ -631,9 +631,9 @@ describe("runDiscover (Plan 0032, E7)", () => {
         [SITE]: assessOk("Krabbelzwerge Gostenhof"),
       },
     });
-    const seen: { known?: ReadonlyMap<string, GeoResult> } = {};
+    const seen: { known?: ReadonlyMap<string, readonly GeoResult[]> } = {};
     // Lage des ersten Turnverein-Orts: Der Fake-Extraktor legt Referenz und Fund an denselben Termin
-    const tvGeo = { lat: 49.4392, lon: 11.0442, display: "Turnhalle" };
+    const tvGeo = { lat: 49.4392, lon: 11.0442, display: "Turnhalle", municipality: "Nürnberg" };
     const r = await run(
       d,
       {},
@@ -789,7 +789,7 @@ describe("Härte: Orte und Klärfälle (Plan 0050, E5)", () => {
     const r = await run(tempData(), {
       search: kandidaten({ name: twin.name, url: SITE }),
       assess: { [SITE]: assessOk(twin.name) },
-      geocode: async () => ({ ...geo, display: "x" }),
+      geocode: async () => ({ ...geo, display: "x", municipality: "Nürnberg" }),
     });
     expect(r.regions[0]?.adopted).toEqual([]);
     expect(r.regions[0]?.klaerfaelle[0]?.grund).toBe(`Dublette von ${twin.id}? (ähnlicher Name, Ort ≤ 100 m)`);

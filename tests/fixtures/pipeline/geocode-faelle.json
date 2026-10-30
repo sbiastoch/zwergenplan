@@ -61,6 +61,22 @@
       "eingabe": "Turnhalle (1. OG), Reutersbrunnenstraße 12, 90429 Nürnberg",
       "region": "nuernberg",
       "erwartet": { "lat": 49.4532419, "lon": 11.0583717 }
+    },
+    {
+      "anbieter": "swimmerfirst",
+      "eingabe": "Langenzennerstr. 82, 90556 Seukendorf",
+      "region": "fuerth",
+      "erwartet": { "lat": 49.4875004, "lon": 10.8731883 },
+      "gebiet": "drin",
+      "notiz": "Landkreis Fürth, gehört zur Region Fürth (Nutzerentscheid 2026-10-29, Plan 0050, S2c); Lage aus Eval-Lauf 1. Nominatim nennt als municipality „Veitsbronn (VGem)“ und als village den Ortsteil Hiltmannsdorf, nicht Seukendorf: drin über den Kreis"
+    },
+    {
+      "anbieter": "vhs-erlangen",
+      "eingabe": "Friedrichstraße 19, 91054 Erlangen",
+      "region": "nuernberg",
+      "erwartet": { "lat": 49.5956624, "lon": 11.0076059 },
+      "gebiet": "draussen",
+      "notiz": "In der bbox von Nürnberg, Gemeinde Erlangen: beim Aufnehmen draußen (Eval-Lauf 2, Plan 0050, S2c); Lage aus OSM (Nominatim, 2026-10-30, Hausnummer 19)"
     }
   ]
 }
