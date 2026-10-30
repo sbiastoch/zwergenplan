@@ -1,6 +1,6 @@
 # Plan 0049 – Seitenfinder: Programmseiten finden, zuerst für bekannte Anbieter
 
-Status: in Umsetzung (Review 4 eingearbeitet; S0 gemessen, Nachtrag 1 Ortsprüfung offen)
+Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 Ortsprüfung nach zwei Reviews eingearbeitet)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`), Punkt 4 (ein Seitenfinder), Punkt 1 (ein Abruf), Punkt 5 (Issue je Lauf neben dem Wächter). Dieser Plan baut das Modul und die **Pflege bekannter Anbieter**. Den Modus `alle` für das Entdecken legt er fest (E1), gebaut wird er mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`), S3.
@@ -351,7 +351,7 @@ Wegwerf-Skript im Job-Verzeichnis auf `lib/site-crawl.ts` und `io/site-crawl.ts`
   - Startseiten mit Teasern (`nuernberger-nest.de/`, `fbs-nuernberg.de/`), die `covered` als `deckungsgleich` erkennen soll;
   - Detailseiten einzelner Kurse (gugelrund, nuebad-flipper, institut-zukunftsmusik), die das Ergebnis `deckungsgleich` oder `anhaengen` bekommen.
 - **robots.txt:** 29 abgerufene Seiten bei 7 Anbietern gesperrt, meist Buchungssysteme: `buchung.schwimmschule-ohana.de` (auch die API, die der Katalog nutzt), `zoff-harmonie.de` (Detailseiten und das Programm-PDF), `st-martin-nuernberg.de` (Termin-Details), `kinder-salzundpfeffer.reservix.de`, `tsv1846nuernberg.kurabu.com`, `pro.bsport.io`, `canva.com`. Für die Katalogseiten selbst zählt die Messung im Runner (Plan 0048, S3).
-- **Orts-`hint`:** nur `geburtshaus-nuernberger-nest`.
+- **Orts-`hint`:** gemessen mit dem alten Muster nur `geburtshaus-nuernberger-nest`; das ist falsch (dessen Hint hat keinen Ortsbezug, `musikfuechse` fehlt), neues Muster in Nachtrag 1.
 - **Dachseiten:** `nuernberg.de`, `eversports.de`, `wolfpack.yoga`, `evangelische-termine.de`, `mutherstudio.com`, `api.kursorganizer.com`, `familieninfo-fuerth.de`.
 - **Ortsprüfung an den heutigen `termine`-Seiten: 107 von 161 (66 %), Soll ≥ 95 % verfehlt.** Gründe der 54 Fehlschläge:
   - Plattform-Widgets und Buchungslisten ohne Adresse (eversports, hebamio, thrivecart);
@@ -359,7 +359,7 @@ Wegwerf-Skript im Job-Verzeichnis auf `lib/site-crawl.ts` und `io/site-crawl.ts`
   - Seiten auf `nuernberg.de` ohne den Katalognamen des Anbieters (Dachseite);
   - eigene Seiten, die die Adresse nur auf der Kontaktseite nennen (`studioherzschlag.de`, `mutherstudio.com`, `zentrum-koberger.de`, die FamilienBox).
   - Behoben im Code schon vor der Zählung: Klammerzusätze („(Hinterhaus)“), Zusätze nach Gedankenstrich und Artikel am Ortsnamen.
-- **Folge:** Nachtrag 1 (unten) zur Ortsprüfung, vor S1.
+- **Folge:** Nachtrag 1 (unten) zur Ortsprüfung, vor `lib/pflege.ts`.
 - **Von Hand:** 20 Kandidaten (jeder dritte der nach Anbieter sortierten Liste) prüft der Nutzer: echte Programmseite des Anbieters ja/nein. Ergebnis hier, dann die Schwellen von `pageSignals`.
 
 ### S1, Teil 1 – Umsetzung (2026-10-30)
@@ -367,16 +367,65 @@ Wegwerf-Skript im Job-Verzeichnis auf `lib/site-crawl.ts` und `io/site-crawl.ts`
 - `lib/url.ts` (URL-Hilfen aus `lib/discover.ts`, Importe in `io/discover.ts`, `lib/watch.ts`, `lib/klaerfall.ts`), `lib/site-crawl.ts` (rein: Bereich, geteilte Websites, Ausschlüsse, Reihenfolge, `pageSignals`, Breitensuche `exploreSite` mit eingespeistem Abruf, `candidatesOf`, `wantsBrowser`, `fullText`, `placeMentioned`), `io/site-crawl.ts` (Warteschlange je Host, `crawlFetcher` nur mit `setAbruf("neu")`, Browser, PDF, iCal).
 - `io/http.ts`: `fetchBytes` meldet `redirects`; `decodeBody` für Bytes mit derselben Zeichensatz-Erkennung.
 - **Arch-Review (Teil 1):** kein Blocker; sechs Majors behoben: Dachseite auch über Subdomain (ob geteilt, entscheidet der Host des Ziels), „Workshop“ ist kein Shop (Wortgrenzen), ungültige Prozentfolgen brechen nicht ab, Restbudget an den Abruf (Browser entfällt, wenn er die 20 überschritte; Weiterleitungen zählen danach), iCal-Feeds als eigene Kandidaten (künftige `DTSTART`, verlinkte Feeds werden besucht), Tests für PDF, Bot-Schutz und Budget. Minors 1–8 nachgezogen; die kanonische URL (Minor 9) kommt mit `pflege.ts`.
-- **Noch nicht:** `lib/pflege.ts`, `io/pflege.ts`, Befehl `pflege`, Zustand (E4). Vorher `/plan-review` von Nachtrag 1.
+- **Noch nicht:** `lib/pflege.ts`, `io/pflege.ts`, Befehl `pflege`, Zustand (E4). Vorher Nachtrag 1 umsetzen und neu messen.
 
-### Nachtrag 1 (2026-10-30, Entwurf): Ortsprüfung nach S0
+### Nachtrag 1 (2026-10-30): Ortsprüfung nach S0
 
-Die Ortsprüfung auf dem Text der Kandidatenseite trifft das Soll nicht; 34 % der heutigen, richtigen Seiten fielen durch. Sie soll nur verhindern, dass das Modell einem fremden Treffpunkt den Hauptort gibt (E2, `fremder-ort`). Vorschlag:
-- **Website statt Seite:** Auf der eigenen Website gilt der Ort als geprüft, wenn irgendeine in der Erkundung abgerufene Seite derselben Website (auch Kontakt, Impressum, Footer) den Ort nennt.
-- **Fremder Ort aktiv erkennen:** `fremder-ort` gilt, wenn die Kandidatenseite eine PLZ der Region oder eine Straße mit Hausnummer nennt, die zu keinem Ort des Anbieters passt, und keinen Ort des Anbieters.
-- **Geteilte Websites und Plattformen:** Hier bleibt der Anbietername Pflicht, verglichen ohne Rechtsform und Zusätze; Widgets, die nur über die eigene Website erreicht werden (ein Sprung), erben die Prüfung der eigenen Website.
-- **Neues Soll:** ≥ 95 % der heutigen `termine`-Seiten, neu gemessen mit dem S0-Skript vor S1.
-- Offen für den Plan-Review: ob iCal-Feeds der Sammelkalender (`evangelische-termine.de`) überhaupt Kandidaten sein dürfen (heute „nie Kandidat“; als Katalogseite in der Messung nur zum Vergleich).
+**Anlass.** Die Ortsprüfung auf dem Text der Kandidatenseite traf das Soll nicht (S0: 107 von 161). Sie soll verhindern, dass das Modell einem fremden Treffpunkt den Hauptort gibt (`prompt/extract.md`: unbekannter Treffpunkt → Hauptort), E2, Ergebnis `fremder-ort`. Der Lehrbuchfall im Katalog ist `musikfuechse`: Jede Seite nennt Kurse in „N-Kraftshof / F-Poppenreuth“, katalogisiert ist nur Kraftshof. Eine Prüfung „eigener Ort genannt“ lässt diese Seite immer durch. Die Prüfung wird deshalb umgedreht: Sie sucht **fremde** Orte, statt nur den eigenen zu bestätigen.
+
+**Regel** (ersetzt den Punkt „Ort geprüft“ in E2):
+1. **Fremder Ort → `fremder-ort`**, gleich ob die Seite auch einen eigenen Ort nennt. Gesucht wird in dem Text, den das Modell bekommt: `programmeText(kind, body, finalUrl)` (`lib/fetch.ts`), also Haupttext von `extractPage` samt JSON-LD bzw. geparstem iCal mit `LOCATION`, ohne Header, Footer, Navigation (dort steht die eigene Adresse und überdeckte alles; Review N1-1, M1; Review N1-2, M2). Ein Ort „passt zum Anbieter“, wenn er zu einem eigenen Ort gehört oder zu einem Ort eines anderen Katalog-Anbieters, der höchstens 100 m von einem eigenen Ort liegt oder dieselbe normalisierte Straße mit Hausnummer hat (geteilte Orte: `hebanne-schulz` in der FamilienBox, `musikfuechse` und `mutherstudio` in der Kraftshofer Hauptstraße 181; N1-2, M4). Als fremder Ort zählt, was nicht passt:
+   - eine fünfstellige PLZ mit folgendem Ortsnamen (jede PLZ, nicht nur die der Region; N1-1, M3);
+   - eine Straße mit Hausnummer, gefunden von einem eigenen Scanner `streetMentions(text)`: Straßenendung aus `STREET_NAME` (`lib/address.ts`) oder „Str.“, oder „Am/An der/Im …“, jeweils mit Hausnummer an der Wortgrenze; normalisiert über `normalizeAddress`. „Raum 2“, „Gruppe 3“, „Kurs 8“ sind keine Straße; „Str. 5“ ist nicht „Str. 56“ (N1-1, M4; N1-2, M5);
+   - ein Name aus der **festen Ortsliste** `PLACE_NAMES` (neu, versioniert in `lib/site-crawl.ts`, mit Quelle und Stichtag im Kommentar): die Gemeinden der Landkreise Fürth, Erlangen-Höchstadt und Nürnberger Land, die Städte Erlangen und Schwabach, die amtlichen Stadtteile bzw. statistischen Bezirke von Nürnberg und Fürth (darunter Poppenreuth). Verglichen an Wortgrenzen, ohne Beugung: „Fürther Straße“ ist nicht „Fürth“, „Erlanger“ nicht „Erlangen“. Die Gemeinde eines eigenen Orts kommt aus `normalizeAddress(address).city`, sein Ortsteil aus `district` (getrennt an „/“ und „bei“) und aus der Ortsliste, wenn die Adresse dort liegt (N1-1, B1; N1-2, B1). `district`-Werte des Katalogs sind **keine** Eingabe: „Süd“, „West“, „Buch“, „Altstadt“, „stadtweit“ sind mehrdeutig (N1-2, M3);
+   - Name oder Straße eines Orts **eines anderen** Katalog-Anbieters, wenn der Name außer Gattungswörtern (`Gemeindehaus`, `Gemeindezentrum`, `Gemeindesaal`, `Turnhalle`, `Saal`, `Haus`, `Raum`, `Kirche`, `Pfarrheim`) einen weiteren Bestandteil hat und genau einem Anbieter gehört (N1-1, m3; N1-2, M3).
+2. **Eigener Ort, nur positiv:** Steht kein fremder Ort im Text, gilt der Ort als geprüft, wenn eine dieser Seiten den Ort des Anbieters nennt (Name ohne Artikel und Zusätze, oder Straße mit Hausnummer über `streetMentions`; die PLZ allein zählt nicht, N1-1, M4): der ganze Text der Kandidatenseite (`fullText`, mit Footer; bleibt) oder eine von höchstens zwei Kontakt-, Anfahrts- oder Impressumsseiten derselben Website, auf einer Dachseite nur unter der Pfadbindung aus E1 (N1-2, M7). `contactLinks`, `CONTACT_PATTERNS` und `MAX_CONTACT_PAGES` ziehen aus `lib/discover.ts` nach `lib/site-crawl.ts`; `lib/discover.ts` importiert von dort. `exploreSite` reiht diese Seiten nach Tiefe 0 und vor Tiefe 1 ein, trotz `neverVisit`, höchstens zwei, innerhalb der 20 Abrufe (N1-1, M2). Ohne Treffer: `fremder-ort` mit Grund „Ort nicht belegt“.
+3. **Geteilte Websites:** Auf einer Dachseite genügt als Nachweis des Mandanten die Pfadbindung aus E1 (Kandidat unter dem Pfad einer Startseite, etwa `/internet/nh_gostenhof/`; m1). Auf einer Plattform bleibt der Anbietername Pflicht, verglichen ohne Rechtsform und Zusätze. Ein Widget, das nur über die eigene Website erreicht wird (ein Sprung), erbt Schritt 2 der eigenen Website, **nicht** den Namen bzw. Mandanten (m2: `nuernberger-nest` verlinkt die hebamio-Seiten anderer Hebammen).
+4. **Nur im Bericht** (E5) steht, wer an einer `termine`-Seite einen `hint` mit Ortsbezug hat. Muster (`PLACE_HINT`, je mit Test):
+   - `/termine an .+ weglassen/i` und `/nur termine (an|in|im) /i`;
+   - `/nur .+ liegen in /i`;
+   - `/(kursort|treffpunkt|veranstaltungsort)[^.]*\b(nicht|anderer|außerhalb|nur)\b/i`.
+
+   Das alte Muster traf `musikfuechse` nicht und `nuernberger-nest` fälschlich (dessen Hint „Kurse ohne genannte Termine … weglassen“ hat keinen Ortsbezug). Die S0-Zeile „Orts-`hint`“ wird neu gemessen.
+
+**Messen, zwei Kennzahlen** (M5, M6), mit dem S0-Skript vor dem Bau von `lib/pflege.ts`:
+- **Fehlalarme:** ≥ 95 % der heutigen `termine`-Seiten ergeben **nicht** `fremder-ort`. Nenner ohne Seiten, die nie Kandidat sein können (Sammelkalender mit Adapter, etwa die iCal-Feeds von `evangelische-termine.de`; sie bleiben „nie Kandidat“, weil ihre Termine über den Adapter kommen, M6). Jede heutige Seite mit `fremder-ort` prüft ein Mensch: Liegt dort wirklich ein fremder Ort, ist sie kein Fehlalarm, sondern ein Fund für die Katalogpflege.
+- **Schutz, bekannte Fälle:** Die drei `musikfuechse`-Seiten auf ihrem **echten, neu abgerufenen** Text (nicht auf einer Fixture) ergeben `fremder-ort` über `foreignPlaces`, nicht nur über den Orts-`hint` (N1-2, B1). Die S0-Messung speichert dazu die `programmeText` je Seite.
+- **Schutz, Kreuzprobe** (deterministisch und groß, N1-2, M6): Für jede heutige `termine`-Seite von Anbieter B prüft `foreignPlaces` gegen jeden Anbieter A, dessen Orte alle weiter als 100 m von denen von B liegen (als läge die Seite unter A). Soll: ≥ 95 % ergeben `fremder-ort`.
+- **Folgen:** Verfehlt die Fehlalarm-Kennzahl ihr Soll, bleibt `fremder-ort` streng (lieber eine Seite zu wenig anhängen): Die Fehlalarme gehen als „nur Bericht, Ort prüfen“ ins Pflege-Issue, ein Mensch hängt die Seite von Hand an. Verfehlt eine Schutz-Kennzahl ihr Soll, bleibt `pflege` im Trockenlauf (`PFLEGE_MODUS=trocken`), bis ein Nachtrag sie erfüllt.
+- **Issue (E5):** Es entsteht auch ohne Anhang, wenn „Ort prüfen“-Fälle vorliegen; Titel „Pflege <datum>: n Seiten angehängt, m Orte prüfen“.
+
+**Code:** `placeMentioned` (S1, Teil 1) entfällt; neu in `lib/site-crawl.ts`: `PLACE_NAMES`, `PLACE_HINT`, `streetMentions(text)`, `foreignPlaces(modelText, provider, catalog)` und `ownPlaceShown(texts, provider)`; `fullText` bleibt für Schritt 2. `contactLinks` samt Konstanten zieht nach `lib/site-crawl.ts`. Prüfung je Schritt: `pnpm verify`; E2E entfällt (nur Pipeline).
+
+**Tests** (`lib/site-crawl.test.ts`):
+- Adresse nur auf der Kontaktseite → geprüft;
+- fremde Adresse im Haupttext, eigene im Footer → `fremder-ort`;
+- „N-Kraftshof / F-Poppenreuth“ mit eigenem Ort Kraftshof → `fremder-ort` (Poppenreuth aus `PLACE_NAMES`);
+- fremder Ort nur im JSON-LD (`location.address`) → `fremder-ort`;
+- Ort „Gemeindehaus“ eines anderen Anbieters, Bezirk „Buch“ → kein fremder Ort;
+- geteilter Ort (`hebanne-schulz` in der FamilienBox, ≤ 100 m) → nicht fremd;
+- „Raum 2“, „Kurs 8“ → keine Straße; „Am Plärrer 2“ → Straße;
+- „Fürther Straße 10“ in Nürnberg → nicht Gemeinde Fürth;
+- Kontaktseite auf einer Dachseite nur unter der Pfadbindung; Kontaktseiten nach Tiefe 0, höchstens zwei, zählen zu den 20;
+- „Kulturladen Röthenbach“ eines anderen Anbieters → `fremder-ort`;
+- Widget per `iframe` erbt den Ort, nicht den Namen;
+- „Str. 5“ gegen „Str. 56“ → nicht derselbe Ort; PLZ allein → nicht geprüft;
+- Dachseite unter dem Pfad der Startseite ohne Anbieternamen → Mandant belegt;
+- Orts-`hint` „nur Kraftshof-Kurse liegen in Nürnberg“ → nur Bericht; „Kurse ohne genannte Termine weglassen“ → kein Orts-`hint`; Kreuzprobe auf zwei Fixture-Anbietern.
+
+**Risiken:** Ortsnamen in Fließtext („Ausflug nach Erlangen“) ergeben `fremder-ort` (gewollt streng, Fehlalarm ins Issue). `PLACE_NAMES` ist begrenzt: Ein fremder Ort ohne PLZ, Hausnummer und bekannten Namen außerhalb der Liste bleibt unerkannt; Abhilfe sind die Kreuzprobe und die menschliche Prüfung der ersten zwei Live-Läufe (Ziel 2). Die Liste veraltet kaum (Gebietsreform selten).
+
+**Review (2026-10-30) – Verdict: Überarbeiten,** alles übernommen:
+- **B1** gemischte Seite (`musikfuechse`) fiel durch: fremder Ort unabhängig vom eigenen, Gemeinde- und Ortsteilnamen, Hint-Muster erweitert.
+- **M1** Suche im Haupttext statt im Volltext. **M2** „Website statt Seite“ ersetzt durch gezielte Kontaktseiten im Budget, Impressum erlaubt. **M3** jede PLZ mit Ort. **M4** Adressvergleich über `normalizeAddress`, Hausnummern an Wortgrenzen, PLZ allein zählt nicht. **M5** zweite Kennzahl für den Schutz, menschliche Prüfung neuer `fremder-ort`. **M6** Nenner ohne Sammelkalender, Folge bei verfehltem Soll festgelegt.
+- **Minor:** m1 Pfadbindung als Mandant auf Dachseiten; m2 Widget erbt nur den Ort; m3 Orte anderer Anbieter; m4 Tests, Code und Risiken ergänzt; m5 Statuszeile und S0-Zeile korrigiert.
+
+**Review 2 (2026-10-30) – Verdict: Überarbeiten,** alles übernommen:
+- **B1** Gemeinde- und Ortsteilliste gab es nicht, Poppenreuth fehlte: feste, versionierte `PLACE_NAMES` mit Quelle; Schutz auf dem echten Text.
+- **M2** Text des Modells (`programmeText` mit JSON-LD und iCal) statt `extractPage().text`. **M3** Gattungswörter und mehrdeutige Bezirke: nur Namen mit weiterem Bestandteil, `district` keine Eingabe. **M4** geteilte Orte (≤ 100 m, gleiche Adresse) sind nicht fremd. **M5** eigener Straßen-Scanner. **M6** Kreuzprobe als zweite Schutz-Kennzahl, Folge Trockenlauf. **M7** Kontaktseiten auf Dachseiten nur unter der Pfadbindung.
+- **Minor:** `fullText` bleibt; `contactLinks` nach `lib/site-crawl.ts`; Einreihung der Kontaktseiten mit Test; Hint-Muster als Regexe; Issue auch ohne Anhang; Gemeinden an Wortgrenzen; `pnpm verify` je Schritt.
+
+Nach dem Skill war das der letzte erlaubte Review. **Die Änderungen aus Review 2 sind nicht mehr unabhängig geprüft.** Absicherung: Vor `lib/pflege.ts` misst das S0-Skript alle drei Kennzahlen auf echten Seiten; ein verfehltes Schutz-Soll hält den Trockenlauf (siehe „Folgen“).
 
 ## Nutzerentscheide (offen)
 
