@@ -41,7 +41,7 @@
    "inputHash": "4a186bc1fae5c375b8e1192157a03608e9e83545993dfdd997a5d4cf8dbe555f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.evangelische-termine.de/ical?vid=1496": {
@@ -178,7 +178,6 @@
    ],
    "inputHash": "fea4d2e45168a93803dd204edfa7a651d799184d3d18d2418917a5a3e676bd55",
    "dated": {
-    "2026-10-29": "3ce2c65a94682ce2704ac530b3f648cf4bc884fe8fed473ef95f064335d4f0aa",
     "2026-10-30": "5d1582c6a0c1483edc9c11769e3ba2b2b5355270563f5a714b71382cb472eb5f",
     "2026-11-05": "d7b0431992cfb73acf31ef5ab7c6cec488e3144627b91a872933c7db277bb9ab",
     "2026-11-09": "61c81196ee38203ce813ef0f6dac7bc0d9ff68dcf7c3f7bcadb3bc56d79a2e09",
@@ -315,7 +314,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "kandidaten": {
@@ -408,7 +407,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine",

@@ -234,7 +234,23 @@ describe("ageCheck", () => {
       fits: false,
       at: "2026-10-07T10:00:00+02:00",
       months: 5,
+      from: { at: "2026-11-04T10:00:00+01:00", months: 6, scheduled: true },
     });
+  });
+
+  it("nennt hinter den Daten den Tag, an dem das Kind ins Alter hineinwächst", () => {
+    const treff = fixtureOffer("krabbeltreff"); // letzter Termin 4.11.
+    expect(ageCheck(treff, "2026-06-01", FIXTURE_NOW)?.from).toEqual({
+      at: "2026-12-01T00:00:00+01:00",
+      months: 6,
+      scheduled: false,
+    });
+  });
+
+  it("hat kein „ab“ für Kurse und für Kinder, die herausgewachsen sind", () => {
+    expect(ageCheck(fixtureOffer("pekip-herbst"), "2026-04-13", FIXTURE_NOW)?.from).toBeUndefined();
+    expect(ageCheck(fixtureOffer("krabbeltreff"), "2024-01-01", FIXTURE_NOW)).toMatchObject({ fits: false });
+    expect(ageCheck(fixtureOffer("krabbeltreff"), "2024-01-01", FIXTURE_NOW)?.from).toBeUndefined();
   });
 });
 

@@ -6,16 +6,63 @@
     {
      "providerId": "muetterzentrum-fuerth",
      "venueId": "muetterzentrum-fuerth",
-     "title": "Einführung von Beikost für Babys",
-     "summary": "Gesprächsrunde zum Übergang von Milch zu Beikost: was man anbieten kann und worauf zu achten ist. Im praktischen Teil wird gezeigt, wie man Brei selbst kocht. Babys können mitgebracht werden.",
+     "title": "Nachhaltigkeitstreff: Info-Nachmittage mit Stoffwindeln (Kinder willkommen)",
+     "summary": "Kostenloser Info-Nachmittag ohne Voranmeldung zu nachhaltigem Familienleben, mit Stoffwindeln und wechselnden Schwerpunkten für Baby/Kleinkind, Frauen oder die ganze Familie. Kinder sind willkommen.",
      "topics": [
-      "beikost",
-      "muetter"
+      "elterntreff"
      ],
-     "format": "einmalig",
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html",
+     "sourceUrl": "https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html",
+     "category": "beratung",
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Kostenlos, ohne Voranmeldung, Erdgeschoss Mütterzentrum"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-02-25T14:00",
+        "end": "2027-02-25T16:00"
+       },
+       {
+        "start": "2027-03-25T14:00",
+        "end": "2027-03-25T16:00"
+       },
+       {
+        "start": "2027-04-29T14:00",
+        "end": "2027-04-29T16:00"
+       },
+       {
+        "start": "2027-05-20T14:00",
+        "end": "2027-05-20T16:00"
+       },
+       {
+        "start": "2027-06-24T14:00",
+        "end": "2027-06-24T16:00"
+       },
+       {
+        "start": "2027-07-29T14:00",
+        "end": "2027-07-29T16:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "muetterzentrum-fuerth",
+     "venueId": "muetterzentrum-fuerth",
+     "title": "Einführung von Beikost für Babys (ab ca. 4 Monaten)",
+     "summary": "Kurs für Mütter mit Babys ab etwa 4 Monaten zu Fragen rund um den Beikoststart, mit praktischem Teil zum Selbermachen von Breien. Das Baby darf mitgebracht werden. Anmeldung ist verpflichtend.",
+     "topics": [
+      "beikost"
+     ],
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "15 € je Termin, ermäßigt für Mitglieder",
+     "price": "15 € je Termin",
      "url": "https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html",
      "sourceUrl": "https://www.muetterzentrum-fuerth.de/mehrgenerationenhaus_muetterzentrum_fuerth_fabel.html",
      "category": "beratung",
@@ -25,7 +72,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung erforderlich, telefonisch im Mütterzentrum unter 0911/772799"
+      "note": "Anmeldung verpflichtend unter Telefon 0911/77 27 99 (Mütterzentrum)"
      },
      "schedule": {
       "kind": "dates",
@@ -38,28 +85,27 @@
      }
     }
    ],
-   "inputHash": "8e7e4cd3ca56662a315a5796acea9fe1af37b7093519d58ebda4f7fef303c20d",
-   "model": "opus",
+   "inputHash": "263bb350d9cabad511d830b2f2d254b90dfd354f796bf47f93d868000603eb8c",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://www.muetterzentrum-fuerth.de/kurse-kopie.html": {
    "events": [
     {
      "providerId": "muetterzentrum-fuerth",
      "venueId": "muetterzentrum-fuerth",
-     "title": "Offene Krabbelgruppe (grüne Spielgruppe), mittwochs",
-     "summary": "Offene Gruppe für Eltern und Großeltern mit Kleinkindern: Die Kinder spielen, die Erwachsenen tauschen sich über einen umweltfreundlichen Alltag mit Kindern aus. Dazu kommen Ausflüge und Bastelaktionen. Ohne Anmeldung; die Seite nennt noch den Jahrgang 2022, die aktuelle Altersgruppe bitte erfragen.",
+     "title": "Offene Krabbelgruppe (Mittwoch 15–17 Uhr)",
+     "summary": "Offener Treff für Eltern (auch Großeltern) mit ihren Kindern; laut Seite gilt Geburtsjahr 2022. Während die Kinder spielen, wird über einen umweltfreundlichen Alltag gesprochen, dazu kommen Ausflüge und Bastelaktionen. Einstieg jederzeit, keine Anmeldung nötig.",
      "topics": [
       "krabbelgruppe",
-      "spielgruppe",
-      "eltern-kind-gruppe"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "4 € Unkostenbeitrag, Mitglieder kostenfrei",
+     "price": "4 € Unkostenbeitrag (Mitglieder kostenfrei)",
      "url": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
      "sourceUrl": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
      "category": "krabbel-spielgruppen",
@@ -74,51 +120,16 @@
       ],
       "start": "15:00",
       "end": "17:00",
-      "from": "2026-10-28",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "muetterzentrum-fuerth",
-     "venueId": "muetterzentrum-fuerth",
-     "title": "Offenes Familiencafé (Mo–Fr vormittags)",
-     "summary": "Offenes Café im Mütterzentrum zum Frühstücken, Kaffeetrinken und Austauschen, Kinder sind willkommen. Bis 13:30 Uhr ist eine Ansprechpartnerin da, danach ist das Café ohne Betreuung bis 16 Uhr offen. Es gibt keinen Verzehrzwang.",
-     "topics": [
-      "elterncafe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "price": "kein Verzehrzwang",
-     "url": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
-     "sourceUrl": "https://www.muetterzentrum-fuerth.de/kurse-kopie.html",
-     "category": "treffs-cafes",
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Einfach vorbeikommen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "MO",
-       "TU",
-       "WE",
-       "TH",
-       "FR"
-      ],
-      "start": "09:00",
-      "end": "13:30",
-      "from": "2026-10-27",
+      "from": "2026-11-04",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "143bf1930e367cb815da29a67b3776f2baa1075e4846a59cbfeefa5b5c285ff6",
-   "model": "opus",
+   "inputHash": "dfcad94f5924816d2326e3fed572aca3b9bf300d10443674a108dcbe59a0fb87",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

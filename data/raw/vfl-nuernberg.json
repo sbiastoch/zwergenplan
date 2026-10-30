@@ -6,8 +6,8 @@
     {
      "providerId": "vfl-nuernberg",
      "venueId": "vfl-nuernberg",
-     "title": "Mutter-Kind-Turnen (montags)",
-     "summary": "Kleinkinder turnen mit einem Elternteil in der VfL-Sporthalle, wöchentlich am Montagnachmittag. Einstieg auf Anfrage beim Verein.",
+     "title": "Mutter-Kind-Turnen, montags 15:30–16:30",
+     "summary": "Wöchentliche Turnstunde für Kleinkinder mit Mutter oder Vater in der VfL-Sporthalle. Kein Aufnahmestopp vermerkt; die Angabe „neuer Kurs ab Januar 2024“ ist veraltet, deshalb vorab über die Kontaktseite anfragen.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage über den Kontakt des VfL Nürnberg"
+      "note": "Kein Aufnahmestopp vermerkt. Anfrage über die Kontaktseite des VfL Nürnberg."
      },
      "schedule": {
       "kind": "weekly",
@@ -38,11 +38,11 @@
      }
     }
    ],
-   "inputHash": "0d03a5371b4e012b7cf8f4621840bee11130d0edd9eb3b8fd834af93a10cdc10",
-   "model": "opus",
+   "inputHash": "b0ae41768aa0cae5eda4a78f83a03f6b549fb66ea10cd2355f6bda9a68becb21",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

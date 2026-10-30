@@ -6,13 +6,12 @@
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk-2",
-     "title": "Rückbildungsgymnastik dienstags (mit oder ohne Baby)",
-     "summary": "Rückbildungskurs mit Hebamme in Cadolzburg, um Beckenboden, Gewebe und Muskulatur nach der Geburt zu stärken; das Baby darf mitkommen. 8 Treffen à 75 Minuten, Kosten übernimmt die Krankenkasse. Startdatum nicht genannt, Einstieg auf Anfrage.",
+     "title": "Rückbildungsgymnastik Dienstag (mit oder ohne Kind)",
+     "summary": "Rückbildungsgymnastik nach der Geburt, Kind darf mitkommen. Dienstags 10:30–11:45 Uhr, 8 Einheiten à 75 Minuten. Kassenleistung; laut Seite derzeit ausgebucht.",
      "topics": [
-      "rueckbildung",
-      "fitness-mit-baby"
+      "rueckbildung"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenlos",
      "price": "Kassenleistung",
@@ -21,7 +20,7 @@
      "category": "bewegung",
      "availability": {
       "status": "ausgebucht",
-      "note": "Auf der Seite als ausgebucht markiert"
+      "note": "Kurs ausgebucht"
      },
      "schedule": {
       "kind": "weekly",
@@ -30,20 +29,19 @@
       ],
       "start": "10:30",
       "end": "11:45",
-      "from": "2026-10-27",
-      "skipHolidays": true
+      "from": "2026-11-03",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk-2",
-     "title": "Rückbildungsgymnastik donnerstags (mit oder ohne Baby)",
-     "summary": "Rückbildungskurs mit Hebamme in Cadolzburg, um Beckenboden, Gewebe und Muskulatur nach der Geburt zu stärken; das Baby darf mitkommen. 8 Treffen à 75 Minuten, Kosten übernimmt die Krankenkasse. Startdatum nicht genannt, Einstieg auf Anfrage.",
+     "title": "Rückbildungsgymnastik Donnerstag (mit oder ohne Kind)",
+     "summary": "Rückbildungsgymnastik nach der Geburt, Kind darf mitkommen. Donnerstags 10:30–11:45 Uhr, 8 Einheiten à 75 Minuten. Kassenleistung; laut Seite derzeit ausgebucht.",
      "topics": [
-      "rueckbildung",
-      "fitness-mit-baby"
+      "rueckbildung"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenlos",
      "price": "Kassenleistung",
@@ -52,7 +50,7 @@
      "category": "bewegung",
      "availability": {
       "status": "ausgebucht",
-      "note": "Auf der Seite als ausgebucht markiert"
+      "note": "Kurs ausgebucht"
      },
      "schedule": {
       "kind": "weekly",
@@ -61,15 +59,15 @@
       ],
       "start": "10:30",
       "end": "11:45",
-      "from": "2026-10-29",
-      "skipHolidays": true
+      "from": "2026-11-05",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk-2",
-     "title": "Babymassage montags (ab 11.01.2027)",
-     "summary": "Babymassage-Kurs mit 5 Treffen in der Hebammenpraxis Cadolzburg: Eltern lernen Massagegriffe, die ihr Baby entspannen und beruhigen und die Bindung stärken.",
+     "title": "Babymassage (Montag, ab 11.01.2027)",
+     "summary": "Babymassage-Kurs mit 5 Einheiten zum Entspannen, Beruhigen und Stärken des Vertrauens. Montags 12–13 Uhr. Anmeldung über die Kursseite.",
      "topics": [
       "babymassage"
      ],
@@ -81,7 +79,7 @@
      "category": "babykurse",
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -92,14 +90,14 @@
       "end": "13:00",
       "from": "2027-01-11",
       "count": 5,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk-2",
-     "title": "Yoga mit Baby freitags (20.11.–18.12.2026)",
-     "summary": "Yogakurs für Mütter nach der Geburt mit kräftigenden Übungen auf der Matte, das Baby ist mit dabei. 5 Termine freitags in Cadolzburg.",
+     "title": "Yoga mit Baby (Freitag, Nov./Dez. 2026)",
+     "summary": "Kräftigende Yogaübungen auf der Matte gemeinsam mit dem Baby. Fünf Freitage vom 20.11. bis 18.12.2026, 10:30–11:30 Uhr.",
      "topics": [
       "yoga-mit-baby"
      ],
@@ -111,7 +109,7 @@
      "category": "bewegung",
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -121,28 +119,57 @@
       "start": "10:30",
       "end": "11:30",
       "from": "2026-11-20",
-      "until": "2026-12-18",
       "count": 5,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk-2",
-     "title": "Mama Fit mit Baby freitags",
-     "summary": "Sanftes Fitnesstraining für Mütter nach der Geburt, das Baby kommt mit. Kurs mit 6 Einheiten freitags in Cadolzburg; ein Startdatum ist nicht genannt, Einstieg auf Anfrage.",
+     "title": "Yoga mit Baby (Freitag, Jan./Feb. 2027)",
+     "summary": "Kräftigende Yogaübungen auf der Matte gemeinsam mit dem Baby. Sieben Freitage vom 15.01. bis 26.02.2027, 10:30–11:30 Uhr.",
      "topics": [
-      "fitness-mit-baby"
+      "yoga-mit-baby"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.hebammen-wunderwerk.de/kurse",
      "sourceUrl": "https://www.hebammen-wunderwerk.de/kurse",
      "category": "bewegung",
      "availability": {
-      "status": "unbekannt",
-      "note": "Starttermin nicht angegeben; Anmeldung über die Website oder per Mail an info@hebammen-wunderwerk.de"
+      "status": "frei",
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "10:30",
+      "end": "11:30",
+      "from": "2027-01-15",
+      "count": 7,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "hebammen-wunderwerk",
+     "venueId": "hebammen-wunderwerk-2",
+     "title": "Mama Fit mit Baby (Freitag, Jan./Feb. 2027)",
+     "summary": "Sanftes Bewegungsprogramm nach der Geburt, das Baby ist dabei. Sieben Freitage vom 15.01. bis 26.02.2027, 9:15–10:15 Uhr.",
+     "topics": [
+      "fitness-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.hebammen-wunderwerk.de/kurse",
+     "sourceUrl": "https://www.hebammen-wunderwerk.de/kurse",
+     "category": "bewegung",
+     "availability": {
+      "status": "frei",
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -151,15 +178,16 @@
       ],
       "start": "09:15",
       "end": "10:15",
-      "from": "2026-10-30",
-      "skipHolidays": true
+      "from": "2027-01-15",
+      "count": 7,
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk-2",
-     "title": "FenKid Midi (4.–9. Lebensmonat) montags, 09.11.–14.12.2026",
-     "summary": "FenKid-Kurs für Babys im 4. bis 9. Lebensmonat: Die Kinder entdecken im freien Spiel ihre Umgebung, die Eltern begleiten sie dabei. 6 Termine montags in Cadolzburg.",
+     "title": "FenKid Midi (4.–9. Lebensmonat), Nov./Dez. 2026",
+     "summary": "Babykurs mit freiem Spiel, bei dem das Baby auf Entdeckungsreise geht. Für Babys im 4. bis 9. Lebensmonat, sechs Montage vom 09.11. bis 14.12.2026.",
      "topics": [
       "fenkid"
      ],
@@ -175,7 +203,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -185,16 +213,83 @@
       "start": "09:15",
       "end": "10:15",
       "from": "2026-11-09",
-      "until": "2026-12-14",
       "count": 6,
-      "skipHolidays": true
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "hebammen-wunderwerk",
+     "venueId": "hebammen-wunderwerk-2",
+     "title": "FenKid Midi (4.–9. Lebensmonat), Jan./Feb. 2027",
+     "summary": "Babykurs mit freiem Spiel für Babys im 4. bis 9. Lebensmonat. Sieben Montage vom 11.01. bis 22.02.2027, 9:15–10:15 Uhr.",
+     "topics": [
+      "fenkid"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.hebammen-wunderwerk.de/kurse",
+     "sourceUrl": "https://www.hebammen-wunderwerk.de/kurse",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 9
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "09:15",
+      "end": "10:15",
+      "from": "2027-01-11",
+      "count": 7,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "hebammen-wunderwerk",
+     "venueId": "hebammen-wunderwerk-2",
+     "title": "FenKid Maxi (ab 9. Lebensmonat), Jan./Feb. 2027",
+     "summary": "Babykurs mit freiem Spiel für Babys ab dem 9. Lebensmonat. Sieben Montage vom 11.01. bis 22.02.2027, 10:30–11:30 Uhr.",
+     "topics": [
+      "fenkid"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.hebammen-wunderwerk.de/kurse",
+     "sourceUrl": "https://www.hebammen-wunderwerk.de/kurse",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 9,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "10:30",
+      "end": "11:30",
+      "from": "2027-01-11",
+      "count": 7,
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk",
-     "title": "Babyschwimmen Freitag 9 Uhr (6 Termine ab November 2026)",
-     "summary": "Babyschwimmkurs ab dem 4. Monat mit 6 Einheiten im Zentrum für Therapie & Training in Fürth. Die Seite nennt als Start „Freitag 14.11.2026“, der 14.11. ist aber ein Samstag; das Startdatum sollte man beim Anbieter klären.",
+     "title": "Babyschwimmen ab 4. Monat (Freitag, Nov. 2026, 9 Uhr)",
+     "summary": "Babyschwimmen im Zentrum für Therapie & Training in Fürth für Babys ab dem 4. Lebensmonat. Sechs Freitage ab 14.11.2026, 9–10 Uhr.",
      "topics": [
       "babyschwimmen"
      ],
@@ -210,7 +305,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich; Startdatum widersprüchlich angegeben (Freitag / 14.11.)"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -219,16 +314,16 @@
       ],
       "start": "09:00",
       "end": "10:00",
-      "from": "2026-11-13",
+      "from": "2026-11-14",
       "count": 6,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk",
-     "title": "Babyschwimmen Freitag 10 Uhr (6 Termine ab November 2026)",
-     "summary": "Babyschwimmkurs ab dem 4. Monat mit 6 Einheiten im Zentrum für Therapie & Training in Fürth. Die Seite nennt als Start „Freitag 14.11.2026“, der 14.11. ist aber ein Samstag; das Startdatum sollte man beim Anbieter klären.",
+     "title": "Babyschwimmen ab 4. Monat (Freitag, Nov. 2026, 10 Uhr)",
+     "summary": "Babyschwimmen im Zentrum für Therapie & Training in Fürth für Babys ab dem 4. Lebensmonat. Sechs Freitage ab 14.11.2026, 10–11 Uhr.",
      "topics": [
       "babyschwimmen"
      ],
@@ -244,7 +339,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich; Startdatum widersprüchlich angegeben (Freitag / 14.11.)"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -253,16 +348,16 @@
       ],
       "start": "10:00",
       "end": "11:00",
-      "from": "2026-11-13",
+      "from": "2026-11-14",
       "count": 6,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk",
-     "title": "Babyschwimmen Freitag 9 Uhr (8 Termine ab 15.01.2027)",
-     "summary": "Babyschwimmkurs für Babys ab dem 4. Monat mit Elternteil im Wasser, 8 Einheiten freitags im Zentrum für Therapie & Training in Fürth.",
+     "title": "Babyschwimmen ab 4. Monat (Freitag, Jan. 2027, 9 Uhr)",
+     "summary": "Babyschwimmen im Zentrum für Therapie & Training in Fürth für Babys ab dem 4. Lebensmonat. Acht Freitage ab 15.01.2027, 9–10 Uhr.",
      "topics": [
       "babyschwimmen"
      ],
@@ -278,7 +373,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -289,14 +384,14 @@
       "end": "10:00",
       "from": "2027-01-15",
       "count": 8,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk",
-     "title": "Babyschwimmen Freitag 10 Uhr (8 Termine ab 15.01.2027)",
-     "summary": "Babyschwimmkurs für Babys ab dem 4. Monat mit Elternteil im Wasser, 8 Einheiten freitags in Fürth. Auf der Seite steht als Start der 15.01.2026, gemeint ist wohl der Freitag, 15.01.2027.",
+     "title": "Babyschwimmen ab 4. Monat (Freitag, März 2027, 9 Uhr)",
+     "summary": "Babyschwimmen im Zentrum für Therapie & Training in Fürth für Babys ab dem 4. Lebensmonat. Acht Freitage ab 05.03.2027, 9–10 Uhr.",
      "topics": [
       "babyschwimmen"
      ],
@@ -312,41 +407,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich; Startjahr auf der Seite vermutlich falsch (2026 statt 2027)"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2027-01-15",
-      "count": 8,
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "hebammen-wunderwerk",
-     "venueId": "hebammen-wunderwerk",
-     "title": "Babyschwimmen Freitag 9 Uhr (8 Termine ab 05.03.2027)",
-     "summary": "Babyschwimmkurs für Babys ab dem 4. Monat mit Elternteil im Wasser, 8 Einheiten freitags im Zentrum für Therapie & Training in Fürth.",
-     "topics": [
-      "babyschwimmen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.hebammen-wunderwerk.de/kurse",
-     "sourceUrl": "https://www.hebammen-wunderwerk.de/kurse",
-     "category": "wasser",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung über die Website möglich"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -357,14 +418,14 @@
       "end": "10:00",
       "from": "2027-03-05",
       "count": 8,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "hebammen-wunderwerk",
      "venueId": "hebammen-wunderwerk",
-     "title": "Babyschwimmen Freitag 10 Uhr (8 Termine ab 05.03.2027)",
-     "summary": "Babyschwimmkurs für Babys ab dem 4. Monat mit Elternteil im Wasser, 8 Einheiten freitags im Zentrum für Therapie & Training in Fürth.",
+     "title": "Babyschwimmen ab 4. Monat (Freitag, März 2027, 10 Uhr)",
+     "summary": "Babyschwimmen im Zentrum für Therapie & Training in Fürth für Babys ab dem 4. Lebensmonat. Acht Freitage ab 05.03.2027, 10–11 Uhr.",
      "topics": [
       "babyschwimmen"
      ],
@@ -380,7 +441,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über die Website möglich"
+      "note": "Anmeldebutton aktiv, Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -391,15 +452,15 @@
       "end": "11:00",
       "from": "2027-03-05",
       "count": 8,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "d7046cb7a4639486f7b57ae7e7eed486ab54a4e07d79252f8bbe0ff65330df61",
-   "model": "opus",
+   "inputHash": "87cebdf14fefc9af5fd05bbf60d17fdac121670dffd0de8900ad5743637dc51e",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

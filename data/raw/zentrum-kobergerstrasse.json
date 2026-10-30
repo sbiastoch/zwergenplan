@@ -108,7 +108,7 @@
    "inputHash": "62b94b59988e65e47fe66dd6d2cbbdc6778731d8635f94dd0867ba3314051b01",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/": {
@@ -148,7 +148,7 @@
    "inputHash": "e3427bb69470cf3b805d3aa4e408a0381a2c9ddffc68805531bf00a2cea4d400",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00"
   },
@@ -157,7 +157,7 @@
    "inputHash": "f76dc5e4ce721f2ef6e1ede6f26dbc4597e4f68ed81f45ea40f4b4a9047fff24",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "kandidaten": {
@@ -165,8 +165,8 @@
     {
      "providerId": "zentrum-kobergerstrasse",
      "venueId": "zentrum-kobergerstrasse",
-     "title": "Koberger Minis – Eltern-Treff mit Babys (1–6 Monate)",
-     "summary": "Offener Treff für Eltern mit Babys von 1 bis 6 Monaten zum Austausch und für erste Kontakte der Babys zu Gleichaltrigen. Donnerstags, nicht in den Schulferien, ohne Anmeldung.",
+     "title": "Koberger Minis – offener Eltern-Treff (Babys 1–6 Monate)",
+     "summary": "Offener Treff für Eltern mit Babys bis 6 Monate: Austausch mit anderen Eltern und erste Kontakte der Babys zu Gleichaltrigen, Fachfragen möglich. Donnerstags, nicht in den Schulferien, ohne Anmeldung.",
      "topics": [
       "elterntreff"
      ],
@@ -182,7 +182,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung nötig, einfach vorbeikommen"
+      "note": "Offener Treff, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -191,7 +191,7 @@
       ],
       "start": "10:30",
       "end": "11:45",
-      "from": "2026-10-29",
+      "from": "2026-11-12",
       "skipHolidays": true
      },
      "via": "frankenkids"
@@ -199,8 +199,8 @@
     {
      "providerId": "zentrum-kobergerstrasse",
      "venueId": "zentrum-kobergerstrasse",
-     "title": "Koberger Midis – Elterncafé mit Babys (6–12 Monate)",
-     "summary": "Offenes Elterncafé für Eltern mit Babys von 6 bis 12 Monaten, mit Austausch und altersgerechten Entdeckungsmöglichkeiten für die Kinder. Dienstags, nicht in den Schulferien, ohne Anmeldung.",
+     "title": "Koberger Midis – Elterncafé (Babys 6–12 Monate)",
+     "summary": "Offenes Elterncafé für Eltern mit Babys von 6 bis 12 Monaten: Austausch unter Eltern, dazu Entdeckungsmöglichkeiten für die Kleinen. Dienstags, nicht in den Schulferien, ohne Anmeldung.",
      "topics": [
       "elterncafe"
      ],
@@ -216,7 +216,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung nötig, einfach vorbeikommen"
+      "note": "Offener Treff, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -233,7 +233,6 @@
    ],
    "inputHash": "890f2ddf63770d61f8696e49262f66e5ed344897821af21102234fdbe2622c35",
    "dated": {
-    "2026-10-29": "f2ed2c27ec7db11123009f903ee7fa06247cb4d8dc8846c30993a62ed7316416",
     "2026-11-10": "2979ffc0ae864b87b21e2fe193a7a4420a172b2e34fe1a8a6c533a7466c361b1",
     "2026-11-12": "655ae28fc58787df6137e415dc30d42969c2b99727c6d36b3cec6c98d1ba0e2e",
     "2026-11-17": "197fa6b26edb862fa291fc29c59c8f7b43e324a21a9f6af799f4b9f4924e291d",
@@ -246,12 +245,20 @@
     "2026-12-10": "6811bf53bd8f5068f6afe69fc6d214a8e7ecb2d3926af9b9d9934c59360e9bf6",
     "2026-12-15": "6215be6465c957b6c3261666e4e9a773d3e6c39c3982dcea54a31fc7d6b042ee",
     "2026-12-17": "13307c0e9d02be585d869f719e49192505a9b4eff369889ecb89174a4bb5cd17",
-    "2026-12-22": "9d39411047e384536f68351ff40dc8eab0e8f4dd24f49d4d360994b25859c5b6"
+    "2026-12-22": "9d39411047e384536f68351ff40dc8eab0e8f4dd24f49d4d360994b25859c5b6",
+    "2027-01-12": "d935e213844c9f2e00ec6df8438b0b3ff64e2ddcbf00c0de33ed0ce53f809ad2",
+    "2027-01-14": "87593e7a51e188ccf9a8ee2c2b6cb0a4555f9095f0806ad0175fa345a3f5d750",
+    "2027-01-19": "e6806d8745ce72aa32e2ab1c21ad3fc987e93af4832e4fbd503cb12600efc06c",
+    "2027-01-21": "49e8f7f464a1bc8b6c3c1b886640a93fc25df31fd8e34a6120984ec8391cc84d",
+    "2027-01-26": "05f3730b9414e892b33bdb54d5afaca8761b1094adbe451fede120ebefbe72b4",
+    "2027-01-28": "3ea9cac0af144e99b818b452b144a8268d6496453623aae9b9c59ccc3266dbb4",
+    "2027-02-02": "66749001ee3643b33bd12e80148fdab77da3960b977a4b36880a87f1b755708c",
+    "2027-02-04": "faa16c76ca206459786a446bb2dd16a943653e2ff5e76ac697951d400b8b10bf"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"
    ]

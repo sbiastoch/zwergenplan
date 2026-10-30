@@ -9,11 +9,10 @@ import type { Origin, Reach } from "../domain/reach.ts";
 import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
 import { ABOUT_DATA_PATH } from "../domain/share.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { berlinIsoDate } from "../domain/time.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
 import {
+  ageCheckLabel,
   ageRangeLabel,
-  ageWindowLabel,
   availabilityLabel,
   calendarLoaded,
   costLabel,
@@ -21,7 +20,6 @@ import {
   EXPORT_UNAVAILABLE,
   listedSince,
   longDate,
-  plural,
   registrationLabel,
   registrationNote,
   seriesToast,
@@ -94,7 +92,7 @@ export function DetailContent({
   const check = birthDate ? ageCheck(offer, birthDate, now, fromCalendar) : undefined;
   const availability = availabilityLabel(offer);
   // Altersgrenze dauerhaft sichtbar (Plan 0018, E4): In der iOS-App verdeckt der Kalender-Dialog den Toast sofort.
-  const ageWindow = regular && birthDate ? ageWindowLabel(exportSessions(offer, now, birthDate), now) : undefined;
+  const ageSelection = regular && birthDate ? exportSessions(offer, now, birthDate) : undefined;
 
   /** Datei aus dem Browser (Plan 0018, E2): gleiche VEVENTs und gleicher Name wie die statische Datei (ADR 0018) */
   const exportSeries = async (selection: ExportSelection, stamp: string, container: HTMLElement | undefined) => {
@@ -183,10 +181,7 @@ export function DetailContent({
               <span className="cap">Alter</span>
               <b>{ageRangeLabel(offer.age)}</b>
               {check ? (
-                <span className={check.fits ? "ok" : undefined}>
-                  {check.fits ? "Passt" : "Passt nicht"}: am {shortDate(berlinIsoDate(check.at))}{" "}
-                  {plural(check.months, "Monat", "Monate")} alt{ageWindow && ` · ${ageWindow}`}
-                </span>
+                <span className={check.fits ? "ok" : undefined}>{ageCheckLabel(check, ageSelection, now)}</span>
               ) : (
                 <span>Geburtsdatum eintragen, dann prüfen wir das</span>
               )}

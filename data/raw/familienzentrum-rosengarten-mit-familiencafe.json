@@ -6,8 +6,8 @@
     {
      "providerId": "familienzentrum-rosengarten-mit-familiencafe",
      "venueId": "familienzentrum-rosengarten-mit-familiencafe",
-     "title": "Café Kinderwagen – Treff für Eltern mit Baby (montags)",
-     "summary": "Offener Treff im Familiencafé für Eltern mit Baby: Austausch mit anderen Eltern, Fragen loswerden und bei einem Kaffee durchatmen. Fast jeden Montag, ohne Anmeldung einfach vorbeikommen.",
+     "title": "Café Kinderwagen (Eltern mit Baby, montags)",
+     "summary": "Offener Treff für Eltern mit Baby im Familiencafé Rosengarten: Austausch, Fragen und Kaffee. Montags, meist 10:00–11:30 Uhr. Ohne Anmeldung einfach vorbeikommen.",
      "topics": [
       "elterncafe",
       "elterntreff"
@@ -20,7 +20,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Einfach vorbeikommen; findet (fast) immer montags statt, aktuelle Infos im WhatsApp-Kanal des Familiencafés"
+      "note": "Einfach vorbeikommen, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -34,11 +34,11 @@
      }
     }
    ],
-   "inputHash": "42d602569ded50681d212b90bbbbc3d01dfa1a72226a038b35bc91358a5653e4",
-   "model": "opus",
+   "inputHash": "4bc3484a2439f5dfdbbd63efd8d87e6147956cb893b0e2671c2d9463e0afef1a",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

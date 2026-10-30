@@ -1,148 +1,16 @@
 {
  "version": 2,
  "units": {
-  "seite:https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1115067&min_date={von}&max_date={bis}&page_size=200": {
-   "events": [
-    {
-     "providerId": "imiluv-studio",
-     "venueId": "imiluv-studio",
-     "title": "Reformer Mums & Babies – Pilates mit Baby (mittwochs)",
-     "summary": "Pilates am Reformer für Mütter, das Baby ist dabei (ca. 6 Wochen bis 6 Monate). Der Kurs ist auf Englisch, eine ärztliche Freigabe ist nötig. Einzeltermine buchst du in der IMILUV-App.",
-     "topics": [
-      "fitness-mit-baby",
-      "muetter"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "5 Credits pro Termin",
-     "url": "https://imiluv.de/schedule",
-     "sourceUrl": "https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1115067&min_date=2026-10-01&max_date=2027-11-01&page_size=200",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 1,
-      "maxMonths": 6
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Kein Termin ausgebucht; Buchung nur in der IMILUV-App (bsport)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-28T11:00",
-        "end": "2026-10-28T11:55"
-       },
-       {
-        "start": "2026-11-04T11:00",
-        "end": "2026-11-04T11:55"
-       },
-       {
-        "start": "2026-11-11T11:00",
-        "end": "2026-11-11T11:55"
-       },
-       {
-        "start": "2026-11-18T11:00",
-        "end": "2026-11-18T11:55"
-       },
-       {
-        "start": "2026-11-25T11:00",
-        "end": "2026-11-25T11:55"
-       },
-       {
-        "start": "2026-12-02T11:00",
-        "end": "2026-12-02T11:55"
-       },
-       {
-        "start": "2026-12-09T11:00",
-        "end": "2026-12-09T11:55"
-       }
-      ]
-     }
-    }
-   ],
-   "inputHash": "7b4947f6f0e92b7d70aa6775d6cad4f153db60995b4e59f36d21f7cbf989a11b",
-   "model": "opus",
-   "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
-  },
-  "seite:https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1125443&min_date={von}&max_date={bis}&page_size=200": {
-   "events": [
-    {
-     "providerId": "imiluv-studio",
-     "venueId": "imiluv-studio",
-     "title": "Barre Baby Luv – Barre-Workout mit Baby in der Trage",
-     "summary": "Wöchentliches Barre-Training für Mamas und Papas, das Baby (ca. 6–12 Monate) ist dabei in der Trage. Kurs auf Deutsch und Englisch; eine ärztliche Freigabe ist nötig. Jede Stunde wird einzeln in der IMILUV-App gebucht.",
-     "topics": [
-      "fitness-mit-baby",
-      "mehrsprachig"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "4 Credits je Stunde (IMILUV-App)",
-     "url": "https://imiluv.de/schedule",
-     "sourceUrl": "https://api.production.bsport.io/book/v1/offer/?company=2795&activity=1125443&min_date=2026-10-01&max_date=2027-11-01&page_size=200",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Nicht ausgebucht; Buchung nur in der IMILUV-App (bsport)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-29T10:45",
-        "end": "2026-10-29T11:35"
-       },
-       {
-        "start": "2026-11-05T10:45",
-        "end": "2026-11-05T11:35"
-       },
-       {
-        "start": "2026-11-12T10:45",
-        "end": "2026-11-12T11:35"
-       },
-       {
-        "start": "2026-11-19T10:45",
-        "end": "2026-11-19T11:35"
-       },
-       {
-        "start": "2026-11-26T10:45",
-        "end": "2026-11-26T11:35"
-       },
-       {
-        "start": "2026-12-03T10:45",
-        "end": "2026-12-03T11:35"
-       }
-      ]
-     }
-    }
-   ],
-   "inputHash": "d2be86e0e0c55761fe2e807b8b3898481559ad710c244013ad030ff4c96ee385",
-   "model": "opus",
-   "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
-  },
   "kandidaten": {
    "events": [
     {
      "providerId": "imiluv-studio",
      "venueId": "imiluv-studio",
-     "title": "Barre für Mamas & Babys (Donnerstag, Babys ca. 6–12 Monate)",
-     "summary": "Kräftigendes Barre-Training für Mütter nach der Geburt, das Baby ist in der Trage dabei. Kurs auf Deutsch oder Englisch, eine ärztliche Freigabe ist nötig, Dauer 55 Minuten.",
+     "title": "Barre für Mamas & Babys (Babys ca. 6–12 Monate)",
+     "summary": "Kräftigung und Körpergefühl nach der Geburt, das Baby im Carrier dabei. Kurs auf Deutsch oder Englisch, ärztliche Freigabe nötig. Anmeldung über die IMILUV-App; die Quelle nennt jeden Donnerstag, eingetragen sind die gelisteten Termine.",
      "topics": [
       "fitness-mit-baby",
-      "rueckbildung",
-      "muetter",
-      "mehrsprachig"
+      "rueckbildung"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -156,31 +24,31 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über die IMILUV-App"
+      "note": "Anmeldung über die IMILUV-App (bsport); Platzangaben nicht sichtbar"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "interval": 2,
-      "start": "10:45",
-      "end": "11:40",
-      "from": "2026-11-05",
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-05T10:45",
+        "end": "2026-11-05T11:40"
+       },
+       {
+        "start": "2026-11-19T10:45",
+        "end": "2026-11-19T11:40"
+       }
+      ]
      },
      "via": "frankenkids"
     },
     {
      "providerId": "imiluv-studio",
      "venueId": "imiluv-studio",
-     "title": "Reformer Pilates für Mamas & Babys (Mittwoch, Babys ca. 6 Wochen–6 Monate)",
-     "summary": "Sanftes Pilates-Training am Reformer für Mütter nach der Geburt, das Baby ist mit dabei. Der Kurs findet auf Englisch statt, eine ärztliche Freigabe ist nötig, Dauer 55 Minuten.",
+     "title": "Reformer Pilates für Mamas & Babys (Babys 6 Wochen–6 Monate)",
+     "summary": "Sanftes Reformer-Pilates nach der Geburt, das Baby ist dabei. Kurs auf Englisch, ärztliche Freigabe nötig. Anmeldung über die IMILUV-App.",
      "topics": [
       "fitness-mit-baby",
-      "rueckbildung",
-      "muetter",
-      "mehrsprachig"
+      "rueckbildung"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -194,34 +62,35 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über die IMILUV-App"
+      "note": "Anmeldung über die IMILUV-App (bsport); Platzangaben nicht sichtbar"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "interval": 2,
-      "start": "11:00",
-      "end": "11:55",
-      "from": "2026-10-28",
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-11T11:00",
+        "end": "2026-11-11T11:55"
+       },
+       {
+        "start": "2026-11-25T11:00",
+        "end": "2026-11-25T11:55"
+       }
+      ]
      },
      "via": "frankenkids"
     }
    ],
-   "inputHash": "7cb7fbe92403c9d2c55af92abe39c150302efcf883889598aff6d5da7d3709ee",
+   "inputHash": "068a15470d4200c9422ee37b36a0cd2d6b155ed2aa7d3854bf599bf50507e5fc",
    "dated": {
-    "2026-10-28": "bb0e397cfa0f7faa8bc071e45c37caebbc8ac116cbb0a2fc25e49920f0115d6b",
     "2026-11-05": "4469413ab5cecdfa1ba87562ddf4671fa640e3e4ced70a41309448442ec050dd",
     "2026-11-11": "24881df50e6dff67323da14243116da9864ce627834593e9e54e2667bcae5660",
     "2026-11-19": "e4866a6c6ee548e519d562ca53a332f4bfeec60ff1bbc73c9754a467b41710d8",
     "2026-11-25": "8aa9d068f13f2fb4759af4924487f1d2590dcd95c7a53258c3d43651a9550e72"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"
    ]

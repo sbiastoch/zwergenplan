@@ -8,6 +8,7 @@ import { ACCESS_METERS, TRANSFER_PENALTY_MINUTES, TRANSIT_RULE } from "../domain
 import type { TransitOther } from "../domain/transit-types.ts";
 import {
   aboToast,
+  ageCheckLabel,
   ageChipLabel,
   ageEmptyText,
   agendaHeading,
@@ -866,6 +867,30 @@ describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
     );
     expect(ageWindowLabel(selection("2026-10-09", 4), FIXTURE_NOW)).toBeUndefined();
     expect(ageWindowLabel({ sessions: [] }, FIXTURE_NOW)).toBeUndefined();
+  });
+
+  it("Alterszeile sagt bei regelmäßigen, ab wann es passt, statt „passt nicht“", () => {
+    const at = "2026-10-07T10:00:00+02:00";
+    const fits = { fits: true, at, months: 6 };
+    expect(ageCheckLabel(fits, selection("2026-10-07", 2, { until: "2026-10-14" }), FIXTURE_NOW)).toBe(
+      "Passt: am Mi 7.10. 6 Monate alt · passt bis 14.10.",
+    );
+    expect(ageCheckLabel({ fits: false, at, months: 30 }, undefined, FIXTURE_NOW)).toBe(
+      "Passt nicht: am Mi 7.10. 30 Monate alt",
+    );
+    const later = { fits: false, at, months: 5, from: { at: "2026-11-04T10:00:00+01:00", months: 6, scheduled: true } };
+    expect(
+      ageCheckLabel(later, selection("2026-11-04", 8, { from: "2026-11-04", until: "2027-03-14" }), FIXTURE_NOW),
+    ).toBe("Passt ab 4.11.: dann 6 Monate alt · passt bis 14.3.2027");
+    const beyond = {
+      fits: false,
+      at,
+      months: 8,
+      from: { at: "2028-03-01T00:00:00+01:00", months: 24, scheduled: false },
+    };
+    expect(ageCheckLabel(beyond, { sessions: [] }, FIXTURE_NOW)).toBe(
+      "Passt ab 1.3.2028: dann 24 Monate alt · noch keine Termine bekannt",
+    );
   });
 
   it("nennt das Jahr nur außerhalb des laufenden Berliner Jahres", () => {

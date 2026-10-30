@@ -6,8 +6,8 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen (1½–2½ Jahre, mittwochs 17 Uhr)",
-     "summary": "Kleinkinder turnen mit einem Elternteil frei an einem Parcours, der jede Woche neu aufgebaut wird: laufen, klettern, balancieren, rutschen, dazu Ball, Reifen und Seil. Eltern machen mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09., ein späterer Einstieg nur nach Anfrage.",
+     "title": "Eltern-Kind-Turnen (1½–2½ Jahre), Mittwoch 17:00",
+     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen, Eltern sind aktiv dabei und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09.; ein Enddatum nennt die Seite nicht.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kursnr. 16301; Platzlage nicht angegeben, Einstieg bei der vhs Fürth anfragen"
+      "note": "Platzangabe nicht auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16301)"
      },
      "schedule": {
       "kind": "weekly",
@@ -33,15 +33,15 @@
        "WE"
       ],
       "start": "17:00",
-      "from": "2026-09-23",
+      "from": "2026-11-04",
       "skipHolidays": true
      }
     },
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen (2–3 Jahre, donnerstags 17 Uhr)",
-     "summary": "Kleinkinder turnen mit einem Elternteil frei an einem Parcours, der jede Woche neu aufgebaut wird: laufen, klettern, balancieren, rutschen, dazu Ball, Reifen und Seil. Eltern machen mit und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09., ein späterer Einstieg nur nach Anfrage.",
+     "title": "Eltern-Kind-Turnen (2–3 Jahre), Donnerstag 17:00",
+     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen, Eltern sind aktiv dabei und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09.; ein Enddatum nennt die Seite nicht.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -59,7 +59,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kursnr. 16303; Platzlage nicht angegeben, Einstieg bei der vhs Fürth anfragen"
+      "note": "Platzangabe nicht auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16303)"
      },
      "schedule": {
       "kind": "weekly",
@@ -67,16 +67,16 @@
        "TH"
       ],
       "start": "17:00",
-      "from": "2026-09-24",
+      "from": "2026-11-05",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "538567d97d5120c5938c7a48a67c2decbaacaf546de4d34bf91a5957174c53e3",
-   "model": "opus",
+   "inputHash": "29fef01535c043463883df4c977453794dfa9f1e9d8716e012650608e78def0c",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

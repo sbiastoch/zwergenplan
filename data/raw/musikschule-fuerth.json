@@ -6,29 +6,23 @@
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Winterkurs – Dienstag 09:30",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.10.2023–1.10.2024. Der Kurs läuft seit Oktober, neu einsteigen kann man sonst nur zu Kursbeginn.",
+     "title": "Grabblmusik Minis, Winterkurs 2026, Di 9:30 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.10.2023 bis 1.10.2024. 15 Termine à 45 Minuten, Kursbeginn 6.10.2026. Anmeldeschluss war der 30.06.2026; Neueinstieg nur zu Kursbeginn.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits, Anmeldeschluss war der 30.06.2026; freie Plätze telefonisch erfragen (0911 706 848)"
-     },
-     "registrationWindow": {
-      "deadline": "2026-06-30T23:59"
+      "note": "Anmeldeschluss 30.06.2026 vorbei; Platzstand nicht angegeben, bei der Musikschule nachfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -39,35 +33,29 @@
       "end": "10:15",
       "from": "2026-10-06",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Winterkurs – Dienstag 15:00",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.10.2023–1.10.2024. Der Kurs läuft seit Oktober, neu einsteigen kann man sonst nur zu Kursbeginn.",
+     "title": "Grabblmusik Minis, Winterkurs 2026, Di 15:00 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.10.2023 bis 1.10.2024. 15 Termine à 45 Minuten, Kursbeginn 6.10.2026. Anmeldeschluss war der 30.06.2026; Neueinstieg nur zu Kursbeginn.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits, Anmeldeschluss war der 30.06.2026; freie Plätze telefonisch erfragen (0911 706 848)"
-     },
-     "registrationWindow": {
-      "deadline": "2026-06-30T23:59"
+      "note": "Anmeldeschluss 30.06.2026 vorbei; Platzstand nicht angegeben, bei der Musikschule nachfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -78,35 +66,29 @@
       "end": "15:45",
       "from": "2026-10-06",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Winterkurs – Mittwoch 16:00",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.10.2023–1.10.2024. Der Kurs läuft seit Oktober, neu einsteigen kann man sonst nur zu Kursbeginn.",
+     "title": "Grabblmusik Minis, Winterkurs 2026, Mi 16:00 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.10.2023 bis 1.10.2024. 15 Termine à 45 Minuten, Kursbeginn 7.10.2026. Anmeldeschluss war der 30.06.2026; Neueinstieg nur zu Kursbeginn.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits, Anmeldeschluss war der 30.06.2026; freie Plätze telefonisch erfragen (0911 706 848)"
-     },
-     "registrationWindow": {
-      "deadline": "2026-06-30T23:59"
+      "note": "Anmeldeschluss 30.06.2026 vorbei; Platzstand nicht angegeben, bei der Musikschule nachfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -117,35 +99,29 @@
       "end": "16:45",
       "from": "2026-10-07",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Winterkurs – Mittwoch 17:00",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.10.2023–1.10.2024. Der Kurs läuft seit Oktober, neu einsteigen kann man sonst nur zu Kursbeginn.",
+     "title": "Grabblmusik Minis, Winterkurs 2026, Mi 17:00 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.10.2023 bis 1.10.2024. 15 Termine à 45 Minuten, Kursbeginn 7.10.2026. Anmeldeschluss war der 30.06.2026; Neueinstieg nur zu Kursbeginn.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits, Anmeldeschluss war der 30.06.2026; freie Plätze telefonisch erfragen (0911 706 848)"
-     },
-     "registrationWindow": {
-      "deadline": "2026-06-30T23:59"
+      "note": "Anmeldeschluss 30.06.2026 vorbei; Platzstand nicht angegeben, bei der Musikschule nachfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -156,35 +132,29 @@
       "end": "17:45",
       "from": "2026-10-07",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Frühjahrskurs – Dienstag 09:30",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.3.2024–1.3.2025, 15 Treffen à 45 Minuten, zu Kursbeginn kann man neu einsteigen.",
+     "title": "Grabblmusik Minis, Frühjahr 2027, Di 9:30 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.3.2024 bis 1.3.2025. 15 Termine à 45 Minuten, Kursbeginn 2. März 2027. Anmeldeschluss 15.01.2027, Platzvergabe nach Eingang der Anmeldung.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über die Musikschule (Telefon 0911 706 848 oder info@musikschule-fuerth.de), Plätze nach Eingang der Anmeldung"
-     },
-     "registrationWindow": {
-      "deadline": "2027-01-15T23:59"
+      "note": "Anmeldung über die Website oder per Telefon/E-Mail; Platzstand nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -195,35 +165,29 @@
       "end": "10:15",
       "from": "2027-03-02",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Frühjahrskurs – Dienstag 15:00",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.3.2024–1.3.2025, 15 Treffen à 45 Minuten, zu Kursbeginn kann man neu einsteigen.",
+     "title": "Grabblmusik Minis, Frühjahr 2027, Di 15:00 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.3.2024 bis 1.3.2025. 15 Termine à 45 Minuten, Kursbeginn 2. März 2027. Anmeldeschluss 15.01.2027, Platzvergabe nach Eingang der Anmeldung.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über die Musikschule (Telefon 0911 706 848 oder info@musikschule-fuerth.de), Plätze nach Eingang der Anmeldung"
-     },
-     "registrationWindow": {
-      "deadline": "2027-01-15T23:59"
+      "note": "Anmeldung über die Website oder per Telefon/E-Mail; Platzstand nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -234,35 +198,29 @@
       "end": "15:45",
       "from": "2027-03-02",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Frühjahrskurs – Mittwoch 16:00",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.3.2024–1.3.2025, 15 Treffen à 45 Minuten, zu Kursbeginn kann man neu einsteigen.",
+     "title": "Grabblmusik Minis, Frühjahr 2027, Mi 16:00 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.3.2024 bis 1.3.2025. 15 Termine à 45 Minuten, Kursbeginn 3. März 2027. Anmeldeschluss 15.01.2027, Platzvergabe nach Eingang der Anmeldung.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über die Musikschule (Telefon 0911 706 848 oder info@musikschule-fuerth.de), Plätze nach Eingang der Anmeldung"
-     },
-     "registrationWindow": {
-      "deadline": "2027-01-15T23:59"
+      "note": "Anmeldung über die Website oder per Telefon/E-Mail; Platzstand nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -273,35 +231,29 @@
       "end": "16:45",
       "from": "2027-03-03",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "musikschule-fuerth",
      "venueId": "musikschule-fuerth",
-     "title": "Grabblmusik Minis Frühjahrskurs – Mittwoch 17:00",
-     "summary": "Kleinkinder um 2 Jahre musizieren mit Eltern oder Großeltern: Lieder, Kniereiter, Fingerspiele, Tänze und erste Orff-Instrumente. Für Kinder geboren 2.3.2024–1.3.2025, 15 Treffen à 45 Minuten, zu Kursbeginn kann man neu einsteigen.",
+     "title": "Grabblmusik Minis, Frühjahr 2027, Mi 17:00 Uhr",
+     "summary": "Gemeinsames Musizieren mit Kinderliedern, Fingerspielen und Orff-Instrumenten für Kinder, geboren 2.3.2024 bis 1.3.2025. 15 Termine à 45 Minuten, Kursbeginn 3. März 2027. Anmeldeschluss 15.01.2027, Platzvergabe nach Eingang der Anmeldung.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "136,10 € (15 × 45 Min.)",
+     "price": "136,10 €",
      "url": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "sourceUrl": "https://www.musikschule-fuerth.de/unterricht/eltern-kind-kurse/",
      "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über die Musikschule (Telefon 0911 706 848 oder info@musikschule-fuerth.de), Plätze nach Eingang der Anmeldung"
-     },
-     "registrationWindow": {
-      "deadline": "2027-01-15T23:59"
+      "note": "Anmeldung über die Website oder per Telefon/E-Mail; Platzstand nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -312,15 +264,15 @@
       "end": "17:45",
       "from": "2027-03-03",
       "count": 15,
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "fdc43cf7898da7a619cbabda1cc73eecea2fdc63df00673f06ec1a5b63d860d4",
-   "model": "opus",
+   "inputHash": "28956a951bb590e73a9408ee901e63fa274ef3750c606affe910eafa1d9f80d1",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

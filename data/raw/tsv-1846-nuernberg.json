@@ -6,11 +6,10 @@
     {
      "providerId": "tsv-1846-nuernberg",
      "venueId": "tsv-1846-nuernberg",
-     "title": "Eltern-und-Kind-Turnen (1,5–3 Jahre), montags",
-     "summary": "Wöchentliche Turnstunde für Kleinkinder mit Eltern in der Sporthalle Fuggerstraße. Im Mittelpunkt stehen spielerische Bewegungserfahrungen. Die Gruppe ist derzeit ausgebucht, Anfragen per Mail an die Übungsleiterin.",
+     "title": "Eltern-und-Kind-Turnen (1,5–3 Jahre)",
+     "summary": "Gemeinsames Turnen für Kleinkinder mit Bewegungserfahrungen, Spiel und Gruppenerlebnis, montags in der Sporthalle Fuggerstraße. Der Kurs ist laut Seite komplett ausgebucht; Preis steht nicht auf der Seite.",
      "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
+      "eltern-kind-turnen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -24,7 +23,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs komplett ausgebucht; Kontakt: veronika.haeupler@online.de"
+      "note": "Kurs komplett ausgebucht (Seite); Anfrage über den Verein"
      },
      "schedule": {
       "kind": "weekly",
@@ -34,23 +33,15 @@
       "start": "15:00",
       "end": "16:00",
       "from": "2026-11-02",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "750e6159de03607a01daab13a720bb1cacc2fc2e3db9d7a1cb6fab5197ab4af0",
-   "model": "opus",
+   "inputHash": "89312e042bb305b2f624ac4b87d3a96329e26ca66aca8367fca9953a00839e82",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
-  },
-  "seite:https://tsv1846nuernberg.kurabu.com/de/events/club": {
-   "events": [],
-   "inputHash": "b7d3df86da56ea36ab68dee6577318c5ea641dfe605901ae85458929d4782ea2",
-   "model": "opus",
-   "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

@@ -100,7 +100,7 @@
    "inputHash": "01096dcd09436cc28dad53af513f5eb62acfb8c9e9ac99888bd9f1a7a839f14e",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip": {
@@ -243,7 +243,7 @@
    "inputHash": "2e9e3032d3784bb82a21fd4f37f356233b84bb07e3badbc3c97b2f91635e7803",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/fenkid": {
@@ -251,7 +251,7 @@
    "inputHash": "7dec4a0dda160e9dd229b8a2361e586180d08acd994edf0c3ea5e8c3f8fe8c17",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/eltern-kind-gruppen": {
@@ -360,7 +360,7 @@
    "inputHash": "1191e7196a3b6d4af8ab9a0f9d6cdfc15119b6f201655c5dd6d12031522867be",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/musikalische-angebote": {
@@ -438,7 +438,7 @@
    "inputHash": "e8f2b51135bc88c3162a9c7c607e9b8d8048f3f63ab5c72eebf820c0e2835097",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/papa---ich-angebote": {
@@ -480,7 +480,7 @@
    "inputHash": "b0f0cd537b118e472fefb53a675945ba581145c8531f1282738d875754fa2e11",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/angebote-in-der-natur": {
@@ -488,7 +488,7 @@
    "inputHash": "b38f766c1101d418263da3a70cffbe91e48ac681301ea5fc664f461527b7e5ff",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00"
   },
@@ -497,7 +497,7 @@
    "inputHash": "352bcaa7d1bf11f0bebbd21b99006b92499187da1d2f418e0fcfdda8daf2a5af",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "kandidaten": {
@@ -508,7 +508,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "stadt-vk"

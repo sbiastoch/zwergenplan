@@ -6,180 +6,13 @@
     {
      "providerId": "institut-zukunftsmusik-evi-reich",
      "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspielerei für Babys (4–8 Monate) – Kurs ab 25.09.2026, freitags 11:30",
-     "summary": "Babys und Eltern spielen, singen und bewegen sich gemeinsam zur Musik. Das Alter gilt für den Kursbeginn. Der Kurs läuft seit September, ein Nachrücken ist auf Anfrage möglich.",
+     "title": "Musikspielerei Babys & Minis, 14–24 Mon., Mo 09:15",
+     "summary": "Musikspiel mit Eltern für Kinder von 14 bis 24 Monaten, Lieder, Rhythmus und Klänge. Kursbeginn laut Anbieter 11.01.2027; Kurs auf Abo, monatlich kündbar.",
      "topics": [
-      "musik"
+      "musik",
+      "eltern-kind-gruppe"
      ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "154 €",
-     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "category": "musik",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 8
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über Kursplan/Shop auf der Website; bei ausgebuchten Kursen ist die Warteliste möglich"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "11:30",
-      "end": "12:15",
-      "from": "2026-09-25",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "institut-zukunftsmusik-evi-reich",
-     "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspielerei für Babys & Minis (9–13 Monate) – Kurs ab 25.09.2026, freitags 10:30",
-     "summary": "Musikalische Spielstunde, in der Kinder im ersten Lebensjahr mit ihren Eltern singen, lauschen und Rhythmus erleben. Das Alter gilt für den Kursbeginn. Der Kurs läuft schon, ein Nachrücken ist auf Anfrage möglich.",
-     "topics": [
-      "musik"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "category": "musik",
-     "age": {
-      "minMonths": 9,
-      "maxMonths": 13
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über den Kursplan auf der Website; bei ausgebuchten Kursen ist die Warteliste möglich"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "10:30",
-      "end": "11:15",
-      "from": "2026-09-25",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "institut-zukunftsmusik-evi-reich",
-     "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspielerei für Babys & Minis (14–24 Monate) – Kurs ab 25.09.2026, freitags 09:30",
-     "summary": "Kleinkinder und Eltern musizieren gemeinsam mit Liedern, Rhythmus- und Bewegungsspielen. Das Alter gilt für den Kursbeginn. Der Kurs läuft schon, ein Nachrücken ist auf Anfrage möglich.",
-     "topics": [
-      "musik"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "category": "musik",
-     "age": {
-      "minMonths": 14,
-      "maxMonths": 24
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über den Kursplan auf der Website; bei ausgebuchten Kursen ist die Warteliste möglich"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "09:30",
-      "end": "10:15",
-      "from": "2026-09-25",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "institut-zukunftsmusik-evi-reich",
-     "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspielerei für Babys (4–8 Monate) – Kurs ab 11.01.2027, montags 11:15",
-     "summary": "Neuer Babykurs mit gemeinsamem Singen, Lauschen und Bewegen zur Musik für Eltern und Babys. Das Alter gilt für den Kursbeginn.",
-     "topics": [
-      "musik"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "154 €",
-     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "category": "musik",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 8
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über den Shop auf der Website"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "MO"
-      ],
-      "start": "11:15",
-      "end": "12:00",
-      "from": "2027-01-11",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "institut-zukunftsmusik-evi-reich",
-     "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspielerei für Babys & Minis (9–13 Monate) – Kurs ab 11.01.2027, montags 10:15",
-     "summary": "Neuer Kurs, in dem Eltern mit ihrem Kind im Krabbelalter singen, Rhythmen erleben und erste Instrumente erkunden. Das Alter gilt für den Kursbeginn.",
-     "topics": [
-      "musik"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "154 €",
-     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
-     "category": "musik",
-     "age": {
-      "minMonths": 9,
-      "maxMonths": 13
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über den Shop auf der Website"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "MO"
-      ],
-      "start": "10:15",
-      "end": "11:00",
-      "from": "2027-01-11",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "institut-zukunftsmusik-evi-reich",
-     "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspielerei für Babys & Minis (14–24 Monate) – Kurs ab 11.01.2027, montags 09:15",
-     "summary": "Neuer Musikkurs für Kleinkinder mit Eltern: Lieder, Bewegungs- und Rhythmusspiele und Instrumente zum Ausprobieren. Das Alter gilt für den Kursbeginn.",
-     "topics": [
-      "musik"
-     ],
-     "format": "kurs",
+     "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "price": "154 €",
@@ -192,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über den Shop auf der Website"
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -202,21 +35,194 @@
       "start": "09:15",
       "end": "10:00",
       "from": "2027-01-11",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "institut-zukunftsmusik-evi-reich",
      "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspiel für Minis (1,5–3 Jahre) – Dienstag 15:00",
-     "summary": "Wöchentliche Musikstunde für Kleinkinder mit Eltern zum Singen, Bewegen und Musizieren. Wird als Abo mit monatlicher Zahlung gebucht und ist monatlich kündbar. Einstieg auf Anfrage.",
+     "title": "Musikspielerei Babys & Minis, 9–13 Mon., Fr 10:15",
+     "summary": "Musikspiel mit Eltern für Kinder von 9 bis 13 Monaten. Kursbeginn laut Anbieter 11.01.2027; Kurs auf Abo, monatlich kündbar.",
      "topics": [
-      "musik"
+      "musik",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Abo, monatliche Zahlung",
+     "price": "154 €",
+     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "category": "musik",
+     "age": {
+      "minMonths": 9,
+      "maxMonths": 13
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "10:15",
+      "end": "11:00",
+      "from": "2027-01-15",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "institut-zukunftsmusik-evi-reich",
+     "venueId": "institut-zukunftsmusik-evi-reich",
+     "title": "Musikspielerei Babys, 4–8 Mon., Mo 11:15",
+     "summary": "Musikspiel mit Eltern für Babys von 4 bis 8 Monaten. Kursbeginn laut Anbieter 11.01.2027; Kurs auf Abo, monatlich kündbar.",
+     "topics": [
+      "musik",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "154 €",
+     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "category": "musik",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 8
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "MO"
+      ],
+      "start": "11:15",
+      "end": "12:00",
+      "from": "2027-01-11",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "institut-zukunftsmusik-evi-reich",
+     "venueId": "institut-zukunftsmusik-evi-reich",
+     "title": "Musikspielerei Babys & Minis, 14–24 Mon., Fr 09:30",
+     "summary": "Laufender Musikkurs mit Eltern für Kinder von 14 bis 24 Monaten, Kursbeginn 25.09.2026. Abo mit monatlicher Zahlung, monatlich kündbar.",
+     "topics": [
+      "musik",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "category": "musik",
+     "age": {
+      "minMonths": 14,
+      "maxMonths": 24
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:15",
+      "from": "2026-10-30",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "institut-zukunftsmusik-evi-reich",
+     "venueId": "institut-zukunftsmusik-evi-reich",
+     "title": "Musikspielerei Babys & Minis, 9–13 Mon., Fr 10:30",
+     "summary": "Laufender Musikkurs mit Eltern für Kinder von 9 bis 13 Monaten, Kursbeginn 25.09.2026. Abo mit monatlicher Zahlung, monatlich kündbar.",
+     "topics": [
+      "musik",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "category": "musik",
+     "age": {
+      "minMonths": 9,
+      "maxMonths": 13
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "10:30",
+      "end": "11:15",
+      "from": "2026-10-30",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "institut-zukunftsmusik-evi-reich",
+     "venueId": "institut-zukunftsmusik-evi-reich",
+     "title": "Musikspielerei Babys, 4–8 Mon., Fr 11:30",
+     "summary": "Laufender Musikkurs mit Eltern für Babys von 4 bis 8 Monaten, Kursbeginn 25.09.2026. Abo mit monatlicher Zahlung, monatlich kündbar.",
+     "topics": [
+      "musik",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "154 €",
+     "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
+     "category": "musik",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 8
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "11:30",
+      "end": "12:15",
+      "from": "2026-10-30",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "institut-zukunftsmusik-evi-reich",
+     "venueId": "institut-zukunftsmusik-evi-reich",
+     "title": "Musik für Minis (1,5–3 J.), Di 15:00",
+     "summary": "Musikspiel mit Eltern für Kinder von 1,5 bis 3 Jahren. Kurs auf Abo, monatlich kündbar; Warteliste bei ausgebuchten Kursen möglich.",
+     "topics": [
+      "musik",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
      "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
      "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
      "category": "musik",
@@ -226,7 +232,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über den Kursplan auf der Website; bei ausgebuchten Kursen ist die Warteliste möglich"
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -235,22 +241,22 @@
       ],
       "start": "15:00",
       "end": "15:45",
-      "from": "2026-10-27",
-      "skipHolidays": true
+      "from": "2026-11-03",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "institut-zukunftsmusik-evi-reich",
      "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspiel für Minis (1,5–3 Jahre) – Mittwoch 15:30",
-     "summary": "Laufende Musikgruppe für Kleinkinder mit Eltern, in der gesungen, getanzt und auf Instrumenten gespielt wird. Wird als monatlich kündbares Abo gebucht. Einstieg auf Anfrage.",
+     "title": "Musik für Minis (1,5–3 J.), Mi 15:30",
+     "summary": "Musikspiel mit Eltern für Kinder von 1,5 bis 3 Jahren. Kurs auf Abo, monatlich kündbar; Warteliste bei ausgebuchten Kursen möglich.",
      "topics": [
-      "musik"
+      "musik",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Abo, monatliche Zahlung",
      "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
      "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
      "category": "musik",
@@ -260,7 +266,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über den Kursplan auf der Website; bei ausgebuchten Kursen ist die Warteliste möglich"
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben, bei ausgebuchten Kursen Warteliste möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -269,22 +275,22 @@
       ],
       "start": "15:30",
       "end": "16:15",
-      "from": "2026-10-28",
-      "skipHolidays": true
+      "from": "2026-11-04",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "institut-zukunftsmusik-evi-reich",
      "venueId": "institut-zukunftsmusik-evi-reich",
-     "title": "Musikspiel für Minis (1,5–3 Jahre) – Mittwoch 16:30, neue Gruppe ab November 2026",
-     "summary": "Neu startende Musikgruppe für Kleinkinder mit Eltern mit Liedern, Bewegung und Instrumenten. Beginn im November 2026, das genaue Startdatum gibt es auf Anfrage. Gebucht wird ein monatlich kündbares Abo.",
+     "title": "Musik für Minis (1,5–3 J.), Mi 16:30, neue Gruppe",
+     "summary": "Neue Musikgruppe mit Eltern für Kinder von 1,5 bis 3 Jahren, Start laut Anbieter im November 2026. Kurs auf Abo, monatlich kündbar.",
      "topics": [
-      "musik"
+      "musik",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Abo, monatliche Zahlung",
      "url": "https://institut-zukunftsmusik.de/kurse-buchen/",
      "sourceUrl": "https://institut-zukunftsmusik.de/kurse-buchen/",
      "category": "musik",
@@ -294,7 +300,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über den Kursplan auf der Website"
+      "note": "Buchung über den Kursplan auf der Seite; Platzstatus nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -304,15 +310,15 @@
       "start": "16:30",
       "end": "17:15",
       "from": "2026-11-04",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "a059f74d2d72e240fd0ba7e2517b554ce13fc267040ad694b7f819c7381b75e1",
-   "model": "opus",
+   "inputHash": "8acfc3b726e9791e693bf36ba029112939e7478b63340191dbceae47e3e85b70",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

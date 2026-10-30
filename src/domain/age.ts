@@ -1,7 +1,7 @@
 import { nextSession, referenceSession, type SessionFit, upcomingSessions } from "./agenda.ts";
 import { type DateRange, inRangeDay } from "./date-range.ts";
 import type { AgeRange, Offer, Session } from "./schema.ts";
-import { berlinDate, daysInMonth, parseIsoDate } from "./time.ts";
+import { addMonths, berlinDate, daysInMonth, fromBerlinLocal, parseIsoDate } from "./time.ts";
 
 /** Ohne Altersangabe gilt ein Angebot für die ganze Zielgruppe 0–3 Jahre. */
 export const DEFAULT_AGE: AgeRange = { minMonths: 0, maxMonths: 36 };
@@ -111,19 +111,32 @@ export interface AgeCheck {
   at: string;
   /** vollendete Monate am Stichtag */
   months: number;
+  /**
+   * Regelmäßig und am Stichtag noch zu jung: ab wann es passt. Der erste spätere passende Termin (`scheduled`), sonst,
+   * hinter den Daten, der Tag, an dem das Kind das Mindestalter erreicht (0:00 Berliner Zeit).
+   */
+  from?: { at: string; months: number; scheduled: boolean };
 }
 
 /**
  * Erklärung für das Detail: an welchem Termin wie alt, passt es?
  * Kurs/einmalig: erster Termin. Regelmäßig: der vorgegebene Termin (Kalender), sonst der erste
- * passende kommende Termin, sonst der nächste – konsistent mit `offerFitsAge`.
+ * passende kommende Termin, sonst der nächste – konsistent mit `offerFitsAge`. Ist das Kind dort bei einem regelmäßigen
+ * Angebot noch zu jung, sagt `from`, ab wann es passt, statt nur „passt nicht“.
  */
 export function ageCheck(offer: Offer, birthDate: string, now: Date, session?: Session): AgeCheck | undefined {
   const fitsAt = (s: Session) => fitsAgeAt(offer.age, birthDate, s.start);
   const ref =
     offer.format === "regelmaessig" ? (session ?? detailSession(offer, now, undefined, birthDate)) : offer.sessions[0];
   if (!ref) return undefined;
-  return { fits: fitsAt(ref), at: ref.start, months: ageInMonths(birthDate, ref.start) };
+  const check = { fits: fitsAt(ref), at: ref.start, months: ageInMonths(birthDate, ref.start) };
+  const { minMonths } = offer.age ?? DEFAULT_AGE;
+  if (offer.format !== "regelmaessig" || check.fits || check.months >= minMonths) return check;
+  const later = offer.sessions.find((s) => Date.parse(s.start) > Date.parse(ref.start) && fitsAt(s));
+  if (later)
+    return { ...check, from: { at: later.start, months: ageInMonths(birthDate, later.start), scheduled: true } };
+  const at = fromBerlinLocal(`${addMonths(birthDate, minMonths)}T00:00`);
+  return { ...check, from: { at, months: minMonths, scheduled: false } };
 }
 
 export interface AgeVisibility<T> {
