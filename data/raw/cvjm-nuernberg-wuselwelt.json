@@ -42,7 +42,7 @@
    "inputHash": "fe1da65bf2132b73a13222eec134b9ae1b4c1916dd8bd818485a45cb9882a6ad",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
@@ -100,7 +100,7 @@
    "inputHash": "56161624885420fc2677b10b60c509a23a0990537740c10b75c95e7d72f056e3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
@@ -108,7 +108,7 @@
    "inputHash": "ca8d157cfc286381ff84c2ff60d5c9ea2ace7fa9d72079fa97817eaa3c9b5873",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00"
   },
@@ -117,7 +117,7 @@
    "inputHash": "2cdc1260174f686e2d6711d6a08ddba2c873e1ecffa7816710d25a5874e4140a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00"
   },
@@ -168,7 +168,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "frankenkids"

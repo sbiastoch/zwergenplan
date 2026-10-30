@@ -6,12 +6,11 @@
     {
      "providerId": "treffpunkt-mut",
      "venueId": "treffpunkt-mut",
-     "title": "MUT – Gruppe für junge Mütter und Schwangere bis 25 Jahre",
-     "summary": "Wöchentliche Gruppe der Frühen Hilfen für junge Mamas und Schwangere bis 25 aus Nürnberg: Austausch mit anderen Müttern, Spielen mit dem Kind, begleitet von zwei Pädagoginnen, die auch beraten. Anmeldung per Telefon oder E-Mail.",
+     "title": "MUT – Gruppe für junge Mütter mit Kind (donnerstags)",
+     "summary": "Gruppe für junge Mütter und Schwangere bis 25 Jahre aus Nürnberg: gemeinsames Spielen mit dem Kind, Austausch und Beratung durch zwei Pädagoginnen. Anmeldung telefonisch oder per E-Mail.",
      "topics": [
-      "elterntreff",
       "eltern-kind-gruppe",
-      "beratung",
+      "elterntreff",
       "muetter"
      ],
      "format": "regelmaessig",
@@ -19,10 +18,10 @@
      "cost": "kostenlos",
      "url": "https://www.treffpunkt-nbg.de/mut/",
      "sourceUrl": "https://www.treffpunkt-nbg.de/mut/",
-     "category": "treffs-cafes",
+     "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung telefonisch unter 0911 27 47 69-0 (Mo–Do 9–14 Uhr) oder per E-Mail"
+      "note": "Keine Platzangabe. Anmeldung telefonisch unter 09 11 / 27 47 69-0 oder per E-Mail."
      },
      "schedule": {
       "kind": "weekly",
@@ -31,23 +30,23 @@
       ],
       "start": "09:30",
       "end": "11:30",
-      "from": "2026-10-29",
+      "from": "2026-11-05",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "d0c0938be6520c4443078320a0414cab5c74e2b043194495d763a1944c16e46f",
-   "model": "opus",
+   "inputHash": "32c1eb026c1c9d03d69539d35b2c5144ffa62bc746d4f6e703326e7e1408b644",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://www.treffpunkt-nbg.de/familienstuetzpunkt/": {
    "events": [],
-   "inputHash": "3125fdd0861ac8fa603e0cf2355d1ee549ad45e9139fabf5d5eeeb765a304ee9",
-   "model": "opus",
+   "inputHash": "aea85f8f023de420c52a27611d836f5ee1db631dd283a03cd545daaa5f271459",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

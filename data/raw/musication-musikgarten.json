@@ -79,7 +79,7 @@
    "inputHash": "b8d802c77ec4b570c43eb8fd5570c3919b8afea8a0cc8392da9718104533d5cf",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten/": {
@@ -268,7 +268,7 @@
    "inputHash": "9351976f67b740fa30810d2d8677ee9f27dddb8230d6912c8d12a798bb954202",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten-englisch-singing-english/": {
@@ -314,7 +314,7 @@
    "inputHash": "22e5aed1755dbcdb8aa05d0af7eb65d003fc38da814cdfd6e8695011fc711bd8",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://musication.de/kinder-musik/musikgarten-sommerkurs/": {
@@ -322,7 +322,7 @@
    "inputHash": "7e5166ef2d186eb01f1950c457945bd8e51b3945757a9469e1f48d9b4dcf9a0f",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

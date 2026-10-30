@@ -6,8 +6,8 @@
     {
      "providerId": "tb-johannis-1888",
      "venueId": "tb-johannis-1888",
-     "title": "Eltern-Kind-Turnen Montag 15:00–16:00 Uhr",
-     "summary": "Wöchentliche Turnstunde für Eltern mit Kleinkindern in der Turnabteilung des TB Johannis 1888, angeleitet von lizenzierten Übungsleitern. Einstieg auf Anfrage über den Verein.",
+     "title": "Eltern-Kind-Turnen (montags 15–16 Uhr)",
+     "summary": "Wöchentliche Turnstunde für Eltern mit Kleinkind im Turnerbund St. Johannis. Die Seite nennt weder Preis noch Anmeldeweg; Plätze werden nicht angezeigt, Anfragen laufen über das Kontaktformular.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -18,9 +18,13 @@
      "url": "https://www.tbj1888.de/abteilungen/turnen-und-gymnastik",
      "sourceUrl": "https://www.tbj1888.de/abteilungen/turnen-und-gymnastik",
      "category": "bewegung",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anfrage über Kontaktformular oder bei Abteilungsleiterin Birgit Wagner (0160 94819817)"
+      "note": "Keine Platzanzeige; Anfrage über das Kontaktformular"
      },
      "schedule": {
       "kind": "weekly",
@@ -32,43 +36,13 @@
       "from": "2026-11-02",
       "skipHolidays": true
      }
-    },
-    {
-     "providerId": "tb-johannis-1888",
-     "venueId": "tb-johannis-1888",
-     "title": "Eltern-Kind-Turnen Montag 16:00–17:00 Uhr",
-     "summary": "Zweite wöchentliche Eltern-Kind-Turnstunde am Montagnachmittag beim TB Johannis 1888 mit lizenzierten Übungsleitern. Einstieg auf Anfrage über den Verein.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.tbj1888.de/abteilungen/turnen-und-gymnastik",
-     "sourceUrl": "https://www.tbj1888.de/abteilungen/turnen-und-gymnastik",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anfrage über Kontaktformular oder bei Abteilungsleiterin Birgit Wagner (0160 94819817)"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "MO"
-      ],
-      "start": "16:00",
-      "end": "17:00",
-      "from": "2026-11-02",
-      "skipHolidays": true
-     }
     }
    ],
-   "inputHash": "9bbe6971026b1692a929c9011abdd8939bbf0f9ac9c02549c00f14755edca04d",
-   "model": "opus",
+   "inputHash": "b0c9b86c180a77ac644af1b338f20a3353d67654631e496410d860762bd399cf",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

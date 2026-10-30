@@ -1,13 +1,14 @@
 {
  "version": 2,
  "units": {
-  "seite:https://kinder-salzundpfeffer.reservix.de/events": {
+  "kandidaten": {
    "events": [],
-   "inputHash": "93510dd1a3ac2d3093102287c18954ca10bba0dac8f4ce92cf7c4ea41d1f4677",
-   "model": "haiku",
+   "inputHash": "a16447e8acefde165e160264c71a34227fcf74548b0d65f68332cec34c094857",
+   "model": "ohne-eingabe",
    "status": "keine-termine",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "sources": []
   }
  }
 }

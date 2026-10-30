@@ -82,7 +82,7 @@
    "inputHash": "340697a2cc931cfe297d1aebda10ef695ad9fc9f914877f7a6f8b11f8c67b271",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "kandidaten": {
@@ -90,11 +90,11 @@
     {
      "providerId": "stadtbibliothek-nuernberg",
      "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
-     "title": "Bücherzwerge (12–36 Monate), Stadtbibliothek Langwasser",
-     "summary": "Einmal im Monat erkunden Kinder mit einer Begleitperson die Bibliothek: Lieder, Reime, Geschichten und Bilderbücher, dazu Tipps zum Vorlesen. Anmeldung erforderlich; bekannte Termine im Horizont sind 19.11. und 17.12.2026.",
+     "title": "Bücherzwerge Langwasser (12–36 Monate)",
+     "summary": "Einmal im Monat erkunden Kinder mit Begleitperson die Bibliothek: Singen, Reime, Vorlesen und Bilderbücher, dazu Tipps zum Vorlesen. Anmeldung telefonisch oder per E-Mail.",
      "topics": [
-      "vorlesen",
       "bibliothek",
+      "vorlesen",
       "singen"
      ],
      "format": "regelmaessig",
@@ -109,7 +109,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung per Telefon (0911/231-4157) oder E-Mail bei der Stadtbibliothek Langwasser"
+      "note": "Keine Platzanzeige. Anmeldung telefonisch unter 0911/231-4157 oder per E-Mail bei der Stadtbibliothek Langwasser."
      },
      "schedule": {
       "kind": "dates",
@@ -129,6 +129,7 @@
    ],
    "inputHash": "a0399adf348028fd154843e489dd7f6db34b970c52dbde94810fd6e5da5bbf02",
    "dated": {
+    "2026-10-31": "c4bca45cfd3a0be6d1a81d74660c3836390aecd76e8d6d4beb81efcb5bb2039c",
     "2026-11-13": "220733e49472bc018079d133e42d1df8b54e24d5ea3cda3437823cfa65e22581",
     "2026-11-19": "e21772940a916b8969f1f258f9a6b325cbb8cd9ceb6e854c863ec7b21ac42107",
     "2026-11-27": "016af92905712802ddfe0b582cf69616d49f908105a330a645a03ef9bb37b763",
@@ -137,8 +138,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "stadt-vk"
    ]

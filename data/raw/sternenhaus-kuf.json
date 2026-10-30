@@ -7,10 +7,10 @@
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
      "title": "Schneeflocken, wippediwapp – Winterlieder mit Lucia Ruf",
-     "summary": "Die Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitsingen, Tanzen und Klatschen. Tickets gibt es im Eventim-Webshop; am 30.11. sind die Vorstellungen um 9:30 und 10:45 ausverkauft.",
+     "summary": "Die Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitsingen und Tanzen im Sternenhaus. Für Kinder ab 2 Jahren; Tickets gibt es über den Eventim-Webshop.",
      "topics": [
       "konzert",
-      "musik"
+      "singen"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets im Eventim-Webshop. 30.11. 9:30 und 10:45 ausverkauft; 29.11. 14:00 ohne Ausverkauft-Meldung."
+      "note": "29.11. 14:00 nicht als ausverkauft gemeldet; 30.11. 09:30 und 10:45 ausverkauft. Tickets im Eventim-Webshop."
      },
      "schedule": {
       "kind": "dates",
@@ -47,8 +47,8 @@
     {
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
-     "title": "WiWaWaldtraum (Mitmachtheater, ab 2 Jahren)",
-     "summary": "Mitmachtheater im Zauberwald: Trolli Tolpatsch muss kniffelige Waldprüfungen bestehen. Für Kinder ab 2 Jahren; Karten gibt es im Webshop, eine Ausverkauft-Markierung liegt nicht vor.",
+     "title": "WiWaWaldtraum – Mitmachtheater (Purzeltraumtheater)",
+     "summary": "Mitmach-Theaterstück: Trolli Tolpatsch legt im Zauberwald Baumbolino seine Waldprüfung ab, Fee Fiofina stellt knifflige Aufgaben. Tickets über den Eventim-Webshop, nicht als ausverkauft markiert.",
      "topics": [
       "theater"
      ],
@@ -64,7 +64,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets im Eventim-Webshop; keine Ausverkauft-Markierung"
+      "note": "Nicht als ausverkauft markiert; Tickets im Eventim-Webshop des Sternenhauses"
      },
      "schedule": {
       "kind": "dates",
@@ -85,11 +85,11 @@
      }
     }
    ],
-   "inputHash": "09b809a22b5d420461283756b258abd78e386fbc8b4c3b9a2163e68ec2b2a9b5",
+   "inputHash": "46e1a94f3b12f7d8a89170e71a979c71a2a78c8f1cb76bd889d761798fb19023",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "kandidaten": {
    "events": [
@@ -143,7 +143,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

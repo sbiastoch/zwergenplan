@@ -6,13 +6,13 @@
     {
      "providerId": "sv-johannis-07",
      "venueId": "sv-johannis-07",
-     "title": "Eltern-Kind-Turnen montags (2 und 3 Jahre)",
-     "summary": "Spielturnen mit Elternbegleitung: Begrüßungslied, Bewegungslandschaft mit Bällen, Reifen, Bänken und Sprossenwand, zum Schluss Abschiedskreis. Buchung nur online im Kursshop, neue Blöcke ab Januar 2027 (Daten noch offen), Einstieg auf Anfrage.",
+     "title": "Eltern-Kind-Turnen 2–3 Jahre (Montag 16:00)",
+     "summary": "Spielturnen mit Bewegungslandschaft, Liedern und Bewegungsspielen für Kinder mit Begleitperson. Der nächste Block startet im Januar 2027, die genauen Termine stehen noch nicht fest. Anmeldung nur online über den Kursshop, keine Warteliste.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.sv-johannis07.de/eltern-kind-turnen",
@@ -20,11 +20,11 @@
      "category": "bewegung",
      "age": {
       "minMonths": 24,
-      "maxMonths": 47
+      "maxMonths": 36
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Nur Online-Buchung über den Kursshop, keine Warteliste; Termine der Januar-Blöcke stehen noch nicht fest"
+      "note": "Nur Online-Buchung über den Kursshop (shop.sv-johannis07.de), keine Warteliste; Platzanzeige nicht prüfbar"
      },
      "schedule": {
       "kind": "weekly",
@@ -33,20 +33,20 @@
       ],
       "start": "16:00",
       "end": "16:45",
-      "from": "2026-11-02",
+      "from": "2027-01-01",
       "skipHolidays": true
      }
     },
     {
      "providerId": "sv-johannis-07",
      "venueId": "sv-johannis-07",
-     "title": "Eltern-Kind-Turnen donnerstags (2 bis 4 Jahre)",
-     "summary": "Bewegungsstunde mit Elternbegleitung: Lieder zum Start und Abschluss, dazwischen Hüpfen, Springen und Balancieren in einer Bewegungslandschaft. Buchung nur online im Kursshop, neue Blöcke ab Januar 2027 (Daten noch offen), Einstieg auf Anfrage.",
+     "title": "Eltern-Kind-Turnen 2–4 Jahre (Donnerstag 16:30)",
+     "summary": "Spielturnen mit Bewegungslandschaft, Liedern und Bewegungsspielen für Kinder mit Begleitperson. Der nächste Block startet im Januar 2027, die genauen Termine stehen noch nicht fest. Anmeldung nur online über den Kursshop, keine Warteliste.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
      ],
-     "format": "regelmaessig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.sv-johannis07.de/eltern-kind-turnen",
@@ -58,7 +58,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Nur Online-Buchung über den Kursshop, keine Warteliste; Termine der Januar-Blöcke stehen noch nicht fest"
+      "note": "Nur Online-Buchung über den Kursshop (shop.sv-johannis07.de), keine Warteliste; Platzanzeige nicht prüfbar"
      },
      "schedule": {
       "kind": "weekly",
@@ -67,23 +67,23 @@
       ],
       "start": "16:30",
       "end": "17:15",
-      "from": "2026-10-29",
+      "from": "2027-01-01",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "e05df999e9feb3da353a5e94d377ca658a227eaedc9974458ffc1061b0bf961b",
-   "model": "opus",
+   "inputHash": "0ec4ab3b6cac09bb25dd2ab5e2e814ab7a69cc9521f20e51c079e09793b54c20",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://shop.sv-johannis07.de/de/courses/": {
    "events": [],
-   "inputHash": "c478bf5e069a7768ad61e52d03270050d000af6a1a10326e0e9da7b0c795121c",
-   "model": "opus",
+   "inputHash": "c7f468b2cc4e89c2a5f979c599e1b2f799560f382f640c36646ca0a2b2248773",
+   "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

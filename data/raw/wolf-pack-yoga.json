@@ -210,13 +210,72 @@
    "model": "haiku",
    "status": "ok",
    "checkedAt": "2026-10-29T08:35:39+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "changedAt": "2026-10-28T08:14:30+01:00",
+   "pending": {
+    "inputHash": "ae4e81d4b68be937fd58f43a7a3f1ac4055882fa957c26187b6201ab49fbea8a",
+    "model": "haiku",
+    "events": [
+     {
+      "providerId": "wolf-pack-yoga",
+      "venueId": "wolf-pack-yoga",
+      "title": "Yoga mit Baby (Babys 3–12 Monate, donnerstags 9:30)",
+      "summary": "Postnatales Yoga für Mamas nach der Rückbildung (und Papas) mit Babys von 3–12 Monaten: Kräftigung, Körpermitte, Beckenboden und Atemübungen. Das Baby ist dabei, Stillen und Wickeln gehören dazu. Geschlossener Kurs mit 6 Terminen; auf Eversports als „Nicht buchbar“ angezeigt.",
+      "topics": [
+       "yoga-mit-baby"
+      ],
+      "format": "kurs",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "price": "102,00 € (Einzelticket)",
+      "url": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
+      "sourceUrl": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
+      "category": "bewegung",
+      "age": {
+       "minMonths": 3,
+       "maxMonths": 12
+      },
+      "availability": {
+       "status": "unbekannt",
+       "note": "Eversports zeigt „Nicht buchbar“; Buchung bzw. Plätze beim Anbieter klären"
+      },
+      "schedule": {
+       "kind": "dates",
+       "dates": [
+        {
+         "start": "2026-10-22T09:30",
+         "end": "2026-10-22T10:30"
+        },
+        {
+         "start": "2026-10-29T09:30",
+         "end": "2026-10-29T10:30"
+        },
+        {
+         "start": "2026-11-05T09:30",
+         "end": "2026-11-05T10:30"
+        },
+        {
+         "start": "2026-11-12T09:30",
+         "end": "2026-11-12T10:30"
+        },
+        {
+         "start": "2026-11-19T09:30",
+         "end": "2026-11-19T10:30"
+        },
+        {
+         "start": "2026-11-26T09:30",
+         "end": "2026-11-26T10:30"
+        }
+       ]
+      }
+     }
+    ]
+   }
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-30T08:39:48+01:00"
   }
  }
 }

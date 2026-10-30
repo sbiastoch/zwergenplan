@@ -155,7 +155,7 @@
    "inputHash": "b25733857f81f77d5315cb6c70ff3ea953768aa22b722ad398a64d8818b4eacc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.evangelische-termine.de/ical?vid=583": {
@@ -329,7 +329,6 @@
    ],
    "inputHash": "4db80008ccb6d7489adb771a1cd005a997de3b2c66fce9bbc3b1ffd291e3db4a",
    "dated": {
-    "2026-10-29": "abce06159aae7b871ecf498bb93a99ca87d71c9ab2355d5fc53c9fa20dd4d969",
     "2026-10-30": "a9398cf6a9814413f75e6c74457e9770291335800bebeb3d9d76abea53de5d3a",
     "2026-11-01": "47589fb48ee0946ea757f85e618606b2b16eff537de73de101d2807b1c39f8c4",
     "2026-11-02": "dc3f70c7f4bcfb94c464d9f7436d09a41f5632d7c9e2834947567a63db4df0b7",
@@ -393,7 +392,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-10-30T08:39:48+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "kandidaten": {
@@ -401,12 +400,12 @@
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Mutter-Kind-Gruppe für Kinder von 1–3 Jahren (mittwochs nachmittags)",
-     "summary": "Wöchentliche Krabbelgruppe im TabeaHaus: Die Kinder spielen und entdecken gemeinsam, die Eltern lernen sich kennen und tauschen sich über Alltagsfragen aus.",
+     "title": "Mutter-Kind-Krabbelgruppe für 1–3-Jährige (Mittwoch)",
+     "summary": "Eltern mit Kindern von etwa 1 bis 3 Jahren treffen sich zum Austausch, die Kinder spielen dabei. Mittwochs 14:30–17:00 im TabeaHaus, Termine bis 23.12.2026.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe",
-      "muetter"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -420,30 +419,56 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage über die Kirchengemeinde St. Johannis"
+      "note": "Keine Platzangabe in der Quelle; Anfrage beim Anbieter."
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "start": "14:30",
-      "end": "17:00",
-      "from": "2026-10-28",
-      "until": "2026-12-23",
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-04T14:30",
+        "end": "2026-11-04T17:00"
+       },
+       {
+        "start": "2026-11-11T14:30",
+        "end": "2026-11-11T17:00"
+       },
+       {
+        "start": "2026-11-18T14:30",
+        "end": "2026-11-18T17:00"
+       },
+       {
+        "start": "2026-11-25T14:30",
+        "end": "2026-11-25T17:00"
+       },
+       {
+        "start": "2026-12-02T14:30",
+        "end": "2026-12-02T17:00"
+       },
+       {
+        "start": "2026-12-09T14:30",
+        "end": "2026-12-09T17:00"
+       },
+       {
+        "start": "2026-12-16T14:30",
+        "end": "2026-12-16T17:00"
+       },
+       {
+        "start": "2026-12-23T14:30",
+        "end": "2026-12-23T17:00"
+       }
+      ]
      },
      "via": "evtermine"
     },
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder (donnerstags vormittags)",
-     "summary": "Eltern treffen sich jede Woche mit ihren Babys und Kleinkindern im TabeaHaus. Gemeinsam wird gespielt, gesungen, gebastelt und es gibt erste Reime; die Eltern tauschen sich über ihre Themen aus.",
+     "title": "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder (Donnerstag)",
+     "summary": "Vormittags treffen sich Eltern mit Säuglingen und Kleinkindern: die Kinder spielen, singen und basteln, die Eltern tauschen sich zu Alltagsfragen aus. Donnerstags 9:30–11:30 im TabeaHaus, Termine bis 17.12.2026.",
      "topics": [
       "eltern-kind-gruppe",
-      "krabbelgruppe",
-      "singen"
+      "elterntreff",
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -453,69 +478,66 @@
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage über die Kirchengemeinde St. Johannis"
+      "note": "Keine Platzangabe in der Quelle; Anfrage beim Anbieter."
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "11:30",
-      "from": "2026-10-29",
-      "until": "2026-12-17",
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-05T09:30",
+        "end": "2026-11-05T11:30"
+       },
+       {
+        "start": "2026-11-12T09:30",
+        "end": "2026-11-12T11:30"
+       },
+       {
+        "start": "2026-11-19T09:30",
+        "end": "2026-11-19T11:30"
+       },
+       {
+        "start": "2026-11-26T09:30",
+        "end": "2026-11-26T11:30"
+       },
+       {
+        "start": "2026-12-03T09:30",
+        "end": "2026-12-03T11:30"
+       },
+       {
+        "start": "2026-12-10T09:30",
+        "end": "2026-12-10T11:30"
+       },
+       {
+        "start": "2026-12-17T09:30",
+        "end": "2026-12-17T11:30"
+       }
+      ]
      },
      "via": "evtermine"
     }
    ],
-   "inputHash": "070fa54902d8e4b711852608011f78a4c47c70e6c3a57854b604b84888b2717f",
+   "inputHash": "2107585a269fc2ebb86d53d358d672e272e259d5a2b1ad4b99fd90ea6873a9ba",
    "dated": {
-    "2026-10-28": "ad36c6cf17ec01f2d704ed9d166fcb20849ca193029a9119924af532e8d12eda",
-    "2026-10-29": "662b61d5ce90dad75aeb6dd96b0095cb32e71f2ea2c94a1d3740114b9544a84f",
-    "2026-11-04": "0a379d95de663aa807f9098a52c25cb8ae0e817c0609b6a9b1c75dd9400cfbdb",
-    "2026-11-05": "06ea1241a658233d02b1b8efa5194e0aaace194dc116de1c2e751aaea102c1dc",
-    "2026-11-11": "1aee9e620aa68d8582d9537347b9358d46586df8025df86133a52512d79aa761",
-    "2026-11-12": "46860328ac65635aa248e3eb7fd0002a55afc046726ebb5ced81009734f017eb",
-    "2026-11-18": "9eb96582ecfcb07a1473a84056f2e601f9ddf122610b1bebb142483617f3d4fb",
-    "2026-11-19": "84f5d409bf70a3c87d0cc507fb550c48b2c6bf1f7f774b79a92278a74af7abf3",
-    "2026-11-25": "27f5e13e324b28e7c7e15d2ad0fe9a6571d3d9ec4d3a8d5cfad8c11c4930cde3",
-    "2026-11-26": "588566f2ec169e702893f07a941e4a9d8e6a641267a70474ef2a1de9d4dc4772",
-    "2026-12-02": "fea0760c6c5cf81b2f92428ccdb1487739e1c0e148f07b10435a9476df2e167b",
-    "2026-12-03": "80929c2fce4f70b18ff6dc002c8dcb4091a40b601041af5d45f05ad2f446c6c8",
-    "2026-12-09": "2bf1b4d47928f0553d818ec4a23e155dc8bb719c2b5bd9155bdba25d69df1156",
-    "2026-12-10": "68b3450501f5fcf59be8ea6a695cb4a420a794ab30f7be13605c98b13c18e46b",
-    "2026-12-16": "e94f3f3e79b44d3b510daab44c854306530b977663799b7a06abcdbf95bb7ac7",
-    "2026-12-17": "97e86b0f84319f6c80fe9bdcb559d24ab8aaa64ef5b50030e4a652d2b3f49e75",
-    "2026-12-23": "e9c941946d67a57805d828466856fa47f2b64e24f7bfbcf3c10e00607f4d8e00"
+    "2026-11-04": "e2eb9867d6ff6e24446533df67fa57b53802afaa7c04fdce46cd597d44d94186",
+    "2026-11-05": "0c823e086646de21eca03a8c4d8fe43bcadc81c218ebe6a5b35431e9eee56e13",
+    "2026-11-11": "89d29c065970fcbec8863194d9ee1338d06459ea38540c1c40f0b3c1e3916755",
+    "2026-11-12": "d19f32035a66fd455513fc812f076396678dde16e06a58bcf6a28390b17640f1",
+    "2026-11-18": "0f62bbdde1adbe097e63a9fa0b41838eaccd01d7a7ecdd4145d3302738f0eb50",
+    "2026-11-19": "c386f4837d57404e6668f396beea2e2767751fe8383c6029bb796d6fbb450401",
+    "2026-11-25": "e9c88467de7d24bb31882df516b31e3dcd03a2f3823d0048b7131274f5d77808",
+    "2026-11-26": "9f1229c5da59bf0175305394c2b62250c6117459d9232c06108ddbcdf79ea8a4",
+    "2026-12-02": "4d9611aeaee4f145c598d1b0a716f214e364ea0e54377edfcd70121d660ff7d3",
+    "2026-12-03": "7365b05e2a8d67826dfd7da27c1ceebd8af298dba620db8063ea545847ec5d87",
+    "2026-12-09": "4fb7c832c4436be61f9c7f028e2e4744fd08880da043042d222bb9287d49c94e",
+    "2026-12-10": "b97b4b41521fe3ec6b30f7c1283fde3c8d5428afae47cd9128ce60ad96056ba7",
+    "2026-12-16": "3e5b101861142ed6f0b13e8dce5c8d4ce79f490ea32c28deb9b545e4447e9a18",
+    "2026-12-17": "2875b07d308e275bf3a59f85823c5e4a3d463d1db8ab54f3f8d0b5ea6811d156",
+    "2026-12-23": "787eec5aea2b3e68c418e94e97d925e0ebca17ace0354bbd9736edb9cf21cd5f"
    },
-   "model": "opus",
+   "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
-   "pending": {
-    "inputHash": "2107585a269fc2ebb86d53d358d672e272e259d5a2b1ad4b99fd90ea6873a9ba",
-    "dated": {
-     "2026-10-29": "662b61d5ce90dad75aeb6dd96b0095cb32e71f2ea2c94a1d3740114b9544a84f",
-     "2026-11-04": "e2eb9867d6ff6e24446533df67fa57b53802afaa7c04fdce46cd597d44d94186",
-     "2026-11-05": "06ea1241a658233d02b1b8efa5194e0aaace194dc116de1c2e751aaea102c1dc",
-     "2026-11-11": "89d29c065970fcbec8863194d9ee1338d06459ea38540c1c40f0b3c1e3916755",
-     "2026-11-12": "46860328ac65635aa248e3eb7fd0002a55afc046726ebb5ced81009734f017eb",
-     "2026-11-18": "0f62bbdde1adbe097e63a9fa0b41838eaccd01d7a7ecdd4145d3302738f0eb50",
-     "2026-11-19": "84f5d409bf70a3c87d0cc507fb550c48b2c6bf1f7f774b79a92278a74af7abf3",
-     "2026-11-25": "e9c88467de7d24bb31882df516b31e3dcd03a2f3823d0048b7131274f5d77808",
-     "2026-11-26": "588566f2ec169e702893f07a941e4a9d8e6a641267a70474ef2a1de9d4dc4772",
-     "2026-12-02": "4d9611aeaee4f145c598d1b0a716f214e364ea0e54377edfcd70121d660ff7d3",
-     "2026-12-03": "80929c2fce4f70b18ff6dc002c8dcb4091a40b601041af5d45f05ad2f446c6c8",
-     "2026-12-09": "4fb7c832c4436be61f9c7f028e2e4744fd08880da043042d222bb9287d49c94e",
-     "2026-12-10": "68b3450501f5fcf59be8ea6a695cb4a420a794ab30f7be13605c98b13c18e46b",
-     "2026-12-16": "3e5b101861142ed6f0b13e8dce5c8d4ce79f490ea32c28deb9b545e4447e9a18",
-     "2026-12-17": "97e86b0f84319f6c80fe9bdcb559d24ab8aaa64ef5b50030e4a652d2b3f49e75",
-     "2026-12-23": "787eec5aea2b3e68c418e94e97d925e0ebca17ace0354bbd9736edb9cf21cd5f"
-    },
-    "model": "haiku",
-    "events": []
-   },
+   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "evtermine"
    ]
