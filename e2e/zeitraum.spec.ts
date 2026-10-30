@@ -131,7 +131,7 @@ test("Zeitraum mit Alter: regelmäßig zählt nur ein passender Termin darin, di
   const treff = page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" });
   await expect(treff).toHaveCount(0);
 
-  // Altersfilter aus: Der Treff steht markiert da, sein Detail sagt dasselbe
+  // Altersfilter aus: Der Treff steht markiert da, sein Detail sagt, ab wann er passt
   const sheet = await openFilter(page);
   await sheet.getByRole("switch", { name: /^Nur passend für/ }).click();
   await sheet.getByRole("button", { name: /Angebote? zeigen$/ }).click();
@@ -139,7 +139,7 @@ test("Zeitraum mit Alter: regelmäßig zählt nur ein passender Termin darin, di
   await expect(page.locator(".card.unfit").filter({ hasText: "Offener Krabbeltreff" })).toBeVisible();
   await treff.getByRole("button").click();
   const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
-  await expect(detail.getByText(/^Passt nicht: am Mi 7\.10\./)).toBeVisible();
+  await expect(detail.getByText("Passt ab 21.10.: dann 6 Monate alt")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(detail).toBeHidden();
 
