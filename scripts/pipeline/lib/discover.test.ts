@@ -12,7 +12,6 @@ import {
   assessMessage,
   assessResponseSchema,
   catalogId,
-  contactLinks,
   directoryFinds,
   dryRunCatalogIssues,
   entryFromAssessment,
@@ -285,41 +284,6 @@ describe("dryRunCatalogIssues (G1/G2 im Trockenlauf)", () => {
   });
   it("G1: ungültiger neuer Eintrag (Anbieter ohne Ort)", () => {
     expect(dryRunCatalogIssues(catalog, [...catalog, neu], ["neu-anbieter"], today)[0]).toMatch(/^G1 \(Katalog\)/);
-  });
-});
-
-describe("contactLinks (Adresse für das Bewerten)", () => {
-  const page = (links: Array<{ label: string; url: string }>) => ({
-    finalUrl: "https://www.schwimm.example.net/kurse/",
-    text: "",
-    links,
-  });
-  it("Kontakt, Anfahrt, Impressum derselben Website, höchstens zwei, Kontakt zuerst", () => {
-    const r = contactLinks(
-      page([
-        { label: "Impressum", url: "https://schwimm.example.net/impressum" },
-        { label: "Kurse", url: "https://schwimm.example.net/kurse/baby" },
-        { label: "So finden Sie uns", url: "https://www.schwimm.example.net/anfahrt" },
-        { label: "Kontakt", url: "https://schwimm.example.net/kontakt/" },
-      ]),
-    );
-    expect(r).toEqual(["https://schwimm.example.net/kontakt/", "https://www.schwimm.example.net/anfahrt"]);
-  });
-  it("Subdomain derselben Website zählt, fremde Website, interne Adresse und die Seite selbst nicht", () => {
-    const r = contactLinks(
-      page([
-        { label: "Kontakt", url: "https://www.schwimm.example.net/kurse/" },
-        { label: "Kontakt", url: "https://andere.example.org/kontakt" },
-        { label: "Kontakt", url: "http://192.168.0.1/kontakt" },
-        { label: "Über uns", url: "https://info.schwimm.example.net/ueber-uns" },
-      ]),
-    );
-    expect(r).toEqual(["https://info.schwimm.example.net/ueber-uns"]);
-  });
-  it("erkennt die Adresse auch am Pfad ohne passenden Linktext", () => {
-    expect(contactLinks(page([{ label: "→", url: "https://schwimm.example.net/de/standorte" }]))).toEqual([
-      "https://schwimm.example.net/de/standorte",
-    ]);
   });
 });
 

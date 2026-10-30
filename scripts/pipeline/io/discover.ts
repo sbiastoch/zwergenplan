@@ -25,7 +25,6 @@ import {
   allowedUrlsOf,
   assessMessage,
   assessResponseSchema,
-  contactLinks,
   type DiscoverReport,
   directoryFinds,
   dryRunCatalogIssues,
@@ -59,6 +58,7 @@ import { anbieterVids } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
 import { providerStatus } from "../lib/raw.ts";
 import { planFetch } from "../lib/select.ts";
+import { contactLinks } from "../lib/site-crawl.ts";
 import { hostOf, sameSite } from "../lib/url.ts";
 import { GateError } from "./discover-git.ts";
 import { effortOf } from "./extract.ts";

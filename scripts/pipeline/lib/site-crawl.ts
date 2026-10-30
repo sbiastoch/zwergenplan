@@ -326,6 +326,10 @@ interface CrawlPage {
   url: string;
   depth: number;
   result: CrawlFetch;
+  /** Seite, die hierher verlinkt (`finalUrl`), fehlt bei den Startseiten */
+  from?: string;
+  /** Kontaktseite für die Ortsprüfung (Nachtrag 1), vor Tiefe 1 abgerufen; Kandidat nur außer Impressum & Co. */
+  contact?: true;
 }
 
 export interface CrawlResult {
@@ -341,6 +345,43 @@ interface Queued {
   score: number;
   /** Plattform-Seite oder Iframe außerhalb des Bereichs: abrufen, nicht weiter */
   leaf: boolean;
+  from?: string;
+}
+
+/** Seiten mit der Adresse: Reihenfolge = Vorrang (Kontakt vor Anfahrt vor Impressum vor „Über uns“) */
+const CONTACT_PATTERNS = [
+  /kontakt|contact/i,
+  /anfahrt|standort|so finden sie uns|lageplan|adresse/i,
+  /impressum|imprint/i,
+  /über uns|ueber-uns|uber-uns|about/i,
+];
+/** weitere Seiten je Kandidat im Bewerten (Entdecken) bzw. je Anbieter in der Erkundung (Ortsprüfung) */
+const MAX_CONTACT_PAGES = 2;
+
+/**
+ * Kontakt- oder Adressseiten derselben Website aus den Links einer Seite (Nutzerentscheid 2026-10-11, Option A):
+ * Startseiten nennen die Kursorte oft nicht. Höchstens zwei, nach Vorrang; erkannt am Linktext oder am Pfad. Interne
+ * Adressen schließt `parseUrl` aus. Genutzt vom Bewerten im Entdecken und von der Ortsprüfung (Plan 0049, Nachtrag 1).
+ */
+export function contactLinks(page: {
+  finalUrl: string;
+  links: ReadonlyArray<{ label: string; url: string }>;
+}): string[] {
+  const self = normalizeUrl(page.finalUrl);
+  if (!self) return [];
+  const ranked = new Map<string, number>();
+  for (const l of page.links) {
+    const n = normalizeUrl(l.url);
+    if (!n || n === self || !sameSite(l.url, page.finalUrl)) continue;
+    const path = parseUrl(l.url)?.pathname ?? "";
+    const rank = CONTACT_PATTERNS.findIndex((p) => p.test(l.label) || p.test(path));
+    if (rank >= 0 && !ranked.has(n)) ranked.set(n, rank);
+  }
+  const urls = new Map(page.links.map((l) => [normalizeUrl(l.url) ?? "", l.url] as const));
+  return [...ranked]
+    .sort(([, a], [, b]) => a - b)
+    .slice(0, MAX_CONTACT_PAGES)
+    .flatMap(([n]) => urls.get(n) ?? []);
 }
 
 const cmp = (a: Queued, b: Queued) =>
@@ -349,7 +390,8 @@ const cmp = (a: Queued, b: Queued) =>
 /**
  * Breitensuche (E1): Startseiten zuerst (Tiefe 0), dann je Tiefe nach Wörtern, Tiefe und URL; höchstens
  * `MAX_FETCHES` Abrufe und Tiefe `MAX_DEPTH`. Plattform-Links und Iframes der eigenen Website außerhalb des Bereichs
- * werden abgerufen, aber nicht erkundet.
+ * werden abgerufen, aber nicht erkundet. Nach Tiefe 0 kommen höchstens zwei Kontaktseiten der Startseiten im Bereich
+ * (Ortsprüfung, Nachtrag 1), auch Impressum trotz `neverVisit`, innerhalb des Budgets.
  */
 export async function exploreSite(
   scope: CrawlScope,
@@ -363,40 +405,74 @@ export async function exploreSite(
   const pages: CrawlPage[] = [];
   const gesperrt: string[] = [];
   let fetches = 0;
+  const visit = async (q: Queued, contact: boolean) => {
+    const key = normalizeUrl(q.url);
+    if (!key || visited.has(key)) return undefined;
+    visited.add(key);
+    const result = await fetchOne(q.url, maxFetches - fetches);
+    fetches += Math.max(1, result.cost);
+    pages.push({
+      url: q.url,
+      depth: q.depth,
+      result,
+      ...(q.from ? { from: q.from } : {}),
+      ...(contact ? { contact: true as const } : {}),
+    });
+    if (!result.ok) {
+      if (result.gesperrt) gesperrt.push(q.url);
+      return undefined;
+    }
+    if (result.finalUrl !== q.url) {
+      const fk = normalizeUrl(result.finalUrl);
+      if (fk) visited.add(fk);
+    }
+    return result;
+  };
+  /** Links einer Seite in Tiefe `depth` als Einträge der nächsten Tiefe */
+  const linksOf = (result: Extract<CrawlFetch, { ok: true }>, depth: number): Queued[] => {
+    const links = [
+      ...result.page.links,
+      // verlinkte Feeds sind selbst Kandidat (E1)
+      ...result.page.feeds.filter((f) => /^https?:/i.test(f)).map((url) => ({ url, label: "iCal-Kalender" })),
+      ...iframeLinks(result.html, result.finalUrl).map((url) => ({ url, label: "iframe" })),
+    ];
+    return links.flatMap((l) => {
+      const n = normalizeUrl(l.url);
+      if (!n || visited.has(n) || neverVisit(l.url, l.label)) return [];
+      const own = inScope(l.url, scope);
+      // ein Sprung auf eine Plattform nur von der eigenen Website
+      const leaf = !own && isPlatform(l.url) && inScope(result.finalUrl, scope);
+      if (!own && !leaf) return [];
+      return [{ url: l.url, depth: depth + 1, score: linkScore(l.url, l.label), leaf, from: result.finalUrl }];
+    });
+  };
+  // Links der Kontaktseiten (Tiefe 1) kommen mit den übrigen Links der Tiefe 1 in Tiefe 2 (Arch-Review N1, M1)
+  let carry: Queued[] = [];
   let level: Queued[] = scope.starts.map((url) => ({ url, depth: 0, score: 0, leaf: false }));
-  for (let depth = 0; depth <= maxDepth && level.length > 0; depth++) {
-    const next: Queued[] = [];
+  for (let depth = 0; depth <= maxDepth && level.length + carry.length > 0; depth++) {
+    const next: Queued[] = depth === 1 ? carry : [];
     for (const q of depth === 0 ? level : [...level].sort(cmp)) {
       if (fetches >= maxFetches) return { pages, fetches, gesperrt };
-      const key = normalizeUrl(q.url);
-      if (!key || visited.has(key)) continue;
-      visited.add(key);
-      const result = await fetchOne(q.url, maxFetches - fetches);
-      fetches += Math.max(1, result.cost);
-      pages.push({ url: q.url, depth, result });
-      if (!result.ok) {
-        if (result.gesperrt) gesperrt.push(q.url);
-        continue;
-      }
-      if (result.finalUrl !== q.url) {
-        const fk = normalizeUrl(result.finalUrl);
-        if (fk) visited.add(fk);
-      }
-      if (q.leaf || depth === maxDepth) continue;
-      const links = [
-        ...result.page.links,
-        // verlinkte Feeds sind selbst Kandidat (E1)
-        ...result.page.feeds.filter((f) => /^https?:/i.test(f)).map((url) => ({ url, label: "iCal-Kalender" })),
-        ...iframeLinks(result.html, result.finalUrl).map((url) => ({ url, label: "iframe" })),
-      ];
-      for (const l of links) {
-        const n = normalizeUrl(l.url);
-        if (!n || visited.has(n) || neverVisit(l.url, l.label)) continue;
-        const own = inScope(l.url, scope);
-        // ein Sprung auf eine Plattform nur von der eigenen Website
-        const leaf = !own && isPlatform(l.url) && inScope(result.finalUrl, scope);
-        if (!own && !leaf) continue;
-        next.push({ url: l.url, depth: depth + 1, score: linkScore(l.url, l.label), leaf });
+      const result = await visit(q, false);
+      if (!result || q.leaf || depth === maxDepth) continue;
+      next.push(...linksOf(result, depth));
+    }
+    if (depth === 0) {
+      const contacts = pages.flatMap(({ result: r }) =>
+        r.ok
+          ? contactLinks({ finalUrl: r.finalUrl, links: r.page.links })
+              .filter((u) => inScope(u, scope) && !visited.has(normalizeUrl(u) ?? ""))
+              .map((url) => ({ url, from: r.finalUrl }))
+          : [],
+      );
+      const seen = new Set<string>();
+      for (const c of contacts) {
+        const n = normalizeUrl(c.url) ?? c.url;
+        if (seen.has(n) || seen.size >= MAX_CONTACT_PAGES) continue;
+        seen.add(n);
+        if (fetches >= maxFetches) return { pages, fetches, gesperrt };
+        const result = await visit({ url: c.url, depth: 1, score: 0, leaf: false, from: c.from }, true);
+        if (result && maxDepth > 1) carry.push(...linksOf(result, 1));
       }
     }
     // gleiche URL über mehrere Links: der beste Eintrag zählt
@@ -407,6 +483,7 @@ export async function exploreSite(
       if (!old || cmp(q, old) < 0) best.set(n, q);
     }
     level = [...best.values()];
+    if (depth >= 1) carry = [];
   }
   return { pages, fetches, gesperrt };
 }
@@ -423,7 +500,8 @@ export interface Candidate {
 export function candidatesOf(crawl: CrawlResult, scope: CrawlScope, today: string): Candidate[] {
   const out = new Map<string, Candidate>();
   for (const p of crawl.pages) {
-    if (!p.result.ok) continue;
+    // eine Kontaktseite bleibt Kandidat, wenn sie Programm zeigt („Kontaktgruppe Babys“); Impressum nie (M1)
+    if (!p.result.ok || (p.contact && neverVisit(p.url))) continue;
     const url = p.result.finalUrl;
     const kind = kindOf(p.result.contentType);
     if (!kind || neverCandidate(url, scope) || neverCandidate(p.url, scope)) continue;
@@ -447,46 +525,4 @@ export function wantsBrowser(
   if (r.status !== 403 && !r.botWall) return false;
   const h = hostOf(r.url);
   return h !== undefined && (isPlatform(r.url) || scope.browserHosts.has(h));
-}
-
-/**
- * Ganzer Text der Seite für die Ortsprüfung (E2): `body` samt `header`, `footer` und `nav`, die `extractPage`
- * entfernt; ohne Skripte und Stile.
- */
-export function fullText(html: string): string {
-  const $ = cheerio.load(html);
-  $("script, style, noscript, template").remove();
-  return $("body").text().replace(/\s+/g, " ").trim();
-}
-
-const normPlace = (s: string) =>
-  s
-    .toLowerCase()
-    .replace(/straße|strasse/g, "str")
-    .replace(/str\./g, "str")
-    .replace(/[^\p{L}\p{N}]+/gu, "");
-
-/**
- * Ortsprüfung (E2): Der Text nennt den Namen oder die Straße eines Orts des Anbieters oder dessen PLZ. Auf einer
- * geteilten Website zusätzlich den Namen des Anbieters.
- */
-export function placeMentioned(
-  text: string,
-  provider: { name: string; venues: ReadonlyArray<{ name: string; address: string }> },
-  shared: boolean,
-): boolean {
-  const t = normPlace(text);
-  if (shared && !t.includes(normPlace(provider.name))) return false;
-  // Zusätze stören: „Rosenaustraße 7 (Hinterhaus)“, „Die FamilienBox – Das 'Dorf' für Familien“ (S0)
-  const core = (x: string) =>
-    (x.replace(/\([^)]*\)/g, " ").split(/\s[–—-]\s/)[0] ?? x).replace(/^\s*(der|die|das)\s+/i, "");
-  return provider.venues.some((v) => {
-    const street = core(v.address.split(",")[0] ?? "");
-    const plz = /\b\d{5}\b/.exec(v.address)?.[0];
-    return (
-      (normPlace(core(v.name)).length >= 4 && t.includes(normPlace(core(v.name)))) ||
-      (normPlace(street).length >= 4 && t.includes(normPlace(street))) ||
-      (plz !== undefined && text.includes(plz))
-    );
-  });
 }

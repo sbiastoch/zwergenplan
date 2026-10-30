@@ -37,7 +37,7 @@ import { matchCandidate } from "./match.ts";
 import { isRelevant } from "./relevance.ts";
 import { costSection } from "./report.ts";
 import { ratio } from "./similar.ts";
-import { hostOf, normalizeUrl, parseUrl, sameSite } from "./url.ts";
+import { hostOf, normalizeUrl, parseUrl } from "./url.ts";
 
 /** G3: höchstens so viele neue Anbieter je Lauf und Region (mit `--bootstrap` gilt `MAX_NEW`) */
 export const MAX_NEW_PER_RUN = 10;
@@ -266,39 +266,8 @@ export interface FetchedFind {
   links: ReadonlyArray<{ label: string; url: string }>;
 }
 
-/** Seiten mit der Adresse: Reihenfolge = Vorrang (Kontakt vor Anfahrt vor Impressum vor „Über uns“) */
-const CONTACT_PATTERNS = [
-  /kontakt|contact/i,
-  /anfahrt|standort|so finden sie uns|lageplan|adresse/i,
-  /impressum|imprint/i,
-  /über uns|ueber-uns|uber-uns|about/i,
-];
-/** weitere Seiten je Kandidat und Zeichen je Seite im Bewerten */
-const MAX_CONTACT_PAGES = 2;
+/** Zeichen je Kontaktseite (`contactLinks`, `lib/site-crawl.ts`) im Bewerten */
 const CONTACT_MAX_CHARS = 8_000;
-
-/**
- * Kontakt- oder Adressseiten derselben Website aus den Links der Fund-Seite (Nutzerentscheid 2026-10-11, Option A):
- * Startseiten nennen die Kursorte oft nicht, das Bewerten verwarf deshalb passende Anbieter. Höchstens zwei, nach
- * Vorrang; erkannt am Linktext oder am Pfad. Interne Adressen schließt `parseUrl` aus.
- */
-export function contactLinks(page: FetchedFind): string[] {
-  const self = normalizeUrl(page.finalUrl);
-  if (!self) return [];
-  const ranked = new Map<string, number>();
-  for (const l of page.links) {
-    const n = normalizeUrl(l.url);
-    if (!n || n === self || !sameSite(l.url, page.finalUrl)) continue;
-    const path = parseUrl(l.url)?.pathname ?? "";
-    const rank = CONTACT_PATTERNS.findIndex((p) => p.test(l.label) || p.test(path));
-    if (rank >= 0 && !ranked.has(n)) ranked.set(n, rank);
-  }
-  const urls = new Map(page.links.map((l) => [normalizeUrl(l.url) ?? "", l.url] as const));
-  return [...ranked]
-    .sort(([, a], [, b]) => a - b)
-    .slice(0, MAX_CONTACT_PAGES)
-    .flatMap(([n]) => urls.get(n) ?? []);
-}
 
 /** Nachricht ans Bewerten (E7.4): Region, Kandidat, Text und Links der abgerufenen Seite, weitere Seiten (Kontakt) */
 export function assessMessage(

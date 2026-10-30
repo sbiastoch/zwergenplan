@@ -4,9 +4,9 @@ import { extractPage } from "./html-extract.ts";
 import {
   type CrawlFetch,
   candidatesOf,
+  contactLinks,
   crawlScope,
   exploreSite,
-  fullText,
   futureDates,
   iframeLinks,
   inScope,
@@ -15,7 +15,6 @@ import {
   neverCandidate,
   neverVisit,
   pageSignals,
-  placeMentioned,
   umbrellaHosts,
   wantsBrowser,
 } from "./site-crawl.ts";
@@ -322,38 +321,111 @@ describe("wantsBrowser", () => {
   });
 });
 
-describe("fullText", () => {
-  it("nimmt header, footer und nav mit, ohne Skripte", () => {
-    const html =
-      "<html><body><nav>Menü</nav><main>Kurse</main><footer>Tellerringstraße 56</footer><script>x=1</script></body></html>";
-    expect(fullText(html)).toBe("MenüKurseTellerringstraße 56");
+describe("Kontaktseiten (Nachtrag 1, bleibt mit Nachtrag 2)", () => {
+  it("nach Tiefe 0 und vor Tiefe 1, höchstens zwei, Impressum trotz neverVisit, zählen zu den 20, nie Kandidat", async () => {
+    const p = anbieter("s", "https://s.de/", []);
+    const s = site({
+      "https://s.de/": html(
+        '<a href="/kurse">Kurse</a><a href="/impressum">Impressum</a><a href="/kontakt">Kontakt</a><a href="/anfahrt">Anfahrt</a>',
+      ),
+      "https://s.de/kurse": html("<p>Babymassage Di 9:30 Uhr, Krabbelgruppe Do 10:00 Uhr</p>"),
+      "https://s.de/kontakt": html("<p>Kontakt Di 9:30 Uhr, Do 10:00 Uhr</p>"),
+      "https://s.de/anfahrt": html(""),
+      "https://s.de/impressum": html(""),
+    });
+    const scope = crawlScope(p, [p]);
+    const crawl = await exploreSite(scope, s.fetchOne);
+    expect(s.log).toEqual(["https://s.de/", "https://s.de/kontakt", "https://s.de/anfahrt", "https://s.de/kurse"]);
+    expect(crawl.pages.filter((x) => x.contact).map((x) => x.url)).toEqual([
+      "https://s.de/kontakt",
+      "https://s.de/anfahrt",
+    ]);
+    expect(crawl.fetches).toBe(4);
+    expect(candidatesOf(crawl, scope, today).map((c) => c.url)).toEqual(["https://s.de/kurse"]);
+  });
+
+  it("nur das Impressum verlinkt: trotzdem abgerufen", async () => {
+    const p = anbieter("s", "https://s.de/", []);
+    const s = site({ "https://s.de/": html('<a href="/impressum">Impressum</a>'), "https://s.de/impressum": html("") });
+    await exploreSite(crawlScope(p, [p]), s.fetchOne);
+    expect(s.log).toEqual(["https://s.de/", "https://s.de/impressum"]);
+  });
+
+  it("Dachseite: nur Kontaktseiten unter der Pfadbindung", async () => {
+    const p = catalog[1] as Provider;
+    const s = site({
+      "https://www.nuernberg.de/internet/a/": html(
+        '<a href="/internet/kontakt.html">Kontakt</a><a href="/internet/a/kontakt.html">Kontakt</a>',
+      ),
+      "https://www.nuernberg.de/internet/a/kurse": html(""),
+      "https://www.nuernberg.de/internet/a/kontakt.html": html(""),
+    });
+    const crawl = await exploreSite(crawlScope(p, catalog), s.fetchOne);
+    expect(crawl.pages.filter((x) => x.contact).map((x) => x.url)).toEqual([
+      "https://www.nuernberg.de/internet/a/kontakt.html",
+    ]);
   });
 });
 
-describe("placeMentioned (Ortsprüfung, E2)", () => {
-  const p = {
-    name: "FamilienBox",
-    venues: [{ name: "Familienzentrum Süd", address: "Tellerringstraße 56, 90473 Nürnberg" }],
-  };
-  it("Straße mit Abkürzung, Name, PLZ; sonst nicht", () => {
-    expect(placeMentioned("Wir sind in der Tellerringstr.56", p, false)).toBe(true);
-    expect(placeMentioned("im Familienzentrum Süd", p, false)).toBe(true);
-    expect(placeMentioned("90473 Nürnberg", p, false)).toBe(true);
-    expect(placeMentioned("Hauptstraße 1, 90402 Nürnberg", p, false)).toBe(false);
-  });
-  it("Zusätze in Klammern und nach Gedankenstrich stören nicht", () => {
-    const box = {
-      name: "Box",
-      venues: [
-        { name: "Die FamilienBox – Das 'Dorf' für Familien", address: "Rosenaustraße 7 (Hinterhaus), 90429 Nürnberg" },
-      ],
-    };
-    expect(placeMentioned("Rosenaustr. 7, Nürnberg", box, false)).toBe(true);
-    expect(placeMentioned("Willkommen in der FamilienBox", box, false)).toBe(true);
+describe("Arch-Review Nachtrag 1 (Erkundung)", () => {
+  it("M1: „Kontaktgruppe Babys“ bleibt Kandidat, Links der „Über uns“-Seite werden erkundet", async () => {
+    const p = anbieter("s", "https://s.de/", []);
+    const s = site({
+      "https://s.de/": html('<a href="/kontaktgruppe-babys">Kontaktgruppe Babys</a><a href="/ueber-uns">Über uns</a>'),
+      "https://s.de/kontaktgruppe-babys": html("<p>Kontaktgruppe für Babys Di 9:30 Uhr, Do 10:00 Uhr</p>"),
+      "https://s.de/ueber-uns": html('<a href="/ueber-uns/kurse">Kurse</a>'),
+      "https://s.de/ueber-uns/kurse": html(""),
+    });
+    const scope = crawlScope(p, [p]);
+    const crawl = await exploreSite(scope, s.fetchOne);
+    expect(s.log).toContain("https://s.de/ueber-uns/kurse");
+    expect(candidatesOf(crawl, scope, today).map((c) => c.url)).toEqual(["https://s.de/kontaktgruppe-babys"]);
   });
 
-  it("geteilte Website: zusätzlich Name des Anbieters", () => {
-    expect(placeMentioned("Tellerringstraße 56", p, true)).toBe(false);
-    expect(placeMentioned("FamilienBox, Tellerringstraße 56", p, true)).toBe(true);
+  it("m5: Iframe einer Plattform auf der eigenen Website merkt sich die eigene Seite in `from`", async () => {
+    const p = anbieter("s", "https://s.de/", []);
+    const s = site({
+      "https://s.de/": html('<iframe src="https://www.eversports.de/widget/w/s"></iframe>'),
+      "https://www.eversports.de/widget/w/s": html(""),
+    });
+    const scope = crawlScope(p, [p]);
+    const crawl = await exploreSite(scope, s.fetchOne);
+    const widget = crawl.pages.find((x) => x.url === "https://www.eversports.de/widget/w/s");
+    expect(widget?.from).toBe("https://s.de/");
+  });
+});
+
+describe("contactLinks (Adresse für das Bewerten)", () => {
+  const page = (links: Array<{ label: string; url: string }>) => ({
+    finalUrl: "https://www.schwimm.example.net/kurse/",
+    text: "",
+    links,
+  });
+  it("Kontakt, Anfahrt, Impressum derselben Website, höchstens zwei, Kontakt zuerst", () => {
+    const r = contactLinks(
+      page([
+        { label: "Impressum", url: "https://schwimm.example.net/impressum" },
+        { label: "Kurse", url: "https://schwimm.example.net/kurse/baby" },
+        { label: "So finden Sie uns", url: "https://www.schwimm.example.net/anfahrt" },
+        { label: "Kontakt", url: "https://schwimm.example.net/kontakt/" },
+      ]),
+    );
+    expect(r).toEqual(["https://schwimm.example.net/kontakt/", "https://www.schwimm.example.net/anfahrt"]);
+  });
+  it("Subdomain derselben Website zählt, fremde Website, interne Adresse und die Seite selbst nicht", () => {
+    const r = contactLinks(
+      page([
+        { label: "Kontakt", url: "https://www.schwimm.example.net/kurse/" },
+        { label: "Kontakt", url: "https://andere.example.org/kontakt" },
+        { label: "Kontakt", url: "http://192.168.0.1/kontakt" },
+        { label: "Über uns", url: "https://info.schwimm.example.net/ueber-uns" },
+      ]),
+    );
+    expect(r).toEqual(["https://info.schwimm.example.net/ueber-uns"]);
+  });
+  it("erkennt die Adresse auch am Pfad ohne passenden Linktext", () => {
+    expect(contactLinks(page([{ label: "→", url: "https://schwimm.example.net/de/standorte" }]))).toEqual([
+      "https://schwimm.example.net/de/standorte",
+    ]);
   });
 });
