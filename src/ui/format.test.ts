@@ -925,6 +925,18 @@ describe("aboToast (Plan 0054, E5)", () => {
     expect(aboToast("suche", true, undefined).text).toBe("Suche abonniert");
   });
 
+  it("iPhone im Browser-Tab ohne Push: Hinweis auf die installierte App, dort neu abonnieren", () => {
+    expect(aboToast("anbieter", true, "nein", false, true)).toEqual({
+      text: "Anbieter abonniert. Push-Nachrichten gibt es auf dem iPhone in der installierten App – dort bitte noch einmal abonnieren.",
+      ms: 6000,
+      tone: "hint",
+    });
+    expect(aboToast("suche", true, "nein", true, true).text).toContain("installierten App");
+    // Chunk nicht geladen: kein Urteil über Push, neutral wie bisher
+    expect(aboToast("suche", true, undefined, false, true).text).toBe("Suche abonniert");
+    expect(aboToast("anbieter", false, "nein", false, true)).toEqual({ text: "Abo beendet" });
+  });
+
   it("Such-Abo mit Wegzeit ohne Startpunkt nennt das, solange Push nicht scheiterte", () => {
     expect(aboToast("suche", true, "an", true).text).toContain("ab einem Startpunkt");
     expect(aboToast("suche", true, "verweigert", true).text).toContain("blockiert");

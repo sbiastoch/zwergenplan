@@ -691,13 +691,15 @@ export interface AboToast {
 
 /**
  * Rückmeldung nach einem Glocken-Tipp (Plan 0054, E5). `push` ist das Ergebnis von `bellPush`, `undefined`, wenn der
- * Chunk nicht lud. `noOrigin`: Such-Abo mit Wegzeit, aber ohne gespeicherten Startpunkt.
+ * Chunk nicht lud. `noOrigin`: Such-Abo mit Wegzeit, aber ohne gespeicherten Startpunkt. `iosTab`: iPhone im
+ * Browser-Tab; dort gibt es kein Push, und die installierte App hat einen eigenen Speicher, das Abo zieht nicht mit.
  */
 export function aboToast(
   kind: "anbieter" | "suche",
   subscribed: boolean,
   push: BellPush | undefined,
   noOrigin = false,
+  iosTab = false,
 ): AboToast {
   if (!subscribed) return { text: "Abo beendet" };
   const what = kind === "anbieter" ? "Anbieter abonniert" : "Suche abonniert";
@@ -712,6 +714,13 @@ export function aboToast(
   if (push === "abo" || push === "netz" || push === "server") {
     return {
       text: `${what}. Push ließ sich nicht einschalten, später beim Schalter „Wöchentliche Push-Nachricht“ nochmal versuchen.`,
+      ms: long,
+      tone: "hint",
+    };
+  }
+  if (push === "nein" && iosTab) {
+    return {
+      text: `${what}. Push-Nachrichten gibt es auf dem iPhone in der installierten App – dort bitte noch einmal abonnieren.`,
       ms: long,
       tone: "hint",
     };
