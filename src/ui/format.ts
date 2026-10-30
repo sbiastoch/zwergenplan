@@ -4,7 +4,7 @@
  */
 import type { PositionProblem } from "../data/geolocation.ts";
 import type { LoadFailure } from "../data/site.ts";
-import { fittingSessions } from "../domain/age.ts";
+import { type AgeCheck, fittingSessions } from "../domain/age.ts";
 import { courseProgress, rhythm, sessionIndex, uniformTimes, upcomingSessions, weekDays } from "../domain/agenda.ts";
 import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange } from "../domain/date-range.ts";
@@ -352,6 +352,22 @@ export function ageWindowLabel({ from, until }: ExportSelection, now: Date): str
   if (until) return `passt bis ${dayDotsInYear(until, now)}`;
   if (from) return `passt ab ${dayDotsInYear(from, now)}`;
   return undefined;
+}
+
+/**
+ * Alterszeile im Detail: „Passt: am Mi 4.11. 6 Monate alt · passt bis 14.3.“. Ist das Kind bei einem regelmäßigen
+ * Angebot noch zu jung (`check.from`), steht dort, ab wann es passt, hinter den Daten ohne Termine dazu.
+ */
+export function ageCheckLabel(check: AgeCheck, selection: ExportSelection | undefined, now: Date): string {
+  const { from } = check;
+  if (from) {
+    const until = selection?.until ? ` · passt bis ${dayDotsInYear(selection.until, now)}` : "";
+    const tail = from.scheduled ? until : " · noch keine Termine bekannt";
+    return `Passt ab ${dayDotsInYear(from.at, now)}: dann ${plural(from.months, "Monat", "Monate")} alt${tail}`;
+  }
+  const window = selection && ageWindowLabel(selection, now);
+  const day = shortDate(berlinIsoDate(check.at));
+  return `${check.fits ? "Passt" : "Passt nicht"}: am ${day} ${plural(check.months, "Monat", "Monate")} alt${window ? ` · ${window}` : ""}`;
 }
 
 /** Kachel: „25 Min.“, „über 2 Std.“ bzw. „1,4 km“ – gerundet von der Domäne (E8). */
