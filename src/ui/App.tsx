@@ -1,6 +1,7 @@
 /** Zwergenplan (Plan 0003): Laden, URL-Zustand, Ansichten, Overlays. Rechenlogik kommt aus src/domain. */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { iosTab } from "../data/platform.ts";
 import { loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/preferences.ts";
 import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
@@ -284,7 +285,7 @@ export function App() {
       void bellPush(subscribed).then((push) => {
         bellBusyRef.current = false;
         setBellBusy(false);
-        const { text, ms, tone } = aboToast(kind, subscribed, push, noOrigin);
+        const { text, ms, tone } = aboToast(kind, subscribed, push, noOrigin, iosTab());
         say(text, ms, tone);
       });
     },
