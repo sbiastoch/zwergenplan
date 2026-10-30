@@ -5,8 +5,8 @@
  */
 import { addDays } from "../../../src/domain/time.ts";
 import type { Find } from "./discover.ts";
-import { normalizeUrl } from "./discover.ts";
 import type { DiscoverState } from "./discover-state.ts";
+import { normalizeUrl } from "./url.ts";
 
 /** Ab drei Klärfällen am Kandidaten setzt er einen Monatslauf aus */
 export const SUSPEND_DAYS = 35;

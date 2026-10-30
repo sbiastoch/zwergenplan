@@ -1,6 +1,6 @@
 # Plan 0049 – Seitenfinder: Programmseiten finden, zuerst für bekannte Anbieter
 
-Status: Review eingearbeitet (Review 4 vom 2026-10-30)
+Status: in Umsetzung (Review 4 eingearbeitet; S0 gemessen, Nachtrag 1 Ortsprüfung offen)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`), Punkt 4 (ein Seitenfinder), Punkt 1 (ein Abruf), Punkt 5 (Issue je Lauf neben dem Wächter). Dieser Plan baut das Modul und die **Pflege bekannter Anbieter**. Den Modus `alle` für das Entdecken legt er fest (E1), gebaut wird er mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`), S3.
@@ -337,6 +337,46 @@ Jeder Schritt mit `pnpm verify` und `pnpm e2e:local --affected`; S1 und S2 mit `
   - Danach Grenzen nach ADR 0033, Punkt 7.
   - `vrr` kommt dazu, sobald Plan 0044 live ist.
 - **S4 – Abschluss.** Ziele 1–4 im Bericht, Live-Prüfung, Restpunkte nach `docs/ideas.md` (Fund für `skipCrawl`), archivieren.
+
+## Umsetzung
+
+### S0 – Messung (2026-10-30)
+
+Wegwerf-Skript im Job-Verzeichnis auf `lib/site-crawl.ts` und `io/site-crawl.ts` (S1-Code, noch ohne Pflegelauf), lokal, `setAbruf("neu")`, 68 Anbieter (`role: anbieter` ohne `coveredBy`/`skipCrawl`), 6 parallel, 1/s je Host.
+
+- **Abrufe und Dauer:** 1 331 Abrufe in 23 Minuten, höchstens 21 je Anbieter (die letzte Seite kostete mit Browser zwei).
+- **Kandidaten**, die der Katalog nicht nennt: 66 bei 33 Anbietern. Darunter viel Rauschen, das erst der Ertragsbeweis filtert:
+  - „Baby“ im Titel eines Stücks für Erwachsene („Drill Baby Drill“, Staatstheater) erfüllt `isRelevant`;
+  - Gottesdienstlisten, Gemeindebriefe als PDF, Kontaktseiten mit Öffnungszeiten („Wochentag plus Uhrzeit“);
+  - Startseiten mit Teasern (`nuernberger-nest.de/`, `fbs-nuernberg.de/`), die `covered` als `deckungsgleich` erkennen soll;
+  - Detailseiten einzelner Kurse (gugelrund, nuebad-flipper, institut-zukunftsmusik), die das Ergebnis `deckungsgleich` oder `anhaengen` bekommen.
+- **robots.txt:** 29 abgerufene Seiten bei 7 Anbietern gesperrt, meist Buchungssysteme: `buchung.schwimmschule-ohana.de` (auch die API, die der Katalog nutzt), `zoff-harmonie.de` (Detailseiten und das Programm-PDF), `st-martin-nuernberg.de` (Termin-Details), `kinder-salzundpfeffer.reservix.de`, `tsv1846nuernberg.kurabu.com`, `pro.bsport.io`, `canva.com`. Für die Katalogseiten selbst zählt die Messung im Runner (Plan 0048, S3).
+- **Orts-`hint`:** nur `geburtshaus-nuernberger-nest`.
+- **Dachseiten:** `nuernberg.de`, `eversports.de`, `wolfpack.yoga`, `evangelische-termine.de`, `mutherstudio.com`, `api.kursorganizer.com`, `familieninfo-fuerth.de`.
+- **Ortsprüfung an den heutigen `termine`-Seiten: 107 von 161 (66 %), Soll ≥ 95 % verfehlt.** Gründe der 54 Fehlschläge:
+  - Plattform-Widgets und Buchungslisten ohne Adresse (eversports, hebamio, thrivecart);
+  - iCal-Feeds von `evangelische-termine.de` (eine Dachseite: verlangt den Anbieternamen, der Feed nennt die Gemeinde anders);
+  - Seiten auf `nuernberg.de` ohne den Katalognamen des Anbieters (Dachseite);
+  - eigene Seiten, die die Adresse nur auf der Kontaktseite nennen (`studioherzschlag.de`, `mutherstudio.com`, `zentrum-koberger.de`, die FamilienBox).
+  - Behoben im Code schon vor der Zählung: Klammerzusätze („(Hinterhaus)“), Zusätze nach Gedankenstrich und Artikel am Ortsnamen.
+- **Folge:** Nachtrag 1 (unten) zur Ortsprüfung, vor S1.
+- **Von Hand:** 20 Kandidaten (jeder dritte der nach Anbieter sortierten Liste) prüft der Nutzer: echte Programmseite des Anbieters ja/nein. Ergebnis hier, dann die Schwellen von `pageSignals`.
+
+### S1, Teil 1 – Umsetzung (2026-10-30)
+
+- `lib/url.ts` (URL-Hilfen aus `lib/discover.ts`, Importe in `io/discover.ts`, `lib/watch.ts`, `lib/klaerfall.ts`), `lib/site-crawl.ts` (rein: Bereich, geteilte Websites, Ausschlüsse, Reihenfolge, `pageSignals`, Breitensuche `exploreSite` mit eingespeistem Abruf, `candidatesOf`, `wantsBrowser`, `fullText`, `placeMentioned`), `io/site-crawl.ts` (Warteschlange je Host, `crawlFetcher` nur mit `setAbruf("neu")`, Browser, PDF, iCal).
+- `io/http.ts`: `fetchBytes` meldet `redirects`; `decodeBody` für Bytes mit derselben Zeichensatz-Erkennung.
+- **Arch-Review (Teil 1):** kein Blocker; sechs Majors behoben: Dachseite auch über Subdomain (ob geteilt, entscheidet der Host des Ziels), „Workshop“ ist kein Shop (Wortgrenzen), ungültige Prozentfolgen brechen nicht ab, Restbudget an den Abruf (Browser entfällt, wenn er die 20 überschritte; Weiterleitungen zählen danach), iCal-Feeds als eigene Kandidaten (künftige `DTSTART`, verlinkte Feeds werden besucht), Tests für PDF, Bot-Schutz und Budget. Minors 1–8 nachgezogen; die kanonische URL (Minor 9) kommt mit `pflege.ts`.
+- **Noch nicht:** `lib/pflege.ts`, `io/pflege.ts`, Befehl `pflege`, Zustand (E4). Vorher `/plan-review` von Nachtrag 1.
+
+### Nachtrag 1 (2026-10-30, Entwurf): Ortsprüfung nach S0
+
+Die Ortsprüfung auf dem Text der Kandidatenseite trifft das Soll nicht; 34 % der heutigen, richtigen Seiten fielen durch. Sie soll nur verhindern, dass das Modell einem fremden Treffpunkt den Hauptort gibt (E2, `fremder-ort`). Vorschlag:
+- **Website statt Seite:** Auf der eigenen Website gilt der Ort als geprüft, wenn irgendeine in der Erkundung abgerufene Seite derselben Website (auch Kontakt, Impressum, Footer) den Ort nennt.
+- **Fremder Ort aktiv erkennen:** `fremder-ort` gilt, wenn die Kandidatenseite eine PLZ der Region oder eine Straße mit Hausnummer nennt, die zu keinem Ort des Anbieters passt, und keinen Ort des Anbieters.
+- **Geteilte Websites und Plattformen:** Hier bleibt der Anbietername Pflicht, verglichen ohne Rechtsform und Zusätze; Widgets, die nur über die eigene Website erreicht werden (ein Sprung), erben die Prüfung der eigenen Website.
+- **Neues Soll:** ≥ 95 % der heutigen `termine`-Seiten, neu gemessen mit dem S0-Skript vor S1.
+- Offen für den Plan-Review: ob iCal-Feeds der Sammelkalender (`evangelische-termine.de`) überhaupt Kandidaten sein dürfen (heute „nie Kandidat“; als Katalogseite in der Messung nur zum Vergleich).
 
 ## Nutzerentscheide (offen)
 

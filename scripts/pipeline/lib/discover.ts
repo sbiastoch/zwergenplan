@@ -34,10 +34,10 @@ import {
 } from "./eval-discover.ts";
 import type { CallRecord } from "./extract.ts";
 import { matchCandidate } from "./match.ts";
-import { isInternalHost } from "./redirect.ts";
 import { isRelevant } from "./relevance.ts";
 import { costSection } from "./report.ts";
 import { ratio } from "./similar.ts";
+import { hostOf, normalizeUrl, parseUrl, sameSite } from "./url.ts";
 
 /** G3: höchstens so viele neue Anbieter je Lauf und Region (mit `--bootstrap` gilt `MAX_NEW`) */
 export const MAX_NEW_PER_RUN = 10;
@@ -57,36 +57,6 @@ export interface Find {
   url: string;
   warum: string;
   quelle: string;
-}
-
-/** Keine IP-Literale und kein `localhost` (`isInternalHost`, gemeinsam mit dem Abruf `io/http.ts`) */
-const parseUrl = (url: string): URL | undefined => {
-  try {
-    const u = new URL(url);
-    return (u.protocol === "http:" || u.protocol === "https:") && !isInternalHost(u.hostname) ? u : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-const bareHost = (u: URL) => u.hostname.toLowerCase().replace(/^www\./, "");
-
-/** Host ohne `www.`; ungültige URL: undefined */
-export const hostOf = (url: string): string | undefined => {
-  const u = parseUrl(url);
-  return u ? bareHost(u) : undefined;
-};
-
-/** Vergleichsform einer URL: ohne Schema, `www.`, Fragment, Tracking-Parameter und Schrägstrich am Ende. */
-export function normalizeUrl(url: string): string | undefined {
-  const u = parseUrl(url);
-  if (!u) return undefined;
-  const params = [...u.searchParams]
-    .filter(([k]) => !/^(utm_|fbclid$|gclid$)/i.test(k))
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([k, v]) => `${k}=${v}`);
-  const path = u.pathname.replace(/\/+$/, "");
-  return `${bareHost(u)}${path}${params.length > 0 ? `?${params.join("&")}` : ""}`;
 }
 
 const urlsOf = (p: Provider): string[] => [p.url, ...p.programme.map((g) => g.url)];
@@ -306,17 +276,6 @@ const CONTACT_PATTERNS = [
 /** weitere Seiten je Kandidat und Zeichen je Seite im Bewerten */
 const MAX_CONTACT_PAGES = 2;
 const CONTACT_MAX_CHARS = 8_000;
-
-/**
- * Dieselbe Website: gleicher Host oder einer ist Subdomain des anderen (`www.`, `info.`). Strenger als „letzte zwei
- * Teile“, damit zwei Seiten beim selben Baukasten-Hoster (`*.jimdofree.com`) nicht als eine gelten (Arch-Review S4b,
- * m2). Interne Adressen: nie (`hostOf` liefert dann nichts).
- */
-export function sameSite(a: string, b: string): boolean {
-  const x = hostOf(a);
-  const y = hostOf(b);
-  return x !== undefined && y !== undefined && (x === y || x.endsWith(`.${y}`) || y.endsWith(`.${x}`));
-}
 
 /**
  * Kontakt- oder Adressseiten derselben Website aus den Links der Fund-Seite (Nutzerentscheid 2026-10-11, Option A):

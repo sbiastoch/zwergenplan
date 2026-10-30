@@ -1,6 +1,6 @@
 # Plan 0048 – Nachtlauf: die Programmseite als Einheit, ein Wächter, ein Abruf
 
-Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel live seit `dde68a2`; Nachtrag 5 Token-Bremse je Modell; S3 Abruf mit Schalter `alt`, Messung offen)
+Status: in Umsetzung (S1 live seit `4328b2d`, Umstellung `32ca5b8` am 2026-10-27; Nachtrag 3 live seit `62f6180`; S2 Wächter live seit `28509f1`; Nachtrag 4 Modellwechsel live seit `dde68a2`; Nachtrag 5 Token-Bremse je Modell; S3 Abruf live seit `b8bcd4a` mit Schalter `alt`, Messung im Runner fertig, N1 offen)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`): Punkte 1 (ein Abruf), 2 (Einheit Seite), 3 (Zustand und Gesundheit), 5 (Wächter) und 7 (Grenzen nach Qualität). Dieser Plan setzt sie um.
@@ -576,7 +576,11 @@ Wegwerf-Skripte unter `runs/s0-0048/` (gitignored): `s0.ts` (Abruf, Einheiten na
 - **Workflow:** Mit `abruf: neu` im Modus `messen` werden die Hashes nicht als Vornacht gespeichert.
 - **Arch-Review (2026-10-30):** kein Blocker, kein Major; alle acht Minors eingearbeitet.
 - **Abweichung Impressum:** Der Absatz zum Abruf kommt mit dem Commit, der `neu` zum Standard macht (nach N1). Solange `alt` gilt, stimmte „beachtet robots.txt“ nicht.
-- **Offen:** Messung im Runner per `workflow_dispatch` (`modus: messen`, `abruf: beide`), Ergebnis hier, dann N1; danach Standard `neu`, Impressum, `/browser-review`, Schalter und `UA` entfallen.
+- **Messung im Runner (2026-10-30, Lauf 41000889524, `modus: messen`, `abruf: beide`, live seit `b8bcd4a`):** 177 Katalogseiten verglichen, Sammelkalender alt und neu gleich (evtermine 39, frankenkids 25, stadt-vk 25 Kandidaten), keine Seite mit mehr als ±20 % Länge, keine nur alt gescheitert, keine Vorab-Auflösung gescheitert.
+  - **Von robots.txt gesperrt (5 Seiten, 4 Anbieter):** `theater-salz-pfeffer` (`kinder-salzundpfeffer.reservix.de/events`), `mutherstudio` (`canva.com/design/…`), `tsv-1846-nuernberg` (`tsv1846nuernberg.kurabu.com/de/events/club`), `imiluv-studio` (zwei Seiten der API `api.production.bsport.io/book/v1/offer/`).
+  - **Nur neu gescheitert (3 Seiten, 1 Anbieter):** `studio-herzschlag`, drei Seiten auf `mamalea-familienbegleitung.de`: „robots.txt nicht erreichbar (fetch failed)“. Der Netzfehler trifft nur den Abruf der robots.txt; ob vorübergehend, zeigt eine zweite Messung oder der erste Lauf mit `neu` (Wächter).
+  - Lokal (S0 von Plan 0049) sperrte robots.txt zusätzlich Seiten, die der Katalog nicht nennt (Buchung der Schwimmschule Ohana, Detailseiten von `zoff-harmonie.de` und `st-martin-nuernberg.de`).
+- **Offen:** N1 (Nutzer), danach Standard `neu`, `blocked` für die gesperrten Seiten, Impressum, `/browser-review`; Schalter und `UA` entfallen.
 
 ### Restpunkte (kommen bei S5 nach `docs/ideas.md`)
 

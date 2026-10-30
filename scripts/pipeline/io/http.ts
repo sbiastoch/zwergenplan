@@ -115,7 +115,10 @@ class RedirectError extends Error {}
  * interner Adressen, höchstens `MAX_REDIRECTS` Sprünge; Methode wie `redirect: "follow"`. `finalUrl` ist die letzte
  * Adresse wie bisher `res.url`.
  */
-async function fetchFollowing(url: string, opts: RequestOptions): Promise<{ res: Response; finalUrl: string }> {
+async function fetchFollowing(
+  url: string,
+  opts: RequestOptions,
+): Promise<{ res: Response; finalUrl: string; redirects: number }> {
   const blocked = blockedUrl(url);
   if (blocked) throw new RedirectError(`Abruf abgelehnt (${blocked})`);
   const signal = AbortSignal.timeout(opts.timeoutMs ?? 60_000);
@@ -137,7 +140,7 @@ async function fetchFollowing(url: string, opts: RequestOptions): Promise<{ res:
       ...(method === "POST" ? { method, body: body ?? "" } : {}),
     });
     const hop = nextHop({ url: current, status: res.status, location: res.headers.get("location"), method, hops });
-    if (hop.kind === "fertig") return { res, finalUrl: current };
+    if (hop.kind === "fertig") return { res, finalUrl: current, redirects: hops };
     await res.body?.cancel().catch(() => undefined);
     if (hop.kind === "fehler") throw new RedirectError(hop.reason);
     // wie die Fetch-Spezifikation: ohne Body keine Body-Header, bei anderem Origin kein Authorization (m2)
@@ -159,17 +162,17 @@ async function fetchFollowing(url: string, opts: RequestOptions): Promise<{ res:
 export async function fetchBytes(
   url: string,
   opts: RequestOptions = {},
-): Promise<Omit<FetchedPage, "body"> & { bytes: Uint8Array }> {
+): Promise<Omit<FetchedPage, "body"> & { bytes: Uint8Array; redirects: number }> {
   const retries = opts.retries ?? 2;
   for (let attempt = 0; ; attempt++) {
     try {
-      const { res, finalUrl } = await fetchFollowing(url, opts);
+      const { res, finalUrl, redirects } = await fetchFollowing(url, opts);
       if (res.status >= 500 && attempt < retries) {
         await sleep(2000 * (attempt + 1));
         continue;
       }
       const contentType = res.headers.get("content-type") ?? "";
-      return { status: res.status, finalUrl, contentType, bytes: new Uint8Array(await res.arrayBuffer()) };
+      return { status: res.status, finalUrl, contentType, redirects, bytes: new Uint8Array(await res.arrayBuffer()) };
     } catch (e) {
       if (e instanceof RedirectError || e instanceof RobotsError || attempt >= retries) throw e;
       await sleep(2000 * (attempt + 1));
@@ -177,8 +180,12 @@ export async function fetchBytes(
   }
 }
 
+/** Text aus Bytes mit derselben Zeichensatz-Erkennung wie `fetchPage` (Seitenfinder: erst Bytes, dann je nach Art) */
+export const decodeBody = (bytes: Uint8Array, contentType: string): string =>
+  decode(bytes, charsetOf(contentType, bytes));
+
 export async function fetchPage(url: string, opts: RequestOptions = {}): Promise<FetchedPage> {
-  const { bytes, ...res } = await fetchBytes(url, opts);
+  const { bytes, redirects: _, ...res } = await fetchBytes(url, opts);
   return { ...res, body: decode(bytes, opts.charset ?? charsetOf(res.contentType, bytes)) };
 }
 

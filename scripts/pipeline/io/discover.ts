@@ -36,7 +36,6 @@ import {
   type HiddenEval,
   hiddenEval,
   hideProviders,
-  hostOf,
   isPdf,
   newProviderCommitMessage,
   parseAssessment,
@@ -47,7 +46,6 @@ import {
   type RegionReport,
   renderDiscoverReport,
   reservedIds,
-  sameSite,
   searchMessage,
   searchResponseSchema,
 } from "../lib/discover.ts";
@@ -61,6 +59,7 @@ import { anbieterVids } from "../lib/match.ts";
 import { placeholderWindow } from "../lib/placeholders.ts";
 import { providerStatus } from "../lib/raw.ts";
 import { planFetch } from "../lib/select.ts";
+import { hostOf, sameSite } from "../lib/url.ts";
 import { GateError } from "./discover-git.ts";
 import { effortOf } from "./extract.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";

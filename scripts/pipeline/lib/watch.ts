@@ -6,9 +6,9 @@
 import { createHash } from "node:crypto";
 import { REGIONS } from "../../../src/domain/regions.ts";
 import { addDays, berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
-import { hostOf, normalizeUrl } from "./discover.ts";
 import type { DiscoverState } from "./discover-state.ts";
 import { isV2, type ProviderRaw, type ProviderRawV2, type UnitState } from "./raw.ts";
+import { hostOf, normalizeUrl } from "./url.ts";
 
 type WatchKind = "seite" | "entfernt" | "gesperrt" | "einbruch" | "leer" | "anbieter" | "umstellung" | "klaerfall";
 

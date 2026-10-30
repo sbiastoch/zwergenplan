@@ -23,7 +23,6 @@ import {
   isPdf,
   newProviderCommitMessage,
   newProvidersIssue,
-  normalizeUrl,
   parseAssessment,
   possibleDuplicate,
   postpone,
@@ -32,11 +31,11 @@ import {
   type RegionReport,
   renderDiscoverReport,
   reservedIds,
-  sameSite,
   searchMessage,
   searchResponseSchema,
 } from "./discover.ts";
 import { DiscoverState, emptyState } from "./discover-state.ts";
+import { normalizeUrl, sameSite } from "./url.ts";
 
 const catalog: Provider[] = ProvidersFile.parse(
   parse(readFileSync(new URL("../../../tests/fixtures/providers.yaml", import.meta.url), "utf8")),

@@ -30,7 +30,7 @@ import { fetchSource } from "./sources.ts";
 const LIMITS = { total: 4, perKey: 2 };
 
 /** Eine Zeile je Fehler, ohne Stacktrace; Zeitüberschreitung und Netzfehler lesbar. */
-function reasonOf(e: unknown): string {
+export function reasonOf(e: unknown): string {
   if (e instanceof Error && e.name === "TimeoutError") return "Zeitüberschreitung";
   const c = e instanceof Error ? e.cause : undefined;
   const cause = c instanceof Error ? ` (${"code" in c && typeof c.code === "string" ? c.code : c.message})` : "";
@@ -38,7 +38,7 @@ function reasonOf(e: unknown): string {
   return `${msg.split("\n")[0]}${cause}`.replace(/\s+/g, " ").slice(0, 200);
 }
 
-function pdftotext(bytes: Uint8Array): Promise<string> {
+export function pdftotext(bytes: Uint8Array): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = execFile(
       "pdftotext",
