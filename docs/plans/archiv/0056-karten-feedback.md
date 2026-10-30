@@ -1,6 +1,6 @@
 # Plan 0056 – Karten nach Nutzer-Feedback: näher am Startpunkt, Liste im Ausschnitt, weniger Text
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 669478b (2026-10-30)
 Datum: 2026-10-29
 
 Bezug:
@@ -312,3 +312,4 @@ Zweiter Reviewer, ohne Chat-Kontext. Er findet keinen Blocker und bestätigt B1,
   - Dark Mode: ohne Inseln; Quellenangabe in beiden Themen lesbar.
   - Befund m1: Mit Startpunkt kennt der Start kein Padding; bei 320 px liegt ein Cluster halb unter den Zoom-Knöpfen. Kommt nach `docs/ideas.md`.
   - Live-Interaktion mit claude-in-chrome nicht gemacht; die Interaktionen decken die E2E-Fälle ab.
+- **S7:** Branch-CI grün, Fast-Forward nach `main` (S1–S3 mit 0d50787, S4–S6 mit 669478b), CI auf `main` grün, `meta.json` zeigt 669478b. `/browser-review live` (390 px, hell und dunkel): Karte mit Startpunkt Gostenhof zeigt „198 Angebote im Kartenausschnitt“ mit „Alle zeigen“ und die Gegend, Tab „Anbieter“ „69 Anbieter“, Liste „356 Angebote“; lange Titel brechen sauber um. Restpunkte in `docs/ideas.md`.

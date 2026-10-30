@@ -113,6 +113,11 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0056** (Karten-Feedback, live seit 669478b, 2026-10-30; Einzelheiten in „Umsetzungsnotizen“ des Plans):
+  - **Padding beim Start am Startpunkt**: Der Start `{ around, radiusKm }` setzt Mitte und Zoom ohne Padding; bei 320 px liegt ein Cluster halb unter den Zoom-Knöpfen. Möglich: `easeTo`/Konstruktor mit `padding` (MapLibre verschiebt dann die Mitte), ohne den Radius zu verkleinern.
+  - **Statuszeile bei 390 px**: „N Angebote im Kartenausschnitt“ bricht neben „Liste | Karte“ und dem Sortierknopf zweizeilig um; kürzer wäre z. B. „N im Ausschnitt“. Nach Rückmeldung.
+  - **Am echten Handy prüfen**: Klappt die Quellenangabe nach 5 s ein und öffnet ein Tipp auf „i“ sie wieder (iOS Safari)? Ist 2 km Radius auf dem eigenen Gerät der gewünschte Ausschnitt (Nutzerwunsch „etwa 10 Anbieter“)?
+  - **PMTiles selbst hosten** neu bewerten: Seit ADR 0039 sieht OpenFreeMap die Gegend des Startpunkts (ADR 0008, Abwägung).
 - **Plan 0055** (Anbieterkarte, live seit 2b31b96, 2026-10-29; Einzelheiten in „Umsetzung“ und „Arch-Review und Browser-Review“ des Plans):
   - **Am echten Handy prüfen**: Scrollt ein Wisch über die Karte im Tab die Seite (ein Finger) und bewegt nur ein Zwei-Finger-Wisch die Karte (`cooperativeGestures`)? Im Browser-Review nur emuliert.
   - **Startausschnitt mit echten Daten**: Live fasst die Karte die 121 Orte beim Öffnen in vier Cluster (79, 28, 12, 2) zusammen; einzelne Anbieter sieht man erst nach Zoomen. Ob ein kleinerer `clusterRadius` oder ein höherer Startzoom besser ist, nach Rückmeldung entscheiden.
