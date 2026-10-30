@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Zwei Stufen: eigener Knopf</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.zp{width:390px;position:relative;overflow:hidden;box-sizing:border-box;background-color:#E8F1FF;background-image:radial-gradient(rgba(19,33,46,.13) 1.3px,transparent 1.6px);background-size:18px 18px;color:#13212E;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.zp button{font:inherit;color:inherit;cursor:pointer}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:23px;letter-spacing:-.02em}
+.logo i{width:28px;height:28px;border-radius:50%;background:#FFD93B;border:2px solid #fff;display:grid;place-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px 0 6px;border-radius:999px;background:#fff;border:2px solid #13212E;box-shadow:3px 3px 0 #13212E;font-weight:800;font-size:15px}
+.face{width:28px;height:28px;border-radius:50%;background:#FFB13B;display:grid;place-items:center}
+.pt{margin:14px 16px 10px;font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.tools{display:flex;gap:10px;align-items:center;padding:0 16px}
+.seg{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid #13212E;border-radius:999px;background:#EEF3FA;padding:2px}
+.seg button{min-height:40px;border:2px solid transparent;border-radius:999px;background:transparent;font-weight:600;font-size:16px}
+.seg button.on{background:#fff;border-color:#13212E;box-shadow:3px 3px 0 #13212E;font-weight:800}
+.round{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid #13212E;background:#fff;box-shadow:3px 3px 0 #13212E;display:grid;place-items:center;padding:0}
+.sec{padding:20px 16px 10px}
+.sec h3{margin:0;font-size:22px;font-weight:800;letter-spacing:-.03em}
+.sec p{margin:2px 0 0;font-size:14px;color:#475563}
+.card{position:relative;margin:0 16px 12px;background:#fff;border:2px solid #13212E;border-radius:22px;box-shadow:5px 5px 0 #13212E;padding:12px 64px 14px 16px}
+.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cat{display:inline-flex;align-items:center;gap:6px;border:2px solid #13212E;border-radius:999px;padding:1px 10px;font-size:13px;font-weight:700}
+.sh{width:9px;height:9px;background:#13212E;border-radius:50%}
+.when{font-size:14px;font-weight:800}
+.ttl{margin:4px 0 0;font-size:20px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+.meta{font-size:14px;color:#475563;margin-top:2px}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.f{background:#EEF3FA;border-radius:8px;padding:3px 8px;font-size:13px;font-weight:600}
+.f.out{background:#fff;border:1.5px solid #13212E}
+.heart{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;border:2px solid #13212E;display:grid;place-items:center;padding:0;box-shadow:2px 2px 0 #13212E;background:#FF6B6B}
+.plan{display:inline-flex;align-items:center;gap:6px;min-height:40px;margin-top:12px;padding:0 14px;border-radius:999px;border:2px dashed #13212E;background:#fff;font-weight:800;font-size:14px}
+.plan.on{border-style:solid;background:#FFD93B;box-shadow:2px 2px 0 #13212E}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:78px;display:flex;padding:8px 10px 10px;box-sizing:border-box;background-color:#FFE38A;background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.5) 0 9px,transparent 9px 20px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;font-weight:700;border:2px solid transparent;border-radius:16px;background:transparent;position:relative}
+.tab.on{background:#fff;border-color:#13212E;box-shadow:3px 3px 0 #13212E}
+.badge{position:absolute;top:2px;left:58%;min-width:20px;height:20px;border-radius:999px;background:#FF6B6B;color:#13212E;font-size:12px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-sizing:border-box}
+</style>
+</helmet>
+<div class="zp" style="height:844px">
+  <div class="hdr">
+    <div class="logo"><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 14 13H2Z" fill="#FF6B6B"></path></svg></i>Zwergenplan</div>
+    <button type="button" class="pill"><span class="face"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5a4 4 0 0 0 7 0M9 10h.01M15 10h.01"></path></svg></span>4 Mon.</button>
+  </div>
+  <h2 class="pt">Meine Merkliste</h2>
+  <div class="tools">
+    <fieldset class="seg" style="margin:0;min-width:0">
+      <legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Darstellung der Merkliste</legend>
+      <button type="button" class="on" aria-pressed="true">Liste</button>
+      <button type="button" aria-pressed="false">Karte</button>
+      <button type="button" aria-pressed="false">Kalender</button>
+    </fieldset>
+    <button type="button" class="round" aria-label="Sortierung: Was ist zu tun"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4"></path></svg></button>
+  </div>
+  <div class="sec"><h3>Rechtzeitig anmelden</h3><p>Beginnt später, Anmeldung nötig – nach Beginn sortiert</p></div>
+  <article class="card">
+    <div class="top"><span class="cat" style="background:#FF7070"><span class="sh"></span>Musik &amp; Singen</span><span class="when">ab Do 5.11.</span></div>
+    <h4 class="ttl">Babymusik (6–12 Monate)</h4>
+    <div class="meta">Musikschule Beispiel (fiktiv) · Südstadt</div>
+    <div class="facts"><span class="f">Kurs · 10 Termine</span><span class="f">110 €</span><span class="f out">Anmeldung nötig</span></div>
+    <button type="button" class="plan" aria-pressed="false"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>Fest einplanen</button>
+    <button type="button" class="heart" aria-label="Von der Merkliste entfernen"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="#13212E"></path></svg></button>
+  </article>
+  <article class="card">
+    <div class="top"><span class="cat" style="background:#FF8CC0"><span class="sh"></span>Babykurse</span><span class="when">ab Di 12.1.</span></div>
+    <h4 class="ttl">PEKiP-Gruppe Winter</h4>
+    <div class="meta">Familientreff Beispielhof (fiktiv) · Altstadt</div>
+    <div class="facts"><span class="f">Kurs · 8 Termine</span><span class="f">120 €</span><span class="f out">Anmeldung nötig</span></div>
+    <button type="button" class="plan on" aria-pressed="true"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>Fest eingeplant</button>
+    <button type="button" class="heart" aria-label="Von der Merkliste entfernen"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="#13212E"></path></svg></button>
+  </article>
+  <nav class="tabs" aria-label="Hauptnavigation">
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5Z"></path></svg>Angebote</button>
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10 5.5 4h13L20 10M4 10h16v10H4ZM9 20v-5h6v5"></path></svg>Anbieter</button>
+    <button type="button" class="tab on" aria-current="page"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg>Merkliste<span class="badge">8</span></button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-30T12:00:00Z" },
+  "title": "Merkliste Mockups",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 390, "h": 1400, "title": "1 Kalender (Start)" },
+    "Liste.dc.html": { "x": 470, "y": 0, "w": 390, "h": 2120, "title": "2 Liste: Was ist zu tun" },
+    "Sortieren.dc.html": { "x": 940, "y": 0, "w": 390, "h": 844, "title": "3 Sortieren" },
+    "Filter.dc.html": { "x": 1410, "y": 0, "w": 390, "h": 1500, "title": "4 Filter-Sheet" },
+    "HerzA.dc.html": { "x": 1880, "y": 0, "w": 390, "h": 844, "title": "5A Zwei Stufen: zweiter Tipp aufs Herz" },
+    "HerzB.dc.html": { "x": 2350, "y": 0, "w": 390, "h": 844, "title": "5B Zwei Stufen: eigener Knopf" },
+    "HerzDemo.dc.html": { "x": 2820, "y": 0, "w": 390, "h": 844, "title": "6 Demo: Herz tippen und halten", "is_interactive": true }
+  },
+  "order": ["Main.dc.html", "Liste.dc.html", "Sortieren.dc.html", "Filter.dc.html", "HerzA.dc.html", "HerzB.dc.html", "HerzDemo.dc.html"],
+  "notes": {
+    "t1": {
+      "x": 0,
+      "y": -300,
+      "text": "Merkliste: Kalender als Start, Liste nach Handlungsbedarf, Long- und Shortlist",
+      "kind": "title1",
+      "maxW": 3210
+    },
+    "nD": {
+      "x": 2820,
+      "y": 920,
+      "w": 390,
+      "text": "Demo zum Ausprobieren (Play): Tippen merkt vor, nochmal tippen oder halten plant fest ein, tippen auf ein volles Herz entfernt. Tweaks: Stil (Aufblasen, Funken, Füllen), Haltezeit, Darstellung von „vorgemerkt“ (hell oder halb voll).",
+      "fill": "green"
+    },
+    "nA": {
+      "x": 1880,
+      "y": 920,
+      "w": 390,
+      "text": "Variante A: Das Herz hat drei Stufen. Leer → vorgemerkt (helles Herz) → fest eingeplant (volles Herz) → entfernt. Gilt überall gleich, auch auf der Startseite und im Detail.",
+      "fill": "orange"
+    },
+    "nB": {
+      "x": 2350,
+      "y": 920,
+      "w": 390,
+      "text": "Variante B: Das Herz bleibt merken / entfernen. „Fest einplanen“ ist ein eigener Knopf, nur auf der Merkliste und im Detail. Die Startseite bleibt unverändert.",
+      "fill": "orange"
+    }
+  },
+  "designSystems": []
+}

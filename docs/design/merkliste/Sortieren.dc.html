@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Merkliste: Sortieren</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;display=swap">
+<style>
+body{margin:0}
+.zp{width:390px;position:relative;overflow:hidden;box-sizing:border-box;background-color:#E8F1FF;background-image:radial-gradient(rgba(19,33,46,.13) 1.3px,transparent 1.6px);background-size:18px 18px;color:#13212E;font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.zp button{font:inherit;color:inherit;cursor:pointer}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 0}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:23px;letter-spacing:-.02em}
+.logo i{width:28px;height:28px;border-radius:50%;background:#FFD93B;border:2px solid #fff;display:grid;place-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px 0 6px;border-radius:999px;background:#fff;border:2px solid #13212E;box-shadow:3px 3px 0 #13212E;font-weight:800;font-size:15px}
+.face{width:28px;height:28px;border-radius:50%;background:#FFB13B;display:grid;place-items:center}
+.pt{margin:14px 16px 10px;font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.tools{display:flex;gap:10px;align-items:center;padding:0 16px}
+.seg{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid #13212E;border-radius:999px;background:#EEF3FA;padding:2px}
+.seg button{min-height:40px;border:2px solid transparent;border-radius:999px;background:transparent;font-weight:600;font-size:16px}
+.seg button.on{background:#fff;border-color:#13212E;box-shadow:3px 3px 0 #13212E;font-weight:800}
+.round{width:44px;height:44px;flex:none;border-radius:50%;border:2px solid #13212E;background:#fff;box-shadow:3px 3px 0 #13212E;display:grid;place-items:center;padding:0}
+.round.dark{background:#13212E;color:#fff}
+.chips{display:flex;gap:8px;padding:12px 16px 2px;overflow:hidden}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border-radius:999px;background:#fff;border:2px solid #13212E;box-shadow:3px 3px 0 #13212E;font-weight:700;font-size:15px;white-space:nowrap;flex:none}
+.status{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px 4px;font-size:14px;color:#475563}
+.status b{color:#13212E}
+.sec{padding:22px 16px 10px}
+.sec h3{margin:0;font-size:22px;font-weight:800;letter-spacing:-.03em}
+.sec p{margin:2px 0 0;font-size:14px;color:#475563}
+.card{position:relative;margin:0 16px 12px;background:#fff;border:2px solid #13212E;border-radius:22px;box-shadow:5px 5px 0 #13212E;padding:12px 64px 14px 16px;height:150px;box-sizing:border-box}
+.menu{position:absolute;top:168px;right:16px;width:310px;background:#fff;border:2px solid #13212E;border-radius:22px;box-shadow:5px 5px 0 #13212E;padding:8px;box-sizing:border-box}
+.mh{margin:6px 10px 6px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#475563}
+.mi{display:flex;flex-direction:column;align-items:flex-start;width:100%;min-height:56px;border:0;border-radius:16px;background:transparent;padding:8px 40px 8px 12px;text-align:left;position:relative;box-sizing:border-box}
+.mi b{font-size:17px;font-weight:800}
+.mi span{font-size:14px;color:#475563}
+.mi.on{background:#FFD93B}
+.mi.on span{color:#13212E}
+.mi .ck{position:absolute;right:12px;top:50%;margin-top:-11px}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:78px;display:flex;padding:8px 10px 10px;box-sizing:border-box;background-color:#FFE38A;background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.5) 0 9px,transparent 9px 20px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;font-weight:700;border:2px solid transparent;border-radius:16px;background:transparent;position:relative}
+.tab.on{background:#fff;border-color:#13212E;box-shadow:3px 3px 0 #13212E}
+.badge{position:absolute;top:2px;left:58%;min-width:20px;height:20px;border-radius:999px;background:#FF6B6B;color:#13212E;font-size:12px;font-weight:800;display:grid;place-items:center;padding:0 5px;box-sizing:border-box}
+</style>
+</helmet>
+<div class="zp" style="height:844px">
+  <div class="hdr">
+    <div class="logo"><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2 14 13H2Z" fill="#FF6B6B"></path></svg></i>Zwergenplan</div>
+    <button type="button" class="pill"><span class="face"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5a4 4 0 0 0 7 0M9 10h.01M15 10h.01"></path></svg></span>4 Mon.</button>
+  </div>
+  <h2 class="pt">Meine Merkliste</h2>
+  <div class="tools">
+    <fieldset class="seg" style="margin:0;min-width:0">
+      <legend style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Darstellung der Merkliste</legend>
+      <button type="button" class="on" aria-pressed="true">Liste</button>
+      <button type="button" aria-pressed="false">Karte</button>
+      <button type="button" aria-pressed="false">Kalender</button>
+    </fieldset>
+    <button type="button" class="round" aria-label="Sortierung: Was ist zu tun" aria-haspopup="menu" aria-expanded="true"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4"></path></svg></button>
+  </div>
+  <div class="chips">
+    <button type="button" class="chip"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>Filter</button>
+    <button type="button" class="chip">Nur fest eingeplant</button>
+    <button type="button" class="chip">Vormittags</button>
+  </div>
+  <div class="status"><p style="margin:0"><b>8</b> Angebote gemerkt, <b>4</b> davon fest eingeplant</p></div>
+  <div class="sec"><h3>Demnächst</h3><p>Einmaliges und Kursstarts in den nächsten 14 Tagen</p></div>
+  <div class="card"></div>
+  <div class="card"></div>
+
+  <div class="menu">
+    <p class="mh" id="sh">Sortieren nach</p>
+    <div role="menu" aria-labelledby="sh">
+      <button type="button" role="menuitemradio" aria-checked="true" class="mi on"><b>Was ist zu tun</b><span>Demnächst, anmelden, spontan, läuft</span><svg class="ic ck" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></button>
+      <button type="button" role="menuitemradio" aria-checked="false" class="mi"><b>Nächste Termine</b><span>was als Nächstes stattfindet</span></button>
+      <button type="button" role="menuitemradio" aria-checked="false" class="mi"><b>Nächstgelegen</b><span>mit Bus &amp; Bahn ab Gostenhof</span></button>
+      <button type="button" role="menuitemradio" aria-checked="false" class="mi"><b>Zuletzt gemerkt</b><span>was du zuletzt gemerkt hast</span></button>
+    </div>
+  </div>
+
+  <nav class="tabs" aria-label="Hauptnavigation">
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5Z"></path></svg>Angebote</button>
+    <button type="button" class="tab"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10 5.5 4h13L20 10M4 10h16v10H4ZM9 20v-5h6v5"></path></svg>Anbieter</button>
+    <button type="button" class="tab on" aria-current="page"><svg class="ic" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"></path></svg>Merkliste<span class="badge">8</span></button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
