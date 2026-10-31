@@ -90,6 +90,21 @@ describe("berlinKey", () => {
       ctor.mockRestore();
     }
   });
+
+  // LCP-Smoke (Plan 0057, Nachtrag LCP): Der Rhythmus fragt je Termin Tag und Uhrzeit von Beginn und Ende ab, bei
+  // jedem Rendern erneut. Ein Termin-Zeitpunkt wird nur einmal formatiert.
+  it("formatiert denselben Zeitpunkt nur einmal, auch für den Kalendertag", () => {
+    const parts = vi.spyOn(Intl.DateTimeFormat.prototype, "formatToParts");
+    try {
+      const instant = "2031-03-30T00:30:00+01:00";
+      expect(berlinKey(instant)).toBe("20310330T0030");
+      expect(berlinKey(instant)).toBe("20310330T0030");
+      expect(berlinIsoDate(instant)).toBe("2031-03-30");
+      expect(parts).toHaveBeenCalledTimes(1);
+    } finally {
+      parts.mockRestore();
+    }
+  });
 });
 
 describe("berlinIsoDate", () => {
@@ -97,6 +112,8 @@ describe("berlinIsoDate", () => {
     expect(berlinIsoDate(new Date("2026-10-05T22:30:00Z"))).toBe("2026-10-06");
     expect(berlinIsoDate("2026-10-05T23:59:00+02:00")).toBe("2026-10-05");
     expect(berlinIsoDate("2026-12-31T23:30:00Z")).toBe("2027-01-01");
+    // Mitternacht Berlin: Schlüssel mit Stunde 00, nicht 24
+    expect(berlinIsoDate("2026-10-05T22:00:00Z")).toBe("2026-10-06");
   });
 });
 

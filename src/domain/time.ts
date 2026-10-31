@@ -25,8 +25,15 @@ function pad2(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-/** Berliner Kalendertag eines Zeitpunkts als ISO-Datum („heute“ ist `berlinIsoDate(now)`). */
+/**
+ * Berliner Kalendertag eines Zeitpunkts als ISO-Datum („heute“ ist `berlinIsoDate(now)`). Termin-Zeitpunkte (Text) gehen
+ * über den Zwischenspeicher von `berlinKey` (Plan 0057, Nachtrag LCP).
+ */
 export function berlinIsoDate(instant: string | Date): string {
+  if (typeof instant === "string") {
+    const key = berlinKey(instant);
+    return `${key.slice(0, 4)}-${key.slice(4, 6)}-${key.slice(6, 8)}`;
+  }
   const { year, month, day } = berlinDate(instant);
   return `${year}-${pad2(month)}-${pad2(day)}`;
 }
@@ -89,14 +96,27 @@ const instantFmt = new Intl.DateTimeFormat("en-CA", {
 });
 
 /**
+ * Schlüssel je Zeitpunkt-Text (Plan 0057, Nachtrag LCP): Der Rhythmus einer regelmäßigen Kachel fragt je kommendem
+ * Termin Tag und Uhrzeit von Beginn und Ende ab, bei jedem Rendern der Liste erneut; `formatToParts` war gedrosselt der
+ * größte Posten zwischen Daten und LCP. Die Termine des Datenstands begrenzen die Menge, die Obergrenze nur zur Sicherheit.
+ */
+const keyCache = new Map<string, string>();
+const KEY_CACHE_MAX = 50_000;
+
+/**
  * Lokaler Berliner Schlüssel eines Zeitpunkts: 20261013T0930 (für stabile IDs/Dateinamen, Uhrzeiten der Kacheln).
  * Nutzt den einen Formatierer `instantFmt`: Ein neuer je Aufruf kostete ≈ 0,1 ms, beim Start mit echten Daten
  * ≈ 1 800 Aufrufe (LCP-Smoke nach dem Nachtlauf 2026-10-12).
  */
 export function berlinKey(instant: string): string {
+  const known = keyCache.get(instant);
+  if (known !== undefined) return known;
   const parts = instantFmt.formatToParts(new Date(instant));
   const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
-  return `${get("year")}${get("month")}${get("day")}T${get("hour")}${get("minute")}`;
+  const key = `${get("year")}${get("month")}${get("day")}T${get("hour")}${get("minute")}`;
+  if (keyCache.size >= KEY_CACHE_MAX) keyCache.clear();
+  keyCache.set(instant, key);
+  return key;
 }
 
 const LOCAL_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
