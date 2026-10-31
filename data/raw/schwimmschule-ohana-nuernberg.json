@@ -177,8 +177,9 @@
    "inputHash": "b00bbbcdbe1b56bdf556eaa4698c0b8eab6fa3ca3bdb1ea9e2fbe6e2e094d894",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "partsHash": "af30022381f70d519ba33965e65b3cf352e86a32734bb09c23c093e407046922"
   },
   "seite:https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291": {
    "events": [
@@ -254,8 +255,9 @@
    "inputHash": "4b272b9eaead18371541ec0a8528c747a4178c651359807a544567a590f3ac46",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "partsHash": "a84bb2ed546ae4814a96439cd5b0b540a11301612e87220b19845c91708fd1a7"
   },
   "seite:https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292": {
    "events": [
@@ -365,8 +367,9 @@
    "inputHash": "1e745c914aa95f733fc193ea8020807ca3c56973c43804f4abdc9ea49e85ae17",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "partsHash": "2dbca5b3382f77e652ff85c49279a49db4118d6b0d169dda8535979136d77bff"
   }
  }
 }

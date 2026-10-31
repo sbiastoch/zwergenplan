@@ -88,8 +88,9 @@
    "inputHash": "46e1a94f3b12f7d8a89170e71a979c71a2a78c8f1cb76bd889d761798fb19023",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "partsHash": "1773169258ff9b94e692feaa4cb6c79f6de49ce0e4ff6630b0de1afcb56cb389"
   },
   "kandidaten": {
    "events": [
@@ -143,11 +144,12 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"
-   ]
+   ],
+   "partsHash": "44d9bd27c6ccd2b55661b7cf8704787c80ce5157a42d88f35dac350cb018bd08"
   }
  }
 }

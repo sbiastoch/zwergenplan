@@ -6,8 +6,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Babyschwimmen (3–12 Mon.), Kursstart 29.11.2026",
-     "summary": "Wassergewöhnung für Babys ab 3 Monaten zusammen mit einem Elternteil. Der Kurs ist voll, es gibt eine Warteliste. Start laut Buchungssystem am 29.11.2026.",
+     "title": "Babyschwimmen (3–12 Monate), Kursbeginn 29.11.2026",
+     "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten mit einem Elternteil. Der Kurs ist voll, zwei Personen stehen auf der Warteliste. Weitere Kurstermine nennt die Quelle nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "babyschwimmen"
      ],
@@ -23,7 +23,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "2 Personen auf der Warteliste"
+      "note": "Kurs voll, 2 Personen auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -37,8 +37,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Kursstart 29.11.2026",
-     "summary": "Schwimmkurs für Kinder ab etwa 2,5 Jahren zusammen mit einem Elternteil. Der Kurs ist voll, es gibt eine Warteliste. Start laut Buchungssystem am 29.11.2026.",
+     "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 Jahren), Kursbeginn 29.11.2026",
+     "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren mit einem Elternteil. Der Kurs ist voll, eine Person steht auf der Warteliste. Weitere Termine nennt die Quelle nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -54,7 +54,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "1 Person auf der Warteliste"
+      "note": "Kurs voll, 1 Person auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -68,8 +68,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-     "title": "Babyschwimmen (3–12 Mon.), Kursstart 30.11.2026",
-     "summary": "Wassergewöhnung für Babys ab 3 Monaten zusammen mit einem Elternteil. Der Kurs ist ausgebucht. Start laut Buchungssystem am 30.11.2026.",
+     "title": "Babyschwimmen (3–12 Monate), Kursbeginn 30.11.2026",
+     "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten mit einem Elternteil in der Boxdorfer Werkstatt. Der Kurs ist ausgebucht, es gibt keine Warteliste. Weitere Kurstermine nennt die Quelle nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "babyschwimmen"
      ],
@@ -85,7 +85,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "keine freien Plätze"
+      "note": "Keine freien Plätze, keine Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -99,8 +99,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Babyschwimmen (3–12 Mon.), Kursstart 21.02.2027",
-     "summary": "Wassergewöhnung für Babys ab 3 Monaten zusammen mit einem Elternteil. Der Kurs ist ausgebucht. Start laut Buchungssystem am 21.02.2027.",
+     "title": "Babyschwimmen (3–12 Monate), Kursbeginn 21.02.2027",
+     "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten mit einem Elternteil. Der Kurs ist ausgebucht, es gibt keine Warteliste. Weitere Kurstermine nennt die Quelle nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "babyschwimmen"
      ],
@@ -116,7 +116,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "keine freien Plätze"
+      "note": "Keine freien Plätze, keine Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -130,8 +130,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Kleinkinderschwimmen (ab 15 Mon.), Kursstart 21.02.2027",
-     "summary": "Wasserspiele für Kleinkinder ab 15 Monaten zusammen mit einem Elternteil. Noch 2 Plätze frei. Start laut Buchungssystem am 21.02.2027.",
+     "title": "Kleinkinderschwimmen (ab 15 Monate), Kursbeginn 21.02.2027",
+     "summary": "Schwimmkurs für Kleinkinder ab 15 Monaten mit Begleitung eines Elternteils. Noch zwei Plätze frei. Weitere Kurstermine nennt die Quelle nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -161,8 +161,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Kursstart 21.02.2027",
-     "summary": "Schwimmkurs für Kinder ab etwa 2,5 Jahren zusammen mit einem Elternteil. Der Kurs ist voll, es gibt eine Warteliste. Start laut Buchungssystem am 21.02.2027.",
+     "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 Jahren), Kursbeginn 21.02.2027",
+     "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren mit einem Elternteil. Der Kurs ist voll, eine Person steht auf der Warteliste. Weitere Termine nennt die Quelle nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -178,7 +178,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "1 Person auf der Warteliste"
+      "note": "Kurs voll, 1 Person auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -192,8 +192,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-     "title": "Babyschwimmen 2 (ab 8 Mon.), Kursstart 22.02.2027",
-     "summary": "Wassergewöhnung für Babys ab 8 Monaten zusammen mit einem Elternteil. Derzeit sind 10 Plätze frei. Start laut Buchungssystem am 22.02.2027.",
+     "title": "Babyschwimmen 2 (ab 8 Monate), Kursbeginn 22.02.2027",
+     "summary": "Wassergewöhnung für Babys ab 8 Monaten mit einem Elternteil in der Boxdorfer Werkstatt. Zehn Plätze sind frei. Weitere Kurstermine nennt die Quelle nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "babyschwimmen"
      ],
@@ -221,11 +221,12 @@
      }
     }
    ],
-   "inputHash": "f5d3088a5fd7f48c5183ad59fb524a124c6b1661d180a2e6ad47ba54b7011959",
+   "inputHash": "cf0057f96684525a4c8c3bbb4dcae395bd9f83059ff5ddb9e9bfc38b24cb1cf9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T12:36:21+01:00",
+   "partsHash": "e214e5f818d739a00baad01c33c44a169546b2e788677037cad30c1990911103"
   }
  }
 }

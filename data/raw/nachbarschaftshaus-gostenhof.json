@@ -77,24 +77,27 @@
    "inputHash": "9e4966c1d35ffca761567d17e503c08d456b30a10a31882a670121119aff3ef9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "partsHash": "159ed93d0c00e8cf48580e9e3ed297a9c837e7328224ec8a037d9ce33b01c06b"
   },
   "seite:https://www.nuernberg.de/internet/nh_gostenhof/veranstaltungen.html": {
    "events": [],
    "inputHash": "e92acfb801852fc147149ebe270896f4c3e9fb960861f470ddec4f955f2a7042",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   },
   "seite:https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28veranstalterID%20%3D%3D%20412%29%20OR%20%28ortID%20%3D%3D%2028%29&AUSGABEFELDER=TITEL,UNTERTITEL,DATUM,ORT&MAX_LIMIT=200&ALLETERMINE=1&ORDER=DATUM&START_DATUM={von}": {
    "events": [],
    "inputHash": "f13d4861d9756814c4db3acdf23d5286d28b0a2a758d717c33a9ebc380d52e62",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   }
  }
 }

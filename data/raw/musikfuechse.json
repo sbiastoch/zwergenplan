@@ -875,8 +875,9 @@
    "inputHash": "bbcc82e31b99b231c881777c754881c4708bf1e77d90756caf893e6c0681bdef",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "partsHash": "934c3dd4db5beb92773e1e4b19222db4464586cc4e901262f24f1cbc915a47e3"
   },
   "seite:https://musikfuechse.com/musikfuechse-fuer-kleinkinder/": {
    "events": [
@@ -1316,16 +1317,18 @@
    "inputHash": "ae3dd5ec537162a3ed3fffe9eca251fbe3fa2aee176fded60a85a9065d1738ef",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "partsHash": "a421d1863f17b57b26765135d9398706a483182ee29173eaf1b1c4cfbae5c5a5"
   },
   "seite:https://musikfuechse.com/workshops/": {
    "events": [],
    "inputHash": "4c498328f03f4de5035acf3ef6791d26e003cb7003609ef262ac4b2749deb878",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "73ff7c6dd89368375a1bb91128658250c43613d8d77b62b2ab845b8798eb97d6"
   }
  }
 }

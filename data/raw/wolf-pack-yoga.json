@@ -204,14 +204,15 @@
    "inputHash": "ef57fe0f136c1c4f5496bb55bac59bda8d1cda9bf5f066f2c7d5cecf889ab0aa",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "partsHash": "766e03d83a107d8c166739ed26c23c79486547433de07097e17bb784a4f8c7f9"
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00"
   }
  }
 }

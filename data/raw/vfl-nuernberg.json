@@ -41,8 +41,9 @@
    "inputHash": "b0ae41768aa0cae5eda4a78f83a03f6b549fb66ea10cd2355f6bda9a68becb21",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "partsHash": "1aa957448ac89ddf85265dfb156bbcab812ddee8f75c84ab188511b118cc8a17"
   }
  }
 }

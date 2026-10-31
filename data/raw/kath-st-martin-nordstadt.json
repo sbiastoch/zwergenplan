@@ -39,8 +39,9 @@
    "inputHash": "7bbe49055391106f61ef39bab34929a32e88ad5d2a16343c8ed635f0f2279dec",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "partsHash": "626cdf4007a3c4e8fe4aae351b146175841c8cce06c0836cccbcfa6b528685e9"
   },
   "seite:https://st-martin-nuernberg.de/aktuelles/termine": {
    "events": [
@@ -80,8 +81,9 @@
    "inputHash": "f4b168e58a374392d150121212e6b051fbd1d6f5baa8d9ea0d897a66cc8f3a79",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "partsHash": "626cdf4007a3c4e8fe4aae351b146175841c8cce06c0836cccbcfa6b528685e9"
   }
  }
 }

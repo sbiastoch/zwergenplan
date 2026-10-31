@@ -6,8 +6,9 @@
    "inputHash": "d7b9a2987e7b46b3ccb1c60bb73919898ac1d845d751e9135e667eb8753f7693",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.com/mamababyyoga": {
    "events": [
@@ -77,8 +78,9 @@
    "inputHash": "fcefd77659b49cba6a99ae04921e8f5317444e0953f280e76c39eb200dcd52f2",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.com/body-mind-and-kids": {
    "events": [
@@ -123,9 +125,10 @@
    "inputHash": "d9c8df91136cff59531dcee2c8952f7acb1cac25f7096b815a097c410cab1bc8",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
-   "emptySince": "2026-10-29T08:35:39+01:00"
+   "emptySince": "2026-10-29T08:35:39+01:00",
+   "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.com/waldspielracker": {
    "events": [
@@ -229,17 +232,19 @@
    "inputHash": "37b44d11ea58720fd790ab0b60dfc5f72085576a54ac7790bcc51a937d436937",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.thrivecart.com/mama-mini--mental-health-6x-mittwochs/": {
    "events": [],
    "inputHash": "23879046ab6066d4e816b8f464c3143b5216f639dc0bce4b616f8a07f0e63a54",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
-   "emptySince": "2026-10-31T08:26:00+01:00"
+   "emptySince": "2026-10-31T08:26:00+01:00",
+   "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   }
  }
 }

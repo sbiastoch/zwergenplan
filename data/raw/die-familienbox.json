@@ -761,32 +761,36 @@
    "inputHash": "1f75f0e7ab9c51457e60ad38f91181cf328cba3626688ca621341b7bc670b5bd",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
+   "partsHash": "c46924271613ab642140a033397f2e9e905f996c6d9d4ce48e9be9ac862df6fa"
   },
   "seite:https://www.diefamilienbox.de/babykurse-nürnberg/": {
    "events": [],
    "inputHash": "1b0cf117f12ff3e6a4779a1626d50f8cb53914abb460cc11bbbacd97b1fd244b",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "c46924271613ab642140a033397f2e9e905f996c6d9d4ce48e9be9ac862df6fa"
   },
   "seite:https://www.diefamilienbox.de/kleinkindkurse-nürnberg/": {
    "events": [],
    "inputHash": "8f65f8d32c3fd36ff014cd17f0881a81dc29f24968c0225528b1ee42722c7ab8",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "c46924271613ab642140a033397f2e9e905f996c6d9d4ce48e9be9ac862df6fa"
   },
   "seite:https://www.eversports.de/org/widget/12409d8f-a593-49f5-8c73-910dfef5e2a6?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5": {
    "events": [],
    "inputHash": "5834d9110f1715bc43a393f96cc03fa3c45b4409cf9d559650ff6be070fe94b7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "c46924271613ab642140a033397f2e9e905f996c6d9d4ce48e9be9ac862df6fa"
   },
   "seite:https://www.diefamilienbox.de/erwachsenenkurse/stundenplan/": {
    "events": [
@@ -1540,24 +1544,27 @@
    "inputHash": "9a9f8414a4bcb1acb27ba77d4360981c20a58c7d29f109f4ec9fe796af8d6a82",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
+   "partsHash": "c46924271613ab642140a033397f2e9e905f996c6d9d4ce48e9be9ac862df6fa"
   },
   "seite:https://www.eversports.de/widget/w/vX25EB?list=course&group=84326": {
    "events": [],
    "inputHash": "62953c1dc3f7282119d435d788f479566aede77f15c63364e90e49be742dcf3b",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "c46924271613ab642140a033397f2e9e905f996c6d9d4ce48e9be9ac862df6fa"
   },
   "seite:https://www.eversports.de/org/widget/0455f70c-bfb9-40da-b2ca-d4a77077dae2?venueId=6ffa06db-0965-43e9-80fb-47f4e18aa5d5": {
    "events": [],
    "inputHash": "e7e24387c40ad66a9f6b0699c5d450f43debfd9deabb39962ca3c00522505b10",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "c46924271613ab642140a033397f2e9e905f996c6d9d4ce48e9be9ac862df6fa"
   }
  }
 }

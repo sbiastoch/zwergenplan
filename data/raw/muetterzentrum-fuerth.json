@@ -88,8 +88,9 @@
    "inputHash": "263bb350d9cabad511d830b2f2d254b90dfd354f796bf47f93d868000603eb8c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "partsHash": "4931ecef9e2fb9aa7c07b2fdafd616783679a6259b5aeae4fc2db97c260300b2"
   },
   "seite:https://www.muetterzentrum-fuerth.de/kurse-kopie.html": {
    "events": [
@@ -128,8 +129,9 @@
    "inputHash": "dfcad94f5924816d2326e3fed572aca3b9bf300d10443674a108dcbe59a0fb87",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "partsHash": "4931ecef9e2fb9aa7c07b2fdafd616783679a6259b5aeae4fc2db97c260300b2"
   }
  }
 }

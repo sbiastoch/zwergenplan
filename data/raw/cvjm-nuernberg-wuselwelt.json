@@ -42,89 +42,39 @@
    "inputHash": "381791ef31df43a5178a9a7f991899c2d36c494af3bca50d036d4cae377cbdc1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
-   "events": [
-    {
-     "providerId": "cvjm-nuernberg-wuselwelt",
-     "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre)",
-     "summary": "Offene Bewegungs- und Spielzeit in der Turnhalle des CVJM, freitags 9:30–10:15 Uhr, ohne Anmeldung. Nicht an jedem Freitag; im Kalender stehen bisher 30.10., 13.11., 20.11., 27.11. und 04.12. Kosten auf der Seite nicht angegeben.",
-     "topics": [
-      "bewegung",
-      "spielplatz-indoor"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Offenes Angebot ohne Anmeldung"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-30T09:30",
-        "end": "2026-10-30T10:15"
-       },
-       {
-        "start": "2026-11-13T09:30",
-        "end": "2026-11-13T10:15"
-       },
-       {
-        "start": "2026-11-20T09:30",
-        "end": "2026-11-20T10:15"
-       },
-       {
-        "start": "2026-11-27T09:30",
-        "end": "2026-11-27T10:15"
-       },
-       {
-        "start": "2026-12-04T09:30",
-        "end": "2026-12-04T10:15"
-       }
-      ]
-     }
-    }
-   ],
-   "inputHash": "56161624885420fc2677b10b60c509a23a0990537740c10b75c95e7d72f056e3",
+   "events": [],
+   "inputHash": "a9949d26eb6f088ab240ac25c36d181bd7fedfa0599f71af8bede2a62f168110",
    "model": "haiku",
-   "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
-   "pending": {
-    "inputHash": "a9949d26eb6f088ab240ac25c36d181bd7fedfa0599f71af8bede2a62f168110",
-    "model": "haiku",
-    "events": []
-   }
+   "status": "keine-termine",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T12:36:21+01:00",
+   "emptySince": "2026-10-31T12:36:21+01:00",
+   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
    "events": [],
    "inputHash": "838582b1370f1ad427b6757d85bf5b3a4d0f5d0a51e3b0deb154d49d1b506ec7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
-   "emptySince": "2026-10-29T08:35:39+01:00"
+   "emptySince": "2026-10-29T08:35:39+01:00",
+   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;": {
    "events": [],
    "inputHash": "9c086ebf9bf21d8f713a845f846a3dc1d7a5029d207ef9f981a9765581bf4076",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
-   "emptySince": "2026-10-29T08:35:39+01:00"
+   "emptySince": "2026-10-29T08:35:39+01:00",
+   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "kandidaten": {
    "events": [
@@ -172,11 +122,12 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "frankenkids"
-   ]
+   ],
+   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   }
  }
 }

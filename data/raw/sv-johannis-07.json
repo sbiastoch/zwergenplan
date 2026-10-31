@@ -75,16 +75,18 @@
    "inputHash": "0ec4ab3b6cac09bb25dd2ab5e2e814ab7a69cc9521f20e51c079e09793b54c20",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-30T08:39:48+01:00",
+   "partsHash": "e7e87374b993bfadda5a96e476a21c603f1349fa0b1dfdb94ac6ca8888fe38e7"
   },
   "seite:https://shop.sv-johannis07.de/de/courses/": {
    "events": [],
    "inputHash": "c7f468b2cc4e89c2a5f979c599e1b2f799560f382f640c36646ca0a2b2248773",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "e7e87374b993bfadda5a96e476a21c603f1349fa0b1dfdb94ac6ca8888fe38e7"
   }
  }
 }

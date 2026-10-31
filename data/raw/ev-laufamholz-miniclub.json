@@ -119,11 +119,12 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "sources": [
     "evtermine"
-   ]
+   ],
+   "partsHash": "b8915026224032f3874512963b7c0d70777e8bdbe80128de24f409f29457462c"
   }
  }
 }

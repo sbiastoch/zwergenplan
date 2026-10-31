@@ -233,41 +233,46 @@
    "inputHash": "aa59872c670653584b75c6ae333b10bbeb36fb7ce2cf2b8f0a9aa1caf89d82cc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "partsHash": "36d453cda993c6a910fc65ddae1bbb668fea46b24c3b3f2d2246c0e82d5e99c8"
   },
   "seite:https://bauersachs.hebamio.de/kursliste": {
    "events": [],
    "inputHash": "529382906ad0fed0789cde87933de19cb63c4cc1a11abdb6b3773c04e9fbc47c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
-   "emptySince": "2026-10-30T08:39:48+01:00"
+   "emptySince": "2026-10-30T08:39:48+01:00",
+   "partsHash": "568c4bed25570c5e0cc2590ea1e50548fc857884701ab7c78400c6d6583faa94"
   },
   "seite:https://melville.hebamio.de/kursliste": {
    "events": [],
    "inputHash": "d1139e2070e95d887ea363fbe259396b279122045359d1f4955735ef2f52a473",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   },
   "seite:https://kinder-hautnah.de/termine-aktuelles/": {
    "events": [],
    "inputHash": "55d54e6a771bf866fe1cdfbf2ba30e23087ae95784d116232e3c1523b3325684",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   },
   "seite:https://deinkindernotfallkurs.de/": {
    "events": [],
    "inputHash": "657594f6c76a0104838cb74a9fdd8c8a3b4233e7e322d1d2f371add35ce7c745",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   }
  }
 }

@@ -108,8 +108,9 @@
    "inputHash": "62b94b59988e65e47fe66dd6d2cbbdc6778731d8635f94dd0867ba3314051b01",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
+   "partsHash": "13e11626f398ad0eb8b2b71ca8d7333aaa60a870ccb39fd46ab27533654651d2"
   },
   "seite:https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/": {
    "events": [
@@ -148,17 +149,19 @@
    "inputHash": "e3427bb69470cf3b805d3aa4e408a0381a2c9ddffc68805531bf00a2cea4d400",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
-   "emptySince": "2026-10-29T08:35:39+01:00"
+   "emptySince": "2026-10-29T08:35:39+01:00",
+   "partsHash": "13e11626f398ad0eb8b2b71ca8d7333aaa60a870ccb39fd46ab27533654651d2"
   },
   "seite:https://www.zentrum-koberger.de/koberger-themenabende/workshops/": {
    "events": [],
    "inputHash": "f76dc5e4ce721f2ef6e1ede6f26dbc4597e4f68ed81f45ea40f4b4a9047fff24",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "13e11626f398ad0eb8b2b71ca8d7333aaa60a870ccb39fd46ab27533654651d2"
   },
   "kandidaten": {
    "events": [
@@ -257,11 +260,12 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"
-   ]
+   ],
+   "partsHash": "13e11626f398ad0eb8b2b71ca8d7333aaa60a870ccb39fd46ab27533654651d2"
   }
  }
 }

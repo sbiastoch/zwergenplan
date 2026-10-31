@@ -139,8 +139,9 @@
    "inputHash": "8b94b100f25afd6c1d983dacdc303ffbdd677f4b6ae3654727f0016d1c8a690c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-29T08:35:39+01:00",
+   "partsHash": "00fbd5e89db292585ca79a9f9266636e0f94d0966a214a85b9abd0d90c1af5cc"
   }
  }
 }

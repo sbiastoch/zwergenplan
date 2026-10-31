@@ -6,8 +6,8 @@
     {
      "providerId": "stadtteiltreff-nordost",
      "venueId": "stadtteiltreff-nordost",
-     "title": "Offener Krabbeltreff (Eltern mit Kindern bis 3 Jahre)",
-     "summary": "Offener Dienstagstreff für Eltern und Aufsichtspersonen mit Kindern bis 3 Jahren aus dem Stadtteil, mit Spielmöglichkeiten. Ältere Geschwister sind willkommen. Einfach vorbeikommen, keine Anmeldung nötig.",
+     "title": "Offener Krabbeltreff (Kinder bis 3 Jahre)",
+     "summary": "Offener Treff für Eltern und andere Aufsichtspersonen mit Kindern bis 3 Jahren aus dem Stadtteil am Nordostbahnhof, mit Spielmöglichkeiten. Ältere Geschwister sind willkommen. Einfach vorbeikommen, keine Anmeldung nötig.",
      "topics": [
       "krabbelgruppe",
       "elterntreff"
@@ -15,7 +15,6 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "kostenfrei",
      "url": "https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html",
      "sourceUrl": "https://www.nuernberg.de/internet/sozialamt_nbg/vor_ort_nordost.html",
      "category": "krabbel-spielgruppen",
@@ -25,7 +24,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offener Treff, einfach vorbeikommen"
+      "note": "Offener Treff, ohne Anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -39,11 +38,12 @@
      }
     }
    ],
-   "inputHash": "dcb6431cff4069cda8d9b7fae851fe1f01ffd6eb4ef859333a940cc425ce4223",
+   "inputHash": "c96c4a68b4ea9b128a3565ab2a34ef9fd851be1bc66fd791dbd854ffe88db332",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-31T12:36:21+01:00",
+   "partsHash": "96311cfd65fba31f7d477bdecc4ee04587b83ff7e2812dc5ac3580ce10c12c89"
   }
  }
 }

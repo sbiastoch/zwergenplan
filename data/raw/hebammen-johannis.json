@@ -38,16 +38,18 @@
    "inputHash": "4605b886a50c23be9d82462ceb7ea86209d7a7d471186b11e096fe0b922cf46e",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-28T08:14:30+01:00",
+   "partsHash": "002eee6e178d4538accb1fa99b89051fc5a7ca8c7eac3608c8c889cac2785744"
   },
   "seite:https://www.wolfpack.yoga": {
    "events": [],
    "inputHash": "a53e48c392b30ffbce745166568fd651ebc595bd42dfa848ed4ea3093af3aa98",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "472fb699946653c5a353743990626c116678c0e5b7df40f157632781561bf97e"
   }
  }
 }

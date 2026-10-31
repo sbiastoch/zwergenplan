@@ -6,56 +6,63 @@
    "inputHash": "bdca6ac9580b9f81493b056f5573339ee03dd05ee422885fdad37927776bb104",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/imperia/md/kuf_kultur/bilder/kinderuni/aktuelles/flyer_kitheaterreihe_2026_27.pdf": {
    "events": [],
    "inputHash": "4ab0112fa36a2b2dd028c1df359d5e153eba9de611718674908bf383ef9998e9",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_november.html": {
    "events": [],
    "inputHash": "62ae865f740c913e8c90ee4a84b750f83c1dce43710f62e8ef1f9c4b152e7a99",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_januar.html": {
    "events": [],
    "inputHash": "e7cb40316cb3c0db9e5031227b8a1650f3aafd1c175b8867b3ce0350572928ea",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_februar.html": {
    "events": [],
    "inputHash": "cfa3e28d6c6ef0117ac845456a546a8af70176d83e9a34796007d0aa51ee2081",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_maerz.html": {
    "events": [],
    "inputHash": "96942ee159af75a02d975b67d0315e0c366fad78c14049c7fea6bceedb378052",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_april.html": {
    "events": [],
    "inputHash": "9ed0aa605383980a7367b02d1eb27441abe8599978965e8c672ef18732c6cfcd",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00"
+   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00",
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "kandidaten": {
    "events": [],
@@ -68,11 +75,12 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "stadt-vk"
-   ]
+   ],
+   "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   }
  }
 }
