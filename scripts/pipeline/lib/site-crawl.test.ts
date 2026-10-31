@@ -156,6 +156,10 @@ describe("pageSignals und futureDates", () => {
     expect(pageSignals(page("Babys\nDienstag\nZeit: 09:15 Uhr\nMittwoch\nZeit: 14:30 Uhr"), today).candidate).toBe(
       true,
     );
+    // Adverb klein geschrieben (wie Krabbelgruppen Südstadt)
+    expect(pageSignals(page("Krabbelgruppe dienstags, 9:30 bis 11:30 Uhr; donnerstags 9 Uhr"), today).candidate).toBe(
+      true,
+    );
     // eine Ziffer dazwischen trennt (kein Datum als Uhrzeit)
     expect(pageSignals(page("Babys am Dienstag 06.10.2026, Mittwoch 07.10.2026"), today).candidate).toBe(false);
   });

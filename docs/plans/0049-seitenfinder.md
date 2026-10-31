@@ -1,6 +1,6 @@
 # Plan 0049 – Seitenfinder: Programmseiten finden, zuerst für bekannte Anbieter
 
-Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 durch Nachtrag 2 ersetzt; Nachtrag 2 A und B live, C gemessen: keine Fehlverortung, D entfällt; nächstes: S1 `lib/pflege.ts`)
+Status: in Umsetzung (S0 gemessen; Nachtrag 2 A, B live, C gemessen, D entfällt; S1 Pflegelauf im Trockenlauf live seit d67c8ae, Ziel 1 gemessen: 6 von 10 statt 8, Nutzerentscheid N3 offen; nächstes: Trockenlauf Ziel 2)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`), Punkt 4 (ein Seitenfinder), Punkt 1 (ein Abruf), Punkt 5 (Issue je Lauf neben dem Wächter). Dieser Plan baut das Modul und die **Pflege bekannter Anbieter**. Den Modus `alle` für das Entdecken legt er fest (E1), gebaut wird er mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`), S3.
@@ -805,9 +805,45 @@ Gebaut auf `plan-0050`, teils parallel in eigenen Worktrees (Richter, ID-Kontinu
 - Im Bestand von `fbs-nuernberg` stehen Extraktionsfehler: Abenteuerturnen doppelt, zwei erfundene MilchZeit-Termine (02.12., 16.12.), uneinheitliche Felder bei zwei inhaltsgleichen Kursen. Das Eval-Soll ist korrigiert, der Bestand nicht (nie von Hand).
 - `staatstheater-nuernberg-familie`: Haiku fand auf der großen Spielplanseite einmal kein einziges Angebot (siehe oben); das Gate hält, bis sich die Seite ändert.
 
+### S1, Teil 2 – Umsetzung und Messung (2026-10-31)
+
+**Code** (`342062f`, Arch-Review `d67c8ae`, Messkorrekturen `2607b41`, `50589d5` und der folgende Commit):
+- `lib/pflege.ts` (rein): Vergleichsstand (`comparisonRaws`: nur Einheiten des wirksamen Katalogs, ohne Einheiten mit `dauerhaft` seit zwei Kalendertagen), `standOf`, simulierter Nachtlauf (`simulateNight`), `coveredBy`, `judgeProof`, `neighborIds`, `ortsHint`, `termineHints`, `listPages`, `careOrder`, `inRest`, `nextState`, `rejectedUrls`, `pflegeReport`.
+- `io/pflege.ts`: `runPflege`, Beweis je Kandidat in `runs/<datum>/pflege[-n]/beweis/<id>/<n>/` (B1), Beilagen einmal je Anbieter (M5), Zeitbudget und Bremsen, Zustand je Region, `report.md`, `anhaengen.json` und `kosten.jsonl` nur unter `runs/`. `pflegeArgsError`: nur `--dry-run` (bis S2), nur `--abruf neu`, `--katalog` nur im Trockenlauf.
+- `discover-state.ts`: `seiten`, `gepflegt`, `abgelehnt.anbieter` (E4); `cost.ts`: `RunKind` `pflege`, `PFLEGE_BRAKES`, `PFLEGE_BUDGET_MIN`; `url.ts`: `canonicalUrl`, `normalizeUrl` mit denselben Sitzungsparametern; `fetch-inputs.ts`: `fetchOutcome`, `proofInput`; `extract.ts`: `extractModelOf` für Nachtlauf, Entdecken und Pflege (M2); `cli.ts`: Befehl `pflege`.
+
+**Abweichungen vom Plan** (aus Messung und Review):
+- **Zwei Builds je Beweis** (M6): Angebote des Kandidaten aus dem Build mit Kandidat (Ursprung in seinem Batch), verglichen mit dem Build ohne ihn. Ein Build reicht nicht: Beim Vereinigen gewinnt die erste Einheit, Einheiten im Fehler und `kandidaten` kommen danach; ein Angebot, das der Kandidat mit `kandidaten` teilt, hätte sonst seinen Ursprung und fehlte im Vergleich. Ganz vereinigt (keine eigenen Angebote, aber Termine extrahiert) ist `deckungsgleich`.
+- **Geteilte Eingabe ist nicht `abgeschnitten`** (E2): Der Nachtlauf extrahiert große Seiten in Teilen, der Beweis auch (Vermerk „Eingabe in Teilen“). In den Läufen A und B fielen sonst vier gefundene Seiten weg (27 000 bis 135 000 Zeichen). `abgeschnitten` bleibt für eine Eingabe über `MAX_INPUT_CHARS`.
+- **Die eigene `url` ist Kandidat** (E1, „nie Kandidat: Seiten, die der Katalog schon nennt“): Gemeint sind Programmseiten. Die `url` eines Eintrags ist oft die Programmseite selbst und bleibt nach einem Relaunch stehen; drei der zehn entfernten Seiten aus Lauf 1 waren zugleich `url`. Die `url` anderer Anbieter bleibt bekannt.
+- **Signale** (E1): auch Daten mit Monatsnamen („07. Oktober – 16. Dezember 2026“), Wochentag und Uhrzeit bis 25 Zeichen ohne Ziffer auseinander („Dienstag / Zeit: 09:15 Uhr“), Adverbformen klein („dienstags“), Kleinkindbezug auch aus JSON-LD.
+- **Browser:** Die Kennung einer gerenderten Seite ist das Ziel der HTTP-Weiterleitungen, nicht die per Skript umgeschriebene Adresse.
+- **Hinweise der Terminseiten:** Jedes „würde anhängen“ eines Anbieters mit `hint` an einer Terminseite trägt im Bericht „Hinweise der Terminseiten gelten hier nicht: …“. Anlass: Gugelrund (`hint` „nur Kurse mit Baby; Rückbildung ist ohne Kind“) – Haiku nahm auf der neuen Seite die Rückbildung ohne Kind auf; Ohana („Nürnberg = Präfix NDE“) – auf einer neuen Kursseite kamen Fürther Kurse an den Nürnberger Ort. 21 von 66 Teilnehmern haben einen solchen `hint`. Ob sie live nur berichtet werden, ist N4.
+
+**Messung Ziel 1** (Katalogkopie, je 10 Anbieter, je eine erreichbare, nicht abgedeckte Seite entfernt; Pool 25 Anbieter mit 44 Seiten; „nicht abgedeckt“ mit `simulateNight`/`judgeProof` bestimmt; Haiku, `high`):
+
+| Lauf | Seed | Code | wiedergefunden |
+|---|---|---|---|
+| 1 | 49 | `342062f` | 2 von 10 |
+| A | 49 | `2607b41` | 5 von 10 |
+| A2 | 49 | `50589d5` | 6 von 10 |
+| B2 | 50 (unabhängig) | `50589d5` | 6 von 10 |
+
+Die Korrekturen stammen aus dem Sample von Seed 49; Seed 50 ist die unabhängige Messung. **Ziel 1 (≥ 8) ist verfehlt.** Ursachen der Fehlschläge in A2 und B2:
+- **Budget, 20 Abrufe** (Ziel 4), 3 Fälle; in allen Läufen verbrauchte jeder Anbieter alle 20: FBS hat 13 Startseiten aus dem Katalog; Happy Bellies (Wix) braucht für jede Seite den Browser, der doppelt zählt; BRK „Auf Entdeckungsreise mit Papa“.
+- **Haiku schwankt**, 2 Fälle: Dieselbe Seite liefert einmal Angebote, einmal keine (Hebammen Johannis: A ja, A2 nein; Eva Kauper: Lauf 1 und B2 ja, A nein). Staatstheater: der Spielplan liefert keine Angebote, wie im Nachtlauf (Nachtrag 2, B).
+- **Signal**, 2 Fälle: Krabbelgruppen Südstadt („dienstags“, nach B2 behoben, noch nicht in einem Lauf gemessen); Treffpunkt MUT („junge Mamas“, „mit deinem Kind“) fällt durch `isRelevant`. `isRelevant` gilt auch fürs Entdecken und bleibt hier unverändert.
+
+Die Liste „würde anhängen“ der Läufe ist noch nicht von Hand geprüft (Ziel 2 folgt im Trockenlauf über die erste Hälfte von `vgn`).
+
+**Offen in S1:** Trockenlauf `vgn`, erste Hälfte, mit Abnahme je Seite (Ziel 2); Nutzerentscheide N3, N4.
+- Risiko (Arch-Review m11): `sid` kann in manchen CMS eine Bereichs-ID sein. Der Beweis liest die Seite mit `sid`, angehängt wird sie ohne. Die Abnahme je Seite achtet darauf.
+
 ## Nutzerentscheide (offen)
 
 - **N1 – Live ohne Abnahme je Seite.** Voraussetzung: Ziel 2 in beiden Trockenläufen erreicht. Empfehlung: dann live; Rücknahme per Revert und `abgelehnt`; die ersten zwei Live-Läufe prüft ein Mensch nachträglich. Alternative: dauerhaft Trockenlauf mit Vorschlägen im Issue (wie Plan 0045, S3b).
+- **N3 – Ziel 1 verfehlt (6 von 10).** Die Lücken liegen am Budget von 20 Abrufen (3) und an der Streuung von Haiku (2). Optionen: (a) Budget je Anbieter auf 30 und Startseiten aus dem Katalog nicht mitzählen; (b) im Beweis bei „ohne Ertrag“ einmal wiederholen (Haiku schwankt), oder Sonnet nur für den Beweis (weicht von M2 ab: dann misst der Beweis nicht mehr, was nachts entsteht); (c) Ziel 1 auf ≥ 6 senken. Empfehlung: (a), danach neu messen; (b) nur als Wiederholung mit Haiku.
+- **N4 – Anbieter mit Hinweis an einer Terminseite.** Live nur berichten (wie Orts-`hint`) oder anhängen mit Vermerk und Abnahme? Empfehlung: nach dem Trockenlauf zu Ziel 2 entscheiden, mit der Zahl der falschen Anhänge aus diesem Grund.
 - **N2 – Takt.** Empfehlung: wöchentlich je Netz, ausgefallene Seiten zuerst (ADR 0033, Punkt 4). Alternative: zusätzlich täglich nach dem Nachtlauf mit `--only` für neue Fälle `dauerhaft`, für schnelleren Ersatz.
 
 ## Kosten

@@ -230,7 +230,10 @@ export function iframeLinks(html: string, base: string): string[] {
     });
 }
 
-const WEEKDAYS = "(Mo|Di|Mi|Do|Fr|Sa|So|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)";
+// Adverbformen auch klein („dienstags, 9:30 bis 11:30 Uhr“; S1, Messung Ziel 1)
+const WEEKDAYS =
+  "([Mm]ontags|[Dd]ienstags|[Mm]ittwochs|[Dd]onnerstags|[Ff]reitags|[Ss]amstags|[Ss]onntags|" +
+  "Mo|Di|Mi|Do|Fr|Sa|So|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)";
 const WEEKDAY_TIME = new RegExp(
   // bis zu 25 Zeichen ohne Ziffer zwischen Wochentag und Uhrzeit, auch über eine Zeile („Dienstag / Zeit: 09:15 Uhr“)
   `\\b${WEEKDAYS}s?\\b\\.?[^\\d]{0,25}?(ab\\s*)?\\d{1,2}([:.]\\d{2})?\\s*(-|–|bis)?\\s*\\d{0,2}[:.]?\\d{0,2}\\s*Uhr`,

@@ -56,6 +56,18 @@ Beleg für Plan 0049, Nachtrag 2, Schritt C (m6): Steht ein Live-Angebot an eine
 
 **Nebenbefund für die Katalogpflege:** Ohana Burgfarrnbach (Physio Aktiv, Hintere Straße 112, 90768 Fürth) liegt in der Region Fürth und hat Baby-, Mini- und Maxi-Kurse. Die Adresse ist dieselbe wie beim Ort `hebammen-wunderwerk` („Zentrum für Therapie & Training“). Kandidat für einen zweiten Ohana-Ort.
 
+## Seitenfinder – Ziel 1, Wiederfinden (2026-10-31)
+
+Plan 0049, S1, E6: Katalogkopie, 10 Anbieter, je eine erreichbare, nicht abgedeckte Seite entfernt, `pnpm pipeline pflege --dry-run --katalog <kopie> --only <10>`, Modell Haiku/`high`, Modus trocken. Soll ≥ 8 von 10.
+
+| Datum | Lauf | Seed | Code | wiedergefunden | würde anhängen | von Hand bestätigt | Abrufe | Dauer |
+|---|---|---|---|---|---|---|---|---|
+| 2026-10-31 | 1 | 49 | 342062f | 2/10 | 3 | – | 200 | 13 Min. |
+| 2026-10-31 | A2 | 49 | 50589d5 | 6/10 | 9 | – | 200 | 19 Min. |
+| 2026-10-31 | B2 | 50 | 50589d5 | 6/10 | 8 | – | 200 | 21 Min. |
+
+Jeder Anbieter brauchte in jedem Lauf alle 20 Abrufe. Kosten 0,03–0,13 $ je Lauf (Schätzung zum API-Gegenwert). Fehlschläge: Budget 3, Haiku ohne Angebot 2, Signal 2 (Plan 0049, „S1, Teil 2“). Die Läufe A (5/10) und B (4/10) liegen zwischen den Korrekturen.
+
 ## Extraktion
 
 Eine Zeile je Lauf von `pnpm eval` über alle Fälle in `evals/cases/`. Bewertet wird nach dem Expandieren mit der Build-Funktion des Nachtlaufs. Neue Zeilen hängt `pnpm eval` ans Dateiende; diese Tabelle bleibt deshalb die letzte.
