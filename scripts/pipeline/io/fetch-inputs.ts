@@ -85,7 +85,7 @@ function checked(status: number, text: string): string {
 
 async function fetchTask(
   task: PageTask,
-  browser: ReturnType<typeof browserSession>,
+  browser: Pick<ReturnType<typeof browserSession>, "render">,
 ): Promise<{ text: string; finalUrl: string }> {
   if (task.render === "browser") {
     const page = await browser.render(task.url);
@@ -102,6 +102,32 @@ async function fetchTask(
       : {};
   const page = await fetchPage(task.url, { headers, ...(task.request ? { post: task.request.body } : {}) });
   return { text: checked(page.status, programmeText(task.kind, page.body, page.finalUrl)), finalUrl: page.finalUrl };
+}
+
+/**
+ * Eine Seite abrufen wie der Nachtlauf (Art, Browser, Fehlerklasse). Auch für die Beilagen im Ertragsbeweis der
+ * Pflege (Plan 0049, E2), die über die Warteschlange je Host laufen.
+ */
+export async function fetchOutcome(
+  task: PageTask,
+  browser: Pick<ReturnType<typeof browserSession>, "render">,
+): Promise<PageOutcome> {
+  const started = performance.now();
+  const ms = () => Math.round(performance.now() - started);
+  try {
+    const { text, finalUrl } = await fetchTask(task, browser);
+    return {
+      url: task.url,
+      art: artOf(task),
+      ok: true,
+      text,
+      ms: ms(),
+      ...(finalUrl && finalUrl !== task.url ? { finalUrl } : {}),
+    };
+  } catch (e) {
+    const klasse = e instanceof RobotsError ? e.klasse : failureClassOf(e instanceof HttpError ? e.status : undefined);
+    return { url: task.url, art: artOf(task), ok: false, reason: reasonOf(e), ms: ms(), klasse };
+  }
 }
 
 const hostOf = (url: string) => {
@@ -151,25 +177,7 @@ export async function fetchInputs(plan: FetchPlan, catalog: readonly Provider[],
       tasks,
       LIMITS,
       (t) => hostOf(t.task.url),
-      async ({ task }): Promise<PageOutcome> => {
-        const started = performance.now();
-        const ms = () => Math.round(performance.now() - started);
-        try {
-          const { text, finalUrl } = await fetchTask(task, browser);
-          return {
-            url: task.url,
-            art: artOf(task),
-            ok: true,
-            text,
-            ms: ms(),
-            ...(finalUrl && finalUrl !== task.url ? { finalUrl } : {}),
-          };
-        } catch (e) {
-          const klasse =
-            e instanceof RobotsError ? e.klasse : failureClassOf(e instanceof HttpError ? e.status : undefined);
-          return { url: task.url, art: artOf(task), ok: false, reason: reasonOf(e), ms: ms(), klasse };
-        }
-      },
+      ({ task }) => fetchOutcome(task, browser),
     );
   } finally {
     // ein gescheiterter Browserstart kostet nur die Browser-Seiten, nicht den Lauf (Arch-Review S1.2, Minor 4)
@@ -292,4 +300,46 @@ export function unitInputs(
     ];
   });
   return { units, beilagen };
+}
+
+/**
+ * Eingabe des Ertragsbeweises der Pflege (Plan 0049, E2, M1): nur die Einheit `unitId` des Kandidaten mit ihren
+ * Beilagen, aus dem vollen Katalogeintrag `entry` (Kandidat als letzte Seite). `outcomes` hält die Abrufe je
+ * Programmindex (Kandidat und Beilagen); jede andere Seite gilt als nicht abgerufen. So baut `unitInputs` die Einheit
+ * genau wie in der nächsten Nacht, ohne dass der Beweis die übrigen Seiten des Anbieters abruft.
+ */
+export function proofInput(
+  entry: Anbieter,
+  unitId: string,
+  outcomes: ReadonlyMap<number, PageOutcome>,
+): FetchedProvider {
+  const pages = entry.programme.flatMap((g, i): PageOutcome[] =>
+    g.use === "info" || g.blocked !== undefined
+      ? []
+      : [
+          outcomes.get(i) ?? {
+            url: g.url,
+            art: g.render === "browser" ? "browser" : g.kind,
+            ok: false,
+            reason: "im Beweis nicht abgerufen",
+            ms: 0,
+            klasse: "voruebergehend",
+          },
+        ],
+  );
+  const r = unitInputs(entry, pages, []);
+  const unit = r.units.find((u) => u.id === unitId);
+  if (!unit) throw new Error(`${entry.id}: Einheit ${unitId} fehlt im Katalogeintrag`);
+  return {
+    status: unit.status,
+    ...(unit.reason ? { reason: unit.reason } : {}),
+    text: unit.text,
+    pages: unit.pages,
+    candidates: [],
+    allowedUrls: unit.allowedUrls,
+    via: "seiten",
+    adapterIssues: {},
+    units: [unit],
+    beilagen: r.beilagen,
+  };
 }

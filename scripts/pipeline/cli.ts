@@ -54,6 +54,15 @@
  *                                               Eigenes Laufverzeichnis (-2, -3 …) oder --run-dir. Modell: Opus high
  *                                               für alle fünf LLM_*-Variablen, soweit nicht gesetzt.
  *                                               --model/--effort: Suche und Bewerten (vor LLM_*_DISCOVER).
+ *   pflege [--region <id> | --netz vgn] [--only a,b] --dry-run [--katalog <datei>] [--run-dir <pfad>]
+ *                                               Pflege bekannter Anbieter (Plan 0049, E5): Website erkunden, bis zu 5
+ *                                               Kandidatenseiten je Anbieter per Ertragsbeweis prüfen (Modell wie der
+ *                                               Nachtlauf, LLM_MODEL_EXTRACT/LLM_EFFORT_EXTRACT), Bericht, Zustand und
+ *                                               Liste „würde anhängen“ nach runs/<heute>/pflege/; nichts nach data/.
+ *                                               Bis S2 nur mit --dry-run; nur mit --abruf neu (robots.txt). --katalog
+ *                                               ersetzt data/providers.yaml (Messung Ziel 1) und ignoriert die
+ *                                               Ruhezeiten. Zeitbudget PFLEGE_BUDGET_MIN (120), Bremsen MAX_CALLS (300),
+ *                                               MAX_TOKENS (30 Mio.).
  *   discover-publish RUN_DIR                    Commits des Entdeckens nach main (pull --rebase, validate-data,
  *                                               push); schreibt RUN_DIR/issue.md, wenn ein Anbieter neu ist (E7.10).
  *   holidays FROM TO                            freie Tage (Ferien/Feiertage Bayern)
@@ -77,6 +86,7 @@ import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { REGION_IDS, type RegionId } from "../../src/domain/regions.ts";
 import { berlinDate, berlinIsoDate, formatGermanDate, toBerlinIso } from "../../src/domain/time.ts";
+import { browserSession } from "./io/browser.ts";
 import {
   createDiscoverModel,
   DISCOVER_BUDGET_MIN,
@@ -92,10 +102,10 @@ import {
   type ExtractInput,
   type ExtractOutcome,
   type ExtractResult,
-  effortOf,
+  extractModelOf,
   modelKey,
 } from "./io/extract.ts";
-import { fetchInputs, fetchPdfText } from "./io/fetch-inputs.ts";
+import { fetchInputs, fetchOutcome, fetchPdfText } from "./io/fetch-inputs.ts";
 import {
   DISCOVER_EVAL,
   DISCOVER_URTEILE,
@@ -116,9 +126,12 @@ import { createJudge } from "./io/judge.ts";
 import { liveStatus } from "./io/live.ts";
 import { EFFORTS } from "./io/llm.ts";
 import { DEFAULT_BUDGET_MIN, runBuildOnly, runNightly } from "./io/nightly.ts";
+import { pflegeArgsError, runPflege } from "./io/pflege.ts";
 import { publishNightly } from "./io/publish.ts";
+import { crawlFetcher, hostQueue } from "./io/site-crawl.ts";
+import { nightlyWindow } from "./lib/build-offers.ts";
 import type { Candidate } from "./lib/candidate.ts";
-import { DISCOVER_BRAKES, parseBrakes } from "./lib/cost.ts";
+import { DISCOVER_BRAKES, PFLEGE_BRAKES, PFLEGE_BUDGET_MIN, parseBrakes } from "./lib/cost.ts";
 import { abortOf, MAX_NEW_PER_RUN, newProvidersIssue, renderDiscoverReport } from "./lib/discover.ts";
 import { selectTerms } from "./lib/discover-terms.ts";
 import { DiscoverEvalSchema, evalRegions, freshRunDir, modelEnv, UrteileSchema } from "./lib/eval-discover.ts";
@@ -170,6 +183,8 @@ const { positionals, values } = parseArgs({
     faelle: { type: "boolean", default: false },
     aufzeichnen: { type: "boolean", default: false },
     abruf: { type: "string" },
+    katalog: { type: "string" },
+    netz: { type: "string" },
   },
 });
 const [command, ...args] = positionals;
@@ -336,8 +351,7 @@ async function nightly() {
   for (const id of umstellen ?? [])
     if (!readCatalog().some((p) => p.id === id)) fail(`--umstellen: unbekannter Anbieter ${id}`);
   // Modell und Effort gehören in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
-  const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
-  const effort = effortOf(process.env);
+  const { model, effort } = extractModelOf(process.env);
   const acceptance = readIdAcceptanceOrWarn(join(ROOT, "data"), (m) =>
     print(`::warning::Hinnehmen-Datei unlesbar, nichts hingenommen: ${m}`),
   );
@@ -498,8 +512,7 @@ async function discoverCmd() {
       fail(`G1 schon vor dem Lauf rot, nichts entdeckt: ${(e as Error).message}`);
     }
   // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf: Der Zustand des Ertragsbeweises gilt dort weiter (E1)
-  const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
-  const effort = effortOf(process.env);
+  const { model, effort } = extractModelOf(process.env);
   const step = (m: string | undefined, e: string | undefined) => `${m}/${e || "Standard"}`;
   const modelle =
     `Suche/Bewerten ${step(process.env["LLM_MODEL_DISCOVER"] ?? "haiku", process.env["LLM_EFFORT_DISCOVER"])}, ` +
@@ -739,6 +752,81 @@ async function oepnv() {
   );
 }
 
+/** Pflege bekannter Anbieter (Plan 0049, E5), bis S2 nur als Trockenlauf. Exit 1 nur bei falschen Argumenten. */
+async function pflegeCmd() {
+  const date = today();
+  const dryRun = values["dry-run"];
+  const argError = pflegeArgsError({ dryRun, katalog: values.katalog, abruf: abrufValue });
+  if (argError) fail(argError);
+  if (values.region && values.netz) fail("--region oder --netz, nicht beides");
+  // beide Regionen liegen im VGN; weitere Netze kommen mit dem Plan „site.json je Gebiet“
+  if (values.netz && values.netz !== "vgn") fail(`unbekanntes Netz: ${values.netz} (bisher nur vgn)`);
+  const regions: RegionId[] = values.region
+    ? [REGION_IDS.find((r) => r === values.region) ?? fail(`unbekannte Region: ${values.region}`)]
+    : [...REGION_IDS];
+  const catalog = values.katalog ? readCatalog(resolve(values.katalog)) : readCatalog();
+  const only = values.only?.split(",").filter(Boolean);
+  for (const id of only ?? []) if (!catalog.some((p) => p.id === id)) fail(`--only: unbekannter Anbieter ${id}`);
+  for (const id of only ?? []) {
+    const p = catalog.find((x) => x.id === id);
+    if (p?.role !== "anbieter" || p.coveredBy || p.skipCrawl)
+      fail(`--only: ${id} nimmt nicht teil (kein Anbieter, coveredBy oder skipCrawl)`);
+    if (!regions.includes(p.region)) fail(`--only: ${id} liegt nicht in ${regions.join(", ")}`);
+  }
+  const participants = catalog
+    .filter((p) => p.role === "anbieter" && !p.coveredBy && !p.skipCrawl && regions.includes(p.region))
+    .filter((p) => !only || only.includes(p.id))
+    .map((p) => p.id);
+  const brakes = parseBrakes(process.env, PFLEGE_BRAKES);
+  if (!brakes.ok) fail(brakes.error);
+  const budgetMin = Number(process.env["PFLEGE_BUDGET_MIN"] || PFLEGE_BUDGET_MIN);
+  if (!(budgetMin > 0)) fail(`PFLEGE_BUDGET_MIN ungültig: ${process.env["PFLEGE_BUDGET_MIN"]}`);
+  // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf (M2): Ziel 2 misst, was live entstünde
+  const { model, effort } = extractModelOf(process.env);
+  // eigenes Verzeichnis je Lauf (-2, -3 …): ein zweiter Lauf am Tag ließe sonst alte Beweise liegen (Arch-Review S1, m5)
+  const runDir = values["run-dir"]
+    ? resolve(values["run-dir"])
+    : freshRunDir(join(ROOT, "runs", date, "pflege"), existsSync);
+  actionsOutput("run_dir", runDir);
+  const { freeDaysSpan } = nightlyWindow(date);
+  const controller = new AbortController();
+  process.once("SIGINT", () => controller.abort());
+  process.once("SIGTERM", () => controller.abort());
+  const queue = hostQueue();
+  const browser = browserSession();
+  try {
+    const r = await runPflege({
+      catalog,
+      participants,
+      raws: readRawDir(join(ROOT, "data", "raw")),
+      previous: readPreviousOffers(),
+      states: Object.fromEntries(readDiscoverStates(join(ROOT, "data")).map((s) => [s.region, s] as const)),
+      today: date,
+      now: () => toBerlinIso(new Date()),
+      freeDays: await loadFreeDays(freeDaysSpan.from, freeDaysSpan.to),
+      keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },
+      runDir,
+      ignoreRest: values.katalog !== undefined,
+      brakes: brakes.brakes,
+      budgetMin,
+      signal: controller.signal,
+      log: print,
+      modell: `${model}/${effort || "Standard"}`,
+      deps: {
+        crawlFetch: (scope) => crawlFetcher(scope, { queue, browser }),
+        fetchTask: (task) => queue(task.url, () => fetchOutcome(task, browser)),
+        extractor: createExtractor({ model }),
+      },
+    });
+    print(
+      `Pflege ${date}: ${r.rows.length} Anbieter, ${r.append.length} Seiten würden angehängt` +
+        `${r.abort ? `, vorzeitig beendet (${r.abort})` : ""}; Bericht ${join(runDir, "report.md")}`,
+    );
+  } finally {
+    await browser.close().catch(() => undefined);
+  }
+}
+
 switch (command) {
   case "fetch-page":
     await fetchPageCmd();
@@ -757,6 +845,9 @@ switch (command) {
     break;
   case "discover":
     await discoverCmd();
+    break;
+  case "pflege":
+    await pflegeCmd();
     break;
   case "discover-publish":
     discoverPublish(need(args[0], "RUN_DIR"));

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Anbieter } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import type { PageOutcome } from "../lib/fetch.ts";
-import { unitInputs } from "./fetch-inputs.ts";
+import { proofInput, unitInputs } from "./fetch-inputs.ts";
 
 const base = loadFixtures().providers.find((p) => p.id === "familientreff-beispiel");
 if (base?.role !== "anbieter") throw new Error("Fixture fehlt");
@@ -72,5 +72,30 @@ describe("unitInputs (Plan 0048, E1, E2)", () => {
 
   it("passt die Zahl der Abrufe nicht zu den Seiten im Katalog, scheitert es laut", () => {
     expect(() => unitInputs(owner, [ok(A), ok(B)], [])).toThrow(/2 Abrufe für 3 Seiten/);
+  });
+});
+
+describe("proofInput (Plan 0049, E2, M1)", () => {
+  const C = "https://example.org/neu";
+  const entry: Anbieter = { ...owner, programme: [...owner.programme, { url: C, kind: "html", use: "termine" }] };
+  const idx = (url: string) => entry.programme.findIndex((g) => g.url === url);
+
+  it("nur die Einheit des Kandidaten mit ihren Beilagen; andere Seiten gelten als nicht abgerufen", () => {
+    const r = proofInput(
+      entry,
+      `seite:${C}`,
+      new Map([
+        [idx(PLAETZE), ok(PLAETZE)],
+        [idx(C), ok(C)],
+      ]),
+    );
+    expect(r.units.map((u) => u.id)).toEqual([`seite:${C}`]);
+    expect(r.units[0]?.pages.map((p) => p.url)).toEqual([C, PLAETZE]);
+    expect(r).toMatchObject({ status: "ok", via: "seiten", beilagen: { [`seite:${PLAETZE}`]: { ok: true } } });
+    expect(r.text).not.toContain(`Text ${A}`);
+  });
+
+  it("unbekannte Einheit: Fehler", () => {
+    expect(() => proofInput(entry, "seite:https://example.org/fremd", new Map())).toThrow(/fehlt/);
   });
 });

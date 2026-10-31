@@ -496,8 +496,17 @@ export interface Candidate {
   reason: string;
 }
 
-/** Kandidaten (E1): Signale, nicht im Katalog, kein Sammelkalender; höchstens 5, nach künftigen Terminen, dann URL */
-export function candidatesOf(crawl: CrawlResult, scope: CrawlScope, today: string): Candidate[] {
+/**
+ * Kandidaten (E1): Signale, nicht im Katalog, kein Sammelkalender; höchstens 5, nach künftigen Terminen, dann URL.
+ * `skip` (Pflege: abgelehnt oder in Ruhe, E4) nimmt eine Seite vor der Grenze heraus, sonst verdrängten ruhende Seiten
+ * neue auf Dauer.
+ */
+export function candidatesOf(
+  crawl: CrawlResult,
+  scope: CrawlScope,
+  today: string,
+  skip: (url: string) => boolean = () => false,
+): Candidate[] {
   const out = new Map<string, Candidate>();
   for (const p of crawl.pages) {
     // eine Kontaktseite bleibt Kandidat, wenn sie Programm zeigt („Kontaktgruppe Babys“); Impressum nie (M1)
@@ -506,7 +515,7 @@ export function candidatesOf(crawl: CrawlResult, scope: CrawlScope, today: strin
     const kind = kindOf(p.result.contentType);
     if (!kind || neverCandidate(url, scope) || neverCandidate(p.url, scope)) continue;
     const s = pageSignals(p.result.page, today);
-    if (!s.candidate) continue;
+    if (!s.candidate || skip(url)) continue;
     const n = normalizeUrl(url) ?? url;
     if (!out.has(n)) out.set(n, { url, kind, browser: p.result.browser, future: s.future, reason: s.reason });
   }

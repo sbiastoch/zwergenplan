@@ -303,6 +303,16 @@ describe("exploreSite (Breitensuche)", () => {
       "https://sh.de/kurs-3",
       "https://sh.de/kurs-2",
     ]);
+    // ruhende oder abgelehnte Seiten fallen vor der Grenze heraus (Plan 0049, E4)
+    const skipped = new Set(["https://sh.de/kurs-6", "https://sh.de/kurs-5"]);
+    const d = candidatesOf(await exploreSite(scope, site(pages).fetchOne), scope, today, (u) => skipped.has(u));
+    expect(d.map((x) => x.url)).toEqual([
+      "https://sh.de/kurs-4",
+      "https://sh.de/kurs-3",
+      "https://sh.de/kurs-2",
+      "https://sh.de/kurs-1",
+      "https://sh.de/kurs-0",
+    ]);
   });
 });
 

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import { EXTRACT_CATEGORIES } from "../../../src/domain/topics.ts";
-import { createExtractor, EXTRACT_KEY_PARTS, effortOf, modelKey } from "./extract.ts";
+import { createExtractor, EXTRACT_KEY_PARTS, effortOf, extractModelOf, modelKey } from "./extract.ts";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const BIN = join(ROOT, "tests/fixtures/fake-claude.mjs");
@@ -140,6 +140,16 @@ describe("createExtractor (Fake-CLI)", () => {
     expect(a.seen().stdin).toContain("Teil 1 von 2: ");
     expect(b.seen().stdin).toContain("Teil 2 von 2: ");
     expect(b.seen().stdin).not.toContain("Krabbeltreff");
+  });
+});
+
+describe("extractModelOf (Plan 0049, M2)", () => {
+  it("Nachtlauf, Beweis des Entdeckens und Pflege lesen dasselbe Modell: LLM_MODEL_EXTRACT, sonst haiku", () => {
+    expect(extractModelOf({})).toEqual({ model: "haiku", effort: undefined });
+    expect(extractModelOf({ LLM_MODEL_EXTRACT: "sonnet", LLM_EFFORT_EXTRACT: "high" })).toEqual({
+      model: "sonnet",
+      effort: "high",
+    });
   });
 });
 

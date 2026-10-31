@@ -22,12 +22,19 @@ export const hostOf = (url: string): string | undefined => {
   return u ? bareHost(u) : undefined;
 };
 
-/** Vergleichsform einer URL: ohne Schema, `www.`, Fragment, Tracking-Parameter und Schrägstrich am Ende. */
+/** Sitzungs- und Tracking-Parameter, die eine Seite nicht ändern (Plan 0049, E2; auch `canonicalUrl`) */
+const VOLATILE_PARAM = /^(utm_.*|fbclid|gclid|sid|phpsessid|jsessionid|sessionid)$/i;
+
+/**
+ * Vergleichsform einer URL: ohne Schema, `www.`, Fragment, Tracking- und Sitzungsparameter und Schrägstrich am Ende.
+ * Dieselben Parameter wie `canonicalUrl`, damit Katalogabgleich, Dedupe und Beweis denselben Schlüssel haben
+ * (Arch-Review S1, M1).
+ */
 export function normalizeUrl(url: string): string | undefined {
   const u = parseUrl(url);
   if (!u) return undefined;
   const params = [...u.searchParams]
-    .filter(([k]) => !/^(utm_|fbclid$|gclid$)/i.test(k))
+    .filter(([k]) => !VOLATILE_PARAM.test(k))
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([k, v]) => `${k}=${v}`);
   const path = u.pathname.replace(/\/+$/, "");
@@ -43,4 +50,17 @@ export function sameSite(a: string, b: string): boolean {
   const x = hostOf(a);
   const y = hostOf(b);
   return x !== undefined && y !== undefined && (x === y || x.endsWith(`.${y}`) || y.endsWith(`.${x}`));
+}
+
+/**
+ * Kanonische URL einer Seite (Plan 0049, E2): die URL ohne Fragment, ohne Sitzungs- und Tracking-Parameter, sonst
+ * unverändert (Schema, Host, Pfad und Reihenfolge der übrigen Parameter bleiben). Der Aufrufer übergibt das Ziel nach
+ * Weiterleitungen. Gilt für die Kennung im Ertragsbeweis und für den Anhang im Katalog, damit `seite:<URL>` passt.
+ */
+export function canonicalUrl(url: string): string | undefined {
+  const u = parseUrl(url);
+  if (!u) return undefined;
+  u.hash = "";
+  for (const k of [...u.searchParams.keys()]) if (VOLATILE_PARAM.test(k)) u.searchParams.delete(k);
+  return u.toString();
 }
