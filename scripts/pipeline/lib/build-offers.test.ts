@@ -10,6 +10,7 @@ import {
   type Candidate,
   dropSameSourceDuplicates,
   isNewRun,
+  nightlyWindow,
 } from "./build-offers.ts";
 import { ProviderRaw, RawBatch, RawEvent } from "./raw.ts";
 import { checkIdContinuity, type Draft, SAME_SOURCE_SESSIONS, windowKey } from "./stable-ids.ts";
@@ -1301,6 +1302,15 @@ describe("Ursprung je ID (Plan 0049, Nachtrag 2, B2)", () => {
     expect(byTitle).toEqual({
       "Offener Krabbeltreff": "familientreff-beispiel#00",
       Babycafé: "familientreff-beispiel#01",
+    });
+  });
+});
+
+describe("nightlyWindow: Horizont und Spanne der freien Tage des Nachtlaufs (Plan 0049, Nachtrag 2, B7)", () => {
+  it("12 Monate Horizont, freie Tage ein Jahr davor bis zwei Jahre danach", () => {
+    expect(nightlyWindow("2026-10-31")).toEqual({
+      horizon: { from: "2026-10-31", to: "2027-10-31" },
+      freeDaysSpan: { from: "2025-10-31", to: "2029-10-31" },
     });
   });
 });

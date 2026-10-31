@@ -107,6 +107,8 @@ gh workflow run discover.yml -f eval=true [-f model=sonnet -f effort=high]    # 
 
 Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `evals/results.md`; sonst warnt `pnpm data:validate` in der CI. Ändert der Prompt die Antwort für alle Anbieter (etwa ein neues Feld), gilt wie beim Modellwechsel: einmal mit `max_tokens=5000000`.
 
+Modell, Prompt und Schema prüft die Fixture der ID-Kontinuität nicht, denn sie friert die Ausgabe der Extraktion ein. Sie hält nur den Build-Code (`id-continuity.test.ts`, Plan 0049, Nachtrag 2, B7). Wird der Test nach einer Änderung am Build rot und ist der ID-Verlust gewollt, `node scripts/pipeline/freeze-id-continuity.ts` ausführen (friert den letzten Nachtlauf neu ein) und den Verlust im Commit begründen. Neu einfrieren ist auch nötig, wenn das Format von `data/raw` wechselt.
+
 ## 6. Region starten
 
 Eine neue Region ist ein eigener Plan (Muster: Plan 0036 Fürth, ADR 0029). Code-Teil: Eintrag in `src/domain/regions.ts` mit bbox (in `NUERNBERG_BBOX`), Einwohnern mit Quelle, `kreis` (Startgebiet der Wegzeit), `territory` (Gebiet fürs Entdecken: Gemeinden und Kreise laut Nominatim, Label für den Prompt; Plan 0050, S2c) und Platz in `REGION_IDS` (spezifischere Region vor der umfassenden, denn in dieser Reihenfolge läuft das Entdecken); Stadtteile in `src/domain/districts.ts` (jeder braucht einen Zugangshalt, `pnpm data:build` prüft das); Texte. Außerhalb Bayerns oder des VGN zusätzlich Ferien und Fahrplan (`docs/ideas.md`). Steht sie in `REGION_IDS`, füllt das Entdecken ihren Katalog:
