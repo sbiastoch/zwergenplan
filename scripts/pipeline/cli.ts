@@ -102,6 +102,7 @@ import {
   git,
   ROOT,
   readCatalog,
+  readIdAcceptance,
   readJson,
   readPreviousOffers,
   readRawDir,
@@ -135,7 +136,7 @@ import {
 } from "./lib/gtfs.ts";
 import { renderFetchReport } from "./lib/html-extract.ts";
 import { fillPlaceholders } from "./lib/placeholders.ts";
-import type { ProviderRaw } from "./lib/raw.ts";
+import { acceptanceFor, type ProviderRaw } from "./lib/raw.ts";
 import { offerUnits } from "./lib/refresh.ts";
 import { assessRun, NightlyReport, nightlyCommitMessage, renderStatus, type StepOutcome } from "./lib/report.ts";
 import { planFetch } from "./lib/select.ts";
@@ -337,13 +338,15 @@ async function nightly() {
   // Modell und Effort gehören in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const effort = effortOf(process.env);
+  const acceptance = readIdAcceptance(join(ROOT, "data"));
   const r = await runNightly({
     extractor: createExtractor({ model }),
     keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },
     // immer, auch bei gleichem Fallback-Modell (Plan 0048, E5)
     strongRetry: true,
-    // ID-Gate (ADR 0041): Richter mit LLM_MODEL_JUDGE (Standard opus)
+    // ID-Gate (ADR 0041): Richter mit LLM_MODEL_JUDGE (Standard opus), Hinnehmen aus data/id-hinnehmen.yaml
     judge: createJudge(),
+    accepted: (providerId, heldSince) => acceptanceFor(acceptance, providerId, heldSince),
     ...(umstellen ? { forceMigrate: umstellen } : {}),
     budgetMin,
     brakes: brakes.brakes,
