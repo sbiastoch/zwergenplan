@@ -1,6 +1,6 @@
 # Plan 0049 – Seitenfinder: Programmseiten finden, zuerst für bekannte Anbieter
 
-Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 durch Nachtrag 2 ersetzt; Nachtrag 2 A im Arbeitsbaum, nächstes: B ID-Gate)
+Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 durch Nachtrag 2 ersetzt; Nachtrag 2 A live, B gebaut auf plan-0050, nächstes: B prüfen und live, dann C)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`), Punkt 4 (ein Seitenfinder), Punkt 1 (ein Abruf), Punkt 5 (Issue je Lauf neben dem Wächter). Dieser Plan baut das Modul und die **Pflege bekannter Anbieter**. Den Modus `alle` für das Entdecken legt er fest (E1), gebaut wird er mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`), S3.
@@ -727,6 +727,37 @@ Der Code von Nachtrag 1 wurde nie committet. Nachtrag 2 ersetzt ihn.
   - m9 Bedingung `prev.inputHash`.
 
 Nach dem Skill war das der letzte erlaubte Review. **Die Änderungen aus Review 2 sind nicht mehr unabhängig geprüft.** Absicherung: `/arch-review` von B (Pflicht: neues Modul, Schemaänderung) und die Tests oben, besonders der Durchlauf in `io/nightly.test.ts`.
+
+#### Nachtrag 2 – Umsetzung B (2026-10-31)
+
+Gebaut auf `plan-0050`, teils parallel in eigenen Worktrees (Richter, ID-Kontinuität, Wächter samt Hinnehmen-Datei, Tests). Abweichungen vom Text oben:
+- **ADR 0041** statt 0040: Die Nummer 0040 hatte Plan 0057 inzwischen vergeben (Merkliste).
+- **B1, Pin-Test der Epoche** (`lib/input-epoch.test.ts`): eingefrorene Seiten stehen im Test selbst (HTML mit JSON-LD, iCal), nicht unter `scripts/pipeline/fixtures/input-epoch/`; das ist kleiner und lesbarer.
+- **B2, Schreiben:** `refreshProvider` schreibt weiter selbst. `runIdGate` (`io/id-gate.ts`) liest danach den neuen Stand, baut (a) und (b) mit dem gemeinsamen reinen Kern `buildFromState` und schreibt nur die gerichteten Anbieter neu. Ein Absturz dazwischen veröffentlicht nichts, denn `publish` läuft erst nach einem erfolgreichen Lauf; lokal schreibt nur `--dry-run`, und das ins Overlay.
+- **B2, Ursprung:** `assignIds` gibt je Angebot den Index seines Entwurfs zurück (`sources`). Daraus baut `buildOffers` `report.origins` (ID → Batch), und `batchesFromRaw` liefert `unitOf` (Batch → Einheit).
+- **B3, Richter** (`lib/judge.ts`, `io/judge.ts`, `prompt/judge.md`):
+  - `JudgeInput` hat zusätzlich `layout` (Seitengrenzen für `splitInput`) und `pageChanged` (optional; der Nachtlauf setzt es noch nicht, im Prompt heißt das „unbekannt“).
+  - Bei Kurs und regelmäßigem Angebot ist das ganze Event ein Ziel: Zwei alte IDs auf demselben Event ergeben beide `unklar`.
+  - Teilen sich zwei Teile die Urteile, gewinnt ein `gleich`; widersprechen sich zwei `gleich`, gilt `unklar`.
+  - `LLM_EFFORT_JUDGE` (in `nightly.yml`: `high`).
+  - `JUDGE_BRAKES` 60 Aufrufe und 6 Mio. gewichtete Tokens, `JUDGE_BUDGET_MIN` 20; `brakeHit` des Nachtlaufs zählt Richter-Aufrufe nicht mit.
+- **B3, Taken:** Ein Event gilt als vergeben, wenn ein Angebot in (a) mit ähnlichem Titel und gemeinsamem Beginn eine alte, nicht verlorene ID trägt (`judgeInputOf`).
+- **B5, Hinnehmen:**
+  - Schema `IdAcceptance`, `acceptanceFor` und `idAcceptanceIssues` liegen in `lib/raw.ts`, `readIdAcceptance` in `io/files.ts`.
+  - `data:validate` prüft die Datei, wenn sie existiert.
+  - Der Hinweis zum Hinnehmen steht im Kopf des Wächter-Issues, nur bei einem Befund `ids`.
+- **B6, Schattenlauf:** Die CLI hat kein `--max-calls`; die Bremsen kommen aus der Umgebung (`MAX_CALLS`, `MAX_TOKENS`, `RUN_BUDGET_MIN`). Der Skill nennt den Aufruf so.
+- **B7, ID-Kontinuität:**
+  - `freeze-id-continuity.ts` friert den letzten Nachtlauf aus git ein (gzip, 378 KB), samt dem **Vorstand dieses Laufs** (`offers-before.json.gz`).
+  - Zwei Fälle:
+    - Fixpunkt mit dem Ergebnis als Vorstand;
+    - der Nachtlauf nachgebaut aus seinem Vorstand.
+  - Befund: Der heutige Build verliert keine IDs (436 von 436).
+  - Grenze: Eine leicht verschärfte Schwelle (`SAME_SESSIONS` 0,99) bemerkt der Test nicht, weil die eingefrorenen Übergänge keine Grenzfälle enthalten; erst eine abgeschaltete Stufe 1 macht ihn rot. Mehrere eingefrorene Läufe würden ihn schärfen (Restpunkt).
+- **Refactorings unterwegs:**
+  - `buildFromState` und `nightlyWindow` (`lib/build-offers.ts`) ersetzen doppelte Rechnungen in `io/nightly.ts`.
+  - `callRecordOf` ist der gemeinsame Teil von Extraktion und Richter.
+  - `messageExcerpt` (vorher `catalogExcerpt` in `lib/extract.ts`) heißt so, damit es nicht mit `normalize.catalogExcerpt` verwechselt wird.
 
 ## Nutzerentscheide (offen)
 

@@ -189,8 +189,14 @@ describe("unitLosses: Verluste je gated Einheit", () => {
     expect(losses({ previous: [overnight], a: [], b: [overnight], origins: { lost0001: `${P}#00` } })).toHaveLength(1);
   });
 
-  it("Ursprung in einer nicht gated Einheit oder ohne Ursprung (Altbestand): kein Verlust des Gates", () => {
-    expect(losses({ previous: [lost], a: [], b: [lost], origins: { lost0001: `${P}#01` } })).toEqual([]);
+  it("Ursprung in einer nicht gated Einheit: Verlust an der gated Einheit, ohne Urteil (crossUnit)", () => {
+    // (a) und (b) unterscheiden sich nur in den gated Einheiten: Der Verlust kommt von einer neuen Fassung
+    expect(losses({ previous: [lost], a: [], b: [lost], origins: { lost0001: `${P}#01` } })).toEqual([
+      { providerId: P, unit: A, lost: [lost], crossUnit: true },
+    ]);
+  });
+
+  it("ohne Ursprung (Altbestand): kein Verlust des Gates", () => {
     expect(losses({ previous: [lost], a: [], b: [lost], origins: {} })).toEqual([]);
   });
 
@@ -201,7 +207,7 @@ describe("unitLosses: Verluste je gated Einheit", () => {
     expect(r).toEqual([{ providerId: P, unit: A, lost: [y, x] }]);
   });
 
-  it("Ursprung über mergeParts: dasselbe Angebot auf zwei Seiten liegt im Batch der ersten; ist nur B gated, kein Verlust", () => {
+  it("Ursprung über mergeParts: dasselbe Angebot auf zwei Seiten liegt im Batch der ersten; ist nur B gated, Verlust ohne Urteil an B", () => {
     const shared = event({ title: "Babymassage", sourceUrl: URL_B });
     const before = { [P]: raw({ [A]: unit([shared], { partsHash: "f1" }), [B]: unit([shared], { partsHash: "f1" }) }) };
     const night0 = build(before);
@@ -219,7 +225,7 @@ describe("unitLosses: Verluste je gated Einheit", () => {
       gated: new Map([[P, new Set([B])]]),
       today: TODAY,
     });
-    expect(r).toEqual([]);
+    expect(r.map((l) => [l.unit, l.lost.map((o) => o.id), l.crossUnit])).toEqual([[B, [id], true]]);
     // ist A gated, ist es ein Verlust von A
     const ra = unitLosses({
       previous: night0.file,

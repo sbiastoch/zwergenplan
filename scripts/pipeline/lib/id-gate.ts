@@ -4,8 +4,10 @@
  * bauen und schreiben macht `io/id-gate.ts`.
  *
  * Verlust: eine ID mit künftigem Termin im Vorstand, die im Build mit allen neuen Ergebnissen (a) fehlt, im Build mit
- * dem alten Stand der gated Einheiten (b) aber vorkommt. Nur die Einheit, aus der das Angebot in (b) stammt, wird
- * gerichtet; zeigt der Ursprung auf eine Einheit ohne neue Fassung, ist der Verlust erlaubt (geänderte Seite, ADR 0022).
+ * dem alten Stand der gated Einheiten (b) aber vorkommt. Da sich (a) und (b) nur in den gated Einheiten unterscheiden,
+ * verursacht immer eine neue Fassung den Verlust. Gerichtet wird die Einheit, aus der das Angebot in (b) stammt; liegt
+ * der Ursprung in einer Einheit ohne neue Fassung (über `mergeParts` vereinigt), kann der Richter dort nicht urteilen,
+ * und der Verlust hängt an der ersten gated Einheit des Anbieters (`crossUnit`, gehalten).
  */
 import type { Anbieter, Offer, OffersFile } from "../../../src/domain/schema.ts";
 import { berlinIsoDate, fromBerlinLocal } from "../../../src/domain/time.ts";
@@ -58,6 +60,8 @@ export interface UnitLoss {
   unit: string;
   /** verlorene Angebote aus dem Vorstand, nach ID */
   lost: Offer[];
+  /** Ursprung in einer Einheit ohne neue Fassung: kein Urteil möglich, die Einheit wird gehalten */
+  crossUnit?: true;
 }
 
 /** Verluste je gated Einheit (siehe Kopf); Reihenfolge nach Anbieter, Einheit. */
@@ -79,10 +83,20 @@ export function unitLosses(o: {
   for (const offer of old) {
     if (inA.has(offer.id) || !inB.has(offer.id) || !hasFutureSession(offer, o.today)) continue;
     const batch = o.origins[offer.id];
-    const unit = batch === undefined ? undefined : o.unitOf[batch];
-    if (unit === undefined || !o.gated.get(offer.providerId)?.has(unit)) continue;
-    const key = `${offer.providerId}\u0000${unit}`;
-    const g = groups.get(key) ?? { providerId: offer.providerId, unit, lost: [] };
+    const origin = batch === undefined ? undefined : o.unitOf[batch];
+    const units = o.gated.get(offer.providerId);
+    // ohne Ursprung (Altbestand) oder ohne gated Einheit beim Anbieter kein Verlust durch eine neue Fassung
+    if (origin === undefined || units === undefined) continue;
+    const cross = !units.has(origin);
+    const unit = cross ? [...units].sort()[0] : origin;
+    if (unit === undefined) continue;
+    const key = `${offer.providerId}\u0000${unit}\u0000${cross}`;
+    const g = groups.get(key) ?? {
+      providerId: offer.providerId,
+      unit,
+      lost: [],
+      ...(cross ? { crossUnit: true } : {}),
+    };
     g.lost.push(offer);
     groups.set(key, g);
   }

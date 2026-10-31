@@ -69,8 +69,14 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
       sources: o.sources,
     });
   const b = build(heldBack(o.prev, o.next, gated));
-  // Ohne gültigen Stand (b) gibt es keinen Vergleich; der Build danach scheitert genauso und schreibt nichts
-  if (!b.file) return out;
+  // Ohne gültigen Stand (b) gibt es keinen Vergleich: alle gated Einheiten halten (nächste Nacht erneut). Der Build
+  // danach scheitert dann wie (b) und schreibt keine offers.json; die IDs bleiben so sicher (ADR 0041)
+  if (!b.file) {
+    const why = `Vergleichsstand (b) gescheitert: ${b.report.errors.slice(0, 2).join("; ")}`;
+    for (const [providerId, units] of gated)
+      for (const unit of [...units].sort()) holdAfterCheck(o, out, { providerId, unit, lost: [] }, unit, "grenze", why);
+    return out;
+  }
   const a = build(o.next);
   const losses: UnitLoss[] = a.file
     ? unitLosses({
@@ -113,6 +119,10 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
         ...(note ? { note } : {}),
       });
     };
+    if (loss.crossUnit) {
+      hold("unklar", undefined, "Verlust über eine Einheit ohne neue Fassung (vereinigt), kein Urteil möglich");
+      continue;
+    }
     if (!a.file) {
       hold(
         "grenze",
@@ -199,7 +209,9 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
  * gelten nur, solange alle gated Einheiten übernommen werden: Hält das Gate eine davon, kann eine andere eine ID
  * kosten, die in (a) die gehaltene trug; ein Erbe (`keepIds`) kann im Build an einer Dublette oder einem Konflikt
  * scheitern. Je solchem Verlust wird erst die Einheit gehalten, aus der das Angebot in (b) stammt, sonst jede
- * übernommene gated Einheit des Anbieters, mit Grund `grenze` (nächste Nacht erneut gerichtet), bis nichts fehlt.
+ * übernommene gated Einheit des Anbieters, bis nichts fehlt. Grund `grenze`: Eine so gehaltene Einheit hatte oft gar
+ * kein eigenes Urteil (ihr Verlust zeigte sich erst nach dem Halten einer anderen); die nächste Nacht legt sie dem
+ * Richter vor. Scheitert dagegen ein Erbe dauerhaft, kostet das einen Aufruf je Nacht, bis ein Mensch eingreift.
  */
 function recheck(p: {
   o: IdGateOptions;
@@ -233,14 +245,21 @@ function recheck(p: {
       const units = isHeld(loss.providerId, loss.unit)
         ? [...(p.gated.get(loss.providerId) ?? [])].filter((u) => !isHeld(loss.providerId, u))
         : [loss.unit];
-      for (const unit of units) changed = holdAfterCheck(o, out, loss, unit) || changed;
+      for (const unit of units) changed = holdAfterCheck(o, out, loss, unit, "grenze") || changed;
     }
     if (!changed) return;
   }
 }
 
-/** Halten nach der Nachprüfung; ersetzt einen Eintrag `uebernommen`/`hingenommen` der Einheit. */
-function holdAfterCheck(o: IdGateOptions, out: IdGateResult, loss: UnitLoss, unit: string): boolean {
+/** Halten nach der Nachprüfung (oder ohne Vergleichsstand); ersetzt einen Eintrag der Einheit. */
+function holdAfterCheck(
+  o: IdGateOptions,
+  out: IdGateResult,
+  loss: UnitLoss,
+  unit: string,
+  reason: "unklar" | "grenze",
+  note?: string,
+): boolean {
   const prevRaw = o.prev[loss.providerId];
   const raw = out.raws[loss.providerId] ?? o.next[loss.providerId];
   const fresh = o.next[loss.providerId];
@@ -252,7 +271,7 @@ function holdAfterCheck(o: IdGateOptions, out: IdGateResult, loss: UnitLoss, uni
   const ids = loss.lost.map((x) => x.id);
   out.raws[loss.providerId] = {
     ...raw,
-    units: { ...raw.units, [unit]: holdUnit(prevUnit, nextUnit, { since: o.now, reason: "grenze", lost: ids }) },
+    units: { ...raw.units, [unit]: holdUnit(prevUnit, nextUnit, { since: o.now, reason, lost: ids }) },
   };
   out.held[loss.providerId] = [...(out.held[loss.providerId] ?? []), unit];
   const at = out.entries.findIndex((e) => e.provider === loss.providerId && e.unit === unit);
@@ -260,9 +279,9 @@ function holdAfterCheck(o: IdGateOptions, out: IdGateResult, loss: UnitLoss, uni
     provider: loss.providerId,
     unit,
     outcome: "gehalten",
-    held: "grenze",
+    held: reason,
     ids: loss.lost.map((x) => ({ id: x.id, title: x.title })),
-    note: `Nachprüfung: ohne Halten fehlten ${ids.join(", ")}`,
+    note: note ?? `Nachprüfung: ohne Halten fehlten ${ids.join(", ")}`,
   };
   if (at >= 0) out.entries.splice(at, 1, entry);
   else out.entries.push(entry);
