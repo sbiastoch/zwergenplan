@@ -35,6 +35,11 @@
     height: env(safe-area-inset-top);
     background: var(--statusbar);
     pointer-events: none;
+    /*
+     * Ohne Text, aber mit Zeile: Mit der geerbten Webschrift lud der Streifen sie schon vor „load“ und hielt so den
+     * Seitenaufbau auf (font-swap.spec, LCP im Smoke; CI des Nachtrags). Systemschrift lädt nichts.
+     */
+    font: 0 / 0 sans-serif;
   }
   /*
    * große Karte: nur ein Verlauf, die Karte läuft unter Notch und Uhr weiter. Seine Höhe hängt allein an der Safe-Area,

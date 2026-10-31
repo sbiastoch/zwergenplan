@@ -376,6 +376,11 @@ Kein Blocker, kein Major. Eingearbeitet:
 - Minor 4: Mobile-UX-Ansicht `merkliste-karte-gross-liste`.
 - Minor 5: Das Budget kommt mit Schritt 5.
 
+### Branch-CI Nachtrag 1
+
+- Rot waren `font-swap.spec`, `font-swap.smoke.spec` (`page.goto` im Zeitlimit) und LCP im Smoke (2 568–2 700 ms statt < 2 500). Ursache: `body::before` mit `content: ""` erbte die Webschrift des `body` und lud sie schon vor `load`. Die Swap-Messung hält genau diese Schrift zurück, `load` kam also nie.
+- Fix: `font: 0 / 0 sans-serif` am Streifen. Gegenprobe lokal: ohne Fix 3 Tests rot, mit Fix grün.
+
 ### Restpunkte
 
 - Auf dem echten iPhone (installierte App) prüfen: Läuft die Karte unter der Notch weiter? Ist die Uhr auf dem Streifen bzw. Verlauf lesbar, hell und dunkel? Steht der Kopf der App nicht unter der Uhr?
