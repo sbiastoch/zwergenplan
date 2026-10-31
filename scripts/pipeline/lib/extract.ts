@@ -37,9 +37,14 @@ export interface ExtractInput {
   strong?: boolean;
 }
 
+/**
+ * Schritte eines Modellaufrufs: `search`/`assess` Websuche und Bewerten des Entdeckens (Plan 0032, E7/E8), `judge`
+ * der Richter des ID-Gates (Plan 0049, Nachtrag 2, B3; eigene Bremse `JUDGE_BRAKES` in `lib/cost.ts`).
+ */
+export const CALL_STEPS = ["extract", "fallback", "search", "assess", "judge"] as const;
+
 export interface CallRecord {
-  /** `search`/`assess`: Websuche und Bewerten des Entdeckens (Plan 0032, E7/E8) */
-  step: "extract" | "fallback" | "search" | "assess";
+  step: (typeof CALL_STEPS)[number];
   providerId: string;
   /** Teil der Eingabe („2/5“), nur wenn sie aufgeteilt wurde (`splitInput`) */
   part?: string;
@@ -222,8 +227,11 @@ function parseCandidate(line: string): Candidate[] {
   }
 }
 
-/** Katalogauszug für das Modell: ohne `notes` (ADR 0025), IDs, Koordinaten und gesperrte oder reine Info-Seiten. */
-function catalogExcerpt(p: Provider) {
+/**
+ * Katalogauszug für das Modell (Extraktion und Richter): ohne `notes` (ADR 0025), IDs, Koordinaten und gesperrte oder
+ * reine Info-Seiten. Nicht zu verwechseln mit `catalogExcerpt` in `lib/normalize.ts` (Text für den Cache-Schlüssel).
+ */
+export function messageExcerpt(p: Provider) {
   const venues =
     p.role === "anbieter" ? p.venues.map(({ id, name, address, hint }) => ({ id, name, address, hint })) : [];
   return {
@@ -264,7 +272,7 @@ export function extractMessage(input: {
   return [
     `Heute: ${from}\nHorizont: ${from} bis ${to}`,
     ...part,
-    `## Anbieter\n${JSON.stringify(catalogExcerpt(input.provider), null, 1)}`,
+    `## Anbieter\n${JSON.stringify(messageExcerpt(input.provider), null, 1)}`,
     input.text,
   ].join("\n\n");
 }
@@ -285,6 +293,26 @@ export interface ModelReply {
   abort: "auth" | "limit" | null;
   truncated: boolean;
   error: string | null;
+}
+
+/** Zeile für `kosten.jsonl` aus einer Antwort; `part` und `unit` setzt der Aufrufer. */
+export function callRecordOf(
+  step: CallRecord["step"],
+  providerId: string,
+  model: string,
+  reply: ModelReply,
+  result: CallRecord["result"],
+): CallRecord {
+  return {
+    step,
+    providerId,
+    model,
+    ...reply.usage,
+    turns: reply.turns,
+    durationMs: reply.durationMs,
+    costUsd: reply.costUsd,
+    result,
+  };
 }
 
 const MAX_FEEDBACK_LINES = 30;
@@ -322,16 +350,7 @@ export async function runExtraction(p: {
           : checked.ok
             ? "ok"
             : "invalid";
-    calls.push({
-      step,
-      providerId: p.providerId,
-      model,
-      ...reply.usage,
-      turns: reply.turns,
-      durationMs: reply.durationMs,
-      costUsd: reply.costUsd,
-      result,
-    });
+    calls.push(callRecordOf(step, p.providerId, model, reply, result));
     return { reply, checked, result, model };
   };
   type Attempt = Awaited<ReturnType<typeof attempt>>;

@@ -6,6 +6,9 @@ import {
   type CostRow,
   costCsvRow,
   costJsonl,
+  JUDGE_BRAKES,
+  JUDGE_BUDGET_MIN,
+  judgeBrakeHit,
   parseBrakes,
   summarizeCosts,
 } from "./cost.ts";
@@ -143,6 +146,31 @@ describe("Bremsen (E8: MAX_CALLS, MAX_TOKENS)", () => {
       brakeHit([call({ model: "sonnet", inputTokens: 920 }), call({ model: "sonnet", inputTokens: 920 })], brakes),
     ).toBe("tokens");
     expect(brakeHit([call({ model: "unbekannt", inputTokens: 920 })], brakes)).toBe("tokens");
+  });
+});
+
+describe("Grenzen des Richters (Plan 0049, Nachtrag 2, B3)", () => {
+  it("brakeHit zählt Richter-Aufrufe nicht mit", () => {
+    const brakes = { maxCalls: 2, maxTokens: 1000 };
+    const judge = call({ step: "judge", model: "opus", inputTokens: 5000 });
+    expect(brakeHit([call(), judge, judge, judge], brakes)).toBeUndefined();
+    expect(brakeHit([call(), call(), judge], brakes)).toBe("aufrufe");
+  });
+
+  it("judgeBrakeHit zählt nur Richter-Aufrufe, gewichtet wie brakeHit", () => {
+    const brakes = { maxCalls: 2, maxTokens: 1000 };
+    const judge = (over: Partial<CallRecord> = {}) => call({ step: "judge", model: "opus", ...over });
+    expect(judgeBrakeHit([call(), call(), call(), judge()], brakes)).toBeUndefined();
+    expect(judgeBrakeHit([judge(), judge()], brakes)).toBe("aufrufe");
+    expect(judgeBrakeHit([judge({ inputTokens: 920 })], brakes)).toBe("tokens");
+    expect(judgeBrakeHit([judge({ model: "haiku", inputTokens: 920 })], brakes)).toBeUndefined();
+  });
+
+  it("Standard JUDGE_BRAKES, Zeitbudget innerhalb der 40 Minuten Marge des Jobs", () => {
+    expect(JUDGE_BRAKES).toEqual({ maxCalls: 60, maxTokens: 6_000_000 });
+    expect(judgeBrakeHit(Array.from({ length: 59 }, () => call({ step: "judge", model: "opus" })))).toBeUndefined();
+    expect(judgeBrakeHit(Array.from({ length: 60 }, () => call({ step: "judge", model: "opus" })))).toBe("aufrufe");
+    expect(JUDGE_BUDGET_MIN).toBeLessThan(40);
   });
 });
 

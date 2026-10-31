@@ -6,7 +6,7 @@
 import { z } from "zod";
 import { berlinIsoDate, formatGermanDate } from "../../../src/domain/time.ts";
 import { type CostSummary, summarizeCosts } from "./cost.ts";
-import type { CallRecord } from "./extract.ts";
+import { CALL_STEPS, type CallRecord } from "./extract.ts";
 import { CATEGORY_CONFLICT, type ProviderRaw, providerStatus, rawEvents, unitStates } from "./raw.ts";
 import type { ProviderResult } from "./refresh.ts";
 
@@ -36,7 +36,7 @@ export type ProviderState = z.infer<typeof ProviderState>;
 /** `CallRecord` (lib/extract.ts) beim Lesen von nightly.json; `part` nur, wenn gesetzt */
 const CallRecordSchema = z
   .object({
-    step: z.enum(["extract", "fallback", "search", "assess"]),
+    step: z.enum(CALL_STEPS),
     providerId: z.string(),
     part: z.string().optional(),
     unit: z.string().optional(),
