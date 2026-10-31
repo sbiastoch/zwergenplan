@@ -59,3 +59,54 @@ describe("DiscoverState: orte und klaerfaelle (Plan 0050, E5)", () => {
     expect(emptyState("nuernberg")).toMatchObject({ orte: {}, klaerfaelle: [] });
   });
 });
+
+describe("DiscoverState: seiten, gepflegt, abgelehnt.anbieter (Plan 0049, E4)", () => {
+  it("bestehende Dateien ohne die neuen Felder bleiben gültig und bekommen leere Werte", () => {
+    const s = DiscoverState.parse({ region: "nuernberg", abgelehnt: [], zurueckgestellt: [] });
+    expect(s.seiten).toEqual([]);
+    expect(s.gepflegt).toEqual([]);
+    expect(emptyState("fuerth")).toMatchObject({ seiten: [], gepflegt: [] });
+  });
+
+  it("nimmt geprüfte Seiten und gepflegte Anbieter, lehnt ein unbekanntes Ergebnis ab", () => {
+    const seite = {
+      url: "https://example.org/kurse",
+      anbieter: "beispiel",
+      geprueft: "2026-10-31",
+      ergebnis: "deckungsgleich",
+      stand: "abc123",
+    };
+    const s = DiscoverState.parse({
+      region: "nuernberg",
+      abgelehnt: [],
+      zurueckgestellt: [],
+      seiten: [seite, { ...seite, url: "https://example.org/b", ergebnis: "fehler", grund: "HTTP 500" }],
+      gepflegt: [{ anbieter: "beispiel", datum: "2026-10-31" }],
+    });
+    expect(s.seiten).toHaveLength(2);
+    expect(() => DiscoverState.parse({ ...s, seiten: [{ ...seite, ergebnis: "fremder-ort" }] })).toThrow();
+  });
+
+  it("abgelehnt mit anbieter (abgelehnte Seite) löst keinen reservedConflicts aus, mit id schon", () => {
+    const s = DiscoverState.parse({
+      region: "nuernberg",
+      abgelehnt: [
+        { url: "https://example.org/fremd", anbieter: "beispiel", grund: "fremder Veranstalter", datum: "2026-10-31" },
+      ],
+      zurueckgestellt: [],
+    });
+    expect(reservedConflicts([{ id: "beispiel" }], [s])).toEqual([]);
+    const t = DiscoverState.parse({ ...s, abgelehnt: [{ id: "beispiel", grund: "zurück", datum: "2026-10-31" }] });
+    expect(reservedConflicts([{ id: "beispiel" }], [t])).toHaveLength(1);
+  });
+
+  it("abgelehnt mit anbieter braucht eine url", () => {
+    expect(() =>
+      DiscoverState.parse({
+        region: "nuernberg",
+        abgelehnt: [{ host: "example.org", anbieter: "beispiel", grund: "x", datum: "2026-10-31" }],
+        zurueckgestellt: [],
+      }),
+    ).toThrow();
+  });
+});

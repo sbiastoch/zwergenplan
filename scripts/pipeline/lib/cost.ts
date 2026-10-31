@@ -8,8 +8,8 @@
  */
 import type { CallRecord } from "./extract.ts";
 
-/** Lauf, zu dem ein Aufruf gehört: Nachtlauf (E6) oder Entdecken (E7) */
-type RunKind = "nacht" | "entdecken";
+/** Lauf, zu dem ein Aufruf gehört: Nachtlauf (E6), Entdecken (E7) oder Pflege bekannter Anbieter (Plan 0049, E5) */
+type RunKind = "nacht" | "entdecken" | "pflege";
 
 export interface CostLineContext {
   run: RunKind;
@@ -105,6 +105,14 @@ export const NIGHT_BRAKES: Brakes = { maxCalls: 150, maxTokens: 3_000_000 };
  * jetzt der Job von 330 Minuten; S6 setzt die Bremsen auf das Doppelte des größten gemessenen Laufs.
  */
 export const DISCOVER_BRAKES: Brakes = { maxCalls: 1500, maxTokens: 150_000_000 };
+
+/**
+ * Standard der Pflege (Plan 0049, E5), je Lauf: höchstens 5 Ertragsbeweise je Anbieter. S3 setzt die Grenzen auf das
+ * Doppelte des größten gemessenen vollständigen Laufs (ADR 0033, Punkt 7).
+ */
+export const PFLEGE_BRAKES: Brakes = { maxCalls: 300, maxTokens: 30_000_000 };
+/** Zeitbudget der Pflege in Minuten (E5) */
+export const PFLEGE_BUDGET_MIN = 120;
 
 /**
  * Grenze des Richters im ID-Gate (Plan 0049, Nachtrag 2, B3, Review N2-2, M6): Opus, eigene Grenze neben

@@ -41,6 +41,32 @@ const Klaerfall = z.strictObject({
   aussetzenBis: IsoDate.optional(),
 });
 
+/** Ergebnis des Ertragsbeweises einer Kandidatenseite (Plan 0049, E2) */
+const PFLEGE_ERGEBNISSE = [
+  "anhaengen",
+  "deckungsgleich",
+  "fremder-anbieter",
+  "ohne-ertrag",
+  "abgeschnitten",
+  "budget",
+  "fehler",
+] as const;
+export type PflegeErgebnis = (typeof PFLEGE_ERGEBNISSE)[number];
+
+/**
+ * Geprüfte Kandidatenseite (Plan 0049, E4). `stand` ist der Hash über die Einheiten des Anbieters und die mit
+ * `dauerhaft`; ändert er sich, entfällt die Ruhezeit.
+ */
+const Seite = z.strictObject({
+  url: z.url(),
+  anbieter: z.string().regex(KEBAB_ID_PATTERN),
+  geprueft: IsoDate,
+  ergebnis: z.enum(PFLEGE_ERGEBNISSE),
+  grund: z.string().min(1).optional(),
+  stand: z.string().min(1),
+});
+export type Seite = z.infer<typeof Seite>;
+
 /**
  * Zustand des Entdeckens je Region (`data/discover/<region>.json`, E5/E13), dauerhafter Zustand der Pipeline, kein
  * Vertrag der Website. `abgelehnt` pflegt ein Mensch (Rücknahme per Revert, E7); `zurueckgestellt` schreibt der Lauf
@@ -61,10 +87,16 @@ export const DiscoverState = z.strictObject({
          */
         id: z.string().regex(KEBAB_ID_PATTERN).optional(),
         publicId: z.string().regex(SHORT_ID_PATTERN).optional(),
+        /**
+         * Katalog-ID des Anbieters einer abgelehnten Programmseite (Plan 0049, E4): `url` ist dann die Seite, die die
+         * Pflege nie wieder anhängt. Nicht `id`, das hieße „Anbieter zurückgenommen“ (`reservedConflicts`).
+         */
+        anbieter: z.string().regex(KEBAB_ID_PATTERN).optional(),
         grund: z.string().min(1),
         datum: IsoDate,
       })
-      .refine((a) => a.url !== undefined || a.host !== undefined || a.id !== undefined, "url, host oder id erwartet"),
+      .refine((a) => a.url !== undefined || a.host !== undefined || a.id !== undefined, "url, host oder id erwartet")
+      .refine((a) => a.anbieter === undefined || a.url !== undefined, "anbieter nur mit url (abgelehnte Seite)"),
   ),
   zurueckgestellt: z.array(
     z.strictObject({
@@ -78,6 +110,10 @@ export const DiscoverState = z.strictObject({
   /** Geocoder-Treffer der Region je Eingabe (`placeKey`), 12 Monate gültig; „kein Treffer“ steht hier nie */
   orte: z.record(z.string(), Ort).default({}),
   klaerfaelle: z.array(Klaerfall).default([]),
+  /** geprüfte Kandidatenseiten des Seitenfinders (Plan 0049, E4), Grundlage der Ruhezeit */
+  seiten: z.array(Seite).default([]),
+  /** letzter Pflegelauf je Anbieter, auch ohne Kandidaten (Reihenfolge, E5) */
+  gepflegt: z.array(z.strictObject({ anbieter: z.string().regex(KEBAB_ID_PATTERN), datum: IsoDate })).default([]),
 });
 export type DiscoverState = z.infer<typeof DiscoverState>;
 
@@ -87,6 +123,8 @@ export const emptyState = (region: RegionId): DiscoverState => ({
   zurueckgestellt: [],
   orte: {},
   klaerfaelle: [],
+  seiten: [],
+  gepflegt: [],
 });
 
 /**

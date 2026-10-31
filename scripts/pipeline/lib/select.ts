@@ -44,7 +44,7 @@ export interface FetchPlan {
   skipped: Array<{ id: string; reason: string }>;
 }
 
-function pageTask(g: Programme, today: string): PageTask {
+export function pageTask(g: Programme, today: string): PageTask {
   return {
     url: fillPlaceholders(g.url, today),
     kind: g.kind,
