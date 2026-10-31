@@ -207,6 +207,18 @@ describe("unitLosses: Verluste je gated Einheit", () => {
     expect(r).toEqual([{ providerId: P, unit: A, lost: [y, x] }]);
   });
 
+  it("eigener Verlust und Verlust über eine nicht gated Einheit: eine Gruppe mit crossUnit", () => {
+    const own = offer("aa000001");
+    const cross = offer("zz000001");
+    const r = losses({
+      previous: [own, cross],
+      a: [],
+      b: [own, cross],
+      origins: { aa000001: `${P}#00`, zz000001: `${P}#01` },
+    });
+    expect(r).toEqual([{ providerId: P, unit: A, lost: [own, cross], crossUnit: true }]);
+  });
+
   it("Ursprung über mergeParts: dasselbe Angebot auf zwei Seiten liegt im Batch der ersten; ist nur B gated, Verlust ohne Urteil an B", () => {
     const shared = event({ title: "Babymassage", sourceUrl: URL_B });
     const before = { [P]: raw({ [A]: unit([shared], { partsHash: "f1" }), [B]: unit([shared], { partsHash: "f1" }) }) };

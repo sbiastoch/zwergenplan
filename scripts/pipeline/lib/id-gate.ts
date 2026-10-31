@@ -90,14 +90,12 @@ export function unitLosses(o: {
     const cross = !units.has(origin);
     const unit = cross ? [...units].sort()[0] : origin;
     if (unit === undefined) continue;
-    const key = `${offer.providerId}\u0000${unit}\u0000${cross}`;
-    const g = groups.get(key) ?? {
-      providerId: offer.providerId,
-      unit,
-      lost: [],
-      ...(cross ? { crossUnit: true } : {}),
-    };
+    // eine Gruppe je Einheit: Mit einem Verlust über eine andere Einheit wird sie ohnehin gehalten, ein Urteil über
+    // ihre eigenen Verluste änderte nichts; zwei Gruppen ergäben zwei Einträge und ein Urteil über den alten Stand
+    const key = `${offer.providerId}\u0000${unit}`;
+    const g: UnitLoss = groups.get(key) ?? { providerId: offer.providerId, unit, lost: [] };
     g.lost.push(offer);
+    if (cross) g.crossUnit = true;
     groups.set(key, g);
   }
   return [...groups.values()].sort((x, y) => x.providerId.localeCompare(y.providerId) || x.unit.localeCompare(y.unit));

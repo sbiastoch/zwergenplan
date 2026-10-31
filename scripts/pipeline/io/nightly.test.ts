@@ -1178,6 +1178,22 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     return { dirsOf, ids, r, j };
   }
 
+  it("crossUnit und eigener Verlust derselben Einheit: ein Eintrag, alle Verluste in held.lost, kein Richter", async () => {
+    const { dirsOf, ids, r, j } = await crossNight(renamed);
+    expect(j.seen).toEqual([]);
+    expect(r.idGate?.map((e) => [e.unit, e.outcome, e.held])).toEqual([[UNIT_B, "gehalten", "unklar"]]);
+    expect(r.idGate?.[0]?.ids.map((x) => x.id).sort()).toEqual(Object.values(ids).sort());
+    const held = rawUnit(dirsOf, UNIT_B);
+    expect([...(held?.held?.lost ?? [])].sort()).toEqual(Object.values(ids).sort());
+    // gehalten ist das Ergebnis der neuen Fassung, ohne Erbe
+    expect(held?.held?.events.map((e) => e.title)).toEqual([...renamed.map((e) => e.title), "Kinderwagen-Runde"]);
+    expect(held?.held?.events.some((e) => e.keepIds)).toBe(false);
+    expect(held?.events.map((e) => e.title)).toEqual(treffs.map((e) => e.title));
+    const now = idsByTitle(dirsOf);
+    expect(now["Sanfte Berührung für Babys"]).toBe(ids["Babymassage"]);
+    for (const t of treffs) expect(now[t.title]).toBe(ids[t.title]);
+  });
+
   it("Verlust mit Ursprung in einer nicht gated Einheit: die gated Einheit wird ohne Richter gehalten (crossUnit), ID bleibt", async () => {
     const { dirsOf, ids, r, j } = await crossNight(treffs);
     expect(j.seen).toEqual([]);
