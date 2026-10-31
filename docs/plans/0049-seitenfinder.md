@@ -1,6 +1,6 @@
 # Plan 0049 – Seitenfinder: Programmseiten finden, zuerst für bekannte Anbieter
 
-Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 durch Nachtrag 2 ersetzt; Nachtrag 2 A live, B gebaut auf plan-0050, nächstes: B prüfen und live, dann C)
+Status: in Umsetzung (S0 gemessen, S1 Teil 1 auf main; Nachtrag 1 durch Nachtrag 2 ersetzt; Nachtrag 2 A und B live, C gemessen: keine Fehlverortung, D entfällt; nächstes: S1 `lib/pflege.ts`)
 Datum: 2026-10-26
 Bezug:
 - **ADR 0033** (`docs/adr/0033-crawling-architektur.md`), Punkt 4 (ein Seitenfinder), Punkt 1 (ein Abruf), Punkt 5 (Issue je Lauf neben dem Wächter). Dieser Plan baut das Modul und die **Pflege bekannter Anbieter**. Den Modus `alle` für das Entdecken legt er fest (E1), gebaut wird er mit Plan 0050 (`docs/plans/0050-entdecken-schlank.md`), S3.
@@ -777,6 +777,33 @@ Gebaut auf `plan-0050`, teils parallel in eigenen Worktrees (Richter, ID-Kontinu
   - `buildFromState` und `nightlyWindow` (`lib/build-offers.ts`) ersetzen doppelte Rechnungen in `io/nightly.ts`.
   - `callRecordOf` ist der gemeinsame Teil von Extraktion und Richter.
   - `messageExcerpt` (vorher `catalogExcerpt` in `lib/extract.ts`) heißt so, damit es nicht mit `normalize.catalogExcerpt` verwechselt wird.
+
+#### Nachtrag 2 – Umsetzung C (2026-10-31)
+
+**Erster Nachtlauf mit Gate** (manuell gestartet, live `3ae0cb8`): 202 von 203 Einheiten tragen danach ihre Fassung (`partsHash`). Das Gate griff einmal: `staatstheater-nuernberg-familie`, Seite `spielplan-26-27`. Haiku fand dort 0 statt 2 Events (der Einbruch-Wächter hielt das Ergebnis schon zurück). Opus urteilte für die drei IDs `unklar`, weil die Angebote noch im Text stehen; die Einheit ist gehalten. 4 Richter-Aufrufe (die Seite ist in 4 Teile geteilt), $0,66.
+
+**Code:** `TRAPS` mit `fremder-ort`; `EvalExpected.excluded` (optional, `{title, starts}`); `CaseScore.misplaced` und `Summary.misplaced` über `countMisplaced` (ähnlicher Titel **und** gemeinsamer Beginn, gleich an welchem Katalogort). „fehlverortet n“ steht in der Spalte „je Fall“, ohne neue Spalte, damit ältere Zeilen in `evals/results.md` ihre Spaltenzahl behalten. Tests in `lib/eval-score.test.ts`, darunter der Gegenfall „gleicher Titel, anderer Beginn“.
+
+**Fälle** (frisch eingefroren am 2026-10-31, `expected.json` von Hand geprüft, je Fall `NOTES.md`):
+- Fallen: `musikfuechse-2026-10-31` (Katalogauszug wie vor `563de13`, 10 Angebote in Kraftshof, 12 Poppenreuth-Kurse mit 60 Terminen in `excluded`); `schwimmschule-ohana-nuernberg-2026-10-31` (10 NDE-Kurse, 32 Kurse an fünf fremden Standorten mit 305 Terminen in `excluded`).
+- Gegenfallen: `mutherstudio-2026-10-31`, `hebamme-kobielski-2026-10-31`, `fbs-nuernberg-2026-10-31` (Fenster bis 2026-12-20, damit von Hand prüfbar).
+- `musikfuechse-2026-10-11`: Katalogauszug mit Poppenreuth, dessen 12 Kurse im Soll; `NOTES.md` vermerkt den Nutzerentscheid und dass frühere Werte nicht vergleichbar sind.
+- **Abweichung:** Die Kindertheaterreihe entfällt. Jedes Stück ist ab 3 oder 4 Jahren, das Soll wäre leer, und jede Fehlverortung wäre zugleich ein Altersfehler; 0 fehlverortet wäre dort eine trügerische Entwarnung.
+
+**Messung:** zwei volle Läufe, `--model haiku --effort high`, 18 Fälle, Prompt-Hash `7b31b918b80b` (zwei Zeilen vom 2026-10-31 in `evals/results.md`). **Fehlverortet: 0 in beiden Läufen.** Beide Fallen trafen 100/100 (musikfuechse 50 von 50, Ohana 94 von 94 Terminen, kein fremder Kurs an einem Katalogort). Die Gegenfallen verloren nichts wegen eines fremden Ortsnamens. Im zweiten Lauf fielen mutherstudio (47/43) und hebamme-kobielski (36/100) ab, aus anderen Gründen: Waldspielracker am Hauptort statt am Spielplatz (Verwechslung zweier Katalogorte), „Mama Fitness“ weggelassen und Babymassage eine Woche zu spät begonnen. Im ersten Lauf waren beide fehlerfrei.
+
+**Beleg** (m6): Scan der Live-Angebote in `evals/results.md`, „Seitenfinder – Scan auf Fehlverortung“: 25 Seiten mit fremdem Ort, 15 Anbieter, 126 Angebote, 0 fehlverortet.
+
+**Entscheidung** (nach „Schritt C“, Entscheidung): Der Prompt bleibt, **D entfällt**. Ein Orts-Gate in der Pflege gibt es nicht.
+
+**Grenzen:**
+- In beiden Fallen hilft ein Katalog-Hinweis (musikfuechse: Kürzel N-/F-; Ohana: Präfix „NDE“). Die Fälle messen damit den Nachtlauf, wie er ist; ein fremder Ort ohne Hinweis ist leichter zu verfehlen. Eine Seite, die der Seitenfinder (S1) neu anhängt, hat anfangs keinen solchen Hinweis. Die Abnahme je Seite (Ziel 2) bleibt deshalb die Absicherung, und die Falle wird bei der ersten angehängten Seite mit fremdem Ort um einen Fall ohne Hinweis ergänzt.
+- Der Scan belegt nur den heutigen Bestand: In 13 von 15 Fällen gibt es am fremden Ort kein Angebot für 0–3 mit Termin.
+
+**Nebenbefunde für die Katalogpflege** (Skill `babyevents-nuernberg`, nicht Teil dieses Plans):
+- Ohana Burgfarrnbach (Hintere Straße 112, Fürth; Baby-, Mini- und Maxi-Kurse) ist ein Kandidat für einen zweiten Ohana-Ort.
+- Im Bestand von `fbs-nuernberg` stehen Extraktionsfehler: Abenteuerturnen doppelt, zwei erfundene MilchZeit-Termine (02.12., 16.12.), uneinheitliche Felder bei zwei inhaltsgleichen Kursen. Das Eval-Soll ist korrigiert, der Bestand nicht (nie von Hand).
+- `staatstheater-nuernberg-familie`: Haiku fand auf der großen Spielplanseite einmal kein einziges Angebot (siehe oben); das Gate hält, bis sich die Seite ändert.
 
 ## Nutzerentscheide (offen)
 

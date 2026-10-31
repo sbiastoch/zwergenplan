@@ -1,5 +1,5 @@
 {
- "basis": "data/offers.json vom 2026-10-04T14:05:37+02:00, von Hand gegen input.json geprüft am 2026-10-11 (Korrekturen in NOTES.md)",
+ "basis": "data/offers.json vom 2026-10-04T14:05:37+02:00, von Hand gegen input.json geprüft am 2026-10-11 (Korrekturen in NOTES.md); Fürther Kurse (Poppenreuth) ergänzt am 2026-10-31 nach Katalogstand 563de13",
  "window": {
   "from": "2026-10-11",
   "to": "2027-02-04"
@@ -248,6 +248,300 @@
     "2026-10-26T15:30:00+01:00",
     "2026-11-09T15:30:00+01:00",
     "2026-11-16T15:30:00+01:00"
+   ]
+  },
+  {
+   "id": "kc3n0i74",
+   "title": "Musikfüchse Baby I, Do 10:30 (ab 26.11.2026)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-26T10:30:00+01:00",
+    "2026-12-03T10:30:00+01:00",
+    "2026-12-10T10:30:00+01:00",
+    "2026-12-17T10:30:00+01:00",
+    "2027-01-14T10:30:00+01:00",
+    "2027-01-21T10:30:00+01:00",
+    "2027-01-28T10:30:00+01:00",
+    "2027-02-04T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "0ul3nxc2",
+   "title": "Musikfüchse Baby II, Do 9:30 (ab 26.11.2026)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-26T09:30:00+01:00",
+    "2026-12-03T09:30:00+01:00",
+    "2026-12-10T09:30:00+01:00",
+    "2026-12-17T09:30:00+01:00",
+    "2027-01-14T09:30:00+01:00",
+    "2027-01-21T09:30:00+01:00",
+    "2027-01-28T09:30:00+01:00",
+    "2027-02-04T09:30:00+01:00"
+   ]
+  },
+  {
+   "id": "7pzumj6i",
+   "title": "Musikfüchse Baby I+II, Do 15:30 (ab 26.11.2026)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-26T15:30:00+01:00",
+    "2026-12-03T15:30:00+01:00",
+    "2026-12-10T15:30:00+01:00",
+    "2026-12-17T15:30:00+01:00",
+    "2027-01-14T15:30:00+01:00",
+    "2027-01-21T15:30:00+01:00",
+    "2027-01-28T15:30:00+01:00",
+    "2027-02-04T15:30:00+01:00"
+   ]
+  },
+  {
+   "id": "7p333ciz",
+   "title": "Musikfüchse Baby I, Do 10:30 (ab 17.09.2026)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-15T10:30:00+02:00",
+    "2026-10-22T10:30:00+02:00",
+    "2026-10-29T10:30:00+01:00",
+    "2026-11-12T10:30:00+01:00",
+    "2026-11-19T10:30:00+01:00"
+   ]
+  },
+  {
+   "id": "ga2v9qyy",
+   "title": "Musikfüchse Baby II, Do 9:30 (ab 17.09.2026)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-15T09:30:00+02:00",
+    "2026-10-22T09:30:00+02:00",
+    "2026-10-29T09:30:00+01:00",
+    "2026-11-12T09:30:00+01:00",
+    "2026-11-19T09:30:00+01:00"
+   ]
+  },
+  {
+   "id": "fap6o5xy",
+   "title": "Musikfüchse Baby I+II, Do 15:30 (ab 17.09.2026)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-15T15:30:00+02:00",
+    "2026-10-22T15:30:00+02:00",
+    "2026-10-29T15:30:00+01:00",
+    "2026-11-12T15:30:00+01:00",
+    "2026-11-19T15:30:00+01:00"
+   ]
+  },
+  {
+   "id": "vuxwtac1",
+   "title": "Musikfüchse I, Di 15:30, Start 24.11.2026 (18 Mon.–3 J.)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-24T15:30:00+01:00",
+    "2026-12-01T15:30:00+01:00",
+    "2026-12-08T15:30:00+01:00",
+    "2026-12-15T15:30:00+01:00",
+    "2026-12-22T15:30:00+01:00",
+    "2027-01-12T15:30:00+01:00",
+    "2027-01-19T15:30:00+01:00",
+    "2027-01-26T15:30:00+01:00"
+   ]
+  },
+  {
+   "id": "rbexe0ek",
+   "title": "Musikfüchse I & II, Di 16:30, Start 24.11.2026 (18 Mon.–4,5 J.)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-24T16:30:00+01:00",
+    "2026-12-01T16:30:00+01:00",
+    "2026-12-08T16:30:00+01:00",
+    "2026-12-15T16:30:00+01:00",
+    "2026-12-22T16:30:00+01:00",
+    "2027-01-12T16:30:00+01:00",
+    "2027-01-19T16:30:00+01:00",
+    "2027-01-26T16:30:00+01:00"
+   ]
+  },
+  {
+   "id": "685kq90t",
+   "title": "Musikfüchse I & II, Do 16:30, Start 26.11.2026 (18 Mon.–4,5 J.)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-11-26T16:30:00+01:00",
+    "2026-12-03T16:30:00+01:00",
+    "2026-12-10T16:30:00+01:00",
+    "2026-12-17T16:30:00+01:00",
+    "2027-01-14T16:30:00+01:00",
+    "2027-01-21T16:30:00+01:00",
+    "2027-01-28T16:30:00+01:00",
+    "2027-02-04T16:30:00+01:00"
+   ]
+  },
+  {
+   "id": "wtvvdshx",
+   "title": "Musikfüchse I, Di 15:30, Start 15.09.2026 (18 Mon.–3 J.)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-13T15:30:00+02:00",
+    "2026-10-20T15:30:00+02:00",
+    "2026-10-27T15:30:00+01:00",
+    "2026-11-10T15:30:00+01:00",
+    "2026-11-17T15:30:00+01:00"
+   ]
+  },
+  {
+   "id": "1cun9o0s",
+   "title": "Musikfüchse I & II, Di 16:30, Start 15.09.2026 (18 Mon.–4,5 J.)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-13T16:30:00+02:00",
+    "2026-10-20T16:30:00+02:00",
+    "2026-10-27T16:30:00+01:00",
+    "2026-11-10T16:30:00+01:00",
+    "2026-11-17T16:30:00+01:00"
+   ]
+  },
+  {
+   "id": "uhkesa1k",
+   "title": "Musikfüchse I & II, Do 16:30, Start 17.09.2026 (18 Mon.–4,5 J.)",
+   "venueId": "musikfuechse-poppenreuth",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "topics": [
+    "musik",
+    "singen"
+   ],
+   "category": "musik",
+   "availability": {
+    "status": "frei"
+   },
+   "starts": [
+    "2026-10-15T16:30:00+02:00",
+    "2026-10-22T16:30:00+02:00",
+    "2026-10-29T16:30:00+01:00",
+    "2026-11-12T16:30:00+01:00",
+    "2026-11-19T16:30:00+01:00"
    ]
   }
  ]

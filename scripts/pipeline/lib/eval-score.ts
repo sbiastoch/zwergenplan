@@ -25,8 +25,11 @@ export const CASE_KINDS = [
   "gross",
   "keine-termine",
 ] as const;
-/** Fallen (E9): Die richtige Antwort lässt diese Angebote weg. */
-export const TRAPS = ["ab-3-jahren", "eltern-ohne-kind", "vergangen"] as const;
+/**
+ * Fallen (E9): Die richtige Antwort lässt diese Angebote weg. `fremder-ort` (Plan 0049, Nachtrag 2, C): Angebote an
+ * einem Ort außerhalb des Katalogauszugs; sie stehen in `expected.excluded` und dürfen keinem Katalogort zufallen.
+ */
+export const TRAPS = ["ab-3-jahren", "eltern-ohne-kind", "vergangen", "fremder-ort"] as const;
 
 const Instant = z.iso.datetime({ offset: true, local: false });
 const IsoDate = z.iso.date();
@@ -71,12 +74,21 @@ export const EvalOffer = z.strictObject({
 });
 export type EvalOffer = z.infer<typeof EvalOffer>;
 
+/** Angebot an einem Ort außerhalb des Katalogauszugs (Falle `fremder-ort`): Titel und Beginnzeiten im Fenster. */
+export const EvalExcluded = z.strictObject({
+  title: z.string().min(1),
+  starts: z.array(Instant).min(1),
+});
+export type EvalExcluded = z.infer<typeof EvalExcluded>;
+
 export const EvalExpected = z.strictObject({
   /** Herkunft, etwa „data/offers.json vom 2026-10-04, von Hand geprüft (NOTES.md)“ */
   basis: z.string().min(1),
   /** bewertet werden nur Termine, deren Berliner Kalendertag hier liegt */
   window: z.strictObject({ from: IsoDate, to: IsoDate }),
   offers: z.array(EvalOffer),
+  /** Falle `fremder-ort`: Angebote, die an einem fremden Ort stattfinden und deshalb nicht in `offers` stehen */
+  excluded: z.array(EvalExcluded).optional(),
 });
 export type EvalExpected = z.infer<typeof EvalExpected>;
 
@@ -166,6 +178,20 @@ export interface CaseScore {
   fields: Record<Field, Hits>;
   /** vorhergesagte Angebote, deren `category` zu keinem ihrer Themen passt (Plan 0037, E10); Bezug `offers.predicted` */
   categoryConflicts: number;
+  /** vorhergesagte Angebote, die einem `excluded`-Eintrag entsprechen: an einen Katalogort verlegt (Falle `fremder-ort`) */
+  misplaced: number;
+}
+
+/**
+ * Fehlverortet: ähnlicher Titel **und** mindestens ein gemeinsamer Beginn mit einem `excluded`-Eintrag, gleich an
+ * welchem Katalogort. Der Titel allein reicht nicht, denn derselbe Kurs läuft oft auch am eigenen Ort (musikfuechse).
+ */
+function countMisplaced(excluded: readonly EvalExcluded[], predicted: readonly EvalOffer[]): number {
+  const startsOf = (starts: readonly string[]) => new Set(starts.map((s) => Date.parse(s)));
+  const ex = excluded.map((e) => ({ title: e.title, starts: startsOf(e.starts) }));
+  return predicted.filter((p) =>
+    ex.some((e) => similarTitle(e.title, p.title) && p.starts.some((s) => e.starts.has(Date.parse(s)))),
+  ).length;
 }
 
 const emptyFields = (): Record<Field, Hits> => ({
@@ -192,7 +218,11 @@ const fieldHit: Record<Field, (a: EvalOffer, b: EvalOffer) => boolean> = {
  * Bewertung eines Falls: Termine 1:1 über Ort und Beginn (bei mehreren Angeboten am selben Ort und Beginn zuerst
  * Paare mit ähnlichem Titel), Angebote 1:1 über die meisten gemeinsamen Termine, Feldtreffer je Angebotspaar.
  */
-export function scoreCase(expected: readonly EvalOffer[], predicted: readonly EvalOffer[]): CaseScore {
+export function scoreCase(
+  expected: readonly EvalOffer[],
+  predicted: readonly EvalOffer[],
+  excluded: readonly EvalExcluded[] = [],
+): CaseScore {
   const slots = (offers: readonly EvalOffer[]) => {
     const m = new Map<string, number[]>();
     offers.forEach((o, i) => {
@@ -249,6 +279,7 @@ export function scoreCase(expected: readonly EvalOffer[], predicted: readonly Ev
     offers: { expected: expected.length, predicted: predicted.length, matched: usedE.size },
     fields,
     categoryConflicts: predicted.filter((o) => !categoriesOf(o.topics).includes(o.category)).length,
+    misplaced: countMisplaced(excluded, predicted),
   };
 }
 
@@ -274,6 +305,8 @@ export interface Summary {
   fields: Record<Field, Hits>;
   /** vorhergesagte Angebote mit `category` ohne passendes Thema, über alle Fälle; Bezug `offers.predicted` */
   categoryConflicts: number;
+  /** fehlverortete Angebote über alle Fälle (Falle `fremder-ort`) */
+  misplaced: number;
   costUsd: number;
   durationMs: number;
 }
@@ -310,6 +343,7 @@ export function summarize(results: readonly CaseResult[]): Summary {
     offerPrecision: ratio(offers.matched, offers.predicted),
     fields,
     categoryConflicts: results.reduce((n, r) => n + r.score.categoryConflicts, 0),
+    misplaced: results.reduce((n, r) => n + r.score.misplaced, 0),
     costUsd: calls.reduce((s, c) => s + (c.costUsd ?? 0), 0),
     durationMs: calls.reduce((s, c) => s + c.durationMs, 0),
   };
@@ -328,7 +362,7 @@ export function promptHash(parts: { prompt: string; schema: string }): string {
 }
 
 export const RESULTS_HEADER = [
-  "| Datum | Modell | Prompt-Hash | Fälle gültig | Aufrufe gültig | Termine R | Termine P | Angebote R | Angebote P | format | Platzstand | cost | registration | topics | category | Kat. ohne Thema | Kosten (USD, Schätzung) | Dauer | je Fall (Termine R/P in %, FP = falsch positive Termine) |",
+  "| Datum | Modell | Prompt-Hash | Fälle gültig | Aufrufe gültig | Termine R | Termine P | Angebote R | Angebote P | format | Platzstand | cost | registration | topics | category | Kat. ohne Thema | Kosten (USD, Schätzung) | Dauer | je Fall (Termine R/P in %, FP = falsch positive Termine, fehlverortet = Angebote an fremdem Ort) |",
   "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
 ].join("\n");
 
@@ -340,8 +374,10 @@ function perCase(r: CaseResult): string {
   const name = shortName(r.name);
   if (r.outcome === "fehler") return `${name} fehler`;
   const s = r.score.sessions;
-  if (s.expected === 0) return `${name} FP ${s.predicted}`;
-  return `${name} ${pct(ratio(s.matched, s.expected))}/${pct(ratio(s.matched, s.predicted))}`;
+  // ohne eigene Spalte, damit ältere Zeilen in results.md ihre Spaltenzahl behalten
+  const misplaced = r.score.misplaced > 0 ? ` fehlverortet ${r.score.misplaced}` : "";
+  if (s.expected === 0) return `${name} FP ${s.predicted}${misplaced}`;
+  return `${name} ${pct(ratio(s.matched, s.expected))}/${pct(ratio(s.matched, s.predicted))}${misplaced}`;
 }
 
 /** Eine Tabellenzeile für `evals/results.md`. */
