@@ -181,16 +181,30 @@ export interface ExtractKey {
  * extrahierte jede neue Epoche alles neu, auch wo der Text gleich bleibt.
  *
  * Grenzen des Pins (Arch-Review B, M1):
- * - Die Abrufart (`--abruf alt|neu`, `io/http.ts`) liegt vor `programmeText` und ist nicht pinbar. Wer sie für den
- *   Nachtlauf umschaltet, erhöht die Epoche von Hand im selben Commit.
+ * - Die Abrufart (`--abruf alt|neu`, `io/http.ts`) liegt vor `programmeText` und ist nicht pinbar. Sie ist per
+ *   Workflow-Start ohne Commit umschaltbar und geht deshalb selbst in die Fassung (`fassung` von `extractKey`,
+ *   Arch-Review 2, M2); die Epoche braucht dafür keine Erhöhung von Hand.
  * - `LLM_MODEL_FALLBACK` gehört bewusst nicht zur Fassung: Der zweite Versuch läuft nur nach einer Schlüsseländerung,
  *   mit demselben Schlüssel wie der erste; das Gate hat dann schon über die Fassung des Laufs entschieden.
  */
 export const INPUT_EPOCH = 1;
 
-/** Hash der Fassung: Bestandteile des Schlüssels außer der Eingabe, dazu `INPUT_EPOCH`. */
-function partsHashOf(parts: KeyParts): string {
-  const sorted = Object.entries({ ...parts, epoch: String(INPUT_EPOCH) }).sort(([a], [b]) => a.localeCompare(b));
+/**
+ * Weitere Bestandteile der Fassung außerhalb des Schlüssels (Arch-Review 2, M2), mit dem Wert des heutigen Nachtlaufs.
+ * Ein Eintrag mit diesem Wert geht nicht in `partsHashOf` ein: So bleibt `partsHash` bitgleich zum Stand vor dem Umbau,
+ * und ohne Angabe (Tests, Entdecken) gilt der Nachtlauf. Nur ein abweichender Wert ändert die Fassung.
+ */
+const FASSUNG_STANDARD: Readonly<Record<string, string>> = { abruf: "neu" };
+
+/** Hash der Fassung: Bestandteile des Schlüssels außer der Eingabe, dazu `INPUT_EPOCH` und abweichende `fassung`. */
+function partsHashOf(parts: KeyParts, fassung: Readonly<Record<string, string>> = {}): string {
+  // mit Präfix, damit ein Eintrag der Fassung keinen Bestandteil des Schlüssels überschreibt
+  const extra = Object.entries(fassung)
+    .filter(([k, v]) => FASSUNG_STANDARD[k] !== v)
+    .map(([k, v]) => [`fassung:${k}`, v] as const);
+  const sorted = Object.entries({ ...parts, epoch: String(INPUT_EPOCH), ...Object.fromEntries(extra) }).sort(
+    ([a], [b]) => a.localeCompare(b),
+  );
   return createHash("sha256").update(JSON.stringify(sorted)).digest("hex");
 }
 
@@ -198,7 +212,12 @@ function partsHashOf(parts: KeyParts): string {
 export function extractKey(
   input: { pages: HashInput["pages"]; candidates: readonly Candidate[] },
   parts: KeyParts,
-  opts: { today: string; orderFree?: boolean },
+  opts: {
+    today: string;
+    orderFree?: boolean;
+    /** Fassung außerhalb des Schlüssels, etwa die Abrufart; geht nur in `parts` ein (`FASSUNG_STANDARD`) */
+    fassung?: Readonly<Record<string, string>>;
+  },
 ): ExtractKey {
   const items: Array<{ day: string; text: string }> = [];
   const pages = input.pages.map((p) => {
@@ -227,7 +246,7 @@ export function extractKey(
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([day, texts]) => [day, createHash("sha256").update(JSON.stringify(texts.sort())).digest("hex")]),
   );
-  return { hash, dated, parts: partsHashOf(parts) };
+  return { hash, dated, parts: partsHashOf(parts, opts.fassung) };
 }
 
 /** Gleiche Eingabe für die Extraktion: gleicher Grundschlüssel und gleiche datierte Bestandteile ab `today`. */

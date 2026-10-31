@@ -30,6 +30,7 @@ import { planFetch } from "../lib/select.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
 import { readCatalog, readPreviousOffers, readRawDir, removeRaw, writeJson, writeOffers, writeRaw } from "./files.ts";
 import { loadFreeDays } from "./holidays.ts";
+import type { Abruf } from "./http.ts";
 import { runIdGate } from "./id-gate.ts";
 import { refreshProvider } from "./refresh.ts";
 
@@ -70,6 +71,11 @@ export interface NightlyOptions {
   judge?: Judge;
   /** Eintrag in `data/id-hinnehmen.yaml` für Anbieter und Beginn des Haltens; ohne: nichts hingenommen */
   accepted?: (providerId: string, heldSince: string) => { grund: string } | undefined;
+  /**
+   * Abrufart des Laufs (`--abruf`, `setAbruf`): geht in die Fassung des ID-Gates, nicht in den Schlüssel (Arch-Review 2,
+   * M2). Ohne Angabe die des Nachtlaufs (`neu`).
+   */
+  abruf?: Abruf;
   /** für Tests: Abruf und Ferien ohne Netz */
   fetch?: typeof fetchInputs;
   freeDays?: typeof loadFreeDays;
@@ -167,6 +173,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
           ...(o.strongRetry ? { mayRetry: mayGo } : {}),
           forceMigrate: force.has(provider.id),
           ...(o.accepted ? { acceptHeld: (since: string) => o.accepted?.(provider.id, since) !== undefined } : {}),
+          ...(o.abruf ? { abruf: o.abruf } : {}),
           freeDays,
           today: o.today,
           now: fetchedAt,

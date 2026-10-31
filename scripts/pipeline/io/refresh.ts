@@ -27,6 +27,7 @@ import type { NightlyReport } from "../lib/report.ts";
 import type { ExpandWindow } from "../lib/schedule.ts";
 import { KANDIDATEN, type UnitDef, unitExcerpt, unitsOf } from "../lib/units.ts";
 import { RAW_DIR, readRaw, writeRaw } from "./files.ts";
+import type { Abruf } from "./http.ts";
 
 export interface RefreshOptions {
   provider: Anbieter;
@@ -60,6 +61,8 @@ export interface RefreshOptions {
   outDir?: string;
   /** ID-Gate (ADR 0041): Hat ein Mensch das seit `heldSince` gehaltene Ergebnis hingenommen (`data/id-hinnehmen.yaml`)? */
   acceptHeld?: (heldSince: string) => boolean;
+  /** Abrufart des Laufs (`setAbruf`), Teil der Fassung (Arch-Review 2, M2); ohne Angabe die des Nachtlaufs */
+  abruf?: Abruf;
 }
 
 type UnitResult = RefreshResult | "offen";
@@ -313,6 +316,7 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
       now: o.now,
       freeDays: o.freeDays,
       ...(prev?.held && o.acceptHeld?.(prev.held.since) ? { acceptHeld: true } : {}),
+      ...(o.abruf ? { abruf: o.abruf } : {}),
     };
     const r = await refreshUnit(o, ctx, calls);
     if (r.kind !== "done") {

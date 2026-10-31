@@ -12,7 +12,8 @@ import { extractKey, INPUT_EPOCH, normalizeText } from "./normalize.ts";
  * Gepinnt ist die ganze Kette einer eingefrorenen Einheit (Arch-Review B, M1): Seitentext je Art (`programmeText` für
  * HTML, iCal und PDF), Zusammensetzung des Einheitentexts (`assembleProvider`: Seitenköpfe, Kandidaten-Abschnitt,
  * Leerraum) und der Schlüssel selbst (`extractKey`: Grundhash samt `ORDER_FREE_KEY`, reihenfolgefreier Hash, `dated`).
- * Die Abrufart (`--abruf alt|neu`) liegt davor und ist hier nicht pinbar (Kopfkommentar von `INPUT_EPOCH`).
+ * Die Abrufart (`--abruf alt|neu`) liegt davor und ist hier nicht pinbar; sie geht als eigener Bestandteil in die
+ * Fassung ein (`fassung` von `extractKey`, Arch-Review 2, M2), nicht in den Schlüssel.
  */
 const PAGES: ReadonlyArray<{ kind: "html" | "ical" | "pdf"; url: string; body: string }> = [
   {
