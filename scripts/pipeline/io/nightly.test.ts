@@ -10,7 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { parse, stringify } from "yaml";
 import { validateDataset } from "../../../src/domain/dataset.ts";
 import type { Provider } from "../../../src/domain/schema.ts";
@@ -31,9 +31,34 @@ const TODAY = "2026-10-06";
 const NOW = () => "2026-10-06T03:00:00+02:00";
 const KEY_PARTS = { prompt: "Prompt", schema: "{}", model: "haiku" };
 
+/**
+ * Eingriff in `buildFromState` für die Fehlerpfade des ID-Gates: Ein Build, der nur in der Mischung aus übernommenen
+ * und gehaltenen Einheiten scheitert, lässt sich mit echten Daten nicht herstellen (Dubletten über Einheiten hinweg
+ * räumt `mergeParts` ab, Fehler innerhalb einer Einheit haben (a) oder (b) schon). Standard: unverändert durchreichen.
+ */
+const buildHook: { fail?: ((callIndex: number) => boolean) | undefined; calls: number } = vi.hoisted(() => ({
+  calls: 0,
+}));
+vi.mock("../lib/build-offers.ts", async (importOriginal) => {
+  const orig = await importOriginal<typeof import("../lib/build-offers.ts")>();
+  return {
+    ...orig,
+    buildFromState: (o: Parameters<typeof orig.buildFromState>[0]) => {
+      const index = buildHook.calls++;
+      const r = orig.buildFromState(o);
+      if (!buildHook.fail?.(index)) return r;
+      const { file: _f, ...rest } = r;
+      return { ...rest, report: { ...r.report, errors: [...r.report.errors, "Testfehler im Build"] } };
+    },
+  };
+});
+
 const dirs: string[] = [];
 afterEach(() => {
   for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
+  buildHook.fail = undefined;
+  buildHook.calls = 0;
+  vi.restoreAllMocks();
 });
 
 function tempData() {
@@ -1271,6 +1296,145 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     expect(j2.seen).toHaveLength(1);
     expect(n2.r.build.errors).toEqual([]);
     expectInherited(dirsOf, ids);
+  });
+
+  it("Fehler im Gate selbst (Ausnahme beim Hinnehmen): alle gated Einheiten grenze, der Lauf baut, IDs bleiben", async () => {
+    const { dirsOf, ids } = await baseline(true);
+    const events = (u: string) => (u === UNIT_B ? [massageNeu] : renamed);
+    await gateNight(dirsOf, { judge: fakeJudge(all("unklar")).judge, events });
+    expect([rawUnit(dirsOf, UNIT_A)?.held?.reason, rawUnit(dirsOf, UNIT_B)?.held?.reason]).toEqual([
+      "unklar",
+      "unklar",
+    ]);
+    // `accepted` fragt erst `refreshProvider` je gehaltener Einheit (2×), dann das Gate: dort wirft es
+    let asked = 0;
+    const j = fakeJudge(sameByNumber);
+    const { r } = await gateNight(dirsOf, {
+      judge: j.judge,
+      events,
+      extra: {
+        accepted: () => {
+          asked++;
+          if (asked > 2) throw new Error("Hinnehmen kaputt");
+          return { grund: "geprüft" };
+        },
+      },
+    });
+    expect(asked).toBe(3);
+    expect(j.seen).toEqual([]);
+    expect(r.build.errors).toEqual([]);
+    expect(r.build.written).toBeDefined();
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    expect([rawUnit(dirsOf, UNIT_A)?.held?.reason, rawUnit(dirsOf, UNIT_B)?.held?.reason]).toEqual([
+      "grenze",
+      "grenze",
+    ]);
+    expect(r.idGate?.map((e) => [e.unit, e.outcome, e.held]).sort()).toEqual(
+      [
+        [UNIT_A, "gehalten", "grenze"],
+        [UNIT_B, "gehalten", "grenze"],
+      ].sort(),
+    );
+    expect(r.idGate?.every((e) => e.note?.startsWith("ID-Gate: Hinnehmen kaputt"))).toBe(true);
+  });
+
+  it("Nachprüfung scheitert (Build der Mischung rot): alle gated Einheiten gehalten, IDs bleiben", async () => {
+    const { dirsOf, ids } = await baseline();
+    // Builds der Nacht: (b), (a), Nachprüfung, Build danach; nur die Nachprüfung scheitert
+    buildHook.calls = 0;
+    buildHook.fail = (i) => i === 2;
+    const j = fakeJudge(sameByNumber);
+    const { r } = await gateNight(dirsOf, { judge: j.judge });
+    expect(j.seen).toHaveLength(1);
+    expect(buildHook.calls).toBe(4);
+    expect(r.build.errors).toEqual([]);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    const unit = rawUnit(dirsOf);
+    expect(unit?.held?.reason).toBe("grenze");
+    expect(unit?.events.map((e) => e.title)).toEqual(treffs.map((e) => e.title));
+    // gehalten ist das Ergebnis der neuen Fassung ohne das Erbe, das nicht nachgeprüft werden konnte
+    expect(unit?.held?.events.some((e) => e.keepIds)).toBe(false);
+    expect(r.idGate).toEqual([
+      expect.objectContaining({
+        unit: UNIT_A,
+        outcome: "gehalten",
+        held: "grenze",
+        note: expect.stringMatching(/^Build nach den Urteilen gescheitert: .*Testfehler im Build/),
+      }),
+    ]);
+  });
+
+  /** Uhr des Laufs: verschiebt `performance.now` ab dem Aufruf von `jump` um `ms` (Zeitbudget, Frist des Richters) */
+  function clock() {
+    const real = performance.now.bind(performance);
+    let offset = 0;
+    let first: number | undefined;
+    vi.spyOn(performance, "now").mockImplementation(() => {
+      const t = real() + offset;
+      first ??= t;
+      return t;
+    });
+    return {
+      /** auf `min` Minuten seit dem ersten Ablesen (Laufstart) springen, minus `restMs` */
+      jumpTo: (min: number, restMs = 0) => {
+        offset += min * 60_000 - restMs - (real() + offset - (first ?? real()));
+      },
+    };
+  }
+
+  /**
+   * Echte Wartezeit: `AbortSignal.timeout` läuft über Node-interne Timer, die weder `performance.now` noch Fake-Timer
+   * steuern. 2 s Rest reichen für die beiden Gate-Builds vor dem Aufruf auch unter Last; das Zeitlimit des Tests
+   * (15 s statt 5 s) deckt Rest plus Lauf unter der Last paralleler Sessions.
+   */
+  const FRIST_REST_MS = 2000;
+  it("Frist des Richters läuft während des Aufrufs ab: der Aufruf wird abgebrochen, gehalten mit grenze", {
+    timeout: 15_000,
+  }, async () => {
+    const { dirsOf, ids } = await baseline();
+    const c = clock();
+    const aborted: unknown[] = [];
+    const judge: Judge = (_input, signal) =>
+      new Promise((resolve) => {
+        const done = () => {
+          aborted.push(signal.reason);
+          resolve({ outcome: { kind: "fehler", reason: "Aufruf abgebrochen" }, calls: [call("judge", PROVIDER)] });
+        };
+        if (signal.aborted) done();
+        else signal.addEventListener("abort", done, { once: true });
+      });
+    const started = Date.now();
+    const { r } = await gateNight(dirsOf, {
+      judge,
+      events: () => {
+        // bis kurz vor die Frist: Der Richter darf anfangen, die Frist endet in seinem Aufruf
+        c.jumpTo(70, FRIST_REST_MS);
+        return renamed;
+      },
+    });
+    expect(aborted).toHaveLength(1);
+    expect(Date.now() - started).toBeGreaterThanOrEqual(FRIST_REST_MS - 1000);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    expect(rawUnit(dirsOf)?.held?.reason).toBe("grenze");
+    expect(r.idGate?.[0]).toMatchObject({ outcome: "gehalten", held: "grenze", note: "Aufruf abgebrochen" });
+  });
+
+  it("Waise nach geänderter Katalog-URL: die neue Einheit ist nicht gated, kein Richter (m7)", async () => {
+    const { dirsOf } = await baseline();
+    const file = join(dirsOf.dataDir, "providers.yaml");
+    const entries = parse(readFileSync(file, "utf8")) as Array<{ id: string; programme: Array<{ url: string }> }>;
+    const ft = entries.find((p) => p.id === PROVIDER);
+    if (ft?.programme[0]) ft.programme[0].url = "https://example.org/familientreff/neu";
+    writeFileSync(file, stringify(entries));
+    const j = fakeJudge(all("unklar"));
+    // neue Fassung zugleich: Ohne Vorstand der neuen Einheit gibt es nichts zu richten (ein Mensch änderte die URL)
+    const { r } = await gateNight(dirsOf, { judge: j.judge });
+    expect(j.seen).toEqual([]);
+    expect(r.idGate).toBeUndefined();
+    expect(r.warnings[PROVIDER]).toContain(`${UNIT_A}: entfällt (nicht mehr im Katalog)`);
+    expect(rawUnit(dirsOf)).toBeUndefined();
+    expect(rawUnit(dirsOf, "seite:https://example.org/familientreff/neu")?.held).toBeUndefined();
+    expect(Object.keys(idsByTitle(dirsOf)).sort()).toEqual(renamed.map((e) => e.title).sort());
   });
 
   it("ein Richter ohne Urteil zu einer verlorenen ID übernimmt nicht (fehlendes Urteil = unklar)", async () => {

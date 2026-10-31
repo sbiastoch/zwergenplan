@@ -615,6 +615,20 @@ describe("runDiscover (Plan 0032, E7)", () => {
     mkdirSync(join(d.dataDir, "discover"));
     writeFileSync(join(d.dataDir, "discover", "nuernberg.json"), JSON.stringify(held));
     const before = readFileSync(join(d.dataDir, "providers.yaml"), "utf8");
+    // Zustand des ausgeblendeten Anbieters aus einer anderen Fassung: Der Ertragsbeweis hat kein ID-Gate (ADR 0041,
+    // Punkt 8), er extrahiert frisch ins Laufverzeichnis und lässt data/raw unberührt
+    mkdirSync(join(d.dataDir, "raw"));
+    const rawFile = join(d.dataDir, "raw", "turnverein-beispiel.json");
+    const oldUnit = {
+      events: [],
+      inputHash: "h-alt",
+      partsHash: "f-alt",
+      model: "haiku",
+      status: "keine-termine",
+      checkedAt: "2026-10-01T03:00:00+02:00",
+    };
+    writeFileSync(rawFile, JSON.stringify({ version: 2, units: { "seite:https://example.org/alt": oldUnit } }));
+    const rawBefore = readFileSync(rawFile, "utf8");
     const turnverein = "https://example.org/turnverein";
     const tvKurse = `${turnverein}/kinderturnen`;
     const tv = assessOk("Turnverein Beispiel");
@@ -661,6 +675,15 @@ describe("runDiscover (Plan 0032, E7)", () => {
     // Mittwochs 14.10. bis 2.12.: acht Termine im Fenster bis +8 Wochen, alle am selben Ort
     expect(r.hidden?.outcomes[1]?.ertrag).toEqual({ treffer: 8, referenz: 8 });
     expect(existsSync(join(d.runDir, "referenz", "turnverein-beispiel.json"))).toBe(true);
+    expect(readFileSync(rawFile, "utf8")).toBe(rawBefore);
+    const proof: { units: Record<string, { partsHash?: string; held?: unknown }> } = JSON.parse(
+      readFileSync(join(d.runDir, "referenz", "turnverein-beispiel.json"), "utf8"),
+    );
+    const proofUnits = Object.values(proof.units);
+    expect(Object.keys(proof.units)).not.toContain("seite:https://example.org/alt");
+    expect(proofUnits.every((u) => u.held === undefined && u.partsHash !== undefined && u.partsHash !== "f-alt")).toBe(
+      true,
+    );
     expect(r.hidden?.extra.map((a) => [a.id, a.urteil?.urteil])).toEqual([["krabbelzwerge-gostenhof", "passend"]]);
     expect(r.calls.filter((c) => c.step === "extract")).toHaveLength(3);
     expect(JSON.parse(readFileSync(join(d.runDir, "report.json"), "utf8")).hidden.outcomes[1].ertrag).toEqual({
