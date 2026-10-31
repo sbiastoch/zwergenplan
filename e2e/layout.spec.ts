@@ -630,7 +630,9 @@ test.describe("Herz-Animation ohne Überlauf (320 px, Plan 0057, E2)", () => {
   });
 
   test("die Glocke behält `slap`", async ({ page }) => {
-    await page.getByRole("button", { name: "Kurse", exact: true }).click();
+    // seit Plan 0054, Nachtrag A nur noch Anbieter-Glocken: im Tab „Anbieter“
+    await page.goto("./?ansicht=anbieter");
+    await mapSettled(page);
     const bell = page.getByRole("button", { name: /abonnieren$/ }).first();
     await expect(bell).toBeVisible();
     const css = await bell.evaluate((el) => {
