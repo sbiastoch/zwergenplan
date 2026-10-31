@@ -648,3 +648,9 @@ Abweichungen bei der Umsetzung von S5, im Sinn des Plans entschieden:
 - `e2e/karte.spec.ts`: Der Test zum Startpunkt im Querformat wechselt ebenso über `setViewportSettled`; `TestMap` kennt `getContainer` und `getCanvas`.
 
 **Test:** `pnpm verify` grün. `e2e/anbieter-karte.spec.ts` und `e2e/karte.spec.ts` liefen mehrfach auf `pixel-7`, `pixel-7-quer`, `desktop` und `android-klein`.
+
+## Nachtrag S6 (2026-10-31)
+
+- **Budgets** in ADR 0012 fortgeschrieben: Start-JS 106,66 → 112,25 kB (+5,59 kB, geschätzt waren +2,5 bis +3,5 kB, E11), CSS 12,67 → 13,68 kB, Service Worker 9,10 → 9,17 kB. Die Grenzen (150 / 15 / 12 kB) halten.
+- **LCP**: Die Mehrbytes teilen sich im gedrosselten Smoke die Leitung mit `site.json` und verschoben das LCP mit echten Daten um etwa +85 ms (lokal je 7 Läufe, Median: a5dc5b5 2476, 88cfc54 2560 ms), knapp über die Grenze von 2500 ms. Statt Bytes zu sparen (Lazy-Chunk der Merkliste, ADR 0012, Option d, abgelehnt) speichert `berlinKey` den Berliner Schlüssel je Termin zwischen (58c641a); das CPU-Profil vor dem LCP fällt von etwa 310 auf 88 ms, das LCP auf 2416 ms. Der Puffer ist lokal etwa 80 ms; der nächste merkliche Zuwachs am Start-JS braucht „Merkliste als Lazy-Chunk“ (`docs/ideas.md`) und eine Nutzerentscheidung.
+- **`docs/ideas.md`**: erledigt „Freie Datumseingabe auf der Merkliste“, „Weitere Filter auf der Merkliste“ und der Restpunkt zum „Zurücksetzen“-Chip aus Plan 0025 (der zur quer abgeschnittenen Filterzeile bleibt, E10); neu „Stufen im Teilen-Fragment (Format v2)“ („Tageszeit in Such-Abos und Push“ kam schon mit S2).
