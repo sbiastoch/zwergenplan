@@ -42,6 +42,7 @@ interface TestMap {
   getPaintProperty: (layer: string, name: string) => unknown;
   getLayoutProperty: (layer: string, name: string) => unknown;
   loaded: () => boolean;
+  isMoving: () => boolean;
   once: (event: string, listener: () => void) => void;
 }
 declare global {
@@ -67,13 +68,16 @@ async function openMap(page: Page, path = "./?ansicht=karte") {
   await idle(page);
 }
 
-/** Wartet, bis die Karte nichts mehr lädt oder bewegt. */
+/**
+ * Wartet, bis die Karte nichts mehr lädt oder bewegt. `loaded()` allein reicht nicht: Es meint Stil und Kacheln, nicht
+ * die Kamera. Lief `fitBounds`/`easeTo` noch, maß der Test mitten im Übergang (Zoom um bis zu 0,008 daneben).
+ */
 async function idle(page: Page) {
   await page.evaluate(
     () =>
       new Promise<void>((resolve) => {
         const map = window.__zpMap;
-        if (!map || map.loaded()) resolve();
+        if (!map || (map.loaded() && !map.isMoving())) resolve();
         else map.once("idle", () => resolve());
       }),
   );
