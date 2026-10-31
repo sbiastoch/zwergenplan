@@ -253,6 +253,43 @@ describe("scoreCase", () => {
     expect(s.categoryConflicts).toBe(1);
   });
 
+  describe("fehlverortet (Falle fremder-ort, Plan 0049, Nachtrag 2, C)", () => {
+    const fuerth = { title: "Musikfüchse Krabbelgruppe", starts: ["2026-10-14T10:00:00+02:00"] };
+    it("zählt ein vorhergesagtes Angebot mit ähnlichem Titel und gemeinsamem Beginn, gleich an welchem Ort", () => {
+      const p = offer({ title: "Musikfüchse – Krabbelgruppe", venueId: "anderer-ort" });
+      expect(scoreCase([], [p], [fuerth]).misplaced).toBe(1);
+    });
+    it("gleicher Titel mit anderem Beginn ist nicht fehlverortet (derselbe Kurs am eigenen Ort)", () => {
+      const p = offer({ title: "Musikfüchse Krabbelgruppe", starts: ["2026-10-15T10:00:00+02:00"] });
+      expect(scoreCase([], [p], [fuerth]).misplaced).toBe(0);
+    });
+    it("gleicher Beginn mit fremdem Titel ist nicht fehlverortet", () => {
+      expect(scoreCase([], [offer({ title: "Babyschwimmen" })], [fuerth]).misplaced).toBe(0);
+    });
+    it("ohne excluded 0; ein Angebot zählt einmal, auch bei mehreren Treffern", () => {
+      expect(scoreCase([offer()], [offer()]).misplaced).toBe(0);
+      const p = offer({ title: "Musikfüchse Krabbelgruppe" });
+      expect(scoreCase([], [p], [fuerth, { ...fuerth, starts: [...fuerth.starts] }]).misplaced).toBe(1);
+    });
+    it("summiert über die Fälle und meldet es je Fall, wenn größer 0", () => {
+      const r: CaseResult[] = [
+        {
+          name: "musikfuechse-2026-10-31",
+          outcome: "ok",
+          score: scoreCase([offer()], [offer(), offer({ title: "Musikfüchse Krabbelgruppe" })], [fuerth]),
+          calls: [call()],
+        },
+        { name: "a-2026-10-11", outcome: "ok", score: scoreCase([offer()], [offer()]), calls: [call()] },
+      ];
+      const s = summarize(r);
+      expect(s.misplaced).toBe(1);
+      const row = resultsRow(s, r, { date: "d", model: "m", hash: "h" });
+      expect(row).toContain("musikfuechse 100/50 fehlverortet 1");
+      expect(row).toContain("; a 100/100");
+      expect(row).not.toContain("a 100/100 fehlverortet");
+    });
+  });
+
   it("keine erwarteten Termine (Falle): jeder vorhergesagte Termin ist falsch positiv", () => {
     const s = scoreCase([], [offer()]);
     expect(s.sessions).toEqual({ expected: 0, predicted: 2, matched: 0 });

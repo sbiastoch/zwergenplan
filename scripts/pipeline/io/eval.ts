@@ -182,6 +182,7 @@ function scoreRun(
   window: Window,
 ): CaseRun {
   const expected = c.expected.offers;
+  const excluded = c.expected.excluded ?? [];
   if (answer.kind === "fehler")
     return {
       name: c.name,
@@ -190,7 +191,7 @@ function scoreRun(
       answer,
       predicted: [],
       calls,
-      score: scoreCase(expected, []),
+      score: scoreCase(expected, [], excluded),
     };
   const built = predictOffers({
     events: answer.events,
@@ -201,8 +202,13 @@ function scoreRun(
   });
   const base = { name: c.name, answer, predicted: built.offers, calls };
   return built.errors.length > 0
-    ? { ...base, outcome: "fehler", reason: `Build: ${built.errors.join("; ")}`, score: scoreCase(expected, []) }
-    : { ...base, outcome: "ok", score: scoreCase(expected, built.offers) };
+    ? {
+        ...base,
+        outcome: "fehler",
+        reason: `Build: ${built.errors.join("; ")}`,
+        score: scoreCase(expected, [], excluded),
+      }
+    : { ...base, outcome: "ok", score: scoreCase(expected, built.offers, excluded) };
 }
 
 /** Details nach `outDir`, Zeile an `evals/results.md` (legt die Datei mit Kopf an, falls sie fehlt). */

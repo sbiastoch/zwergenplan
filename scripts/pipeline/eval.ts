@@ -65,7 +65,8 @@ function line(r: CaseRun): string {
   const cost = r.calls.reduce((n, c) => n + (c.costUsd ?? 0), 0);
   const secs = r.calls.reduce((n, c) => n + c.durationMs, 0) / 1000;
   const head = r.outcome === "ok" ? "✓" : `✗ ${r.reason ?? ""}`;
-  return `${head} ${r.name}: Termine ${s.matched}/${s.expected} erwartet, ${s.predicted} vorhergesagt; ${r.calls.length} Aufrufe, $${cost.toFixed(3)}, ${secs.toFixed(0)} s`;
+  const misplaced = r.score.misplaced > 0 ? `, ${r.score.misplaced} fehlverortet` : "";
+  return `${head} ${r.name}: Termine ${s.matched}/${s.expected} erwartet, ${s.predicted} vorhergesagt${misplaced}; ${r.calls.length} Aufrufe, $${cost.toFixed(3)}, ${secs.toFixed(0)} s`;
 }
 
 async function evaluate() {

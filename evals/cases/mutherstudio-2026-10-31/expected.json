@@ -1,0 +1,96 @@
+{
+ "basis": "data/offers.json vom 2026-10-31T12:53:21+01:00, von Hand gegen input.json geprüft am 2026-10-31 (Korrekturen in NOTES.md)",
+ "window": {
+  "from": "2026-10-31",
+  "to": "2027-10-31"
+ },
+ "offers": [
+  {
+   "id": "pqgsvjd5",
+   "title": "Mama-Baby-Yoga, Mittwochs (Nov.–Dez. 2026)",
+   "venueId": "mutherstudio",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "bewegung",
+   "topics": [
+    "yoga-mit-baby"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-11-11T10:45:00+01:00",
+    "2026-11-18T10:45:00+01:00",
+    "2026-11-25T10:45:00+01:00",
+    "2026-12-02T10:45:00+01:00",
+    "2026-12-09T10:45:00+01:00",
+    "2026-12-16T10:45:00+01:00",
+    "2026-12-23T10:45:00+01:00",
+    "2026-12-30T10:45:00+01:00"
+   ]
+  },
+  {
+   "id": "6ocn7teo",
+   "title": "Mama-Baby-Yoga, Mittwochs (Sept.–Nov. 2026)",
+   "venueId": "mutherstudio",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "bewegung",
+   "topics": [
+    "yoga-mit-baby"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-11-04T10:45:00+01:00"
+   ]
+  },
+  {
+   "id": "jd9rx573",
+   "title": "Waldspielracker Herbst 2026 (ca. 15 Monate–3 Jahre)",
+   "venueId": "mutherstudio-spielplatz-schiestlstrasse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "natur",
+   "topics": [
+    "waldgruppe"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-11-10T10:00:00+01:00",
+    "2026-11-17T10:00:00+01:00"
+   ]
+  },
+  {
+   "id": "1ipp0gdo",
+   "title": "Waldspielracker Winter 2026/27 (ca. 15 Monate–3 Jahre)",
+   "venueId": "mutherstudio-spielplatz-schiestlstrasse",
+   "format": "kurs",
+   "registration": "mit-anmeldung",
+   "cost": "kostenpflichtig",
+   "category": "natur",
+   "topics": [
+    "waldgruppe"
+   ],
+   "availability": {
+    "status": "unbekannt"
+   },
+   "starts": [
+    "2026-12-01T10:00:00+01:00",
+    "2026-12-08T10:00:00+01:00",
+    "2026-12-15T10:00:00+01:00",
+    "2027-01-26T10:00:00+01:00",
+    "2027-02-02T10:00:00+01:00",
+    "2027-02-16T10:00:00+01:00",
+    "2027-02-23T10:00:00+01:00",
+    "2027-03-02T10:00:00+01:00"
+   ]
+  }
+ ]
+}
