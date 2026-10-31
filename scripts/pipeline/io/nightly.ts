@@ -221,8 +221,12 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     // ID-Gate (ADR 0041): nach allen Anbietern, vor dem Build; eigene Bremse. Frist ab Laufstart (Arch-Review M2): Der
     // Richter urteilt nur bis Budget + JUDGE_BUDGET_MIN, ein laufender Aufruf bricht dort ab (Halten mit `grenze`).
     // Läuft die Schleife schon länger (Überhang bis Budget + 30), urteilt er gar nicht; die Marge des Jobs reicht so.
-    const restMs = Math.max(0, Math.floor((o.budgetMin + JUDGE_BUDGET_MIN - elapsedMin()) * 60_000));
+    const deadlineMin = o.budgetMin + JUDGE_BUDGET_MIN;
+    const restMs = Math.max(0, Math.floor((deadlineMin - elapsedMin()) * 60_000));
     const judgeSignal = AbortSignal.any([controller.signal, AbortSignal.timeout(restMs)]);
+    // `AbortSignal.timeout` feuert erst über die Ereignisschleife, auch bei 0: Vor jedem Aufruf zählt deshalb die Uhr
+    // selbst, sonst liefe nach abgelaufener Frist noch ein Aufruf an
+    const inTime = () => !judgeSignal.aborted && elapsedMin() < deadlineMin;
     const gate = await runIdGate({
       prev: before,
       next: { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(outDir) : {}) },
@@ -236,7 +240,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
       inputs: fetched.inputs,
       judge: o.judge,
       signal: judgeSignal,
-      mayJudge: (own) => !judgeSignal.aborted && judgeBrakeHit(own) === undefined,
+      mayJudge: (own) => inTime() && judgeBrakeHit(own) === undefined,
       accepted: o.accepted ?? (() => undefined),
     });
     calls.push(...gate.calls);

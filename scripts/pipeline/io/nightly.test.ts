@@ -1382,6 +1382,25 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     };
   }
 
+  it("Frist des Richters abgelaufen (Budget + JUDGE_BUDGET_MIN): kein Aufruf, gehalten mit grenze", async () => {
+    const { dirsOf, ids } = await baseline();
+    const c = clock();
+    const j = fakeJudge(sameByNumber);
+    const { r } = await gateNight(dirsOf, {
+      judge: j.judge,
+      events: () => {
+        // die Extraktion dauert bis über die Frist (50 + 20 Minuten)
+        c.jumpTo(71);
+        return renamed;
+      },
+    });
+    expect(j.seen).toEqual([]);
+    expect(r.calls.filter((x) => x.step === "judge")).toEqual([]);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    expect(rawUnit(dirsOf)?.held?.reason).toBe("grenze");
+    expect(r.idGate?.[0]).toMatchObject({ outcome: "gehalten", held: "grenze" });
+  });
+
   /**
    * Echte Wartezeit: `AbortSignal.timeout` läuft über Node-interne Timer, die weder `performance.now` noch Fake-Timer
    * steuern. 2 s Rest reichen für die beiden Gate-Builds vor dem Aufruf auch unter Last; das Zeitlimit des Tests
