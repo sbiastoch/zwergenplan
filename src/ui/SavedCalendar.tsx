@@ -8,6 +8,7 @@ import { monthDays, type Occurrence, type RangeAgenda, rangeAgenda } from "../do
 import { type CalendarNav, type CalendarSelection, calendarNav, clampDay, selectionRange } from "../domain/calendar.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { parseIsoDate } from "../domain/time.ts";
+import type { Category } from "../domain/topics.ts";
 import {
   longDate,
   monthTitle,
@@ -43,6 +44,9 @@ interface MonthAnchor {
 
 const termine = (n: number) => plural(n, "Termin", "Termine");
 
+/** Form eines Termins in Woche und Monat: vorgemerkt nur als Umriss in der Textfarbe (Plan 0057, E4) */
+const dotClass = (category: Category, tentative: boolean) => `k-${category}${tentative ? " tentative" : ""}`;
+
 export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFilter }: SavedCalendarProps) {
   const { index, allIndex, ageIndex, dataEnd, endedToday, selection, setSelection, monthOpen, setMonthOpen } = calendar;
   const context = { dataEnd, endedToday, allIndex, ageIndex };
@@ -65,6 +69,8 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
     if (target) setSelection({ unit, day: target });
   };
   const label = (d: string) => `${longDate(d)}, ${termine(itemsOf(d).length)}`;
+  // Vorgemerktes zeigt die Form nur als Umriss (Plan 0057, E4)
+  const tentative = (id: string) => ctx.stageOf(id) === "vorgemerkt";
 
   // Die Woche verschwindet beim Aufklappen (≈ 130 px). Der Knopf bleibt dasselbe Element (Fokus),
   // und die Seite scrollt vor dem Zeichnen so nach, dass er unter dem Finger bleibt.
@@ -104,6 +110,7 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
     <>
       {!monthOpen && (
         <WeekStrip
+          tentative={tentative}
           nav={nav}
           selection={selection}
           today={today}
@@ -120,6 +127,7 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
       </button>
       {monthOpen && (
         <MonthGrid
+          tentative={tentative}
           nav={nav}
           selection={selection}
           today={today}
@@ -148,6 +156,7 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
               item={item}
               ctx={ctx}
               numbered
+              markTentative
               calendarDay={group.day}
             />
           ))}
@@ -246,6 +255,8 @@ function RangeEmpty({
 }
 
 interface StripProps {
+  /** nur vorgemerkt: Form als Umriss */
+  tentative: (id: string) => boolean;
   nav: CalendarNav;
   selection: CalendarSelection;
   today: string;
@@ -277,7 +288,7 @@ function TitleButton({
   );
 }
 
-function WeekStrip({ nav, selection, today, count, itemsOf, label, select, go }: StripProps) {
+function WeekStrip({ tentative, nav, selection, today, count, itemsOf, label, select, go }: StripProps) {
   return (
     <>
       <div className="cal-nav">
@@ -327,7 +338,7 @@ function WeekStrip({ nav, selection, today, count, itemsOf, label, select, go }:
                   .map((o) => {
                     const c = o.offer.category;
                     return (
-                      <span key={`${o.offer.id}-${o.session.start}`} className={`k-${c}`}>
+                      <span key={`${o.offer.id}-${o.session.start}`} className={dotClass(c, tentative(o.offer.id))}>
                         <Shape category={c} ink={false} />
                       </span>
                     );
@@ -342,6 +353,7 @@ function WeekStrip({ nav, selection, today, count, itemsOf, label, select, go }:
 }
 
 function MonthGrid({
+  tentative,
   nav,
   selection,
   today,
@@ -403,8 +415,8 @@ function MonthGrid({
               onClick={() => onPick(d)}
             >
               {parseIsoDate(d).day}
-              {c && (
-                <span className={`k-${c}`}>
+              {c && first && (
+                <span className={dotClass(c, tentative(first.offer.id))}>
                   <Shape category={c} ink={false} />
                 </span>
               )}

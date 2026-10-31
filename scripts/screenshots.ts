@@ -92,6 +92,25 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 2)) await heart.click();
     await page.getByRole("button", { name: /^Merkliste/ }).click();
   },
+  // Herz mit Stufen (Plan 0057, E2, E3): erstes Herz vorgemerkt, zweites fest, Toast mit „Rückgängig“
+  herz: async (page) => {
+    const hearts = (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 2);
+    await hearts[0]?.click();
+    await hearts[1]?.click();
+    await hearts[1]?.click();
+    await page.getByRole("button", { name: "Rückgängig" }).waitFor();
+  },
+  // Wochenleiste und Agenda mit vorgemerkt und fest (Plan 0057, E4)
+  "merkliste-woche": async (page) => {
+    const hearts = (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3);
+    for (const [i, heart] of hearts.entries()) {
+      await heart.click();
+      if (i > 0) await heart.click();
+    }
+    await page.locator(".toast").waitFor({ state: "detached", timeout: 10_000 });
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+  },
   detail: async (page) => {
     await page.getByTestId("offer").first().getByRole("heading").getByRole("button").click();
     await page.getByRole("dialog").waitFor();

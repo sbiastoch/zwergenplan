@@ -6,7 +6,7 @@ import { collapsedSessions, sessionOnDay, upcomingSessions } from "../domain/age
 import { seriesIcsFileName, seriesIcsPath, sessionIcsPath } from "../domain/ics-paths.ts";
 import { isNewlyListed } from "../domain/listing.ts";
 import type { Origin, Reach } from "../domain/reach.ts";
-import { type ExportSelection, exportSessions, seriesExport } from "../domain/saved.ts";
+import { type ExportSelection, exportSessions, type SavedStage, seriesExport } from "../domain/saved.ts";
 import { ABOUT_DATA_PATH } from "../domain/share.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
@@ -30,7 +30,7 @@ import {
 } from "./format.ts";
 import { Icon, Shape } from "./icons.tsx";
 import { download, type IcsExport, loadExport } from "./ics-export.ts";
-import { DistPending, HeartButton } from "./OfferCard.tsx";
+import { DistPending, HeartButton, type HeartCycle, type HeartHold } from "./OfferCard.tsx";
 import { ReachLong } from "./ReachLong.tsx";
 import { LONG_TOAST_MS, type Say } from "./use-app-state.ts";
 import { WhereTile } from "./Ways.tsx";
@@ -48,8 +48,10 @@ interface DetailProps {
   reach: Reach | undefined;
   /** Wegzeit lädt: Platzhalter statt Entfernung (Plan 0009, E11) */
   reachPending: boolean;
-  saved: boolean;
-  onToggleSave: (offer: SiteOffer) => void;
+  /** Stufe auf der Merkliste und Herz-Aktionen (Plan 0057, E2) */
+  stage: SavedStage;
+  onCycle: HeartCycle;
+  onHold: HeartHold;
   /** Teilen per Link (Plan 0026, E6): synchron im Tipp */
   onShare: (offer: SiteOffer) => void;
   onClose: () => void;
@@ -71,8 +73,9 @@ export function DetailContent({
   origin,
   reach,
   reachPending,
-  saved,
-  onToggleSave,
+  stage,
+  onCycle,
+  onHold,
   onShare,
   onClose,
   onProvider,
@@ -148,7 +151,7 @@ export function DetailContent({
           <button type="button" className="iconbtn" onClick={() => onShare(offer)} aria-label="Teilen">
             <Icon name="share" />
           </button>
-          <HeartButton offer={offer} saved={saved} onToggle={onToggleSave} inline />
+          <HeartButton offer={offer} stage={stage} onCycle={onCycle} onHold={onHold} inline />
         </div>
       </div>
       <div className="dscroll">

@@ -6,6 +6,8 @@
   .body {
     --body-pad: 16px;
     padding: 0 var(--body-pad) 20px;
+    /* Funken und Ring des Herzens (Plan 0057, E2) ragen nie über den Rand; `clip` statt `hidden`: kein Scroll-Container */
+    overflow-x: clip;
   }
   .status {
     display: flex;

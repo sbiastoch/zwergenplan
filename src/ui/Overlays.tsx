@@ -84,7 +84,7 @@ export function Overlays(props: OverlaysProps) {
   const { birthDate, setBirthDate, theme, today, originApi, kidFallback, activeTab } = props;
   const { transit, providerId, openProvider, closeProvider } = props;
   const { origin } = originApi;
-  const { now, onToggleSave } = ctx;
+  const { now, onCycle, onHold } = ctx;
   // Teilen (Plan 0026, E6): Pfad nur aus der ID, nie aus `location`
   const { share, manualLink, closeManualLink } = useShare(say);
   const shareOffer = (offer: SiteOffer) => share({ title: offer.title, path: offerSharePath(offer.id) });
@@ -142,8 +142,9 @@ export function Overlays(props: OverlaysProps) {
             origin={origin}
             reach={ctx.reachOf(detailOffer)}
             reachPending={ctx.reachPending}
-            saved={ctx.isSaved(detailOffer.id)}
-            onToggleSave={onToggleSave}
+            stage={ctx.stageOf(detailOffer.id)}
+            onCycle={onCycle}
+            onHold={onHold}
             onShare={shareOffer}
             onClose={closeDetail}
             onProvider={onProvider}

@@ -1,8 +1,10 @@
 /** Angebots-Kachel (Plan 0003, E9): Kopfzeile mit Kategorie-Pille und Zeit, Titel, Meta, Fakten, Herz. */
-import { type MouseEvent, useState } from "react";
+import { type MouseEvent, type PointerEvent, useEffect, useRef, useState } from "react";
+import { vibrate } from "../data/haptics.ts";
 import type { Occurrence } from "../domain/agenda.ts";
 import { isNewlyListed } from "../domain/listing.ts";
 import type { Reach } from "../domain/reach.ts";
+import type { SavedStage } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
 import {
@@ -17,14 +19,18 @@ import {
   shortDate,
   timeRange,
 } from "./format.ts";
+import { type GestureEvent, HOLD_MS, heartGesture, IDLE_GESTURE, SWALLOW_MS } from "./heart-gesture.ts";
 import { Icon, Shape } from "./icons.tsx";
 
 /** Was jede Kachel von außen braucht – von allen Ansichten gemeinsam genutzt. */
 export interface CardContext {
   now: Date;
-  isSaved: (id: string) => boolean;
+  /** Stufe auf der Merkliste (Plan 0057, E1) */
+  stageOf: (id: string) => SavedStage;
   isUnfit: (id: string) => boolean;
-  onToggleSave: (offer: SiteOffer) => void;
+  /** Tipp aufs Herz und Halten (Plan 0057, E2) */
+  onCycle: HeartCycle;
+  onHold: HeartHold;
   /** Detail öffnen; `day` = gewählter Kalendertag (Termin im Kalender) */
   onOpen: (offer: SiteOffer, day?: string) => void;
   /** neu eingefügte Kacheln dürfen sich einkleben (nicht beim ersten Rendern, wegen LCP) */
@@ -42,6 +48,8 @@ interface OfferCardProps {
   dated?: boolean;
   /** Kurstermin mit seiner Stelle zeigen, „Termin 3 von 8“ (Merkliste) */
   numbered?: boolean;
+  /** Vorgemerktes absetzen: ohne Schatten, Rand gedämpft, Etikett „vorgemerkt“ (Kalender, Plan 0057, E4) */
+  markTentative?: boolean;
   /** Termin gehört zu einem gewählten Kalendertag (Kalender; Liste mit Zeitraum, Plan 0023, E7) */
   calendarDay?: string | undefined;
   /**
@@ -51,13 +59,22 @@ interface OfferCardProps {
   context?: "place" | "provider";
 }
 
-export function OfferCard({ item, ctx, dated = false, numbered = false, calendarDay, context }: OfferCardProps) {
+export function OfferCard({
+  item,
+  ctx,
+  dated = false,
+  numbered = false,
+  markTentative = false,
+  calendarDay,
+  context,
+}: OfferCardProps) {
   const { offer, session } = item;
   const [fresh] = useState(ctx.animate);
   // Etikett, Farbe und Form nur aus der Hauptkategorie; kein Filter ändert sie (Plan 0037, E11)
   const category = offer.category;
   const unfit = ctx.isUnfit(offer.id);
-  const saved = ctx.isSaved(offer.id);
+  const stage = ctx.stageOf(offer.id);
+  const tentative = markTentative && stage === "vorgemerkt";
   const availability = availabilityLabel(offer);
   const atPlace = context === "place";
   const reach = atPlace ? undefined : ctx.reachOf(offer);
@@ -68,7 +85,7 @@ export function OfferCard({ item, ctx, dated = false, numbered = false, calendar
 
   return (
     <article
-      className={`card k-${category}${unfit ? " unfit" : ""}${fresh ? " fresh" : ""}${isNew ? " is-new" : ""}`}
+      className={`card k-${category}${unfit ? " unfit" : ""}${fresh ? " fresh" : ""}${isNew ? " is-new" : ""}${tentative ? " tentative" : ""}`}
       data-testid="offer"
     >
       {isNew && <span className="new-tag">Neu</span>}
@@ -103,6 +120,7 @@ export function OfferCard({ item, ctx, dated = false, numbered = false, calendar
           )}
         </p>
         <div className="facts">
+          {tentative && <span className="fact tentative-tag">vorgemerkt</span>}
           <span className="fact">{formatFact(offer, session, ctx.now, numbered)}</span>
           <span className="fact">{costLabel(offer)}</span>
           <span className={offer.registration === "mit-anmeldung" ? "fact reg" : "fact"}>
@@ -112,7 +130,7 @@ export function OfferCard({ item, ctx, dated = false, numbered = false, calendar
           {unfit && <span className="fact warn">{ageRangeLabel(offer.age)}</span>}
         </div>
       </div>
-      <HeartButton offer={offer} saved={saved} onToggle={ctx.onToggleSave} />
+      <HeartButton offer={offer} stage={stage} onCycle={ctx.onCycle} onHold={ctx.onHold} />
     </article>
   );
 }
@@ -164,28 +182,148 @@ export function BellButton({
   );
 }
 
+/** Tipp aufs Herz: schaltet weiter und liefert die neue Stufe; `button` bekommt nach „Rückgängig“ den Fokus zurück */
+export type HeartCycle = (offer: SiteOffer, button: HTMLButtonElement) => SavedStage;
+/** Halten abgelaufen: fest einplanen */
+export type HeartHold = (offer: SiteOffer, button: HTMLButtonElement) => void;
+
+/** Animation nach einer Nutzeraktion (E2): nie beim Rendern, nie bei „Rückgängig“ */
+type HeartAnimation = "pop-small" | "pop-big" | "deflate";
+
+function animationFor(next: SavedStage): HeartAnimation {
+  if (next === "vorgemerkt") return "pop-small";
+  return next === "fest" ? "pop-big" : "deflate";
+}
+
+/** `motion.css` schaltet Animationen ab, dann feuert kein `animationend`: gar keine Klasse setzen (E2) */
+function reducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+const PRESSED: Record<SavedStage, boolean | "mixed"> = { aus: false, vorgemerkt: "mixed", fest: true };
+
+/**
+ * Herz mit drei Stufen (Plan 0057, E2): aus, vorgemerkt (halb voll, `aria-pressed="mixed"`), fest eingeplant (voll).
+ * `click` schaltet weiter, langes Halten (550 ms) plant fest ein. Die Logik steckt in `heart-gesture.ts`, hier nur
+ * Ereignisse, Timer, Vibration und Animation. Der Name bleibt „<Titel> merken“; die Wirkung sagt der Toast an.
+ */
 export function HeartButton({
   offer,
-  saved,
-  onToggle,
+  stage,
+  onCycle,
+  onHold,
   inline = false,
 }: {
   offer: SiteOffer;
-  saved: boolean;
-  onToggle: (offer: SiteOffer) => void;
+  stage: SavedStage;
+  onCycle: HeartCycle;
+  onHold: HeartHold;
   inline?: boolean;
 }) {
+  const button = useRef<HTMLButtonElement>(null);
+  const [holding, setHolding] = useState(false);
+  const [animation, setAnimation] = useState<HeartAnimation>();
+  const gesture = useRef(IDLE_GESTURE);
+  const timers = useRef<{ hold?: ReturnType<typeof setTimeout>; swallow?: ReturnType<typeof setTimeout> }>({});
+  // Timer feuern nach dem Rendern: Sie lesen die aktuellen Props
+  const latest = useRef({ offer, stage, onCycle, onHold });
+  latest.current = { offer, stage, onCycle, onHold };
+
+  useEffect(() => {
+    const el = button.current;
+    const own = timers.current;
+    // `animationcancel` kennt React nicht; beide räumen die Klasse ab, die Animation der Funken zählt nicht
+    // Nur die Animation der aktuellen Klasse räumt ab: Ein schneller zweiter Tipp bricht `pop-small` ab, und dessen
+    // `animationcancel` darf das neue `pop-big` nicht löschen
+    const done = (event: AnimationEvent) => {
+      setAnimation((current) => (current && `heart-${current}` === event.animationName ? undefined : current));
+    };
+    el?.addEventListener("animationend", done);
+    el?.addEventListener("animationcancel", done);
+    return () => {
+      el?.removeEventListener("animationend", done);
+      el?.removeEventListener("animationcancel", done);
+      clearTimeout(own.hold);
+      clearTimeout(own.swallow);
+    };
+  }, []);
+
+  const feedback = (before: SavedStage, next: SavedStage) => {
+    if (next === before) return;
+    if (next !== "aus") vibrate(next === "fest" ? 25 : 8);
+    if (!reducedMotion()) setAnimation(animationFor(next));
+  };
+
+  const dispatch = (event: GestureEvent) => {
+    const [next, effects] = heartGesture(gesture.current, event);
+    gesture.current = next;
+    const own = timers.current;
+    const el = button.current;
+    const now = latest.current;
+    for (const effect of effects) {
+      if (effect === "startHold") {
+        clearTimeout(own.hold);
+        own.hold = setTimeout(() => dispatch({ type: "holdElapsed" }), HOLD_MS);
+        setHolding(true);
+      } else if (effect === "stopHold") {
+        clearTimeout(own.hold);
+        setHolding(false);
+      } else if (effect === "startSwallow") {
+        clearTimeout(own.swallow);
+        own.swallow = setTimeout(() => dispatch({ type: "swallowElapsed" }), SWALLOW_MS);
+      } else if (effect === "stopSwallow") {
+        clearTimeout(own.swallow);
+      } else if (el && effect === "cycle") {
+        feedback(now.stage, now.onCycle(now.offer, el));
+      } else if (el) {
+        now.onHold(now.offer, el);
+        feedback(now.stage, "fest");
+      }
+    }
+  };
+
+  const point = (event: PointerEvent<HTMLButtonElement>) => ({ x: event.clientX, y: event.clientY });
   return (
     <button
+      ref={button}
       type="button"
-      className={inline ? "heart inline" : "heart"}
-      aria-pressed={saved}
+      className={`heart${inline ? " inline" : ""}${holding ? " holding" : ""}${animation ? ` ${animation}` : ""}`}
+      aria-pressed={PRESSED[stage]}
       aria-label={`${offer.title} merken`}
-      onClick={() => onToggle(offer)}
+      // Ziel für den Fokus nach „Rückgängig“, wenn das auslösende Herz verschwunden ist (E3)
+      data-offer={offer.id}
+      onClick={() => dispatch({ type: "click" })}
+      onPointerDown={(event) =>
+        dispatch({ type: "down", ...point(event), primary: event.isPrimary && event.button === 0, stage })
+      }
+      onPointerMove={(event) => dispatch({ type: "move", ...point(event) })}
+      onPointerUp={() => dispatch({ type: "up" })}
+      onPointerCancel={() => dispatch({ type: "cancel" })}
+      // Touch fängt den Zeiger implizit ein, die Maus nicht: Verlässt sie das Herz, endet das Halten
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") dispatch({ type: "cancel" });
+      }}
+      onContextMenu={(event) => event.preventDefault()}
     >
       <span className="hs">
-        <Icon name="heart" size={20} />
+        <span className="hw">
+          <Icon name={stage === "vorgemerkt" ? "heartHalf" : "heart"} size={20} />
+        </span>
       </span>
+      {holding && (
+        <svg className="heart-ring" width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
+          <circle cx="30" cy="30" r="27" />
+        </svg>
+      )}
+      {animation === "pop-big" && (
+        <span className="sparks" aria-hidden="true">
+          {SPARKS.map((n) => (
+            <i key={n} />
+          ))}
+        </span>
+      )}
     </button>
   );
 }
+
+const SPARKS = [0, 1, 2, 3, 4, 5, 6, 7] as const;

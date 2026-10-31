@@ -5,9 +5,11 @@ import {
   loadOriginDistrict,
   loadOriginPoint,
   loadSavedProviders,
+  loadTentative,
   saveOnboardingDone,
   saveOrigin,
   saveSavedProviders,
+  saveTentative,
   storageUsable,
 } from "./preferences.ts";
 
@@ -176,6 +178,50 @@ describe("gemerkte Anbieter: nur die Form (Plan 0025, E1)", () => {
     expect(loadSavedProviders()).toEqual(["b-anbieter", "a-anbieter"]);
     saveSavedProviders([]);
     expect(storage.data.has(PROVIDERS_KEY)).toBe(false);
+  });
+});
+
+describe("vorgemerkte Angebote: nur die Form (Plan 0057, E1)", () => {
+  const TENTATIVE_KEY = "zwergenplan.merkliste-vorgemerkt";
+  let storage: ReturnType<typeof fakeStorage>;
+
+  beforeEach(() => {
+    storage = fakeStorage();
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("ohne Speicher, mit kaputtem JSON und falschem Typ eine leere Liste", () => {
+    expect(loadTentative()).toEqual([]);
+    storage.data.set(TENTATIVE_KEY, "{kaputt");
+    expect(loadTentative()).toEqual([]);
+    storage.data.set(TENTATIVE_KEY, JSON.stringify({ a: 1 }));
+    expect(loadTentative()).toEqual([]);
+    storage.data.set(TENTATIVE_KEY, JSON.stringify(["a", 3, null, "b"]));
+    expect(loadTentative()).toEqual(["a", "b"]);
+  });
+
+  it("ohne nutzbaren Speicher (privater Modus) eine leere Liste, Schreiben wirft nicht", () => {
+    vi.stubGlobal("localStorage", {
+      getItem: () => {
+        throw new Error("gesperrt");
+      },
+      setItem: () => {
+        throw new Error("gesperrt");
+      },
+    });
+    expect(loadTentative()).toEqual([]);
+    expect(() => saveTentative(["a"])).not.toThrow();
+  });
+
+  it("hin und zurück dieselbe Liste, eine leere Liste entfernt den Schlüssel", () => {
+    saveTentative(["b", "a"]);
+    expect(loadTentative()).toEqual(["b", "a"]);
+    saveTentative([]);
+    expect(storage.data.has(TENTATIVE_KEY)).toBe(false);
   });
 });
 

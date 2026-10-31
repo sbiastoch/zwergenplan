@@ -1,6 +1,6 @@
 # Plan 0057 – Merkliste als Wochenplaner: zwei Stufen, Abschnitte, Filter wie auf der Startseite
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-10-30
 Bezug:
 - Plan 0025 (`docs/plans/archiv/0025-merkliste-als-planungszentrale.md`): Merkliste mit Liste | Karte | Kalender, eigener Filter (E6), Schnellwahlen „ab …“ (E7), keine Wegzeit-Grenze (E8), Export aller gemerkten (E9). Dieser Plan löst E6, E7, E8 und E9 teilweise ab.
@@ -555,3 +555,16 @@ Dritter, neuer `plan-reviewer` (letzte erlaubte Runde laut `/plan-review`). Alle
 - Hinweis zum Verweis auf Plan 0043 (aktiv): Wird er vor diesem Plan archiviert, schreibt der Archivschritt (CLAUDE.md, Schritt 7) die Pfadverweise um; `check-docs` fängt es.
 
 Abgelehnt: nichts.
+
+## Nachtrag S1 (2026-10-31)
+
+Abweichungen bei der Umsetzung von S1, im Sinn des Plans entschieden:
+
+- **Größe der Animation:** Wie in der Demo wächst das Herz-Symbol (`.hw`, 20 px) im 40-px-Kreis des 44-px-Knopfs, nicht der ganze Knopf (die Grenzen in E2 rechneten mit 48 px). Bei `pop-big` federt der Kreis zusätzlich auf 1,15 („btnPop“ der Demo). Ring (30 px) und Funken (38 px) bleiben wie geplant; der Knopf liegt 48 px vom Rand.
+- **`overflow-x: clip`** sitzt auf `.body` (allen Tabs), nicht nur auf Liste und Kalender: Dieselbe Kachel steht auch in „Entdecken“.
+- **Halten mit der Maus:** Ohne Pointer-Capture (sonst käme der `click` auch nach dem Loslassen außerhalb). Verlässt die Maus das Herz, endet das Halten (`pointerleave` nur für `pointerType === "mouse"`); bei Touch bleibt es bei Bewegung und `pointercancel`.
+- **Fokus nach „Rückgängig“:** Ist das auslösende Herz verschwunden (Entfernen in der Liste der Merkliste), bekommt das neu gerenderte Herz desselben Angebots den Fokus (`data-offer` am Knopf).
+- **Export-Texte:** Mit Filter heißt der Knopf „Alle N fest eingeplanten in meinen Kalender, auch ausgeblendete“. Der Toast nennt die vorgemerkten ohne Schlusspunkt wie die übrigen Export-Toasts: „… geladen · 3 vorgemerkte sind nicht in der Datei“ (Einzahl „1 vorgemerktes ist …“); mit vorgemerkten steht er 6 s. Passt keins der fest eingeplanten zum Alter: „Keins der fest eingeplanten Angebote passt zum Alter.“
+- **Statuszeile:** zählt Angebote ohne passenden Termin weiter über alle gemerkten, gleich welche Stufe (`collectionExport` ohne Stufen); nur die Datei nimmt allein fest Eingeplantes.
+- **Monatsraster:** Die Form eines vorgemerkten Termins steht auch dort als Umriss, wie in der Wochenleiste.
+- **Tests:** Die Kalender-Darstellung von „vorgemerkt“ (E4) kam schon in S1; ihr E2E-Fall steht deshalb jetzt in `e2e/merkliste-kalender.spec.ts`, nicht erst in S5. `e2e/sortierung.spec.ts` blieb unverändert: Ein Tipp merkt vor, das Angebot steht danach wie erwartet auf der Merkliste.

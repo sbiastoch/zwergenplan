@@ -4,19 +4,25 @@ import { upcomingSessions } from "./agenda.ts";
 import {
   applySavedFilter,
   cleanSavedProviders,
+  cleanSavedState,
   collectionExport,
+  cycleStage,
   EMPTY_SAVED_FILTER,
   exportSessions,
   isSavedFilterChipOn,
   matchesSavedFilter,
   migrateSavedIds,
   type SavedFilter,
+  type SavedStage,
+  type SavedState,
   savedFilterCount,
   savedOffers,
   seriesExport,
+  stageOf,
   toggleId,
   toggleSavedFilter,
   upcomingSessionCount,
+  withStage,
 } from "./saved.ts";
 import type { Offer } from "./schema.ts";
 import {
@@ -282,11 +288,17 @@ describe("collectionExport (Plan 0018, E3)", () => {
   });
 
   it("lässt Angebote ohne passenden Termin weg und zählt sie", () => {
-    expect(collectionExport([treff], FIXTURE_NOW, "2026-08-01")).toEqual({ items: [], count: 0, missing: 1 });
+    expect(collectionExport([treff], FIXTURE_NOW, "2026-08-01")).toEqual({
+      items: [],
+      count: 0,
+      missing: 1,
+      tentative: 0,
+    });
     expect(collectionExport([treff, reime], FIXTURE_NOW, "2026-08-01")).toEqual({
       items: [{ offer: reime, sessions: reime.sessions }],
       count: 4,
       missing: 1,
+      tentative: 0,
     });
   });
 
@@ -295,6 +307,81 @@ describe("collectionExport (Plan 0018, E3)", () => {
     const [first, second] = collectionExport(offers, FIXTURE_NOW, undefined).items;
     expect(first?.offer).toBe(offers[0]);
     expect(second?.offer).toBe(offers[1]);
+  });
+
+  it("nimmt mit Stufen nur fest Eingeplantes und zählt die vorgemerkten (Plan 0057, E4)", () => {
+    const state = { ids: [pekip.id, treff.id, reime.id], tentative: [treff.id, reime.id] };
+    expect(collectionExport([pekip, treff, reime], FIXTURE_NOW, undefined, state)).toEqual({
+      items: [{ offer: pekip, sessions: pekip.sessions }],
+      count: 8,
+      missing: 0,
+      tentative: 2,
+    });
+    // nichts fest: keine Datei, aber die vorgemerkten gezählt
+    expect(collectionExport([treff, reime], FIXTURE_NOW, undefined, state)).toEqual({
+      items: [],
+      count: 0,
+      missing: 0,
+      tentative: 2,
+    });
+    // ohne Stufen alle, keine vorgemerkten (Statuszeile)
+    expect(collectionExport([pekip, treff], FIXTURE_NOW, undefined)).toMatchObject({ count: 13, tentative: 0 });
+  });
+});
+
+describe("Stufen der Merkliste (Plan 0057, E1)", () => {
+  const empty: SavedState = { ids: [], tentative: [] };
+
+  it("Tipp: aus → vorgemerkt → fest → aus", () => {
+    const one = cycleStage(empty, "a");
+    expect(one).toEqual({ ids: ["a"], tentative: ["a"] });
+    expect(stageOf(one, "a")).toBe("vorgemerkt");
+    const two = cycleStage(one, "a");
+    expect(two).toEqual({ ids: ["a"], tentative: [] });
+    expect(stageOf(two, "a")).toBe("fest");
+    const three = cycleStage(two, "a");
+    expect(three).toEqual({ ids: [], tentative: [] });
+    expect(stageOf(three, "a")).toBe("aus");
+  });
+
+  it("Bestand ohne Vorgemerkt-Liste ist fest eingeplant", () => {
+    const state: SavedState = { ids: ["a", "b"], tentative: [] };
+    expect(stageOf(state, "a")).toBe("fest");
+    expect(stageOf(state, "b")).toBe("fest");
+    expect(stageOf(state, "c")).toBe("aus");
+  });
+
+  it("withStage setzt aus jeder Stufe jede", () => {
+    const stages: SavedStage[] = ["aus", "vorgemerkt", "fest"];
+    for (const from of stages) {
+      for (const to of stages) {
+        const start = withStage({ ids: ["x"], tentative: [] }, "a", from);
+        const next = withStage(start, "a", to);
+        expect(stageOf(next, "a"), `${from} → ${to}`).toBe(to);
+        expect(stageOf(next, "x"), "andere bleiben").toBe("fest");
+        expect(next.tentative.every((t) => next.ids.includes(t))).toBe(true);
+      }
+    }
+  });
+
+  it("Stufenwechsel hält die Merk-Reihenfolge, neu Gemerktes hängt hinten an", () => {
+    const state: SavedState = { ids: ["a", "b", "c"], tentative: ["b"] };
+    expect(cycleStage(state, "b").ids).toEqual(["a", "b", "c"]);
+    expect(withStage(state, "a", "vorgemerkt").ids).toEqual(["a", "b", "c"]);
+    // gleiche Stufe: derselbe Zustand, nichts zu speichern
+    expect(withStage(state, "c", "fest")).toBe(state);
+    expect(cycleStage(state, "d")).toEqual({ ids: ["a", "b", "c", "d"], tentative: ["b", "d"] });
+    // „Rückgängig“ nach dem Entfernen: wieder hinten, die alte Stelle ist verloren
+    expect(withStage(withStage(state, "a", "aus"), "a", "fest").ids).toEqual(["b", "c", "a"]);
+  });
+
+  it("cleanSavedState: Vorgemerktes außerhalb der Merkliste fällt weg, alte IDs werden migriert", () => {
+    const long = "familientreff-beispiel--offener-krabbeltreff--familientreff-beispiel-haus";
+    expect(cleanSavedState({ ids: [long, "nle21y1x"], tentative: [long, "weg", "nle21y1x", "nle21y1x"] })).toEqual({
+      ids: ["lxizt974", "nle21y1x"],
+      tentative: ["lxizt974", "nle21y1x"],
+    });
+    expect(cleanSavedState({ ids: ["a"], tentative: [] })).toEqual({ ids: ["a"], tentative: [] });
   });
 });
 

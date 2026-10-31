@@ -3,7 +3,7 @@
  * Querformat (E14, H1). Gemessen wird mit offset*, wo Elemente gedreht sind (Kind-Chip 1,5°, Tab-Leiste −0,6°):
  * Gedrehte Boxen sind im Bounding-Rect größer.
  */
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect, mapSettled, test } from "./fixtures.ts";
 import {
   expectAccessible,
@@ -147,7 +147,7 @@ test("Querformat 915×412: Toast steht über der Inhaltsspalte, nicht über der 
   await ready(page);
   await page.clock.pauseAt(FIXTURE_NOW); // Toast bleibt stehen (Plan 0007, E15)
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
+  await expect(page.locator(".toast .toast-text")).toHaveText(/^Vorgemerkt\./);
   const t = await page.evaluate(() => {
     const toast = document.querySelector<HTMLElement>(".toast");
     const main = document.querySelector("main")?.getBoundingClientRect();
@@ -497,27 +497,140 @@ test.describe("Badge im Querformat", () => {
   }
 });
 
-/** Plan 0008, E9: Der Toast ist reine Meldung und fängt keine Tipps ab. */
-test("Toast lässt Tipps durch (320 px, 200 %)", async ({ page }) => {
+/**
+ * Plan 0008, E9: Der Toast ist reine Meldung und fängt keine Tipps ab. Mit Aktion (Plan 0057, E3) fängt nur der Knopf
+ * Tipps, und der Toast liegt nie über der Herz-Spalte.
+ */
+test("Toast lässt Tipps durch, nur „Rückgängig“ fängt sie, nie über der Herz-Spalte (320 px, 200 %)", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await ready(page);
-  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
+  for (const name of ["Offener Krabbeltreff merken", /PEKiP-Gruppe Herbst .* merken/]) {
+    await page.getByRole("button", { name }).click();
+    await page.getByRole("button", { name }).click();
+  }
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   await expect(page.getByTestId("offer")).toHaveCount(2);
   await setTextScale(page, 2);
   await page.clock.pauseAt(FIXTURE_NOW); // Toast bleibt stehen (Plan 0007, E15)
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  const toast = page.locator(".toast").filter({ hasText: "Nicht mehr gemerkt" });
+  const toast = page.locator(".toast").filter({ hasText: "Nicht mehr gemerkt." });
   await expect(toast).toBeVisible();
-  const inside = await toast.evaluate((el) => {
-    const r = el.getBoundingClientRect();
-    const hit = document.elementFromPoint((r.left + r.right) / 2, (r.top + r.bottom) / 2);
-    return hit !== null && el.contains(hit);
+  const heart = page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ });
+  const heartBox = await heart.boundingBox();
+  if (!heartBox) throw new Error("Herz ohne Box");
+  const hits = await toast.evaluate(
+    (el, heartX) => {
+      const r = el.getBoundingClientRect();
+      const text = el.querySelector(".toast-text")?.getBoundingClientRect();
+      const button = el.querySelector(".toast-action");
+      const b = button?.getBoundingClientRect();
+      if (!text || !b) throw new Error("Text oder Knopf fehlt");
+      const at = (x: number, y: number) => document.elementFromPoint(x, y);
+      const column: boolean[] = [];
+      for (let y = r.top; y <= r.bottom; y += 2) {
+        const hit = at(heartX, y);
+        column.push(hit !== null && el.contains(hit));
+      }
+      const tabs = document.querySelector(".tabs")?.getBoundingClientRect();
+      return {
+        text: el.contains(at((text.left + text.right) / 2, (text.top + text.bottom) / 2)),
+        button: at((b.left + b.right) / 2, (b.top + b.bottom) / 2) === button,
+        column: column.some(Boolean),
+        // ungedrehte Box (Toast −1°): Mittelpunkt plus halbe offsetWidth
+        right: (r.left + r.right) / 2 + (el instanceof HTMLElement ? el.offsetWidth : r.width) / 2,
+        bottom: r.bottom,
+        tabsTop: tabs?.top ?? Number.POSITIVE_INFINITY,
+      };
+    },
+    heartBox.x + heartBox.width / 2,
+  );
+  expect(hits.text, "Tipp auf den Text geht durch den Toast").toBe(false);
+  expect(hits.button, "Tipp auf „Rückgängig“ trifft den Knopf").toBe(true);
+  expect(hits.column, "auf der Höhe des Toasts trifft die Herz-Spalte nie den Toast").toBe(false);
+  expect(hits.right, "mindestens 96 px vor dem rechten Rand").toBeLessThanOrEqual(320 - 96 + 0.5);
+  expect(hits.bottom, "verdeckt die Tab-Leiste nicht").toBeLessThanOrEqual(hits.tabsTop + 1);
+  await page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click({ trial: true });
+});
+
+/**
+ * Plan 0057, E2, Test 14: Kein horizontaler Überlauf am Höhepunkt der Herz-Animation. Alle Animationen werden
+ * angehalten, das Herz am Keyframe mit 1,7, die Funken am Ende (größte Ausdehnung). Die Glocke behält `slap`.
+ */
+async function expectHeartPeakInside(heart: Locator) {
+  await heart.click();
+  await heart.click();
+  const m = await heart.evaluate((el) => {
+    for (const a of document.getAnimations()) {
+      const name = a instanceof CSSAnimation ? a.animationName : "";
+      a.pause();
+      if (name === "heart-pop-big") a.currentTime = 0.3 * 600;
+      if (name === "heart-spark") a.currentTime = 599;
+    }
+    const names = document.getAnimations().map((a) => (a instanceof CSSAnimation ? a.animationName : ""));
+    const rects = [...el.querySelectorAll(".hw, .sparks i")].map((n) => n.getBoundingClientRect());
+    const hw = el.querySelector(".hw")?.getBoundingClientRect();
+    return {
+      names,
+      right: Math.max(...rects.map((r) => r.right)),
+      left: Math.min(...rects.map((r) => r.left)),
+      hwWidth: hw?.width ?? 0,
+      scroll: document.documentElement.scrollWidth,
+      width: window.innerWidth,
+    };
   });
-  expect(inside, "Tipp in der Mitte des Toasts trifft den Toast").toBe(false);
-  await page.getByRole("button", { name: "Alle in den Kalender" }).click({ trial: true });
+  expect(m.names).toContain("heart-pop-big");
+  expect(m.names).toContain("heart-spark");
+  expect(m.hwWidth, "Herz am Höhepunkt größer als in Ruhe").toBeGreaterThan(30);
+  expect(m.right, "rechts im Viewport").toBeLessThanOrEqual(m.width);
+  expect(m.left, "links im Viewport").toBeGreaterThanOrEqual(0);
+  expect(m.scroll, "kein horizontaler Überlauf").toBeLessThanOrEqual(m.width);
+}
+
+test.describe("Herz-Animation ohne Überlauf (320 px, Plan 0057, E2)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await ready(page);
+  });
+
+  test("Liste", async ({ page }) => {
+    await expectHeartPeakInside(page.getByRole("button", { name: "Offener Krabbeltreff merken" }));
+  });
+
+  test("Detail", async ({ page }) => {
+    await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
+    const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
+    await expectHeartPeakInside(detail.getByRole("button", { name: "Offener Krabbeltreff merken" }));
+  });
+
+  test("Orts-Sheet", async ({ page }) => {
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", { timeout: 30_000 });
+    await page.evaluate(() => window.__zpMap?.jumpTo({ center: [11.0767, 49.4521], zoom: 15 }));
+    await mapSettled(page);
+    await page.locator(".map-box").evaluate((el) => el.scrollIntoView({ block: "start" }));
+    const point = await page.evaluate(() => window.__zpMap?.project([11.0767, 49.4521]));
+    const box = await page.locator(".map-box").boundingBox();
+    if (!point || !box) throw new Error("keine Karte");
+    await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
+    const sheet = page.getByRole("dialog", { name: "Familientreff Beispielhof" });
+    await expect(sheet).toBeVisible();
+    await expectHeartPeakInside(sheet.getByRole("button", { name: "Offener Krabbeltreff merken" }));
+  });
+
+  test("die Glocke behält `slap`", async ({ page }) => {
+    await page.getByRole("button", { name: "Kurse", exact: true }).click();
+    const bell = page.getByRole("button", { name: /abonnieren$/ }).first();
+    await expect(bell).toBeVisible();
+    const css = await bell.evaluate((el) => {
+      el.setAttribute("aria-pressed", "true");
+      const hs = el.querySelector(".hs");
+      return hs ? getComputedStyle(hs).animationName : "";
+    });
+    expect(css).toBe("slap");
+  });
 });
 
 /** Plan 0008, E10: Im Filter-Fuß ist „Zurücksetzen“ ein Textknopf, der Fuß einzeilig ab 360 px. */

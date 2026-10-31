@@ -21,34 +21,151 @@ test("Leerzustand führt zurück zum Entdecken", async ({ page }) => {
   await expect(page.getByTestId("offer").first()).toBeVisible();
 });
 
-test("Herz merkt, Badge zählt, Merkliste überlebt das Neuladen und steht nicht in der URL", async ({ page }) => {
-  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await expect(page.getByRole("button", { name: "Offener Krabbeltreff merken" })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
-  await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
-  await page.getByRole("button", { name: `${PEKIP} merken` }).click();
+/** Herz ein- oder zweimal tippen: vorgemerkt bzw. fest eingeplant (Plan 0057, E2) */
+async function tapHeart(page: Page, title: string, times = 2) {
+  const heart = page.getByRole("button", { name: `${title} merken` });
+  for (let i = 0; i < times; i++) await heart.click();
+  return heart;
+}
+
+const toastText = (page: Page) => page.locator(".toast .toast-text");
+
+test("Herz: Tipp merkt vor, zweiter plant fest ein, dritter entfernt; Badge zählt, Stufen überleben das Neuladen, nichts in der URL (Plan 0057, E1–E3)", async ({
+  page,
+}) => {
+  const heart = page.getByRole("button", { name: "Offener Krabbeltreff merken" });
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "mixed");
+  await expect(toastText(page)).toHaveText("Vorgemerkt. Nochmal tippen oder halten: fest einplanen.");
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await expect(toastText(page)).toHaveText("Fest eingeplant – steht im Kalender.");
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "false");
+  await expect(toastText(page)).toHaveText("Nicht mehr gemerkt.");
+  await expect(page.getByRole("button", { name: /^Merkliste/ })).not.toContainText("1");
+
+  // Krabbeltreff vorgemerkt, PEKiP fest eingeplant
+  await heart.click();
+  await tapHeart(page, PEKIP);
   await expect(page.getByRole("button", { name: /^Merkliste/ })).toContainText("2");
 
   await page.reload();
+  await expect(page.getByRole("button", { name: "Offener Krabbeltreff merken" })).toHaveAttribute(
+    "aria-pressed",
+    "mixed",
+  );
+  await expect(page.getByRole("button", { name: `${PEKIP} merken` })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   await expect(page).toHaveURL(/ansicht=merkliste$/);
   await expect(page.getByRole("heading", { level: 2, name: "Meine Merkliste" })).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(2);
   await expect(page.getByTestId("offer").first()).toContainText("Mi 7.10. · 10:00 Uhr");
   await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+  expect(
+    await page.evaluate(() => [
+      localStorage.getItem("zwergenplan.merkliste"),
+      localStorage.getItem("zwergenplan.merkliste-vorgemerkt"),
+    ]),
+  ).toEqual(['["lxizt974","nle21y1x"]', '["lxizt974"]']);
+  expect(page.url()).not.toMatch(/lxizt974|nle21y1x|vorgemerkt/);
 
+  // vorgemerkt → fest → aus: Die Kachel verschwindet von der Merkliste
   await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await expect(page.getByText("Nicht mehr gemerkt")).toBeVisible();
+  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+  await expect(toastText(page)).toHaveText("Nicht mehr gemerkt.");
   await expect(page.getByTestId("offer")).toHaveCount(1);
+});
+
+test("„Rückgängig“ im Toast stellt die vorige Stufe ohne Animation her, der Fokus geht aufs Herz (Plan 0057, E3)", async ({
+  page,
+}) => {
+  const heart = page.getByRole("button", { name: "Offener Krabbeltreff merken" });
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "mixed");
+  await page.getByRole("button", { name: "Rückgängig" }).click();
+  await expect(heart).toHaveAttribute("aria-pressed", "false");
+  await expect(toastText(page)).toHaveText("Rückgängig gemacht.");
+  await expect(page.getByRole("button", { name: "Rückgängig" })).toHaveCount(0);
+  await expect(heart).toBeFocused();
+  await expect(heart).not.toHaveClass(/pop-|deflate/);
+
+  // Entfernen auf der Merkliste: Die Kachel verschwindet, „Rückgängig“ holt sie zurück, der Fokus aufs neue Herz
+  await tapHeart(page, PEKIP);
+  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await expect(page.getByTestId("offer")).toHaveCount(1);
+  await page.getByRole("button", { name: `${PEKIP} merken` }).click();
+  await expect(page.getByTestId("offer")).toHaveCount(0);
+  await page.getByRole("button", { name: "Rückgängig" }).click();
+  const back = page.getByRole("button", { name: `${PEKIP} merken` });
+  await expect(back).toHaveAttribute("aria-pressed", "true");
+  await expect(back).toBeFocused();
+});
+
+test("Tastatur: Enter am Herz schaltet weiter, der Fokus bleibt am Herz (Plan 0057, E3)", async ({ page }) => {
+  const heart = page.getByRole("button", { name: "Offener Krabbeltreff merken" });
+  await heart.focus();
+  for (const pressed of ["mixed", "true", "false"]) {
+    await page.keyboard.press("Enter");
+    await expect(heart).toHaveAttribute("aria-pressed", pressed);
+    await expect(heart).toBeFocused();
+  }
+});
+
+test("Halten mit der Maus plant fest ein, auch 2 s lang; der Klick danach entfernt nicht (Plan 0057, E2)", async ({
+  page,
+}) => {
+  for (const [title, ms] of [
+    ["Offener Krabbeltreff", 700],
+    [PEKIP, 2000],
+  ] as const) {
+    const heart = page.getByRole("button", { name: `${title} merken` });
+    await heart.hover();
+    await page.mouse.down();
+    await expect(heart).toHaveClass(/\bholding\b/);
+    await page.waitForTimeout(ms);
+    await page.mouse.up();
+    await expect(heart).toHaveAttribute("aria-pressed", "true");
+    await expect(toastText(page)).toHaveText("Fest eingeplant – steht im Kalender.");
+    await page.waitForTimeout(700);
+    await expect(heart, "der Klick nach dem Halten ist geschluckt").toHaveAttribute("aria-pressed", "true");
+  }
+  // der nächste Tipp wirkt
+  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+  await expect(page.getByRole("button", { name: "Offener Krabbeltreff merken" })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+});
+
+test("Halten mit dem Finger (Touch über CDP): fest, der nächste kurze Tipp entfernt (Plan 0057, E2)", async ({
+  page,
+  browserName,
+  isMobile,
+}) => {
+  test.skip(browserName !== "chromium" || !isMobile, "Touch über CDP nur in Chromium mit Touch-Emulation (pixel-7)");
+  const heart = page.getByRole("button", { name: "Offener Krabbeltreff merken" });
+  await heart.scrollIntoViewIfNeeded();
+  const box = await heart.boundingBox();
+  if (!box) throw new Error("Herz ohne Box");
+  const cdp = await page.context().newCDPSession(page);
+  const at = [{ x: box.x + box.width / 2, y: box.y + box.height / 2, id: 1 }];
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: at });
+  await page.waitForTimeout(700);
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await page.waitForTimeout(300);
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: at });
+  await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await cdp.detach();
+  await expect(heart).toHaveAttribute("aria-pressed", "false");
 });
 
 test("Fokus landet auf dem aktiven Tab, wenn die Kachel nach dem Ablösen im Detail fehlt (Plan 0008, E11)", async ({
   page,
 }) => {
-  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await page.getByRole("button", { name: `${PEKIP} merken` }).click();
+  await tapHeart(page, "Offener Krabbeltreff");
+  await tapHeart(page, PEKIP);
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   await expect(page.getByTestId("offer")).toHaveCount(2);
 
@@ -67,13 +184,13 @@ test("Fokus landet auf dem aktiven Tab, wenn die Kachel nach dem Ablösen im Det
   await expect(page.getByRole("button", { name: /^Merkliste/ })).toBeFocused();
 });
 
-test("lädt alle gemerkten Termine als eine ICS-Datei", async ({ page }) => {
-  await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-  await page.getByRole("button", { name: `${PEKIP} merken` }).click();
+test("lädt alle fest eingeplanten Termine als eine ICS-Datei", async ({ page }) => {
+  await tapHeart(page, "Offener Krabbeltreff");
+  await tapHeart(page, PEKIP);
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: "Alle in den Kalender" }).click(),
+    page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click(),
   ]);
   expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
   const ics = readFileSync((await download.path()) ?? "", "utf8");
@@ -110,13 +227,13 @@ test.describe("Export-Code nicht ladbar", () => {
     await page.route("**/assets/export/*.js", (route) => route.abort());
     await page.reload();
     await expect(page.getByTestId("offer").first()).toBeVisible();
-    await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+    await tapHeart(page, "Offener Krabbeltreff");
     await page.getByRole("button", { name: /^Merkliste/ }).click();
     let downloaded = false;
     page.on("download", () => {
       downloaded = true;
     });
-    await page.getByRole("button", { name: "Alle in den Kalender" }).click();
+    await page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click();
     await expect(
       page.getByText("Export gerade nicht möglich – mit Netz die Seite neu laden und nochmal tippen."),
     ).toBeVisible();
@@ -129,7 +246,7 @@ test.describe("Export-Code nicht ladbar", () => {
     await expect(page.getByTestId("offer")).toHaveCount(1);
     const [download] = await Promise.all([
       page.waitForEvent("download"),
-      page.getByRole("button", { name: "Alle in den Kalender" }).click(),
+      page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click(),
     ]);
     expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
   });
@@ -154,7 +271,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     );
     await page.goto("./?ansicht=merkliste");
     await expect(page.getByTestId("offer")).toHaveCount(ids.length);
-    return page.getByRole("button", { name: "Alle in den Kalender" });
+    return page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" });
   }
 
   async function vevents(download: Download) {
@@ -196,7 +313,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     });
     await button.click();
     const toast = page.locator(".toast");
-    await expect(toast).toHaveText("Keins der gemerkten Angebote passt zum Alter.");
+    await expect(toast).toHaveText("Keins der fest eingeplanten Angebote passt zum Alter.");
     // Hinweis, kein Erfolg: Es wurde nichts geladen (Browser-Review Plan 0028)
     await expect(toast).toHaveClass(/\bhint\b/);
     expect(downloaded).toBe(false);
@@ -221,6 +338,55 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     await expect(toast, "nach 5,5 s noch sichtbar").toBeVisible();
     await page.clock.runFor(1_000);
     await expect(toast).toHaveCount(0);
+  });
+});
+
+// Plan 0057, E4: Der Export nimmt nur fest Eingeplantes. Merkliste und Vorgemerktes stehen vor dem Laden im Speicher.
+test.describe("Export nur fest eingeplant (Plan 0057, E4)", () => {
+  async function openWith(page: Page, ids: string[], tentative: string[]) {
+    await page.addInitScript(
+      ([saved, vorgemerkt]) => {
+        localStorage.setItem("zwergenplan.merkliste", saved);
+        localStorage.setItem("zwergenplan.merkliste-vorgemerkt", vorgemerkt);
+      },
+      [JSON.stringify(ids), JSON.stringify(tentative)] as const,
+    );
+    await page.goto("./?ansicht=merkliste");
+    await expect(page.getByTestId("offer")).toHaveCount(ids.length);
+  }
+
+  test("nur das fest eingeplante in der Datei, der Toast nennt die vorgemerkten", async ({ page }) => {
+    await openWith(page, ["nle21y1x", "lxizt974"], ["lxizt974"]);
+    // Statuszeile wie bisher: alle gemerkten
+    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click(),
+    ]);
+    const ics = readFileSync((await download.path()) ?? "", "utf8");
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(8); // nur der Kurs
+    await expect(page.locator(".toast")).toHaveText(
+      "Kalenderdatei mit 8 Terminen geladen · 1 vorgemerktes ist nicht in der Datei",
+    );
+  });
+
+  test("nichts fest: Hinweis statt Datei, der Export-Chunk wird trotzdem angefordert", async ({ page }) => {
+    // Vorladen im Leerlauf aus: Der Request soll vom Tipp kommen
+    await page.addInitScript(() => {
+      window.requestIdleCallback = () => 0;
+    });
+    await openWith(page, ["nle21y1x", "lxizt974"], ["nle21y1x", "lxizt974"]);
+    let downloaded = false;
+    page.on("download", () => {
+      downloaded = true;
+    });
+    const chunk = page.waitForRequest((r) => /\/assets\/export\/[^/]+\.js$/.test(new URL(r.url()).pathname));
+    await page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click();
+    await chunk;
+    const toast = page.locator(".toast");
+    await expect(toast).toHaveText("Noch nichts fest eingeplant. Tippe nochmal aufs Herz.");
+    await expect(toast).toHaveClass(/\bhint\b/);
+    expect(downloaded).toBe(false);
   });
 });
 
@@ -288,8 +454,8 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
     await expect(page.getByRole("status")).toHaveText("5 Angebote mit insgesamt 24 Terminen gemerkt");
     // der breite Knopf und die Zeile „… · Kurse immer komplett“ sind weg
     await expect(page.getByText(/Kurse immer komplett|in einer \.ics-Datei/)).toHaveCount(0);
-    const button = page.getByRole("button", { name: "Alle in den Kalender" });
-    await expect(button).toHaveAttribute("title", "Alle in den Kalender");
+    const button = page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" });
+    await expect(button).toHaveAttribute("title", "Fest Eingeplantes in meinen Kalender");
     await expect(button).toHaveText("");
     const box = await button.boundingBox();
     expect(box && [Math.round(box.width), Math.round(box.height)]).toEqual([48, 48]);
@@ -371,7 +537,7 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
     await expect(page.locator(".map-box")).toHaveCount(0);
     await expect(page.getByRole("group", { name: "Darstellung der Merkliste" })).toHaveCount(0);
     await expect(page.getByRole("status")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toHaveCount(0);
     await page.waitForTimeout(300);
     expect(requests).toHaveLength(1);
   });
@@ -408,7 +574,7 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(karte).toHaveAttribute("aria-pressed", "true");
     await expect(karte).toBeFocused();
     await expect(page.getByRole("status")).toHaveText("5 Angebote gemerkt");
-    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toHaveCount(0);
     await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
     await expect(page.locator(".map-box")).toBeVisible();
     // unter der Karte die gemerkten Angebote, alle im Startausschnitt (Plan 0056, E5)
@@ -422,7 +588,7 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(liste).toBeFocused();
     await expect(page.getByTestId("offer")).toHaveCount(5);
     await expect(page.locator(".map-box")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toBeVisible();
 
     // dritte Darstellung (Etappe 3): Kalender, Statuszeile wie in der Liste, kein Export-Knopf
     const kalender = segment(page, "Kalender");
@@ -433,7 +599,7 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(kalender).toBeFocused();
     await expect(page.getByRole("status")).toHaveText("5 Angebote mit insgesamt 24 Terminen gemerkt");
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Alle in den Kalender" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toHaveCount(0);
     await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
   });
 
@@ -553,8 +719,10 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
   test("Export mit Filter: Name sagt es, die Datei enthält weiter alle Termine (E9)", async ({ page }) => {
     await chip(page, "Kurse").click();
     await expect(page.getByTestId("offer")).toHaveCount(2);
-    const button = page.getByRole("button", { name: "Alle 3 gemerkten in den Kalender, auch ausgeblendete" });
-    await expect(button).toHaveAttribute("title", "Alle 3 gemerkten in den Kalender, auch ausgeblendete");
+    const button = page.getByRole("button", {
+      name: "Alle 3 fest eingeplanten in meinen Kalender, auch ausgeblendete",
+    });
+    await expect(button).toHaveAttribute("title", "Alle 3 fest eingeplanten in meinen Kalender, auch ausgeblendete");
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
     const ics = readFileSync((await download.path()) ?? "", "utf8");
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(19);

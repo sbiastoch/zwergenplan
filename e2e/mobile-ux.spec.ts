@@ -194,9 +194,20 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: "Freitag, 9. Oktober, 0 Termine" }).click();
     await expect(page.getByRole("button", { name: "Für diesen Tag entdecken" })).toBeVisible();
   },
-  // Plan 0025, E3a: Kopf mit Umschalter über die ganze Breite, Statuszeile und rundem Export-Knopf
+  // Plan 0057, E3: Toast mit „Rückgängig“ nach dem Tipp aufs Herz. Fokus auf dem Knopf hält ihn stehen (eine
+  // angehaltene Uhr hielte auch die Frames an, auf die die Gates warten)
+  "toast-rueckgaengig": async (page) => {
+    await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+    const undo = page.getByRole("button", { name: "Rückgängig" });
+    await undo.focus();
+    await page.waitForTimeout(6500);
+    await expect(undo).toBeVisible();
+  },
+  // Plan 0025, E3a: Kopf mit Umschalter über die ganze Breite, Statuszeile und rundem Export-Knopf; ein Herz
+  // vorgemerkt, eins fest eingeplant (Plan 0057, E2)
   merkliste: async (page) => {
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+    await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
     await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
     await page.getByRole("button", { name: /^Merkliste/ }).click();
     await expect(page.getByTestId("offer")).toHaveCount(2);
@@ -834,11 +845,13 @@ for (const scheme of SCHEMES.filter((s) => s.label !== "hell")) {
     // Hält auch die Timer an: Der Toast (2,8 s) bleibt stehen, bis die Uhr weiterläuft (Plan 0007, E15).
     await page.clock.pauseAt(FIXTURE_NOW);
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
-    await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
+    const toast = page.locator(".toast").filter({ hasText: "Vorgemerkt." });
+    await expect(toast).toBeVisible();
     await expectNoBrightIslands(page);
     await expectTextFits(page);
-    await page.clock.runFor(3000);
-    await expect(page.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toHaveCount(0);
+    // mit „Rückgängig“ 6 s (Plan 0057, E3)
+    await page.clock.runFor(6100);
+    await expect(toast).toHaveCount(0);
   });
 }
 
@@ -858,7 +871,7 @@ const LONG_TOASTS = [
     path: "./?ansicht=merkliste",
     birthDate: "2026-08-01",
     saved: [TREFF_ID, REIME_ID],
-    trigger: (page: Page) => page.getByRole("button", { name: "Alle in den Kalender" }),
+    trigger: (page: Page) => page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }),
     toast: "Kalenderdatei mit 4 Terminen geladen – 1 Angebot passt nicht zum Alter",
   },
 ];
@@ -1054,6 +1067,32 @@ test("funktioniert mit reduzierter Bewegung", async ({ page }) => {
   await ready(page);
   await page.getByRole("button", { name: "Kurse", exact: true }).click();
   await expect(page.getByTestId("offer")).toHaveCount(2);
+});
+
+// Plan 0057, Test 18: Das Herz setzt bei „reduce“ keine Animationsklasse (sonst hinge sie ohne `animationend`), das
+// Halten wirkt trotzdem, der Ring steht statisch da.
+test("Herz mit reduzierter Bewegung: keine laufende Animation, Halten wirkt", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await ready(page);
+  const heart = page.getByRole("button", { name: "Offener Krabbeltreff merken" });
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "mixed");
+  await expect(heart).not.toHaveClass(/pop-|deflate/);
+  await expectReducedMotion(page);
+  await heart.click();
+  await heart.click();
+  await expect(heart).toHaveAttribute("aria-pressed", "false");
+  await expect(heart).not.toHaveClass(/pop-|deflate/);
+
+  await heart.hover();
+  await page.mouse.down();
+  await expect(heart.locator(".heart-ring")).toBeVisible();
+  await expectReducedMotion(page);
+  await page.waitForTimeout(700);
+  await page.mouse.up();
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await expect(heart.locator(".sparks")).toHaveCount(0);
+  await expectReducedMotion(page);
 });
 
 test("zeigt bei Tastaturbedienung immer den Fokus", async ({ page, isMobile }) => {

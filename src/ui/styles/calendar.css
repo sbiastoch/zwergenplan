@@ -119,6 +119,16 @@
     gap: 1px;
     height: 11px;
   }
+  /* Vorgemerktes (Plan 0057, E4): Form nur als Umriss in der Textfarbe, 2 px; Grafik mit 3:1 (WCAG 1.4.11) */
+  .tentative > .mini {
+    overflow: visible;
+  }
+  .tentative > .mini .shape {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2px;
+    vector-effect: non-scaling-stroke;
+  }
   .monthbtn {
     width: 100%;
     min-height: 44px;

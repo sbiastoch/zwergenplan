@@ -12,7 +12,7 @@ import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Sort, type Tab, tabSection } from "../domain/route.ts";
-import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
+import { EMPTY_SAVED_FILTER, type SavedFilter, type SavedStage } from "../domain/saved.ts";
 import { searchOf } from "../domain/searches.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
@@ -32,14 +32,16 @@ import {
   OFFER_GONE,
   providerStatusParts,
   reachNote,
+  STAGE_UNDONE,
   searchLabel,
+  stageToast,
   standDate,
 } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { preloadExportWhenIdle } from "./ics-export.ts";
 import { type AgeEscape, EmptyState, ListPending, ListView } from "./ListView.tsx";
 import { MapPanel, ProviderMapPanel } from "./MapPanel.tsx";
-import type { CardContext } from "./OfferCard.tsx";
+import type { CardContext, HeartCycle, HeartHold } from "./OfferCard.tsx";
 import { Onboarding, preloadOnboarding } from "./Onboarding.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import type { OnboardingEnd } from "./onboarding-types.ts";
@@ -101,7 +103,8 @@ export function App() {
   const [attempt, setAttempt] = useState(0);
   const { route, replace, openDetail, closeDetail, openProvider, closeProvider } = useRoute();
   const [birthDate, setBirthDateStored] = useBirthDate();
-  const [savedIds, toggleSaved] = useSaved();
+  const savedApi = useSaved();
+  const savedIds = savedApi.state.ids;
   const [savedProviders, toggleSavedProvider] = useSavedProviders();
   const theme = useTheme();
   const [toast, say] = useToast();
@@ -268,10 +271,46 @@ export function App() {
     views.resetPage();
     window.scrollTo({ top: 0 });
   };
-  const onToggleSave = useCallback(
-    (offer: SiteOffer) =>
-      say(toggleSaved(offer.id) ? "Gemerkt – liegt jetzt auf deiner Merkliste" : "Nicht mehr gemerkt"),
-    [say, toggleSaved],
+  /*
+   * Herz mit Stufen (Plan 0057, E2, E3): Der Toast sagt die neue Stufe an, „Rückgängig“ setzt die vorige ohne Animation
+   * und gibt den Fokus dem auslösenden Herz zurück. Ist es mit dem Entfernen verschwunden (Liste der Merkliste), das
+   * neu gerenderte Herz desselben Angebots.
+   */
+  const { stage: stageOf, cycle, setStage } = savedApi;
+  const heartToast = useCallback(
+    (offer: SiteOffer, before: SavedStage, after: SavedStage, button: HTMLButtonElement) =>
+      say(stageToast(after), {
+        action: {
+          label: "Rückgängig",
+          run: () => {
+            setStage(offer.id, before);
+            say(STAGE_UNDONE);
+            requestAnimationFrame(() => {
+              const target = button.isConnected
+                ? button
+                : document.querySelector<HTMLButtonElement>(`.heart[data-offer="${offer.id}"]`);
+              target?.focus();
+            });
+          },
+        },
+      }),
+    [say, setStage],
+  );
+  const onCycle = useCallback<HeartCycle>(
+    (offer, button) => {
+      const before = stageOf(offer.id);
+      const after = cycle(offer.id);
+      heartToast(offer, before, after, button);
+      return after;
+    },
+    [stageOf, cycle, heartToast],
+  );
+  const onHold = useCallback<HeartHold>(
+    (offer, button) => {
+      const before = stageOf(offer.id);
+      heartToast(offer, before, setStage(offer.id, "fest"), button);
+    },
+    [stageOf, setStage, heartToast],
   );
   // Glocken (Plan 0054, E4, E5): nach dem Umschalten synchron `bellPush` (spiegeln bzw. Push einschalten), der Toast
   // kommt mit dem Ergebnis; Toasts nach dem Muster aus Plan 0022, im Sheet zeigt der Dialog sie. Solange ein Tipp
@@ -310,11 +349,12 @@ export function App() {
   const ctx: CardContext = {
     now,
     animate,
-    isSaved: (id) => savedIds.includes(id),
+    stageOf,
     isUnfit: (id) => views.unfitIds.has(id),
     reachOf: views.reachOf,
     reachPending: reachMode?.kind === "laedt",
-    onToggleSave,
+    onCycle,
+    onHold,
     onOpen: (offer, day) => {
       setDetailDay(day);
       openDetail(offer.id);
@@ -709,6 +749,7 @@ export function App() {
         {load.kind === "ready" && section === "merkliste" && (
           <SavedView
             items={saved}
+            savedState={savedApi.state}
             visible={views.savedVisible}
             inView={views.savedInView}
             narrowed={route.tab === "merkliste-karte" && viewNarrows(mapView)}

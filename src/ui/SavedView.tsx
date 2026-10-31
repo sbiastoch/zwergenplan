@@ -6,7 +6,13 @@
 import { type ReactNode, useMemo, useRef } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
 import type { DateRange } from "../domain/date-range.ts";
-import { collectionExport, EMPTY_SAVED_FILTER, type SavedFilter, upcomingSessionCount } from "../domain/saved.ts";
+import {
+  collectionExport,
+  EMPTY_SAVED_FILTER,
+  type SavedFilter,
+  type SavedState,
+  upcomingSessionCount,
+} from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
@@ -14,6 +20,8 @@ import {
   EXPORT_UNAVAILABLE,
   exportLabel,
   inViewStatusParts,
+  NO_FIXED_FITS,
+  NOTHING_FIXED,
   savedFilteredEmpty,
   savedFilterStatusParts,
   savedMapStatusParts,
@@ -39,6 +47,8 @@ const VIEW_OPTIONS: readonly ViewOption<SavedTab>[] = [
 interface SavedViewProps {
   /** gemerkte Angebote mit kommendem Termin, je mit dem angezeigten Termin und danach sortiert (`savedOffers`) */
   items: readonly Occurrence<SiteOffer>[];
+  /** Stufen der Merkliste: Der Export nimmt nur fest Eingeplantes (Plan 0057, E4) */
+  savedState: SavedState;
   /** dieselben nach dem Merklisten-Filter dieser Darstellung (`views.savedVisible`, E6) */
   visible: readonly Occurrence<SiteOffer>[];
   /** dieselben im Kartenausschnitt (`views.savedInView`, Plan 0056, E5): die Liste unter der Karte */
@@ -75,6 +85,7 @@ interface SavedViewProps {
 
 export function SavedView({
   items: savedItems,
+  savedState,
   visible,
   inView,
   narrowed,
@@ -97,15 +108,20 @@ export function SavedView({
   const offers = savedItems.map((item) => item.offer);
   // stabile Identität: Die Karte meldet sonst bei jedem Render einen neuen Ausschnitt (Endlosschleife, Plan 0056, S4)
   const shown = useMemo(() => visible.map((item) => item.offer), [visible]);
-  const { items, count, missing } = collectionExport(offers, ctx.now, birthDate);
-  // Export immer mit allen gemerkten (E9); der Name sagt es, wenn der Filter in dieser Darstellung etwas ausblendet
-  const exportName = exportLabel(offers.length, filtered);
+  // Statuszeile: gemerkte Angebote ohne passenden Termin, gleich welche Stufe
+  const { missing: unfitting } = collectionExport(offers, ctx.now, birthDate);
+  const { items, count, missing, tentative } = collectionExport(offers, ctx.now, birthDate, savedState);
+  const fixedCount = offers.length - tentative;
+  // Export mit allen fest eingeplanten (Plan 0057, E4), auch ausgeblendeten; der Name sagt es mit Filter
+  const exportName = exportLabel(fixedCount, filtered);
   // Kontext erst im Tipp: Auch `icsContextFor` liegt im Lazy-Chunk (Plan 0010, E8 A).
   const exportAll = async () => {
     if (count === 0) {
-      // Chunk trotzdem anfordern: Sein Request soll nicht verraten, ob etwas zum Alter passt (ADR 0018)
+      // Chunk trotzdem anfordern: Sein Request soll weder verraten, ob etwas zum Alter passt (ADR 0018), noch, ob
+      // etwas fest eingeplant ist (ADR 0040)
       void loadExport().catch(() => {});
-      onExported("Keins der gemerkten Angebote passt zum Alter.", LONG_TOAST_MS, "hint");
+      if (fixedCount === 0) onExported(NOTHING_FIXED, LONG_TOAST_MS, "hint");
+      else onExported(NO_FIXED_FITS, LONG_TOAST_MS, "hint");
       return;
     }
     let ics: IcsExport;
@@ -117,7 +133,8 @@ export function SavedView({
     }
     const withCtx = items.map((i) => ({ ...i, ctx: ics.icsContextFor(i.offer, generatedAt) }));
     download(ics.icsForCollection(withCtx, "Zwergenplan – Merkliste"), "zwergenplan-merkliste.ics");
-    onExported(collectionToast(count, missing), missing > 0 ? LONG_TOAST_MS : undefined);
+    const long = missing > 0 || tentative > 0;
+    onExported(collectionToast(count, missing, tentative), long ? LONG_TOAST_MS : undefined);
   };
   /*
    * Ganzen Filter zurücksetzen, auch einen im Kalender ausgeblendeten Zeitraum (E6). Der Knopf verschwindet danach: Der
@@ -170,7 +187,9 @@ export function SavedView({
                   <span className="sr-only">{inViewAnnounce}</span>
                 </span>
               ) : (
-                <StatusText parts={statusParts({ offers, shown, filtered, tab, now: ctx.now, birthDate, missing })} />
+                <StatusText
+                  parts={statusParts({ offers, shown, filtered, tab, now: ctx.now, birthDate, missing: unfitting })}
+                />
               )}
             </p>
             {mapNarrowed && (

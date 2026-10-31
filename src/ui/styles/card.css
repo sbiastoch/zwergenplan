@@ -226,7 +226,6 @@
     background: #ff7070;
     color: var(--on-color);
     transform: rotate(-10deg);
-    animation: slap 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
   }
   .heart[aria-pressed="true"] .ic {
     fill: currentColor;
@@ -234,12 +233,210 @@
   .heart.inline {
     position: static;
   }
-  /* Glocke (Plan 0054, E1): wie das Herz, abonniert gelb */
+  /* Glocke (Plan 0054, E1): wie das Herz, abonniert gelb; `slap` beim Abonnieren nur noch hier (Plan 0057, E2) */
   .bell[aria-pressed="true"] .hs {
     background: #ffd93b;
+    animation: slap 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
   }
   .bell[aria-busy="true"] .hs {
     opacity: 0.6;
+  }
+
+  /*
+   * Herz mit drei Stufen (Plan 0057, E2; Demo docs/design/merkliste/HerzDemo.dc.html, Stil „Funken“). Alles nur für
+   * `.heart:not(.bell)`: Die Glocke nutzt `.heart` mit. Animationsklassen setzt nur der Handler nach einer Nutzeraktion
+   * (`HeartButton`), bei reduzierter Bewegung gar nicht. Größte Ausdehnung: Ring 30 px, Funken 38 px um die Mitte.
+   */
+  .heart:not(.bell) {
+    --hold: 550ms;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .heart.inline:not(.bell) {
+    /* Bezug für Ring und Funken */
+    position: relative;
+  }
+  .heart:not(.bell)[aria-pressed="mixed"] .hs,
+  .heart:not(.bell).holding .hs {
+    background: var(--heart-tentative);
+    color: var(--ink);
+  }
+  .heart:not(.bell) .hw {
+    display: grid;
+    place-items: center;
+    transition: transform 0.25s cubic-bezier(0.2, 1.4, 0.4, 1);
+  }
+  .heart:not(.bell).holding .hw {
+    transform: scale(1.5);
+    transition: transform var(--hold) cubic-bezier(0.3, 0, 0.5, 1);
+  }
+  .heart:not(.bell) .heart-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -30px 0 0 -30px;
+    pointer-events: none;
+    transform: rotate(-90deg);
+  }
+  .heart:not(.bell) .heart-ring circle {
+    fill: none;
+    stroke: var(--line);
+    stroke-width: 3;
+    stroke-linecap: round;
+    /* Umfang 2π · 27; ohne Animation (reduzierte Bewegung) steht der Ring sofort voll da */
+    stroke-dasharray: 170;
+    animation: heart-ring var(--hold) linear;
+  }
+  .heart:not(.bell).pop-small .hw {
+    animation: heart-pop-small 0.45s cubic-bezier(0.2, 1.2, 0.4, 1);
+  }
+  .heart:not(.bell).pop-big .hw {
+    animation: heart-pop-big 0.6s cubic-bezier(0.2, 1.2, 0.4, 1);
+  }
+  .heart:not(.bell).pop-big .hs {
+    animation: heart-btn-pop 0.5s cubic-bezier(0.2, 1.2, 0.4, 1);
+  }
+  .heart:not(.bell).deflate .hw {
+    animation: heart-deflate 0.35s ease;
+  }
+  /* Ebene der Funken: 96-px-Kasten um den Knopf, `contain: paint` schneidet alles außerhalb ab */
+  .heart:not(.bell) .sparks {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 96px;
+    height: 96px;
+    margin: -48px 0 0 -48px;
+    pointer-events: none;
+    contain: paint;
+  }
+  .heart:not(.bell) .sparks i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: #ff7070;
+    border: 1.5px solid var(--line);
+    opacity: 0;
+    animation: heart-spark 0.6s cubic-bezier(0.1, 0.8, 0.3, 1);
+  }
+  .heart:not(.bell) .sparks i:nth-child(2n) {
+    background: #ffd93b;
+  }
+  .sparks i:nth-child(1) {
+    --r: 0deg;
+  }
+  .sparks i:nth-child(2) {
+    --r: 45deg;
+  }
+  .sparks i:nth-child(3) {
+    --r: 90deg;
+  }
+  .sparks i:nth-child(4) {
+    --r: 135deg;
+  }
+  .sparks i:nth-child(5) {
+    --r: 180deg;
+  }
+  .sparks i:nth-child(6) {
+    --r: 225deg;
+  }
+  .sparks i:nth-child(7) {
+    --r: 270deg;
+  }
+  .sparks i:nth-child(8) {
+    --r: 315deg;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* Halten wirkt ohne Wachsen; der Ring steht statisch voll da (motion.css schaltet seine Animation ab) */
+    .heart:not(.bell).holding .hw {
+      transform: none;
+    }
+  }
+  @keyframes heart-ring {
+    from {
+      stroke-dashoffset: 170;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes heart-pop-small {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.3);
+    }
+    70% {
+      transform: scale(0.92);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes heart-pop-big {
+    0% {
+      transform: scale(1.25);
+    }
+    30% {
+      transform: scale(1.7);
+    }
+    60% {
+      transform: scale(0.88);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes heart-btn-pop {
+    0% {
+      transform: rotate(-10deg) scale(1);
+    }
+    35% {
+      transform: rotate(-10deg) scale(1.15);
+    }
+    100% {
+      transform: rotate(-10deg) scale(1);
+    }
+  }
+  @keyframes heart-deflate {
+    0% {
+      transform: scale(1);
+    }
+    45% {
+      transform: scale(0.6);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes heart-spark {
+    0% {
+      opacity: 1;
+      transform: rotate(var(--r)) translateY(-10px) scale(0.5);
+    }
+    100% {
+      opacity: 0;
+      transform: rotate(var(--r)) translateY(-34px) scale(1);
+    }
+  }
+
+  /* Vorgemerktes im Kalender (Plan 0057, E4): ohne Schatten, Rand gedämpft, Etikett „vorgemerkt“ */
+  .card.tentative {
+    box-shadow: none;
+    border-color: var(--muted);
+  }
+  .fact.tentative-tag {
+    background: var(--heart-tentative);
+    color: var(--ink);
   }
   @keyframes slap {
     0% {

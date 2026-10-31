@@ -342,10 +342,10 @@ test.describe("Anbieter-Sheet und History (E3)", () => {
     const detail = page.getByRole("dialog", { name: "Offener Krabbeltreff" });
     await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
     await detail.getByRole("button", { name: /merken$/ }).click();
-    await expect(detail.locator(".toast")).toHaveText(/^Gemerkt/);
+    await expect(detail.locator(".toast")).toHaveText(/^Vorgemerkt\./);
     await detail.getByRole("button", { name: "Zurück" }).click();
     await expect(providerSheet(page)).toBeVisible();
-    await expect(providerSheet(page).locator(".toast")).toHaveText(/^Gemerkt/);
+    await expect(providerSheet(page).locator(".toast")).toHaveText(/^Vorgemerkt\./);
     // Seiten-Toast (außerhalb der Dialoge) bleibt leer
     await expect(page.locator(".app > [aria-live] .toast")).toHaveCount(0);
   });

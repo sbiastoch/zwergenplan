@@ -66,8 +66,8 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Detail: Dialog, History und Deep-Link (Overlays, use-app-state), ICS aus dem Browser und als statische Datei
   // (build-data.ts), Texte (format.ts), Anmeldefrist, Alter, Route in Google Maps (Ways), Toasts im Dialog.
   "e2e/detail.spec.ts": [
-    /^src\/ui\/(DetailDialog|Overlays|Dialog|Ways|Toast)\.tsx$/,
-    /^src\/ui\/(use-app-state|ics-export|format)\.ts$/,
+    /^src\/ui\/(DetailDialog|Overlays|Dialog|Ways|Toast|OfferCard)\.tsx$/,
+    /^src\/ui\/(use-app-state|ics-export|format|heart-gesture)\.ts$/,
     /^src\/domain\/(age|ics|ics-paths|ics-types|labels|maps-link|registration)\.ts$/,
     BUILD_DATA,
   ],
@@ -102,8 +102,9 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/domain\/(camera|places|provider-places|geo|category-look|map-view)\.ts$/,
   ],
   // Querschnitt Layout über Breiten, Lagen und Textgrößen: nur die globale Hülle (Review 2, M1).
-  // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4)
-  "e2e/layout.spec.ts": [...SHELL, /^src\/ui\/SavedFilters\.tsx$/],
+  // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4); Herz-Animation ohne
+  // Überlauf und Toast mit „Rückgängig“ neben der Herz-Spalte (Plan 0057, Test 14)
+  "e2e/layout.spec.ts": [...SHELL, /^src\/ui\/(SavedFilters|OfferCard|Toast)\.tsx$/, /^src\/ui\/heart-gesture\.ts$/],
   // Anbieter-Abos: Glocke in Liste und Sheet, Reihenfolge im Tab, Suche, Privatsphäre auch beim Glocken-Tipp
   // (preferences, useSavedProviders, bellPush in AppExtras; Plan 0054).
   "e2e/merkliste-anbieter.spec.ts": [
@@ -117,14 +118,15 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // der Merkliste (SavedView), „jetzt“ per Timer und visibilitychange (useNow), Detail am Tag, passend zum Alter.
   // Für agenda.ts und calendar.ts die maßgebliche Prüfung.
   "e2e/merkliste-kalender.spec.ts": [
-    /^src\/ui\/(SavedCalendar|SavedView)\.tsx$/,
+    /^src\/ui\/(SavedCalendar|SavedView|OfferCard)\.tsx$/,
     /^src\/ui\/(use-offer-views|use-app-state)\.ts$/,
     /^src\/data\/preferences\.ts$/,
     /^src\/domain\/(agenda|calendar|time|saved|age)\.ts$/,
   ],
   // Querschnitt Mobile-UX-Gates je Ansicht: die globale Hülle (Review 2, M1), dazu die Vorschauseite ohne JS und
   // 404.html, die nur diese Spec durch die Gates schickt (share-pages.ts).
-  "e2e/mobile-ux.spec.ts": [...SHELL, SHARE_PAGES],
+  // Herz bei reduzierter Bewegung (Plan 0057, Test 18)
+  "e2e/mobile-ux.spec.ts": [...SHELL, SHARE_PAGES, /^src\/ui\/OfferCard\.tsx$/, /^src\/ui\/heart-gesture\.ts$/],
   // App-Schritt des Onboardings mit Push-Fähigkeit (Plan 0033, Tests 5 und 6): Schalter ohne Requests vor dem Tipp,
   // Installationsknopf, Reihenfolge mit und ohne Push.
   "e2e/onboarding-push.spec.ts": [
@@ -174,12 +176,13 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     SHARE_PAGES,
     BUILD_DATA,
   ],
-  // Merkliste: Herz und Badge (OfferCard, useSaved), Sammel-ICS aus dem Browser, Export-Chunk, Kopf und Umschalter
-  // Liste | Karte (MapPanel), passend zum Alter. ICS-Dateien aus build-data.ts.
+  // Merkliste: Herz mit Stufen und Geste (OfferCard, heart-gesture, haptics; Plan 0057, E2), Toast mit „Rückgängig“,
+  // Badge (useSaved), Sammel-ICS aus dem Browser, Export-Chunk, Kopf und Umschalter Liste | Karte (MapPanel), passend
+  // zum Alter. ICS-Dateien aus build-data.ts.
   "e2e/saved.spec.ts": [
-    /^src\/ui\/(SavedView|SavedFilters|OfferCard|MapPanel)\.tsx$/,
-    /^src\/ui\/(ics-export|use-app-state|use-offer-views)\.ts$/,
-    /^src\/data\/preferences\.ts$/,
+    /^src\/ui\/(SavedView|SavedFilters|OfferCard|MapPanel|Toast)\.tsx$/,
+    /^src\/ui\/(ics-export|use-app-state|use-offer-views|heart-gesture)\.ts$/,
+    /^src\/data\/(preferences|haptics)\.ts$/,
     /^src\/domain\/(saved|ics|age)\.ts$/,
     BUILD_DATA,
   ],

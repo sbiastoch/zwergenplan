@@ -6,6 +6,9 @@
  * Sekunden später ab, Text stand so lange in der alten Farbe (Plan 0008, E1).
  * Bedingung: Kein Code hört auf `animationend`/`transitionend`, und keine Animation hält mit `forwards` einen
  * Endzustand. Wer das künftig tut, muss den Fall „reduzieren“ selbst behandeln, denn hier feuert kein Ereignis.
+ * Einzige solche Stelle: das Herz (`HeartButton` in src/ui/OfferCard.tsx, Plan 0057, E2) räumt seine Animationsklasse
+ * bei `animationend` ab und fragt deshalb vorher `matchMedia("(prefers-reduced-motion: reduce)")`; bei „reduce“ setzt
+ * es gar keine.
  */
 @media (prefers-reduced-motion: reduce) {
   *,

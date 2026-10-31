@@ -422,3 +422,31 @@ test.describe("„Heute“ hängt an „jetzt“ (B2)", () => {
     );
   });
 });
+
+// Plan 0057, E4: Vorgemerktes steht im Kalender, aber abgesetzt: Form der Woche als Umriss, Karte mit Etikett.
+test("vorgemerkt: Form der Woche als Umriss, Karte ohne Schatten mit Etikett „vorgemerkt“", async ({ page }) => {
+  await page.addInitScript(
+    (ids) => localStorage.setItem("zwergenplan.merkliste-vorgemerkt", ids),
+    JSON.stringify([IDS.treff]),
+  );
+  await openCalendar(page);
+  const card = offers(page).filter({ hasText: "Offener Krabbeltreff" });
+  await expect(card).toHaveCount(1);
+  await expect(card).toHaveClass(/\btentative\b/);
+  await expect(card.locator(".fact.tentative-tag")).toHaveText("vorgemerkt");
+  expect(await card.evaluate((el) => getComputedStyle(el).boxShadow)).toBe("none");
+  const shape = page.locator(".week .dots .tentative .shape");
+  await expect(shape).toHaveCount(1);
+  const style = await shape.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { fill: s.fill, stroke: s.stroke };
+  });
+  expect(style.fill).toBe("none");
+  expect(style.stroke).not.toBe("none");
+  await expectMobileUx(page);
+  // fest eingeplant (PEKiP, Di 13.10.): gefüllt und ohne Etikett; der Treff am 14.10. weiter als Umriss
+  await page.getByRole("button", { name: "Nächste Woche" }).click();
+  await expect(page.locator(".week .dots .tentative")).toHaveCount(1);
+  await expect(page.locator(".week .dots > span")).toHaveCount(2);
+  await expect(offers(page).filter({ hasText: "PEKiP" }).locator(".tentative-tag")).toHaveCount(0);
+});

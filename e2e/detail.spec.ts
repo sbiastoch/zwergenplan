@@ -107,11 +107,21 @@ test("zeigt Verfügbarkeit als Momentaufnahme und erklärt das Alter", async ({ 
   await expect(dialog.getByText("Geburtsdatum eintragen, dann prüfen wir das")).toBeVisible();
 });
 
-test("merkt aus dem Detail, Meldung im Dialog sichtbar", async ({ page }) => {
+test("merkt aus dem Detail, Meldung im Dialog sichtbar, „Rückgängig“ dort bedienbar (Plan 0057, E3)", async ({
+  page,
+}) => {
   const dialog = await openDetail(page, PEKIP);
-  await dialog.getByRole("button", { name: `${PEKIP} merken` }).click();
-  await expect(dialog.getByText("Gemerkt – liegt jetzt auf deiner Merkliste")).toBeVisible();
-  await expect(dialog.getByRole("button", { name: `${PEKIP} merken` })).toHaveAttribute("aria-pressed", "true");
+  const heart = dialog.getByRole("button", { name: `${PEKIP} merken` });
+  await heart.click();
+  await expect(dialog.getByText("Vorgemerkt. Nochmal tippen oder halten: fest einplanen.")).toBeVisible();
+  await expect(heart).toHaveAttribute("aria-pressed", "mixed");
+  await heart.click();
+  await expect(dialog.getByText("Fest eingeplant – steht im Kalender.")).toBeVisible();
+  await expect(heart).toHaveAttribute("aria-pressed", "true");
+  await dialog.getByRole("button", { name: "Rückgängig" }).click();
+  await expect(heart).toHaveAttribute("aria-pressed", "mixed");
+  await expect(dialog.getByText("Rückgängig gemacht.")).toBeVisible();
+  await expect(heart).toBeFocused();
 });
 
 test("regelmäßig 14-täglich: Wochentag mit Uhrzeit (B1)", async ({ page }) => {

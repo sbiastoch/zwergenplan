@@ -21,7 +21,7 @@ import {
 } from "../domain/reach.ts";
 import { regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
-import type { ExportSelection } from "../domain/saved.ts";
+import type { ExportSelection, SavedStage } from "../domain/saved.ts";
 import type { Cost, Format, Registration, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinDate, berlinIsoDate, isoWeekday, parseIsoDate } from "../domain/time.ts";
@@ -323,18 +323,42 @@ function missingSuffix(missing: number): string {
   return missing === 0 ? "" : ` – ${plural(missing, "Angebot passt", "Angebote passen")} nicht zum Alter`;
 }
 
-/** Toast nach dem Export der Merkliste (Plan 0018, E4): `missing` gemerkte Angebote ohne passenden Termin */
-export function collectionToast(count: number, missing: number): string {
-  return `${calendarLoaded(count)}${missingSuffix(missing)}`;
+/**
+ * Toast nach dem Export der Merkliste (Plan 0018, E4; Plan 0057, E4): `missing` fest eingeplante Angebote ohne
+ * passenden Termin, `tentative` vorgemerkte, die nicht in die Datei kommen
+ */
+export function collectionToast(count: number, missing: number, tentative = 0): string {
+  const left =
+    tentative === 0 ? "" : ` · ${plural(tentative, "vorgemerktes ist", "vorgemerkte sind")} nicht in der Datei`;
+  return `${calendarLoaded(count)}${missingSuffix(missing)}${left}`;
 }
 
+/** Hinweis, wenn der Export nichts fest Eingeplantes findet (Plan 0057, E4) */
+export const NOTHING_FIXED = "Noch nichts fest eingeplant. Tippe nochmal aufs Herz.";
+
 /**
- * Name und Tooltip des runden Export-Knopfs der Merkliste (Plan 0025, E9). Der Export nimmt immer alle gemerkten
- * Angebote (ADR 0007, ADR 0018); mit aktivem Merklisten-Filter sagt der Name es, auch dem Screenreader.
+ * Name und Tooltip des runden Export-Knopfs der Merkliste (Plan 0025, E9; Plan 0057, E4). Der Export nimmt alle fest
+ * eingeplanten Angebote (ADR 0040), auch vom Filter ausgeblendete; mit aktivem Merklisten-Filter sagt der Name es, auch
+ * dem Screenreader.
  */
-export function exportLabel(savedCount: number, filtered: boolean): string {
-  return filtered ? `Alle ${savedCount} gemerkten in den Kalender, auch ausgeblendete` : "Alle in den Kalender";
+export function exportLabel(fixedCount: number, filtered: boolean): string {
+  if (!filtered || fixedCount === 0) return "Fest Eingeplantes in meinen Kalender";
+  if (fixedCount === 1) return "Das fest eingeplante in meinen Kalender, auch wenn ausgeblendet";
+  return `Alle ${fixedCount} fest eingeplanten in meinen Kalender, auch ausgeblendete`;
 }
+
+/** Hinweis, wenn keins der fest eingeplanten Angebote zum Alter passt (Plan 0018, E4; Plan 0057, E4) */
+export const NO_FIXED_FITS = "Keins der fest eingeplanten Angebote passt zum Alter.";
+
+/** Toast nach dem Tipp aufs Herz (Plan 0057, E3): sagt die neue Stufe an, auch dem Screenreader */
+export function stageToast(stage: SavedStage): string {
+  if (stage === "vorgemerkt") return "Vorgemerkt. Nochmal tippen oder halten: fest einplanen.";
+  if (stage === "fest") return "Fest eingeplant – steht im Kalender.";
+  return "Nicht mehr gemerkt.";
+}
+
+/** Toast nach „Rückgängig“ (E3), ohne Aktion */
+export const STAGE_UNDONE = "Rückgängig gemacht.";
 
 /**
  * Toast, wenn der Export-Code nicht lädt (Merkliste und Detail). Chromium behält einen gescheiterten `import()`, auch

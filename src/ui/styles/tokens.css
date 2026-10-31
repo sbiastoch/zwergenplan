@@ -282,6 +282,8 @@
   --hint-ok-line: var(--line);
   --hint-bad-line: var(--line);
   --on-hint: #13212e;
+  /* Herz „vorgemerkt“ (Plan 0057, E2): helles Rosa, Herz in der Textfarbe darauf */
+  --heart-tentative: #ffd6d6;
   color-scheme: light;
 }
 
@@ -313,6 +315,7 @@
     --hint-ok-line: #a6db5e;
     --hint-bad-line: #ff9a9a;
     --on-hint: #eef3f8;
+    --heart-tentative: color-mix(in srgb, #ff7070 38%, #1b2733);
     color-scheme: dark;
   }
 }
@@ -345,6 +348,7 @@
   --hint-ok-line: #a6db5e;
   --hint-bad-line: #ff9a9a;
   --on-hint: #eef3f8;
+  --heart-tentative: color-mix(in srgb, #ff7070 38%, #1b2733);
   color-scheme: dark;
 }
 

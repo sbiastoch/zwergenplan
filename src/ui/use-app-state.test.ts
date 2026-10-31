@@ -405,11 +405,42 @@ describe("useSaved und useSavedProviders: Umschreiben nach ADR 0022", () => {
     storage.setItem("zwergenplan.merkliste", JSON.stringify([long, "nle21y1x"]));
     const setItem = vi.spyOn(storage, "setItem");
     vi.stubGlobal("localStorage", storage);
-    expect(renderSaved(useSaved)[0]).toEqual(["lxizt974", "nle21y1x"]);
+    expect(renderSaved(useSaved).state.ids).toEqual(["lxizt974", "nle21y1x"]);
     expect(JSON.parse(storage.getItem("zwergenplan.merkliste") ?? "")).toEqual(["lxizt974", "nle21y1x"]);
     setItem.mockClear();
     renderSaved(useSaved);
     expect(setItem).not.toHaveBeenCalled();
+  });
+
+  it("liest beide Schlüssel, bereinigt Vorgemerktes einmal, schreibt sonst nur bei Änderung (Plan 0057, E1)", () => {
+    const storage = fakeStorage();
+    const TENTATIVE = "zwergenplan.merkliste-vorgemerkt";
+    storage.setItem("zwergenplan.merkliste", JSON.stringify(["a", "b"]));
+    // „weg“ hat eine alte App-Version aus der Merkliste entfernt
+    storage.setItem(TENTATIVE, JSON.stringify(["b", "weg"]));
+    const setItem = vi.spyOn(storage, "setItem");
+    const removeItem = vi.spyOn(storage, "removeItem");
+    vi.stubGlobal("localStorage", storage);
+    const saved = renderSaved(useSaved);
+    expect(saved.state).toEqual({ ids: ["a", "b"], tentative: ["b"] });
+    expect(saved.stage("a")).toBe("fest");
+    expect(saved.stage("b")).toBe("vorgemerkt");
+    expect(JSON.parse(storage.getItem(TENTATIVE) ?? "")).toEqual(["b"]);
+    expect(setItem.mock.calls.map(([key]) => key)).toEqual([TENTATIVE]);
+    setItem.mockClear();
+    const again = renderSaved(useSaved);
+    expect(setItem).not.toHaveBeenCalled();
+    // Tipp: b wird fest, die leere Vorgemerkt-Liste entfernt den Schlüssel; die Merkliste bleibt gleich
+    expect(again.cycle("b")).toBe("fest");
+    expect(storage.getItem(TENTATIVE)).toBeNull();
+    expect(removeItem).toHaveBeenCalledWith(TENTATIVE);
+    expect(setItem).not.toHaveBeenCalled();
+    // direkt setzen (Halten, Rückgängig) und weiterschalten
+    expect(again.setStage("c", "vorgemerkt")).toBe("vorgemerkt");
+    expect(JSON.parse(storage.getItem("zwergenplan.merkliste") ?? "")).toEqual(["a", "b", "c"]);
+    expect(JSON.parse(storage.getItem(TENTATIVE) ?? "")).toEqual(["c"]);
+    expect(again.cycle("a")).toBe("aus");
+    expect(JSON.parse(storage.getItem("zwergenplan.merkliste") ?? "")).toEqual(["b", "c"]);
   });
 
   it("schreibt Katalog-IDs gemerkter Anbieter einmal auf die publicId um, sonst nichts", () => {
@@ -519,5 +550,33 @@ describe("useToast (Plan 0018, E4)", () => {
       shown: { text: "Export gerade nicht möglich", tone: "hint" },
       delays: [2800],
     });
+  });
+
+  it("nimmt Dauer und Art auch als Optionen (Plan 0057, E3)", () => {
+    expect(sayOnce("Export gerade nicht möglich", { tone: "hint", ms: 4000 })).toEqual({
+      shown: { text: "Export gerade nicht möglich", tone: "hint" },
+      delays: [4000],
+    });
+  });
+
+  it("Toast mit Aktion: 6 s, Pause bei Fokus, Neustart nach Blur, die Aktion schließt ihn (Plan 0057, E3)", () => {
+    const run = vi.fn();
+    const { shown, delays } = sayOnce("Vorgemerkt.", { action: { label: "Rückgängig", run } });
+    expect(delays).toEqual([6000]);
+    expect(shown).toMatchObject({ text: "Vorgemerkt.", tone: "ok", action: { label: "Rückgängig" } });
+    const timeout = vi.spyOn(globalThis, "setTimeout");
+    timeout.mockClear();
+    const clear = vi.spyOn(globalThis, "clearTimeout");
+    clear.mockClear();
+    // Fokus auf dem Knopf: Die Zeit läuft nicht ab
+    shown.action?.hold(true);
+    expect(clear).toHaveBeenCalledTimes(1);
+    expect(timeout).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(10_000);
+    // nach dem Blur beginnen die 6 s neu
+    shown.action?.hold(false);
+    expect(timeout.mock.calls.map((call) => call[1])).toEqual([6000]);
+    shown.action?.run();
+    expect(run).toHaveBeenCalledTimes(1);
   });
 });

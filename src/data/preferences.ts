@@ -1,6 +1,6 @@
 /**
- * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste, gemerkte Anbieter, Darstellung,
- * Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
+ * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste (samt Vorgemerktem), gemerkte Anbieter,
+ * Darstellung, Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
  * Plan 0033, E2; versioniert seit Plan 0035, E4). Die Such-Abos liegen in `searches-store.ts`. Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
@@ -8,6 +8,8 @@
 const KEYS = {
   birthDate: "zwergenplan.geburtsdatum",
   saved: "zwergenplan.merkliste",
+  /** nur vorgemerkte IDs, Teilmenge der Merkliste (Plan 0057, E1; ADR 0040) */
+  tentative: "zwergenplan.merkliste-vorgemerkt",
   savedProviders: "zwergenplan.anbieter-merkliste",
   theme: "zwergenplan.darstellung",
   originDistrict: "zwergenplan.entfernung-ab",
@@ -69,6 +71,18 @@ export function loadSaved(): string[] {
 
 export function saveSaved(ids: readonly string[]): void {
   saveIds(KEYS.saved, ids);
+}
+
+/**
+ * Nur vorgemerkte Angebote (Plan 0057, E1), gebaut wie `loadSaved`. Ob sie zur Merkliste gehören, prüft
+ * `cleanSavedState` in der Hook-Schicht.
+ */
+export function loadTentative(): string[] {
+  return loadIds(KEYS.tentative);
+}
+
+export function saveTentative(ids: readonly string[]): void {
+  saveIds(KEYS.tentative, ids);
 }
 
 /**

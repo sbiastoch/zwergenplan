@@ -251,6 +251,71 @@
       bottom: calc(4.5rem + env(safe-area-inset-bottom));
     }
   }
+  /*
+   * Toast mit Aktion (Plan 0057, E3; löst Plan 0008, E9 dafür ab): links mit 16 px Rand und mindestens 96 px vor dem
+   * rechten Rand der Inhaltsspalte, nie über der Herz-Spalte (Herzen mit Ring bis 80 px vom Rand). Nur der Knopf fängt
+   * Tipps; passt er nicht neben den Text, bricht er darunter um.
+   */
+  .toast.has-action {
+    --col-edge: calc((100vw - min(40rem, 100vw)) / 2);
+    /* 8 statt 16 px links: bei 320 px und 200 % passt „Vorgemerkt.“ sonst nicht in eine Zeile */
+    left: calc(var(--col-edge) + 8px);
+    right: calc(var(--col-edge) + 96px);
+    container: toast / inline-size;
+    width: auto;
+    flex-wrap: wrap;
+    row-gap: 2px;
+    padding-right: 8px;
+    /* kleiner als beim reinen Toast: Der umgebrochene Knopf steht sonst in der Rundung */
+    border-radius: 20px;
+    transform: rotate(-1deg);
+    animation-name: toast-side;
+  }
+  @media (max-height: 500px) and (min-width: 40rem) {
+    .toast.has-action {
+      /* Inhaltsspalte rechts der Seitenleiste, höchstens 40rem breit und darin zentriert */
+      --colw: min(40rem, 100vw - var(--rail) - env(safe-area-inset-right));
+      --col-left: calc(var(--rail) + (100vw - var(--rail) - env(safe-area-inset-right) - var(--colw)) / 2);
+      left: calc(var(--col-left) + 16px);
+      right: calc(100vw - var(--col-left) - var(--colw) + 96px);
+      max-width: 26rem;
+    }
+  }
+  /* Große Schrift im schmalen Toast: das Häkchen weicht dem Text, der Knopf sagt die Art schon */
+  @container toast (max-width: 11rem) {
+    .toast .tk {
+      display: none;
+    }
+  }
+  .toast-text {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+  .toast-action {
+    pointer-events: auto;
+    min-height: 44px;
+    margin-left: auto;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 22px;
+    background: none;
+    color: #ffd93b;
+    font: inherit;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+  }
+  @keyframes toast-side {
+    from {
+      transform: translateY(30px) rotate(-6deg) scale(0.9);
+      opacity: 0;
+    }
+    to {
+      transform: rotate(-1deg);
+      opacity: 1;
+    }
+  }
   .toast:empty {
     display: none;
   }

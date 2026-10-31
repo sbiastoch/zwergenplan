@@ -29,6 +29,7 @@ import {
   listingHeading,
   listStatusParts,
   loadErrorText,
+  NOTHING_FIXED,
   nearSortSub,
   originHint,
   originPhrase,
@@ -51,6 +52,7 @@ import {
   selectionHeading,
   seriesToast,
   shortDate,
+  stageToast,
   standDate,
   timeRange,
   transitSourceNote,
@@ -847,16 +849,31 @@ describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
     );
   });
 
-  it("Name des Export-Knopfs der Merkliste (Plan 0025, E9)", () => {
-    expect(exportLabel(5, false)).toBe("Alle in den Kalender");
-    expect(exportLabel(5, true)).toBe("Alle 5 gemerkten in den Kalender, auch ausgeblendete");
+  it("Name des Export-Knopfs der Merkliste: nur fest Eingeplantes (Plan 0025, E9; Plan 0057, E4)", () => {
+    expect(exportLabel(5, false)).toBe("Fest Eingeplantes in meinen Kalender");
+    expect(exportLabel(5, true)).toBe("Alle 5 fest eingeplanten in meinen Kalender, auch ausgeblendete");
+    expect(exportLabel(1, true)).toBe("Das fest eingeplante in meinen Kalender, auch wenn ausgeblendet");
+    expect(exportLabel(0, true)).toBe("Fest Eingeplantes in meinen Kalender");
   });
 
-  it("Toast der Merkliste zählt fehlende Angebote", () => {
+  it("Toast der Merkliste zählt fehlende und vorgemerkte Angebote", () => {
     expect(collectionToast(13, 0)).toBe("Kalenderdatei mit 13 Terminen geladen");
     expect(collectionToast(1, 0)).toBe("Kalenderdatei mit 1 Termin geladen");
     expect(collectionToast(8, 1)).toBe("Kalenderdatei mit 8 Terminen geladen – 1 Angebot passt nicht zum Alter");
     expect(collectionToast(8, 2)).toBe("Kalenderdatei mit 8 Terminen geladen – 2 Angebote passen nicht zum Alter");
+    expect(collectionToast(8, 0, 3)).toBe(
+      "Kalenderdatei mit 8 Terminen geladen · 3 vorgemerkte sind nicht in der Datei",
+    );
+    expect(collectionToast(8, 1, 1)).toBe(
+      "Kalenderdatei mit 8 Terminen geladen – 1 Angebot passt nicht zum Alter · 1 vorgemerktes ist nicht in der Datei",
+    );
+    expect(NOTHING_FIXED).toBe("Noch nichts fest eingeplant. Tippe nochmal aufs Herz.");
+  });
+
+  it("Toast nach dem Tipp aufs Herz nennt die neue Stufe (Plan 0057, E3)", () => {
+    expect(stageToast("vorgemerkt")).toBe("Vorgemerkt. Nochmal tippen oder halten: fest einplanen.");
+    expect(stageToast("fest")).toBe("Fest eingeplant – steht im Kalender.");
+    expect(stageToast("aus")).toBe("Nicht mehr gemerkt.");
   });
 
   it("Alterszeile im Detail nennt die Grenze nur bei Kürzung", () => {

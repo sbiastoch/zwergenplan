@@ -16,6 +16,53 @@ export function toggleId<T extends string>(ids: readonly T[], id: T): T[] {
   return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
 }
 
+/** Stufe eines Angebots auf der Merkliste (Plan 0057, E1; ADR 0040) */
+export type SavedStage = "aus" | "vorgemerkt" | "fest";
+
+/**
+ * Merkliste mit Stufen (E1): `ids` sind alle gemerkten in Merk-Reihenfolge, `tentative` die nur vorgemerkten (immer eine
+ * Teilmenge). Fest eingeplant ist jede gemerkte ID, die nicht vorgemerkt ist; so gilt der Bestand ohne zweite Liste als
+ * fest eingeplant.
+ */
+export interface SavedState {
+  ids: readonly string[];
+  tentative: readonly string[];
+}
+
+export function stageOf(state: SavedState, id: string): SavedStage {
+  if (!state.ids.includes(id)) return "aus";
+  return state.tentative.includes(id) ? "vorgemerkt" : "fest";
+}
+
+const NEXT_STAGE: Record<SavedStage, SavedStage> = { aus: "vorgemerkt", vorgemerkt: "fest", fest: "aus" };
+
+/** Tipp aufs Herz: aus → vorgemerkt → fest → aus */
+export function cycleStage(state: SavedState, id: string): SavedState {
+  return withStage(state, id, NEXT_STAGE[stageOf(state, id)]);
+}
+
+/**
+ * Halten oder „Rückgängig“: Stufe direkt setzen; „aus“ entfernt aus beiden Listen. Neu Gemerktes hängt hinten an, ein
+ * Wechsel zwischen „vorgemerkt“ und „fest“ hält die Stelle. Bei gleicher Stufe kommt derselbe Zustand zurück.
+ */
+export function withStage(state: SavedState, id: string, stage: SavedStage): SavedState {
+  if (stageOf(state, id) === stage) return state;
+  const without = state.tentative.filter((x) => x !== id);
+  if (stage === "aus") return { ids: state.ids.filter((x) => x !== id), tentative: without };
+  const ids = state.ids.includes(id) ? state.ids : [...state.ids, id];
+  return { ids, tentative: stage === "vorgemerkt" ? [...without, id] : without };
+}
+
+/**
+ * Bereinigung beim Laden (E1; ADR 0022, Punkt 10): beide Listen migriert, Vorgemerktes nur, solange es gemerkt ist.
+ * Eine alte App-Version ohne Stufen kann eine ID aus der Merkliste entfernen und die Vorgemerkt-ID stehen lassen.
+ */
+export function cleanSavedState(state: SavedState): SavedState {
+  const ids = migrateSavedIds(state.ids);
+  const known = new Set(ids);
+  return { ids, tentative: migrateSavedIds(state.tentative).filter((id) => known.has(id)) };
+}
+
 /**
  * Gemerkte Angebote mit kommendem Termin, je mit dem Termin, an dem die Karte steht (`shownSession`), und danach
  * sortiert: mit Geburtsdatum bei regelmäßigen der erste passende (Plan 0028). Passt keiner, bleibt das Angebot am
@@ -106,25 +153,30 @@ export interface CollectionExport<T extends Offer> {
   items: { offer: T; sessions: Session[] }[];
   /** Termine in der Datei */
   count: number;
-  /** gemerkte Angebote ohne passenden Termin; sie fehlen in der Datei */
+  /** fest eingeplante Angebote ohne passenden Termin; sie fehlen in der Datei */
   missing: number;
+  /** vorgemerkte Angebote; sie fehlen in der Datei (Plan 0057, E4) */
+  tentative: number;
 }
 
 /**
- * Auswahl für „Alle in den Kalender“ (Plan 0018, E3) mit `exportSessions` je gemerktem Angebot. Toast und Datei
- * zählen mit derselben Auswahl, Datei und Zahl stimmen also überein.
+ * Auswahl für „Fest Eingeplantes in meinen Kalender“ (Plan 0018, E3; Plan 0057, E4) mit `exportSessions` je fest
+ * eingeplantem Angebot. Mit `state` fallen die vorgemerkten weg und werden gezählt; ohne zählt alles (Statuszeile).
+ * Toast und Datei zählen mit derselben Auswahl, Datei und Zahl stimmen also überein.
  */
 export function collectionExport<T extends Offer>(
   offers: readonly T[],
   now: Date,
   birthDate: string | undefined,
+  state?: SavedState,
 ): CollectionExport<T> {
-  const items = offers.flatMap((offer) => {
+  const fixed = state ? offers.filter((offer) => stageOf(state, offer.id) === "fest") : offers;
+  const items = fixed.flatMap((offer) => {
     const { sessions } = exportSessions(offer, now, birthDate);
     return sessions.length > 0 ? [{ offer, sessions }] : [];
   });
   const count = items.reduce((sum, item) => sum + item.sessions.length, 0);
-  return { items, count, missing: offers.length - items.length };
+  return { items, count, missing: fixed.length - items.length, tentative: offers.length - fixed.length };
 }
 
 /** Filter der Merkliste (Plan 0025, E6): getrennt vom Startseiten-Filter, nie in der URL. */

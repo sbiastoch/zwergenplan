@@ -6,6 +6,8 @@ import { CATEGORY_UI } from "./categories.ts";
 const PATHS = {
   check: "m5 12 5 5 9-10",
   heart: "M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z",
+  // Herz „vorgemerkt“ (Plan 0057, E2): derselbe Umriss, die untere Hälfte gefüllt (`extra`)
+  heartHalf: "M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z",
   bell: "M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.8 2H4.7zM10 20.5a2 2 0 0 0 4 0",
   back: "m15 5-7 7 7 7",
   next: "m9 5 7 7-7 7",
@@ -36,6 +38,9 @@ export type IconName = keyof typeof PATHS;
 /** Zusatzformen, die nicht als einzelner Pfad gehen */
 function extra(name: IconName) {
   switch (name) {
+    case "heartHalf":
+      // untere Hälfte des Herz-Umrisses bis y = 12,6, als eigener Pfad statt clipPath (keine IDs im Dokument)
+      return <path fill="currentColor" d="M5.1 12.6C6.87 16.85 12 20 12 20s5.13-3.15 6.9-7.4z" />;
     case "sliders":
       return (
         <>

@@ -7,11 +7,13 @@ import {
   loadOriginPoint,
   loadSaved,
   loadSavedProviders,
+  loadTentative,
   loadTheme,
   saveBirthDate,
   saveOrigin,
   saveSaved,
   saveSavedProviders,
+  saveTentative,
   saveTheme,
   type ThemeChoice,
 } from "../data/preferences.ts";
@@ -21,7 +23,16 @@ import { districtById } from "../domain/districts.ts";
 import type { FilterState } from "../domain/filter.ts";
 import type { Origin } from "../domain/reach.ts";
 import { isLegacyView, parseRoute, type Route, resolveRouteIds, routeToSearch } from "../domain/route.ts";
-import { cleanSavedProviders, migrateSavedIds, toggleId } from "../domain/saved.ts";
+import {
+  cleanSavedProviders,
+  cleanSavedState,
+  cycleStage,
+  type SavedStage,
+  type SavedState,
+  stageOf,
+  toggleId,
+  withStage,
+} from "../domain/saved.ts";
 import { addSearch, hasSearch, parseSearches, removeSearch, type SearchOutcome, searchOf } from "../domain/searches.ts";
 import { sameMinute } from "../domain/time.ts";
 import { SHARE_COPIED } from "./format.ts";
@@ -151,25 +162,48 @@ export function useBirthDate(): [string | undefined, (value: string | undefined)
   return [value, update];
 }
 
-/** Gemerkte Angebote; IDs aus der Zeit vor ADR 0022 schreibt der Initializer einmal auf Kurz-IDs um. */
-export function useSaved(): [string[], (id: string) => boolean] {
-  const [ids, setIds] = useState(() => {
-    const stored = loadSaved();
-    const migrated = migrateSavedIds(stored);
-    if (migrated.join() !== stored.join()) saveSaved(migrated);
-    return migrated;
+/** Merkliste mit Stufen (Plan 0057, E1) */
+export interface SavedApi {
+  state: SavedState;
+  stage: (id: string) => SavedStage;
+  /** Tipp aufs Herz: speichert sofort und liefert die neue Stufe */
+  cycle: (id: string) => SavedStage;
+  /** Halten oder „Rückgängig“: speichert sofort und liefert die neue Stufe */
+  setStage: (id: string, stage: SavedStage) => SavedStage;
+}
+
+/** Schreibt nur die Liste, die sich geändert hat */
+function storeSaved(before: SavedState, next: SavedState): void {
+  if (next.ids.join() !== before.ids.join()) saveSaved(next.ids);
+  if (next.tentative.join() !== before.tentative.join()) saveTentative(next.tentative);
+}
+
+/**
+ * Gemerkte Angebote mit Stufen (Plan 0057, E1). Der Initializer bereinigt einmal (`cleanSavedState`): IDs aus der Zeit
+ * vor ADR 0022 werden Kurz-IDs, Vorgemerktes außerhalb der Merkliste fällt weg; geschrieben wird nur bei Änderung.
+ */
+export function useSaved(): SavedApi {
+  const [state, setState] = useState<SavedState>(() => {
+    const stored = { ids: loadSaved(), tentative: loadTentative() };
+    const cleaned = cleanSavedState(stored);
+    storeSaved(stored, cleaned);
+    return cleaned;
   });
-  const idsRef = useRef(ids);
-  idsRef.current = ids;
-  /** liefert, ob das Angebot danach gemerkt ist */
-  const toggle = useCallback((id: string) => {
-    const next = toggleId(idsRef.current, id);
-    idsRef.current = next;
-    setIds(next);
-    saveSaved(next);
-    return next.includes(id);
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const setStage = useCallback((id: string, stage: SavedStage) => {
+    const before = stateRef.current;
+    const next = withStage(before, id, stage);
+    stateRef.current = next;
+    setState(next);
+    storeSaved(before, next);
+    return stage;
   }, []);
-  return [ids, toggle];
+  const cycle = useCallback((id: string) => setStage(id, stageOf(cycleStage(stateRef.current, id), id)), [setStage]);
+  // aus dem Ref: Ein zweiter Tipp vor dem nächsten Rendern liest schon den neuen Stand. Die Identität bleibt deshalb
+  // gleich: Ein `useMemo` über Stufen hängt an `state`, nie an `stage`
+  const stage = useCallback((id: string) => stageOf(stateRef.current, id), []);
+  return { state, stage, cycle, setStage };
 }
 
 /**
@@ -273,18 +307,54 @@ const TOAST_MS = 2800;
  */
 export const LONG_TOAST_MS = 6000;
 
-/** Meldung zeigen: 2,8 s oder `ms` lang, standardmäßig als Erfolg */
-export type Say = (message: string, ms?: number, tone?: ToastTone) => void;
+/** Toast mit Knopf (Plan 0057, E3) */
+interface ToastOptions {
+  ms?: number;
+  tone?: ToastTone;
+  /** Knopf im Toast, etwa „Rückgängig“; der Toast steht dann 6 s statt 2,8 s */
+  action?: { label: string; run: () => void };
+}
 
-/** Kurzmeldung, 2,8 s sichtbar oder `ms` lang. */
+/** Meldung zeigen: 2,8 s oder `ms` lang, standardmäßig als Erfolg; mit Optionen auch mit Knopf */
+export type Say = (message: string, msOrOptions?: number | ToastOptions, tone?: ToastTone) => void;
+
+/**
+ * Kurzmeldung, 2,8 s sichtbar oder `ms` lang. Mit Aktion 6 s (Plan 0057, E3): Solange der Knopf Fokus hat, läuft die
+ * Zeit nicht ab, nach dem Blur beginnt sie neu (`hold`). Hover hält ihn bewusst nicht.
+ */
 export function useToast(): [ToastMessage, Say] {
   const [message, setMessage] = useState(NO_TOAST);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
-  const say = useCallback<Say>((text, ms = TOAST_MS, tone = "ok") => {
-    clearTimeout(timer.current);
-    setMessage({ text, tone });
-    timer.current = setTimeout(() => setMessage(NO_TOAST), ms);
+  const say = useCallback<Say>((text, msOrOptions, toneArg) => {
+    const options: ToastOptions =
+      typeof msOrOptions === "object"
+        ? msOrOptions
+        : { ...(msOrOptions !== undefined && { ms: msOrOptions }), ...(toneArg && { tone: toneArg }) };
+    const { action, tone = "ok" } = options;
+    const ms = options.ms ?? (action ? LONG_TOAST_MS : TOAST_MS);
+    const arm = () => {
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => setMessage(NO_TOAST), ms);
+    };
+    setMessage(
+      action
+        ? {
+            text,
+            tone,
+            action: {
+              label: action.label,
+              run: () => {
+                clearTimeout(timer.current);
+                setMessage(NO_TOAST);
+                action.run();
+              },
+              hold: (paused) => (paused ? clearTimeout(timer.current) : arm()),
+            },
+          }
+        : { text, tone },
+    );
+    arm();
   }, []);
   return [message, say];
 }
