@@ -308,3 +308,141 @@ Live seit dc7498d: CI auf `main` grün, Deploy durch, `meta.json` zeigt `dc7498d
 
 Offen vor dem Archivieren: der iPhone-Spike (E5; Glocke bei ausgeschaltetem Push, Erlaubnis „default“ und „granted“), danach Restpunkte nach `docs/ideas.md`.
 
+## Nachtrag A (2026-10-31): Chip „Meine Anbieter“, Push nur für Anbieter, Such-Abos entfallen
+
+### Anlass
+
+Wunsch des Nutzers vom 2026-10-31: „Bei Entdecken sollte man auch nur nach Angeboten von abonnierten Anbietern filtern können, das wäre auch für die Push-Nachricht praktisch.“ Auf die Rückfrage, was das für den Push heißt, entschied er: **Push nur für Anbieter, Such-Abos entfernen.**
+
+### Befund
+
+- Der Wochen-Push zählt heute einen Treffer, wenn er von einem abonnierten Anbieter stammt **oder** zu einem Such-Abo passt (E2). Anbieter-Treffer stehen vorn.
+- Such-Abos sind der einzige Grund, warum der Service Worker `wegzeit.json` lädt und den Startpunkt (`origin`) aus dem Geräte-Speicher liest. `reach` wirkt in `weeklyText` nur über `matchesFilter` mit einem Such-Abo (`src/domain/news.ts`, `fits`; `src/sw/push-tailor.ts`, `reach`). `src/domain/stored-origin.ts` nutzt nur `push-tailor.ts`.
+- In „Entdecken“ gibt es keinen Filter nach abonnierten Anbietern. `useOfferViews` filtert `visible` mit `applyFilters(offers, route.filter, …)` (`src/ui/use-offer-views.ts`).
+- Vorbild für einen Chip außerhalb des Filter-Sheets sind die Listen-Chips der Merkliste (Plan 0058, E1): eigener Zustand im Speicher, nicht in URL und Sheet, kein Badge, „Filter zurücksetzen“ leert sie mit.
+
+### Entscheidungen
+
+**N1 – Chip „Meine Anbieter“ in „Entdecken“.**
+- Er steht in `QuickFilters` der Startseite als erster Chip nach „Filter“, nur wenn mindestens ein Anbieter abonniert ist (`savedProviders`, dieselbe Liste wie im Tab „Anbieter“).
+- Der Zustand `ownProviders: boolean` lebt in `App` (`useState(false)`), nur im Speicher, wie die Listen-Chips der Merkliste. Er steht **nie in der URL**: Beim Empfänger eines geteilten Links zeigte er dessen Abos, also eine andere Liste.
+- Er wirkt in Liste und Karte von „Entdecken“: `useOfferViews` bekommt `ownProviders?: readonly string[]`. Ist es gesetzt, schränkt es `filtered` ein, also das Ergebnis von `applyFilters(offers, route.filter, …)`, **vor** `ageVisibility`. Sonst stimmte `unfitCount` nicht (Review M2). Davon leiten sich Statuszeile, Liste, Karte, Marker, `unfitCount` und die Zahl im Filter-Sheet ab.
+- **Kamera-Regel** (Review M2): `upcoming` und damit `cameraOffers` bleiben unberührt. Der Kartenausschnitt und die Kachel-Requests hängen nie an den Abos (`architecture.md`, Invariante „Kein Request hängt davon ab, ob oder welche Anbieter abonniert sind“). Der Varianten-Test in `use-offer-views.test.ts` bekommt `ownProviders` dazu.
+- Unberührt bleiben der Tab „Anbieter“ und die Merkliste. `providerVisible` ist außerhalb des Tabs „Anbieter“ künftig `visible` **ohne** Chip. Sonst zeigte das Anbieter-Sheet eines nicht abonnierten Anbieters bei gedrücktem Chip alle seine Angebote als „außerhalb der Filter“ (`hasOffersOutside`, `ProviderSheet.tsx`; Review m5).
+- Die reine Funktion `fromProviders(offers, ids)` liegt in `src/domain/filter.ts` (Unit-Test).
+- Nicht im Filter-Sheet, kein Badge (wie Plan 0058, E1). `resetFilters` setzt ihn mit zurück, `resetIfActive` greift auch, wenn nur der Chip an ist.
+- Wird das letzte Abo beendet, verschwindet der Chip, und `ownProviders` wird `false` (Effekt auf `savedProviders.length === 0`). Ein späteres neues Abo zeigt ihn dann nicht schon gedrückt (Review m4). Ein Hook- oder E2E-Fall prüft das.
+- Text: „Meine Anbieter“. Leerzustand wie bei jedem Filter, mit „Filter zurücksetzen“.
+
+**N2 – Push nur für Anbieter-Abos** (`weeklyText`, ersetzt E2 in diesem Punkt).
+- `WeeklyInput` verliert `searches` und `reach`. Treffer: neues Angebot, Alter passt wie bisher, und es stammt von einem abonnierten Anbieter. Ohne Anbieter-Abo zählt wie bisher jedes neue Angebot, nur das Alter filtert.
+- Titel mit Abo: „1 neues Angebot von deinen Anbietern“ bzw. „N neue Angebote von deinen Anbietern“. Wochenzahl: „Diese Woche nichts Neues von deinen Anbietern“. Ohne Abo bleibt alles wie heute.
+- `hits` ist die Datenreihenfolge, denn die Sortierung „Anbieter zuerst“ entfällt.
+
+**N3 – Service Worker ohne Wegzeit und Startpunkt.**
+- `tailorPush` lädt nur `data/site.json`. `TailorEnv` verliert `cachedJson` und `reachFor`, `fetchJson` kennt nur `data/site.json`. Gelesen werden `birthDate`, `providers` und `seenIds`. `src/sw/sw.ts` verdrahtet entsprechend.
+- `src/domain/stored-origin.ts` samt Test entfällt (knip), ebenso sein Eintrag in `scripts/lib/e2e-map.ts`. Plan 0039 (Düsseldorf, in Umsetzung) wollte die Datei auf die Netz-bbox umstellen (E3). Der Punkt entfällt dort, Plan 0039 bekommt einen Hinweis (Review m6).
+- **Altlast löscht auch der Service Worker** (Review M1): `mirror()` läuft nur bei offenem Kind-Sheet, am Ende des Onboardings und nach einem Glocken-Tipp. Bei vielen Nutzern mit Push bliebe der Startpunkt sonst liegen. Deshalb gilt:
+  - `tailorPush` löscht bei jedem Push `origin` und `searches`, auch beim Testversand. Das ist keine Nutzerangabe, sondern Aufräumen.
+  - `TailorEnv.store.set` erlaubt dafür `"origin" | "searches"` mit `undefined`.
+  - Der `activate`-Handler in `src/sw/sw.ts` löscht beide Schlüssel ebenfalls, einmal beim Update des Service Workers. So liegt der Startpunkt spätestens nach dem nächsten Update nicht mehr in der IndexedDB.
+  - Unit-Test in `push-tailor.test.ts`.
+- Privatsphäre: Der Startpunkt liegt bei eingeschaltetem Push nicht mehr in der IndexedDB. Damit fällt die Ergänzung zu ADR 0017 (Punkte 1 und 3) aus ADR 0014 weg.
+
+**N4 – Spiegel: nur Geburtsdatum und Anbieter-Abos.**
+- `MirrorData` verliert `searches` und `origin`, `MIRRORED` wird `["birthDate", "providers"]`.
+- **Altlast im Geräte-Speicher**: `DEVICE_KEYS` behält `searches` und `origin` als `LEGACY_KEYS`. `mirror()` löscht sie, sobald es zum ersten Mal spiegeln darf (je Instanz einmal, über `written`). Bei eingeschaltetem Push bleibt so kein Startpunkt in der IndexedDB liegen. Ein Unit-Test in `push.test.ts` prüft das.
+- `mirrorData()` (`use-push-switch.ts`) liest weder Startpunkt noch Such-Abos.
+
+**N5 – Such-Abos entfallen in der Oberfläche.**
+- Weg sind die Glocke in `QuickFilters` (Prop `bell`; `.quickbar` bleibt nur, wenn das Layout sie noch braucht) und `useSearchAbos`. Mit Tests entfallen `src/domain/searches.ts`, `src/data/searches-store.ts` und `searchLabel`. In `aboToast` fallen die Such-Zweige weg (`kind` nur „anbieter“, ohne `noOrigin` und `daytime`), in `AboList` die Such-Abos (`searches`, `hasOrigin`, `removeSearch`).
+- `bellVisible` hängt nur noch am Tab „Anbieter“ und am Anbieter-Sheet.
+- Leertext von `AboList`: „Noch keine. Tippe auf die Glocke bei einem Anbieter.“, danach der Satz zum Alter wie bisher.
+- **Altlast im `localStorage`**: `forgetSearchAbos()` in `src/data/preferences.ts` entfernt `zwergenplan.such-abos`, gefangen mit `try`/`catch` wie die übrigen Schreiber, denn bei gesperrtem Speicher darf es nicht werfen (Review m8). `App` ruft es einmal beim Start auf (lokal, kein Request). In `docs/ideas.md` kommt ein Eintrag: Den Altlast-Code (`forgetSearchAbos`, `LEGACY_KEYS`, das Löschen im Service Worker) entfernen, sobald er ein halbes Jahr live ist. Bestehende Such-Abos verschwinden ohne Hinweis. Das ist bewusst so: Der Nutzerkreis ist klein, und der Push meldet danach alles Neue bzw. die Anbieter-Treffer.
+- Regeln und Kommentare in `.dependency-cruiser.cjs` (`push-domain-not-in-start`, `onboarding-apart-from-app` u. a.), `vite.config.ts` (Kommentar zu `isAppExtrasModule`) und `scripts/lib/e2e-map.ts` nennen `searches`, `searches-store` und `stored-origin` nicht mehr.
+
+**N6 – ADR 0042** „Push nur für Anbieter-Abos, Such-Abos entfallen“. Es ändert:
+- ADR 0037, Punkte 2 und 7 (Zuschnitt, Such-Abos im Start), dazu die Kopfzeile „Ändert ADR 0027“ (Glocke der Suche als Vorlade-Anlass);
+- ADR 0027 (Vorladen): Anlässe sind nur noch der Tab „Anbieter“ und das Anbieter-Sheet (Review M3);
+- ADR 0014:
+  - Zuschnitt nach Anbieter-Abos und Alter;
+  - je Push lädt nur `site.json`. Der Anlass „beim Push“ für `wegzeit.json`, mit dem ADR 0014 ADR 0011, Punkt 6, geändert hatte, entfällt; ADR 0042 nennt ADR 0011, Punkt 6, ausdrücklich (Review M3);
+  - gespiegelt werden Geburtsdatum und Anbieter-Abos, der Startpunkt liegt nicht in der IndexedDB;
+- `docs/architecture.md`: „Eine Kategorie je Angebot“, App-Extras/Push-Teil (`preloadBell`), Onboarding-Chunk, Push im Service Worker, Such-Abo-Absatz, die Invarianten „Privatsphäre“ (samt Liste der `localStorage`-Schlüssel ohne `zwergenplan.such-abos`), „Startpunkt“ und den Satz „Beim Push lädt der Service Worker `site.json` und `wegzeit.json`“ (Review M3);
+- den Datenschutztext in `imprintPage()` (`scripts/lib/share-pages.ts`): „Abos (Anbieter)“; das Gerät rechnet ohne Startpunkt.
+- ADR 0014 und 0037 bekommen je eine Kopfzeile „Teilweise ersetzt durch ADR 0042“.
+
+### Nicht-Ziele
+
+- Kein Schalter „Meine Anbieter“ im Filter-Sheet, keine Speicherung über das Neuladen hinaus. Beides kommt nach `docs/ideas.md`.
+- Ein Tipp auf den Push öffnet weiter „Neu eingestellt“ ohne den Chip (`docs/ideas.md`: „Push-Ziel mit Meine Anbieter“).
+- `docs/ideas.md`: „Such-Abos als Schnellwahl in der Liste“ und „Tageszeit in Such-Abos und Push“ fallen weg. „Wochen-Nachricht nur bei Treffern (Stufe 3)“ nennt Anbieter-Abos statt Such-Abos und Startpunkt.
+
+### Tests
+
+- **Unit**
+  - `news.test.ts`: Mit Abo zählen nur Angebote abonnierter Anbieter (das Alter filtert weiter). Der Titel lautet „von deinen Anbietern“, die Wochenzahl zählt nur Anbieter-Angebote. Ohne Abo ändert sich nichts. Die Such-Fälle entfallen.
+  - `push-tailor.test.ts`: Geholt wird nur `site.json`, kein `wegzeit.json`. `providers` wird gelesen, ein kaputter Wert ignoriert.
+  - `push.test.ts`: Gespiegelt werden nur `birthDate` und `providers`. Das erste Spiegeln löscht `searches` und `origin`.
+  - `filter.test.ts`: `fromProviders`. `use-offer-views.test.ts`: `ownProviders` schränkt `visible` ein, `providerVisible` nicht.
+  - `format.test.ts`: `aboToast` ohne Such-Fälle. `preferences`: `forgetSearchAbos` entfernt den Schlüssel.
+- **E2E**
+  - `app.spec.ts`:
+    - Ohne Abo fehlt der Chip.
+    - Mit vorbelegtem `zwergenplan.anbieter-merkliste` ist er da. Gedrückt zeigt er in Liste und Karte nur Angebote dieses Anbieters. „Filter zurücksetzen“ schaltet ihn aus, und die URL ändert sich nicht.
+    - `zwergenplan.such-abos` ist nach dem Start gelöscht. Die Tests zur Such-Glocke entfallen.
+  - `push.spec.ts`:
+    - Fälle mit Such-Abos und `origin` entfallen oder werden auf `providers` umgestellt.
+    - Liegt ein Anbieter-Abo im Speicher, lautet der Titel der Zustellung „… von deinen Anbietern“.
+    - Nach dem Spiegeln mit Push an liegt kein `origin` mehr im Speicher.
+    - **Request-Invariante** (Review M4): `SAME_REQUESTS` wird `["/data/site.json"]`. Je Push kommt genau ein Request auf `site.json` und keiner auf `wegzeit.json`, gleich mit und ohne Startpunkt und Abo.
+  - Chip und Requests (Review M2): Ein Tipp auf „Meine Anbieter“ erzeugt keinen Request. Auf der Karte bleibt `tileLog` mit und ohne Chip gleich.
+  - `mobile-ux.spec.ts`: Kind-Sheet ohne Such-Abo. Neue Ansicht `meine-anbieter`: Chipzeile mit gedrücktem Chip, 320 px, 200 % Text.
+  - `pwa.spec.ts` und `scripts/screenshots.ts`: Was dort die Such-Glocke nutzte, nimmt eine Anbieter-Glocke oder entfällt.
+
+### Dateien
+
+- Neu: `docs/adr/0042-push-nur-anbieter.md`
+- Entfällt: `src/domain/searches.ts` (+ Test), `src/data/searches-store.ts`, `src/domain/stored-origin.ts` (+ Test, falls vorhanden)
+- Domäne: `src/domain/news.ts`, `src/domain/filter.ts` (je + Test)
+- Daten: `src/data/push.ts` (+ Test), `src/data/device-store.ts`, `src/data/preferences.ts`
+- SW: `src/sw/push-tailor.ts` (+ Test), `src/sw/sw.ts`, ggf. `src/sw/push-decision.test.ts`
+- UI: `src/ui/App.tsx`, `src/ui/Chrome.tsx`, `src/ui/use-offer-views.ts` (+ Test), `src/ui/use-app-state.ts` (+ Test), `src/ui/format.ts` (+ Test), `src/ui/KidSheet.tsx`, `src/ui/Overlays.tsx`, `src/ui/app-extras/use-push-switch.ts`, ggf. `src/ui/styles/chrome.css`
+- Regeln und Build: `.dependency-cruiser.cjs`, `vite.config.ts` (Kommentar), `scripts/lib/e2e-map.ts`, `scripts/screenshots.ts`
+- Doku: `docs/adr/0014-web-push.md`, `docs/adr/0027-app-chunk-beim-erststart-vorladen.md`, `docs/adr/0037-abos-mit-glocke.md`, `docs/architecture.md`, `scripts/lib/share-pages.ts`, `docs/ideas.md`, `docs/plans/0039-region-duesseldorf.md` (Hinweis)
+- Tests, die mitziehen: `src/domain/route.test.ts` (importiert `searchOf`, Review m7)
+- E2E: `e2e/app.spec.ts`, `e2e/push.spec.ts`, `e2e/mobile-ux.spec.ts`, ggf. `e2e/pwa.spec.ts`
+
+### Schritte
+
+Jeder Schritt endet mit `pnpm verify` grün.
+
+- **A1 – Domäne, SW und Spiegel, test-first** (Review m1: in einem Schritt, sonst kompiliert `push-tailor.ts` nicht): `weeklyText` (N2), `fromProviders` (N1), N3, N4. `pnpm size` misst das SW-Budget, es sinkt.
+- **A2 – Rückbau Such-Abos**: N5 mit Regeln, `e2e-map` und Screenshots. Danach `pnpm e2e:local --affected` (im Hintergrund, Review m2).
+- **A3 – Chip**: N1 in `App`, `QuickFilters` und `useOfferViews`. Danach `pnpm e2e:local --affected` (im Hintergrund).
+- **A4 – Doku**: N6, `ideas.md`, Hinweis in Plan 0039.
+- **A5 – Prüfen**: `pnpm e2e:local --affected --smoke` (Datenschutzseite), `/arch-review` (mehr als 200 Zeilen), `/browser-review` lokal:
+  - Chipzeile mit und ohne Abo, gedrückter Chip in Liste und Karte, auch bei 360 px; Leerzustand; Kind-Sheet ohne Such-Abos;
+  - „Zurücksetzen“ im Filter-Sheet schaltet auch den Chip aus, den das Sheet nicht zeigt. Die Zahl dort zählt ihn mit. Das ist gewollt wie in Plan 0058, die Prüfung bewertet, ob es verständlich ist (Review m9);
+  - hell und dunkel, pixel-7 und iphone-15, 320 px, Querformat, 200 % Text, reduzierte Bewegung (Review m3).
+- **A6 – Ausliefern**: Branch `anbieter-filter` pushen, CI grün, Fast-Forward nach `main`, CI auf `main` grün, `meta.json` prüfen, `/browser-review live`.
+
+### Review Nachtrag A (2026-10-31) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Übernommen:
+- **M1**: Die Altlast `origin`/`searches` löscht auch der Service Worker (`tailorPush`, `activate`), siehe N3.
+- **M2**: Der Chip filtert `filtered` vor `ageVisibility`, `upcoming`/`cameraOffers` bleiben unberührt (N1). Dazu ein Varianten-Test und ein E2E, dass keine Requests und gleiche Kacheln entstehen.
+- **M3**: N6 nennt ADR 0027, ADR 0011, Punkt 6, und die übrigen Stellen in `architecture.md` (Invariante „Startpunkt“, Push-Requests, `localStorage`-Schlüssel).
+- **M4**: Neuer E2E-Test: `SAME_REQUESTS` ist nur noch `site.json`.
+- **m1**: A1 und A2 sind zu einem Schritt zusammengelegt.
+- **m2**: E2E in den UI-Schritten.
+- **m3**: Die Liste des Browser-Reviews ist vollständig.
+- **m4**: Der Chip wird beim letzten beendeten Abo zurückgesetzt.
+- **m5**: `providerVisible` ist außerhalb des Tabs „Anbieter“ ohne Chip.
+- **m6**: Hinweis in Plan 0039.
+- **m7**: `route.test.ts` steht in „Dateien“.
+- **m8**: `try`/`catch` und ein Eintrag in `ideas.md` zum Entfernen der Altlast.
+- **m9**: eine Prüfzeile im Browser-Review.
+
+Abgelehnt: keins. Kein Blocker offen.
+
