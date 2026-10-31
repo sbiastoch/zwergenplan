@@ -7,7 +7,7 @@
 import { z } from "zod";
 import { slug } from "../../../src/domain/ids.ts";
 import { CategoryField, OfferFields, type Provider, ProviderAge } from "../../../src/domain/schema.ts";
-import { fromBerlinLocal } from "../../../src/domain/time.ts";
+import { berlinIsoDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import { categoriesOf } from "../../../src/domain/topics.ts";
 import { LocalDateTime, SOURCES } from "./candidate.ts";
 import { type ExpandWindow, expandSchedule, Schedule } from "./schedule.ts";
@@ -429,4 +429,47 @@ export function validateRaw(input: unknown, ctx: RawContext): RawValidation {
   });
 
   return errors.length > 0 ? { ok: false, errors, warnings } : { ok: true, batch, warnings };
+}
+
+/**
+ * Hinnehmen eines ID-Verlusts (ADR 0041, Punkt 7; Plan 0049, Nachtrag 2, B5): `data/id-hinnehmen.yaml`, von Hand
+ * gepflegt und committet, die einzige Ausnahme vom ID-Gate ohne Richter. Ein Eintrag lässt den nächsten Nachtlauf
+ * `held.events` des Anbieters ohne Richter übernehmen; er wirkt nur auf ein `held`, das spätestens am `datum`
+ * (Europe/Berlin) entstand, ein späterer Verlust braucht einen neuen Eintrag. Fehlt die Datei, gilt die leere Liste.
+ */
+export const IdAcceptance = z.array(
+  z.strictObject({
+    /** Katalog-ID des Anbieters */
+    anbieter: z.string().min(1),
+    /** warum der Verlust hingenommen wird; steht im Bericht und im Commit-Text */
+    grund: z.string().min(1),
+    /** Tag der Entscheidung */
+    datum: z.iso.date(),
+  }),
+);
+export type IdAcceptance = z.infer<typeof IdAcceptance>;
+
+/**
+ * Eintrag, der das `held` eines Anbieters seit `heldSince` (Instant) hinnimmt: `datum` ≥ Berliner Datum von
+ * `heldSince`; bei mehreren der späteste.
+ */
+export function acceptanceFor(
+  entries: IdAcceptance,
+  providerId: string,
+  heldSince: string,
+): { grund: string; datum: string } | undefined {
+  const day = berlinIsoDate(heldSince);
+  const hit = entries
+    .filter((e) => e.anbieter === providerId && e.datum >= day)
+    .sort((a, b) => b.datum.localeCompare(a.datum))[0];
+  return hit && { grund: hit.grund, datum: hit.datum };
+}
+
+/** Befunde für `pnpm data:validate`: Schema, und jede `anbieter`-ID steht im Katalog */
+export function idAcceptanceIssues(label: string, input: unknown, providerIds: ReadonlySet<string>): string[] {
+  const r = IdAcceptance.safeParse(input);
+  if (!r.success) return r.error.issues.map((i) => `${label}: ${i.path.join(".") || "(Wurzel)"}: ${i.message}`);
+  return r.data.flatMap((e, i) =>
+    providerIds.has(e.anbieter) ? [] : [`${label}: Eintrag ${i + 1}: ${e.anbieter} ist kein Anbieter im Katalog`],
+  );
 }

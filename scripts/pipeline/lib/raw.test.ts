@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import {
+  acceptanceFor,
   CATEGORY_CONFLICT,
   expansionWindow,
+  IdAcceptance,
+  idAcceptanceIssues,
   ProviderRaw,
   providerRawIssues,
   providerStatus,
@@ -341,5 +344,55 @@ describe("ProviderRaw Version 2 (Plan 0048, E4)", () => {
     });
     expect(providerStatus(parse(v2({ "seite:a": ok })))).toEqual({ status: "keine-termine", failedUnits: 0 });
     expect(providerStatus(parse({ ...ok, sources: [] }))).toEqual({ status: "keine-termine", failedUnits: 0 });
+  });
+});
+
+describe("Hinnehmen-Datei data/id-hinnehmen.yaml (ADR 0041, Punkt 7; Plan 0049, Nachtrag 2, B5)", () => {
+  const entry = { anbieter: "familientreff-beispiel", grund: "Kurs neu zugeschnitten", datum: "2026-11-02" };
+
+  it("Schema: Liste von {anbieter, grund, datum}, keine weiteren Felder", () => {
+    expect(IdAcceptance.parse([entry])).toEqual([entry]);
+    expect(IdAcceptance.parse([])).toEqual([]);
+    expect(IdAcceptance.safeParse([{ ...entry, grund: "" }]).success).toBe(false);
+    expect(IdAcceptance.safeParse([{ ...entry, datum: "2.11.2026" }]).success).toBe(false);
+    expect(IdAcceptance.safeParse([{ ...entry, ids: ["ab12cd34"] }]).success).toBe(false);
+    expect(IdAcceptance.safeParse({ anbieter: "x" }).success).toBe(false);
+  });
+
+  it("acceptanceFor: nur der eigene Anbieter, datum ≥ Berliner Datum von since, der späteste gewinnt", () => {
+    const since = "2026-11-01T03:00:00+01:00";
+    const other = { ...entry, anbieter: "anderer", datum: "2026-12-01" };
+    const earlier = { ...entry, grund: "alt", datum: "2026-10-31" };
+    const sameDay = { ...entry, grund: "am selben Tag", datum: "2026-11-01" };
+    const later = { ...entry, grund: "später", datum: "2026-11-05" };
+    expect(acceptanceFor([], "familientreff-beispiel", since)).toBeUndefined();
+    expect(acceptanceFor([other, earlier], "familientreff-beispiel", since)).toBeUndefined();
+    expect(acceptanceFor([sameDay], "familientreff-beispiel", since)).toEqual({
+      grund: "am selben Tag",
+      datum: "2026-11-01",
+    });
+    expect(acceptanceFor([later, sameDay, earlier], "familientreff-beispiel", since)).toEqual({
+      grund: "später",
+      datum: "2026-11-05",
+    });
+  });
+
+  it("acceptanceFor: Tag nach Europe/Berlin, nicht nach UTC", () => {
+    // 2026-10-31T23:30Z ist in Berlin schon der 1.11.: Ein Eintrag vom 31.10. stammt von vor dem Halten
+    const since = "2026-10-31T23:30:00Z";
+    expect(acceptanceFor([{ ...entry, datum: "2026-10-31" }], "familientreff-beispiel", since)).toBeUndefined();
+    expect(acceptanceFor([{ ...entry, datum: "2026-11-01" }], "familientreff-beispiel", since)?.datum).toBe(
+      "2026-11-01",
+    );
+  });
+
+  it("idAcceptanceIssues: Schemafehler mit Pfad, unbekannter Anbieter", () => {
+    const anbieter = new Set(["familientreff-beispiel"]);
+    expect(idAcceptanceIssues("h.yaml", [entry], anbieter)).toEqual([]);
+    expect(idAcceptanceIssues("h.yaml", [{ ...entry, datum: "morgen" }], anbieter)[0]).toMatch(/^h\.yaml: 0\.datum: /);
+    expect(idAcceptanceIssues("h.yaml", { a: 1 }, anbieter)[0]).toMatch(/^h\.yaml: \(Wurzel\): /);
+    expect(idAcceptanceIssues("h.yaml", [entry, { ...entry, anbieter: "weg" }], anbieter)).toEqual([
+      "h.yaml: Eintrag 2: weg ist kein Anbieter im Katalog",
+    ]);
   });
 });

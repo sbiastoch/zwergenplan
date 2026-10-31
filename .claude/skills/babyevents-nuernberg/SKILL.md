@@ -25,7 +25,7 @@ pnpm pipeline status runs/<datum>        # Bericht aus einem heruntergeladenen o
 
 Entdecken genauso mit `--workflow discover.yml`. Nach einem Lauf im Modus `live` mit neuen Anbietern gibt es genau ein Issue „Neue Anbieter <datum>“ mit Commit-Links und Fund-URLs (`gh issue list --search "Neue Anbieter"`).
 
-**Wächter-Issue** (Plan 0048, E10; `gh issue list --label waechter --state all`): Der Nachtlauf im Modus `live` hält genau ein Issue mit allen offenen Befunden aktuell und schließt es, wenn nichts offen ist. Ein neuer Befund kommt zusätzlich als Kommentar. Arten: `seite` (Seite oder Beilage scheitert die zweite Nacht), `anbieter` (alle Seiten), `entfernt` (14 Tage 404/410, Angebote weg), `gesperrt` (robots.txt), `einbruch` (zurückgehalten), `leer` (keine künftigen Angebote mehr, 14 Tage lang gemeldet), `umstellung` (Rohdatei noch V1), `klaerfall` (Klärfall des Entdeckens aus `data/discover/<region>.json` ab dem zweiten Lauf, mit Name, Region, Grund und Fund-URL; Plan 0050, S2b). Jede Zeile wird wie die Punkte unten eingeordnet; im Trockenlauf steht derselbe Text unter „Wächter“ in `status.md`.
+**Wächter-Issue** (Plan 0048, E10; `gh issue list --label waechter --state all`): Der Nachtlauf im Modus `live` hält genau ein Issue mit allen offenen Befunden aktuell und schließt es, wenn nichts offen ist. Ein neuer Befund kommt zusätzlich als Kommentar. Arten: `seite` (Seite oder Beilage scheitert die zweite Nacht), `anbieter` (alle Seiten), `entfernt` (14 Tage 404/410, Angebote weg), `gesperrt` (robots.txt), `einbruch` (zurückgehalten), `leer` (keine künftigen Angebote mehr, 14 Tage lang gemeldet), `umstellung` (Rohdatei noch V1), `ids` (eine Einheit vom ID-Gate gehalten, mit den IDs; Abschnitt „Wächter: IDs gehalten“), `klaerfall` (Klärfall des Entdeckens aus `data/discover/<region>.json` ab dem zweiten Lauf, mit Name, Region, Grund und Fund-URL; Plan 0050, S2b). Jede Zeile wird wie die Punkte unten eingeordnet; im Trockenlauf steht derselbe Text unter „Wächter“ in `status.md`.
 
 Worauf achten:
 - **Ampel rot**: Gates, Push, Build, Abbruch (`auth`, `limit`), Bremse, Zeitbudget, mehr als 20 % der Anbieter mit Fehler oder Live-Stand ab 20 Std. hinter `main` (Plan 0032, „Stufe 3 – Umsetzung“). Ein Abbruch oder eine Bremse lässt nur Anbieter offen; die nächste Nacht holt sie nach.
@@ -36,6 +36,22 @@ Worauf achten:
 - **Neue Anbieter** (Issue oder „Würde aufnehmen“ im Trockenlauf): Name, Fund-URL und erstes Angebot gegen die Website prüfen. Passt einer nicht, Abschnitt 2.
 
 Fertig, wenn jede rote Zeile und jeder neue Anbieter eingeordnet ist: in Ordnung, zurückgenommen (2) oder als Katalogpflege umgesetzt (3).
+
+### Wächter: IDs gehalten
+
+Befund `ids` (ADR 0041, Punkt 6): Eine neue Fassung der Pipeline (Prompt, Schema, Modell, Katalogauszug oder `INPUT_EPOCH`) hätte Angebots-IDs mit künftigem Termin gekostet, und der Richter (Opus) hat sie nicht zugeordnet. Die Einheit zeigt weiter ihren alten Stand, das neue Ergebnis liegt in `held` in `data/raw/<id>.json`. Die Zeile nennt die verlorenen IDs (nachzusehen in `data/offers.json`) und den Grund:
+- **„Richter nicht gelaufen (Grenze)“**: Bremse, Zeit oder Fehler des Richters. Nichts tun, die nächste Nacht richtet ohne neue Extraktion erneut. Bleibt der Befund mehrere Nächte, sind die Grenzen (`JUDGE_BRAKES`, `lib/cost.ts`) zu knapp.
+- **„Urteil unklar“**: Ein Mensch entscheidet. Alte Angebote gegen die Seite und gegen `held.events` halten, dann einer von zwei Wegen:
+  1. **Zuordnung verbessern** (`scripts/pipeline/lib/stable-ids.ts`) oder den Katalog korrigieren, wenn das neue Event dasselbe Angebot ist und nur nicht erkannt wurde. Das ist der bessere Weg, denn er hilft auch beim nächsten Wechsel.
+  2. **Hinnehmen**, wenn der Verlust in Ordnung ist (etwa ein Kurs neu zugeschnitten): ein Eintrag in `data/id-hinnehmen.yaml`, von Hand gepflegt und committet. Fehlt die Datei, neu anlegen.
+
+     ```yaml
+     - anbieter: familientreff-beispiel   # Katalog-ID
+       grund: Kurs in zwei Durchgänge geteilt, alte IDs passen zu keinem
+       datum: 2026-11-02                  # Tag der Entscheidung
+     ```
+
+     Der Eintrag wirkt auf jedes `held` des Anbieters, das spätestens an `datum` entstand. Der nächste Nachtlauf übernimmt dann `held.events` ohne Richter; die Verluste stehen mit dem Grund im Bericht und im Commit-Text. Ein späterer neuer Verlust braucht einen neuen Eintrag. `pnpm data:validate` prüft Format und Katalog-ID. Erledigte Einträge dürfen stehen bleiben.
 
 ## 2. Falsch aufgenommenen Anbieter zurücknehmen
 
@@ -102,8 +118,9 @@ gh workflow run discover.yml -f eval=true [-f model=sonnet -f effort=high]    # 
 ## 5. Modell wechseln
 
 1. Messen: `pnpm eval --model <neu> --effort <stufe>` (Modell allein) und mit `--fallback <modell>` (wie der Nachtlauf). Jeder volle Lauf schreibt eine Zeile in `evals/results.md`. Ein Lauf ist eine Stichprobe; vor einer Entscheidung je Modell und Effort zwei Läufe. **Effort immer angeben** (`low`, `medium`, `high`, `xhigh`, `max`; Plan 0048, Nachtrag 2): Ohne `--effort` nimmt die CLI lokal `effortLevel` aus `~/.claude/settings.json`, im Runner den Modellstandard, und lokale Eval und Nachtlauf laufen verschieden.
-2. Entscheidet der Nutzer für den Wechsel, setzt ein Commit `LLM_MODEL_EXTRACT`, `LLM_EFFORT_EXTRACT` (und bei Bedarf `LLM_MODEL_FALLBACK`) in der `env` des Workflows; Nachtlauf und Entdecken dürfen verschieden sein (heute Haiku high und Opus high, Plan 0048, Nachtrag 4; `scripts/lib/nightly-workflow.test.ts` hält die Werte fest). Ohne Wert gilt Haiku mit Sonnet als Fallback und der Effort der CLI. Vor dem Wechsel ein Trockenlauf auf dem Branch (`modus=trocken`, großzügige Grenzen) mit Vergleich von `offers.json` gegen `main` (Angebote je Anbieter, gehaltene IDs). Modell und Effort sind Teil des Cache-Schlüssels: Die erste Nacht danach extrahiert alles neu (N3). Dafür einmal `gh workflow run nightly.yml -f modus=live` mit höheren Grenzen (`max_calls`, `max_tokens`, `budget_min`, `timeout`; Werte im Plan des Wechsels) statt der normalen Bremse. `max_tokens` zählt Opus-gleichwertige Tokens (Haiku 0,2, Sonnet 0,6 je Token; Plan 0048, Nachtrag 5).
-3. Suche und Bewerten beim Entdecken wählen `LLM_MODEL_DISCOVER` (Standard Haiku) und `LLM_EFFORT_DISCOVER` (leer: Effort der CLI), unabhängig davon; heute Opus high in `discover.yml`.
+2. **Schattenlauf** (ADR 0041, Punkt 9), Pflicht vor jeder Umstellung von Prompt, Schema, Modell oder `INPUT_EPOCH`: auf dem Branch mit der neuen Fassung `LLM_MODEL_EXTRACT=<neu> LLM_EFFORT_EXTRACT=<stufe> MAX_CALLS=<Zahl der Einheiten + Puffer> MAX_TOKENS=<…> RUN_BUDGET_MIN=<…> pnpm pipeline nightly --dry-run`, bei Bedarf in mehreren Läufen mit `--only a,b`. Die Bremsen setzt die CLI über die Umgebung (`MAX_CALLS`, `MAX_TOKENS`, `RUN_BUDGET_MIN`), nicht über Optionen. Der Richter läuft mit (`LLM_MODEL_JUDGE`, Standard Opus) und hat eigene Grenzen (`JUDGE_BRAKES`). Nichts landet in `data/`, alles in `runs/<heute>/`. Der Bericht zählt je Anbieter übernommen, geerbt (`keepIds`), weggefallen (`fehlerhaft`, `entfallen`) und gehalten. Das Ergebnis kommt in den Commit-Text der Umstellung. Viele `gehalten` heißt: erst die Zuordnung verbessern (Abschnitt 1, „Wächter: IDs gehalten“).
+3. Entscheidet der Nutzer für den Wechsel, setzt ein Commit `LLM_MODEL_EXTRACT`, `LLM_EFFORT_EXTRACT` (und bei Bedarf `LLM_MODEL_FALLBACK`) in der `env` des Workflows; Nachtlauf und Entdecken dürfen verschieden sein (heute Haiku high und Opus high, Plan 0048, Nachtrag 4; `scripts/lib/nightly-workflow.test.ts` hält die Werte fest). Ohne Wert gilt Haiku mit Sonnet als Fallback und der Effort der CLI. Vor dem Wechsel ein Trockenlauf auf dem Branch (`modus=trocken`, großzügige Grenzen) mit Vergleich von `offers.json` gegen `main` (Angebote je Anbieter, gehaltene IDs). Modell und Effort sind Teil des Cache-Schlüssels: Die erste Nacht danach extrahiert alles neu (N3), übernommen wird aber erst nach dem ID-Gate (ADR 0041). Dafür einmal `gh workflow run nightly.yml -f modus=live` mit höheren Grenzen (`max_calls`, `max_tokens`, `budget_min`, `timeout`; Werte im Plan des Wechsels) statt der normalen Bremse. `max_tokens` zählt Opus-gleichwertige Tokens (Haiku 0,2, Sonnet 0,6 je Token; Plan 0048, Nachtrag 5).
+4. Suche und Bewerten beim Entdecken wählen `LLM_MODEL_DISCOVER` (Standard Haiku) und `LLM_EFFORT_DISCOVER` (leer: Effort der CLI), unabhängig davon; heute Opus high in `discover.yml`.
 
 Ein neuer Prompt oder ein neues Antwortschema braucht ebenfalls eine Zeile in `evals/results.md`; sonst warnt `pnpm data:validate` in der CI. Ändert der Prompt die Antwort für alle Anbieter (etwa ein neues Feld), gilt wie beim Modellwechsel: einmal mit `max_tokens=5000000`.
 
