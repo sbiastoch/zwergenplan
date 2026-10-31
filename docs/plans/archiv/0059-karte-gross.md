@@ -1,6 +1,6 @@
 # Plan 0059 – Karte groß: nur Karte, Detail als Overlay
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 10be9c9 (2026-10-31); Nachtrag 1 live seit 5564f4e (2026-10-31)
 Datum: 2026-10-31
 
 Bezug:

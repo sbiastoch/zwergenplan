@@ -122,6 +122,7 @@ Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Ein
 
 - **Plan 0059** (Karte groß, live seit 10be9c9, 2026-10-31; Einzelheiten in „Browser-Review“ und „Branch-CI“ des Plans):
   - **Am echten Handy prüfen:** Bewegt ein Finger die große Karte? Schließt ein Tipp auf den Schleier über der Karte das Detail? Und wie verhält sich iPhone-Safari mit der Leiste unten (`100dvh`)?
+  - **Nachtrag 1, Statusleiste am iPhone** (live seit 5564f4e): In der installierten App prüfen, ob die große Karte unter der Notch weiterläuft, ob die weiße Uhr auf Streifen bzw. Verlauf lesbar ist (hell und dunkel) und ob der Kopf der App frei von der Uhr bleibt. Dafür eventuell die App neu öffnen oder neu zum Home-Bildschirm hinzufügen.
 - **Plan 0057** (Merkliste als Wochenplaner, live seit 5534f02, 2026-10-31; Einzelheiten in den Nachträgen S1–S6 des Plans):
   - **Spike an echten Geräten** (Plan, „Schritte“): Langes Halten aufs Herz in der installierten App am iPhone (Textauswahl, Lupe, Kontextmenü) und an Android (System-Long-Press, `contextmenu`); Herz mit VoiceOver bzw. TalkBack (Doppeltipp schaltet genau eine Stufe, Ansage „teilweise gedrückt“/„gedrückt“, „Rückgängig“ erreichbar); ob Chrome die Vibration aus dem Halte-Timer blockt, wenn das Halten die erste Berührung der Seite ist. Scheitert das Halten auf einer Plattform, wird es dort abgeschaltet (der zweite Tipp bleibt).
   - **Kalender, heutiger Tag** (Browser-Review live): Die rote Wellenlinie unter dem Datum überdeckt die Kategorie-Formen, bei 320 px liegt das Plus halb darunter.
