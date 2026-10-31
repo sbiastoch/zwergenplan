@@ -106,6 +106,20 @@ export const NIGHT_BRAKES: Brakes = { maxCalls: 150, maxTokens: 3_000_000 };
  */
 export const DISCOVER_BRAKES: Brakes = { maxCalls: 1500, maxTokens: 150_000_000 };
 
+/**
+ * Grenze des Richters im ID-Gate (Plan 0049, Nachtrag 2, B3, Review N2-2, M6): Opus, eigene Grenze neben
+ * `NIGHT_BRAKES`, damit eine Nacht mit neuer Fassung (Modellwechsel: jede Einheit mit Verlust geht zum Richter) die
+ * Bremse des Nachtlaufs nicht reißt und die Extraktion der übrigen Anbieter nicht anhält. 60 Aufrufe decken die
+ * erste Nacht nach B nicht ganz; der Rest wird mit Grund `grenze` gehalten und in den Folgenächten gerichtet.
+ */
+export const JUDGE_BRAKES: Brakes = { maxCalls: 60, maxTokens: 6_000_000 };
+
+/**
+ * Zeitbudget des Richters in Minuten: innerhalb der 40 Minuten Marge zwischen `budget_min` (50) und `timeout` (90)
+ * des Jobs in `.github/workflows/nightly.yml`, damit Build, Commit und Push danach noch Zeit haben.
+ */
+export const JUDGE_BUDGET_MIN = 20;
+
 /** Bremsen aus der Umgebung (`MAX_CALLS`, `MAX_TOKENS`); leer = Standard, ungültig = Fehler (keine stille Grenze). */
 export function parseBrakes(
   env: Readonly<Record<string, string | undefined>>,
@@ -137,11 +151,29 @@ const TOKEN_WEIGHTS: ReadonlyArray<readonly [string, number]> = [
 ];
 const tokenWeight = (model: string) => TOKEN_WEIGHTS.find(([name]) => model.includes(name))?.[1] ?? 1;
 
-/** Erreichte Bremse nach den bisherigen Aufrufen, sonst `undefined`. `MAX_TOKENS` zählt Opus-gleichwertige Tokens. */
-export function brakeHit(calls: readonly CallRecord[], brakes: Brakes): BrakeKind | undefined {
+function hitOf(calls: readonly CallRecord[], brakes: Brakes): BrakeKind | undefined {
   if (calls.length >= brakes.maxCalls) return "aufrufe";
   const weighted = calls.reduce((n, c) => n + (tokensIn(c) + c.outputTokens) * tokenWeight(c.model), 0);
   return weighted >= brakes.maxTokens ? "tokens" : undefined;
+}
+
+/**
+ * Erreichte Bremse nach den bisherigen Aufrufen, sonst `undefined`. `MAX_TOKENS` zählt Opus-gleichwertige Tokens.
+ * Aufrufe des Richters (`step: "judge"`) zählen nicht mit; für sie gilt `judgeBrakeHit`.
+ */
+export function brakeHit(calls: readonly CallRecord[], brakes: Brakes): BrakeKind | undefined {
+  return hitOf(
+    calls.filter((c) => c.step !== "judge"),
+    brakes,
+  );
+}
+
+/** Erreichte Grenze des Richters (`JUDGE_BRAKES`): nur die Aufrufe mit `step: "judge"`, gewichtet wie `brakeHit`. */
+export function judgeBrakeHit(calls: readonly CallRecord[], brakes: Brakes = JUDGE_BRAKES): BrakeKind | undefined {
+  return hitOf(
+    calls.filter((c) => c.step === "judge"),
+    brakes,
+  );
 }
 
 export const COST_CSV_HEADER =

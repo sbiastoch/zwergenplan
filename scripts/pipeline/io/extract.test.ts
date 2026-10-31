@@ -153,6 +153,9 @@ describe("Effort (Plan 0048, Nachtrag 2)", () => {
     expect(effortOf({ LLM_EFFORT_EXTRACT: "low", LLM_EFFORT_DISCOVER: "high" }, "LLM_EFFORT_DISCOVER")).toBe("high");
     expect(effortOf({ LLM_EFFORT_EXTRACT: "low" }, "LLM_EFFORT_DISCOVER")).toBeUndefined();
     expect(() => effortOf({ LLM_EFFORT_DISCOVER: "hoch" }, "LLM_EFFORT_DISCOVER")).toThrow(/LLM_EFFORT_DISCOVER/);
+    // Richter des ID-Gates (Plan 0049, Nachtrag 2, B3)
+    expect(effortOf({ LLM_EFFORT_EXTRACT: "low", LLM_EFFORT_JUDGE: "max" }, "LLM_EFFORT_JUDGE")).toBe("max");
+    expect(() => effortOf({ LLM_EFFORT_JUDGE: "hoch" }, "LLM_EFFORT_JUDGE")).toThrow(/LLM_EFFORT_JUDGE/);
   });
 
   it("Cache-Schlüssel: ohne Effort unverändert, mit Effort Modell/Effort", () => {

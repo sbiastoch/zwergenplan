@@ -51,10 +51,13 @@ export interface ExtractorOptions {
 /** Fallback-Modell der Extraktion (E4): `LLM_MODEL_FALLBACK`, sonst Sonnet. */
 const fallbackModelOf = (env: NodeJS.ProcessEnv): string => env["LLM_MODEL_FALLBACK"] ?? "sonnet";
 
-/** Effort der Extraktion: `LLM_EFFORT_EXTRACT`, leer oder fehlend heißt Standard der CLI. */
+/**
+ * Effort eines Schritts aus der Umgebung: Extraktion `LLM_EFFORT_EXTRACT`, Entdecken `LLM_EFFORT_DISCOVER`, Richter
+ * `LLM_EFFORT_JUDGE` (Plan 0049, Nachtrag 2, B3); leer oder fehlend heißt Standard der CLI.
+ */
 export function effortOf(
   env: NodeJS.ProcessEnv,
-  name: "LLM_EFFORT_EXTRACT" | "LLM_EFFORT_DISCOVER" = "LLM_EFFORT_EXTRACT",
+  name: "LLM_EFFORT_EXTRACT" | "LLM_EFFORT_DISCOVER" | "LLM_EFFORT_JUDGE" = "LLM_EFFORT_EXTRACT",
 ): Effort | undefined {
   const raw = env[name];
   if (!raw) return undefined;

@@ -108,6 +108,8 @@ describe("Doku liest niemand", () => {
     "scripts/pipeline/io/extract.ts",
     // liest die Prompts scripts/pipeline/prompt/discover-*.md (Plan 0032, E7); unschädlich wie io/extract.ts
     "scripts/pipeline/io/discover.ts",
+    // liest den Prompt scripts/pipeline/prompt/judge.md (Plan 0049, Nachtrag 2, B3); unschädlich wie io/extract.ts
+    "scripts/pipeline/io/judge.ts",
   ]);
   // auch Vite-Importe mit Query wie "./x.md?raw" (Arch-Review m2)
   const MD_STRING = /\.md(\?[^"'`]*)?["'`]|\*\.md\b|\.md\$/;
