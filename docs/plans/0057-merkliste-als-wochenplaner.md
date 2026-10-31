@@ -618,3 +618,18 @@ Abweichungen bei der Umsetzung von S4, im Sinn des Plans entschieden:
 - **Browser-Review:** Bei 320 px und 200 % bricht „Anschluss suchen“ in zwei Zeilen um, der Pfeil steht dann am rechten Rand; bleibt so (ohne Umbruch liefe der Knopf über). Die dunkle Marke und die Zahlmarke waren im Dunkelmodus helle Inseln (`--ink`); sie nehmen jetzt `--sel`/`--on-sel` wie gewählte Zustände (gelb im Dunkeln). „Anschluss suchen“ lag unter der Klickfläche von `.card-open` und hat deshalb `z-index: 1` wie das Herz.
 - **Messung** (`pnpm build && pnpm size`, nach S4): JS (initial) 111,54 kB (S3: 110,78, also +0,76 kB), CSS 13,64 kB (+0,13), Service Worker 9,17 kB.
 - **Arch-Review** (keine Blocker): M1 „Läuft gerade“ ohne Gates im Dunkeln und bei 320 px / 200 % → `e2e/mobile-ux.spec.ts` hat die Ansicht `merkliste-laeuft` (Di 27.10.). m1 Tagesdifferenz als `daysBetween` in `time.ts` mit Test, `daysUntilLabel` macht nur den Text. m2 Zahlmarke `aria-hidden`, dafür „, 2 Angebote“ als `sr-only` im Kopf. m3 der E2E-Fall prüft nach „Anschluss suchen“ Badge („3 aktiv“), leere Liste und Scroll oben. m4 Messung steht oben. m5 `docs/architecture.md`: `courseRunning` neben `startedCourse` und `ListGroup` mit den Köpfen der Merkliste.
+
+## Nachtrag: Karten-Tests warten auf Kameraende (2026-10-31)
+
+**Anlass:** Auf dem Branch mit S1–S4 war `e2e/anbieter-karte.spec.ts`, Test 8 („mit Stadtteil startet die Karte dort …“), auf `pixel-7` im Erstversuch und im Retry rot (CI-Lauf 41165104727): Der Kachel-Mock sah `9/271/175.pbf` „ohne Karte im DOM“. Die App ist nicht schuld, S3/S4 auch nicht.
+
+**Ursache (Beleg):** Der Trace zeigt die Reihenfolge `setViewportSize(412 × 915)` → `goto` (+10 ms) → Request `9/271/175` (+12 ms), der Mock prüft dann schon das neue, leere Dokument. Nach „Alle zeigen“ im Querformat steht die Karte bei Zoom 9,93. Das Hochformat zeigt mehr Fläche nach Süden. MapLibre zieht die Größe per ResizeObserver nach und fordert genau diese Kachel an. Lokal nachgemessen: ohne Neuladen, 1,5 s nach dem Wechsel aufs Hochformat, kam in 3 von 3 Läufen genau `/planet/test/9/271/175.pbf`. Ob der Request vor oder nach dem Neuladen ankommt, ist reines Timing. Dazu kommt die Schwäche aus f3c0777: `idle()` dieser Spec und `mapSettled()` galten schon mit `loaded()` als ruhig, auch mitten in einer Kamerafahrt.
+
+**Änderung:**
+- `e2e/fixtures.ts`:
+  - `mapIdle(page)`: wartet auf `loaded() && !isMoving()`, sonst auf das Ereignis `idle`. `mapSettled` nutzt das.
+  - `setViewportSettled(page, size)`: setzt den Viewport, wartet, bis die Zeichenfläche die Größe des Containers hat (`resize()` lief), wartet zwei Frames für das Rendern, das die Kacheln anfordert, dann `mapIdle`.
+- `e2e/anbieter-karte.spec.ts`: `idle` ist `mapIdle`; Test 8 wechselt den Viewport beide Male über `setViewportSettled`.
+- `e2e/karte.spec.ts`: Der Test zum Startpunkt im Querformat wechselt ebenso über `setViewportSettled`; `TestMap` kennt `getContainer` und `getCanvas`.
+
+**Test:** `pnpm verify` grün. `e2e/anbieter-karte.spec.ts` und `e2e/karte.spec.ts` liefen mehrfach auf `pixel-7`, `pixel-7-quer`, `desktop` und `android-klein`.

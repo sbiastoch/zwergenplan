@@ -9,6 +9,7 @@ import {
   expectAttributionCollapses,
   expectTwoLines,
   MAP_READY,
+  setViewportSettled,
   startPreloads,
   test,
   twoLinesEverywhere,
@@ -43,6 +44,8 @@ interface TestMap {
   getLayoutProperty: (layer: string, name: string) => unknown;
   loaded: () => boolean;
   isMoving: () => boolean;
+  getContainer: () => HTMLElement;
+  getCanvas: () => HTMLCanvasElement;
   once: (event: string, listener: () => void) => void;
 }
 declare global {
@@ -723,7 +726,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expectAroundStart(page, { lat: 49.452, lon: 11.077 });
     expect(await page.evaluate(() => window.__zpMap?.queryRenderedFeatures({ layers: ["startpunkt"] }).length)).toBe(1);
 
-    await page.setViewportSize({ width: 915, height: 412 });
+    await setViewportSettled(page, { width: 915, height: 412 });
     await openMap(page);
     await expectAroundStart(page, { lat: 49.452, lon: 11.077 });
   });

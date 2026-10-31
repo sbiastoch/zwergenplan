@@ -5,7 +5,15 @@
  * anbieter.json (N2), `tests/fixtures/` bleibt unverändert. `window.__zpMap` gibt es nur im E2E-Build.
  */
 import type { Page } from "@playwright/test";
-import { expect, expectAttributionCollapses, MAP_READY, mapSettled, test } from "./fixtures.ts";
+import {
+  expect,
+  expectAttributionCollapses,
+  MAP_READY,
+  mapIdle,
+  mapSettled,
+  setViewportSettled,
+  test,
+} from "./fixtures.ts";
 
 test.use({ tiles: "mock" });
 
@@ -31,16 +39,8 @@ const rows = (page: Page) => page.locator("section.providers button.place");
 const providerSheet = (page: Page) => page.getByRole("dialog", { name: "Anbieter" });
 const DIRECTORY = "**/data/anbieter.json";
 
-async function idle(page: Page) {
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        const map = window.__zpMap;
-        if (!map || map.loaded()) resolve();
-        else map.once("idle", () => resolve());
-      }),
-  );
-}
+/** Karte lädt nichts mehr und steht still (auch die Kamera, Plan 0057, Nachtrag „Karten-Tests warten auf Kameraende“) */
+const idle = mapIdle;
 
 async function openTab(page: Page, path = "./?ansicht=anbieter") {
   await page.goto(path);
@@ -244,7 +244,8 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     // Gostenhof: Mitte am Stadtteil, höchstens etwa 6 × 6 km, hoch und quer
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof"));
     for (const viewport of [undefined, { width: 915, height: 412 }]) {
-      if (viewport) await page.setViewportSize(viewport);
+      // Größe erst übernehmen lassen: Sonst lädt die alte Karte Kacheln für den neuen Ausschnitt mitten ins Neuladen
+      if (viewport) await setViewportSettled(page, viewport);
       await openTab(page);
       const at = await camera();
       expect(Math.abs(at.lat - 49.448)).toBeLessThan(0.005);
@@ -263,7 +264,7 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     expect(await allInside()).toBe(true);
 
     // Langwasser: kein Anbieter-Ort in 2 km, Rückfall auf alle Orte (Review M4)
-    await page.setViewportSize({ width: 412, height: 915 });
+    await setViewportSettled(page, { width: 412, height: 915 });
     await page.evaluate(() => localStorage.setItem("zwergenplan.entfernung-ab", "langwasser"));
     await openTab(page);
     const fallback = await camera();
