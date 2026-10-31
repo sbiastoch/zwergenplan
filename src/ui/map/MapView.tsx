@@ -379,7 +379,7 @@ export function MapView(props: MapViewProps) {
     if (selected === shownSelected.current) return;
     shownSelected.current = selected;
     const place = layer.places.find((p) => p.key === selected);
-    if (!place || !latest.current.big) return;
+    if (!place || !latest.current.big || !latest.current.revealSelected) return;
     const center = lngLat(place.geo);
     const offset = revealOffset(map.project(center).y, map.getContainer().clientHeight);
     if (offset) map.easeTo({ center, offset });

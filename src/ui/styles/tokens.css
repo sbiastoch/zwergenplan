@@ -248,6 +248,8 @@
  * Tokens hell auf :root, dunkel per System oder data-theme (gesetzt vom Inline-Skript in index.html).
  */
 :root {
+  /* Streifen hinter der weißen Uhr der durchsichtigen Statusleiste (Plan 0059, Nachtrag 1, N1); dunkel nicht nötig */
+  --statusbar: #13212e;
   --bg: #e8f1ff;
   --dotc: rgba(19, 33, 46, 0.13);
   --surface: #fff;
@@ -291,6 +293,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --statusbar: transparent;
     --bg: #0e1620;
     --dotc: rgba(238, 243, 248, 0.08);
     --surface: #1b2733;
@@ -323,6 +326,7 @@
 }
 
 :root[data-theme="dark"] {
+  --statusbar: transparent;
   --bg: #0e1620;
   --dotc: rgba(238, 243, 248, 0.08);
   --surface: #1b2733;

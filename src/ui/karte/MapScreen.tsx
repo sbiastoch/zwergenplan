@@ -49,7 +49,7 @@ export function MapScreen(props: MapScreenProps) {
   // Orts-Sheet: Sitzungszustand, nie in der URL (E5)
   const [placeKey, setPlaceKey] = useState<string>();
   const place = places.find((p) => p.key === placeKey);
-  const { selected, tap } = useSelection(placeKey, props.overlayOpen);
+  const { selected, reveal, tap } = useSelection(placeKey, props.overlayOpen, props.focusKey);
   const state = module.kind === "fehler" || problem ? "fehler" : ready && module.kind === "da" ? "bereit" : "laden";
   // Ausschnitt an die Liste unter der Karte, nach Orten (Plan 0056, E5)
   const known = useMemo(() => new Set(offers.map((o) => keyOf(o.venue.geo))), [offers]);
@@ -98,6 +98,7 @@ export function MapScreen(props: MapScreenProps) {
             resetKey={props.resetKey}
             big={props.big}
             selected={selected}
+            revealSelected={reveal}
           />
         )}
         <BigSlot {...props} failed={state === "fehler"} />

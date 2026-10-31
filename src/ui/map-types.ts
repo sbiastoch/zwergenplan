@@ -30,6 +30,8 @@ export interface BigMapProps {
 
 /** Props der Karten-Oberfläche (karte/MapScreen.tsx), durchgereicht von MapPanel.tsx */
 export interface MapScreenProps extends BigMapProps {
+  /** Ort des Details aus der Liste im Ausschnitt: markiert, ohne Fahrt (`revealsSelection`, Plan 0059, Nachtrag 1, Review M1) */
+  focusKey?: string | undefined;
   /** sichtbare Angebote (Filter, Alter, Wegzeit) */
   offers: readonly SiteOffer[];
   /** Datenbasis des Startausschnitts: alle kommenden Angebote, ohne Filter, Alter, Startpunkt (ADR 0008) */
@@ -124,6 +126,8 @@ export interface MapViewProps {
   big: boolean;
   /** Schlüssel des getippten Orts, solange sein Overlay offen ist: Auswahl-Ring (Plan 0059, E5) */
   selected: string | undefined;
+  /** Fährt die Karte eine neue Auswahl über das Sheet (Tipp, Orts-Sheet) oder markiert sie nur (Nachtrag 1, M1)? */
+  revealSelected: boolean;
 }
 
 /** „webgl“: Der Browser kann die Karte nicht zeigen. „kacheln“: Stil oder Kacheln nicht ladbar. */

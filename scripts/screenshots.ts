@@ -6,7 +6,7 @@
  * E5–E7a), detail, filter, filter-tageszeit (Plan 0057, E7), kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
  * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), karte-gross,
- * karte-gross-detail, anbieter-gross (Plan 0059: große Karte, Detail als Sheet darüber), push
+ * karte-gross-detail, karte-gross-liste, anbieter-gross (Plan 0059: große Karte, Detail und Liste als Sheet darüber), push
  * (Plan 0017, 0054: Abos im Kind-Sheet), meine-anbieter (Plan 0054, Nachtrag A: Chip gedrückt), onboarding (Plan 0033, E15: alle Schritte der Einführung
  * beim ersten Öffnen, je ein Bild mit Endung -1, -2, …; mit Android-User-Agent, in der Headless-Shell also App-Schritt
  * mit Menü-Hinweis und „verweigert“).
@@ -271,12 +271,14 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   "karte-gross-detail": async (page) => {
     await openMap(page);
     await growMap(page);
-    // Bibliothek der Fixtures (ein Angebot) ins untere Drittel: Die Karte fährt sie über das Sheet
+    // Bibliothek der Fixtures (ein Angebot) ins untere Drittel, rechts neben die Zahl (seit Nachtrag 1 ein Knopf, bei
+    // 320 px bis 254 px breit): Die Karte fährt sie über das Sheet
     const point = await page.evaluate(async () => {
       const map = window.__zpMap;
       if (!map) return undefined;
       map.jumpTo({ center: [11.0812, 49.4498], zoom: 16 });
-      map.panBy([0, -Math.round(map.getContainer().clientHeight * 0.3)], { duration: 0 });
+      const box = map.getContainer();
+      map.panBy([-Math.round(box.clientWidth * 0.36), -Math.round(box.clientHeight * 0.3)], { duration: 0 });
       await new Promise((r) => setTimeout(r, 500));
       return map.project([11.0812, 49.4498]);
     });
@@ -284,6 +286,13 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.mouse.click(point.x, point.y);
     await page.locator("dialog.detail.over-map[open]").waitFor();
     await page.waitForTimeout(600);
+  },
+  "karte-gross-liste": async (page) => {
+    await openMap(page);
+    await growMap(page);
+    await page.locator(".bigmap-count").click();
+    await page.locator("dialog[open].over-map").waitFor();
+    await page.waitForTimeout(500);
   },
   "anbieter-gross": async (page) => {
     await openProviders(page);

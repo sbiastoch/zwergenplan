@@ -47,6 +47,7 @@ import {
   type ViewOption,
   ViewToggle,
 } from "./Chrome.tsx";
+import { Dialog } from "./Dialog.tsx";
 import {
   aboToast,
   ageChipLabel,
@@ -70,7 +71,7 @@ import { Icon } from "./icons.tsx";
 import { preloadExportWhenIdle } from "./ics-export.ts";
 import { type AgeEscape, EmptyState, ListPending, ListView } from "./ListView.tsx";
 import { MapPanel, ProviderMapPanel } from "./MapPanel.tsx";
-import type { CardContext, HeartCycle, HeartHold } from "./OfferCard.tsx";
+import { type CardContext, type HeartCycle, type HeartHold, OfferCard } from "./OfferCard.tsx";
 import { Onboarding, preloadOnboarding } from "./Onboarding.tsx";
 import { Overlays, type SheetKind } from "./Overlays.tsx";
 import type { OnboardingEnd } from "./onboarding-types.ts";
@@ -574,8 +575,23 @@ export function App() {
   useEffect(() => {
     if (bellVisible) preloadBell();
   }, [bellVisible]);
+  // Liste im Ausschnitt über der großen Karte (Nachtrag 1, N2): nur im Speicher, zu mit der großen Karte
+  const [bigList, setBigList] = useState(false);
+  const listOpen = bigList && bigShown;
+  useEffect(() => {
+    if (!bigShown) setBigList(false);
+  }, [bigShown]);
+  const countRef = useRef<HTMLButtonElement>(null);
+  // „Alle zeigen“ in der Liste verschwindet nach dem Tipp: Fokus auf deren Überschrift, die Statuszeile ist verborgen
+  const listHeading = useRef<HTMLHeadingElement>(null);
+  const showAllInList = () => showAllFrom(listHeading.current);
   const dialogOpen =
-    sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined || onboarding !== "aus";
+    sheet !== null ||
+    detailOffer !== undefined ||
+    placeSheet ||
+    sheetProviderId !== undefined ||
+    onboarding !== "aus" ||
+    listOpen;
   // Detail oder Anbieter-Sheet über der Karte: Der getippte Ort bleibt markiert (Plan 0059, E5)
   const overlayOpen = detailOffer !== undefined || sheetProviderId !== undefined;
   const limit = route.filter.reachLimit;
@@ -685,11 +701,12 @@ export function App() {
       : undefined;
   const shownUnfitCount = inProviders ? views.providerUnfitCount : unfitCount;
   // „Alle zeigen“ verschwindet nach dem Tipp: Fokus vorher auf die Statuszeile (Plan 0055, Review 2, m3)
-  const showAll = () => {
-    statusLine.current?.focus();
+  const showAllFrom = (focusTarget: HTMLElement | null) => {
+    focusTarget?.focus();
     if (route.tab === "anbieter") setProviderReset((n) => n + 1);
     else setMapReset((n) => n + 1);
   };
+  const showAll = () => showAllFrom(statusLine.current);
   /*
    * Beide Altersknöpfe verschwinden nach dem Tipp (Leerzustand bzw. Warnhinweis): Der Fokus geht vorher auf die
    * Statuszeile, sonst fiele er auf <body> (Muster wie LimitAction, Plan 0009, N2). Sie meldet die neue Zahl selbst.
@@ -707,6 +724,59 @@ export function App() {
    * sie am Startpunkt (`followOrigin`, ADR 0039); Rückfall, „Alle zeigen“ und die Merkliste nutzen alle kommenden
    * Angebote (`views.map.cameraOffers`), nie die Merkliste selbst.
    */
+  // Liste in „Entdecken“ unter der kleinen Karte und über der großen (Nachtrag 1, N2); „Alle zeigen“ wie die Statuszeile
+  const discoverList = (onShowAll: () => void) => (
+    <>
+      {askOrigin && originPrompt}
+      {listWaits ? (
+        <ListPending />
+      ) : offersNarrowed && views.inView.length === 0 ? (
+        // Ausschnitt ohne Angebote (Plan 0056, E5)
+        <EmptyState icon="search" title="Hier ist gerade nichts">
+          Im Kartenausschnitt gibt es gerade nichts.
+          <br />
+          <button type="button" className="linkbtn" onClick={onShowAll}>
+            Alle zeigen
+          </button>
+        </EmptyState>
+      ) : (
+        <ListView
+          groups={page.groups}
+          remaining={page.remaining}
+          onMore={views.showMore}
+          today={today}
+          ctx={discoverCtx}
+          hasData={offers.length > 0}
+          onResetFilter={resetIfActive}
+          age={ageEscape}
+          openOnDay={ruleActive(route.filter)}
+          origin={origin}
+        />
+      )}
+    </>
+  );
+  // Anbieterliste im Tab und in der Liste über der großen Karte (Nachtrag 1, N2): derselbe Lader, derselbe Katalog
+  const providerPanel = (generatedAt: string, inSheet = false) => (
+    <ProviderPanel
+      generatedAt={generatedAt}
+      offers={offers}
+      visible={views.providerVisible}
+      now={now}
+      view={providerView}
+      onShowAll={inSheet ? showAllInList : showAll}
+      reachOf={views.reachOf}
+      reachMode={reachMode}
+      // Das Suchfeld ist über der großen Karte verborgen: Die Liste dort hängt nicht am Suchtext (Review N1, M3)
+      query={inSheet ? "" : providerQuery}
+      onQuery={setProviderQuery}
+      onOpenProvider={openProvider}
+      onResetFilter={resetProviderFilter}
+      age={ageEscape}
+      saved={savedProviders}
+      onToggleSaved={onToggleProvider}
+      bellBusy={bellBusy}
+    />
+  );
   const bigOverlay = big && (
     <BigMapBar
       onClose={closeBig}
@@ -720,6 +790,8 @@ export function App() {
       }
       count={bigCount}
       announce={bigAnnounce}
+      onOpenList={() => setBigList(true)}
+      countRef={countRef}
     />
   );
   // gemeinsam für alle drei Karten (Plan 0059, E3, E5)
@@ -728,6 +800,7 @@ export function App() {
     views.map && (
       <MapPanel
         {...bigProps}
+        focusKey={listOpen && detailOffer ? placeKey(detailOffer.venue.geo) : undefined}
         offers={shown}
         cameraOffers={views.map.cameraOffers}
         origin={origin}
@@ -906,32 +979,7 @@ export function App() {
         {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, discoverCtx, true)}
         {load.kind === "ready" && (route.tab === "entdecken" || route.tab === "karte") && (
           <>
-            {askOrigin && originPrompt}
-            {listWaits ? (
-              <ListPending />
-            ) : offersNarrowed && views.inView.length === 0 ? (
-              // Ausschnitt ohne Angebote (Plan 0056, E5): „Alle zeigen“ wie in der Statuszeile
-              <EmptyState icon="search" title="Hier ist gerade nichts">
-                Im Kartenausschnitt gibt es gerade nichts.
-                <br />
-                <button type="button" className="linkbtn" onClick={showAll}>
-                  Alle zeigen
-                </button>
-              </EmptyState>
-            ) : (
-              <ListView
-                groups={page.groups}
-                remaining={page.remaining}
-                onMore={views.showMore}
-                today={today}
-                ctx={discoverCtx}
-                hasData={offers.length > 0}
-                onResetFilter={resetIfActive}
-                age={ageEscape}
-                openOnDay={ruleActive(route.filter)}
-                origin={origin}
-              />
-            )}
+            {discoverList(showAll)}
             {/* erst mit der Liste: Sonst rutschte er beim Ersetzen des Platzhalters (CLS) */}
             {!listWaits && (
               <p className="stand">
@@ -942,26 +990,7 @@ export function App() {
             )}
           </>
         )}
-        {load.kind === "ready" && route.tab === "anbieter" && (
-          <ProviderPanel
-            generatedAt={load.data.generatedAt}
-            offers={offers}
-            visible={views.providerVisible}
-            now={now}
-            view={providerView}
-            onShowAll={showAll}
-            reachOf={views.reachOf}
-            reachMode={reachMode}
-            query={providerQuery}
-            onQuery={setProviderQuery}
-            onOpenProvider={openProvider}
-            onResetFilter={resetProviderFilter}
-            age={ageEscape}
-            saved={savedProviders}
-            onToggleSaved={onToggleProvider}
-            bellBusy={bellBusy}
-          />
-        )}
+        {load.kind === "ready" && route.tab === "anbieter" && providerPanel(load.data.generatedAt)}
         {load.kind === "ready" && section === "merkliste" && (
           <SavedView
             items={saved}
@@ -1105,6 +1134,51 @@ export function App() {
           setOnboarding("manuell");
         }}
       />
+      {load.kind === "ready" && (
+        // Liste im Ausschnitt über der großen Karte (Nachtrag 1, N2): dieselben Bausteine wie unter der kleinen Karte
+        <Dialog
+          open={listOpen}
+          onClose={() => setBigList(false)}
+          label={bigCount}
+          className="sheet over-map"
+          toast={toast}
+          fallbackFocus={countRef}
+        >
+          <div className="sheet-body">
+            <div className="sheet-scroll">
+              <div className="grab" />
+              <h2 ref={listHeading} tabIndex={-1}>
+                {bigCount}
+              </h2>
+              {route.tab === "anbieter" ? (
+                providerPanel(load.data.generatedAt, true)
+              ) : route.tab === "merkliste-karte" ? (
+                views.savedInView.length === 0 ? (
+                  <EmptyState icon="search" title="Hier ist gerade nichts">
+                    Im Kartenausschnitt liegt nichts von deiner Merkliste.
+                    <br />
+                    <button type="button" className="linkbtn" onClick={showAllInList}>
+                      Alle zeigen
+                    </button>
+                  </EmptyState>
+                ) : (
+                  views.savedInView.map((item) => (
+                    <OfferCard key={item.offer.id} item={item} ctx={savedCtx} dated numbered />
+                  ))
+                )
+              ) : (
+                // dieselbe Liste wie unter der kleinen Karte (Review N1, Minor 1; Arch-Review, Minor 1)
+                discoverList(showAllInList)
+              )}
+            </div>
+            <div className="sheetfoot">
+              <button type="button" className="btn primary wide" onClick={() => setBigList(false)}>
+                Schließen
+              </button>
+            </div>
+          </div>
+        </Dialog>
+      )}
       {/* nach den Overlays: Im Modus „manuell“ schließt das Kind-Sheet im selben Commit (E3, Review 2, M-1) */}
       {onboarding !== "aus" && (
         <Onboarding

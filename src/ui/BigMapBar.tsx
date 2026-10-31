@@ -24,9 +24,12 @@ interface BigMapBarProps {
   count: string;
   /** Ansage erst, wenn die Karte ruht (`useSettled`) */
   announce: string;
+  /** Tipp auf die Zahl: Liste im Ausschnitt als Sheet (Nachtrag 1, N2); Fokus-Rückweg beim Schließen */
+  onOpenList: () => void;
+  countRef: RefObject<HTMLButtonElement | null>;
 }
 
-export function BigMapBar({ onClose, closeRef, filter, count, announce }: BigMapBarProps) {
+export function BigMapBar({ onClose, closeRef, filter, count, announce, onOpenList, countRef }: BigMapBarProps) {
   return (
     <>
       <div className="bigmap-bar">
@@ -46,9 +49,13 @@ export function BigMapBar({ onClose, closeRef, filter, count, announce }: BigMap
           </button>
         )}
       </div>
-      <p className="bigmap-count" role="status">
-        <span aria-hidden="true">{count}</span>
-        <span className="sr-only">{announce}</span>
+      {/* Knopf statt Live-Region: Die Ansage steht daneben, sonst läse der Screenreader jede Änderung als Namen vor */}
+      <button ref={countRef} type="button" className="bigmap-count" aria-haspopup="dialog" onClick={onOpenList}>
+        {count}
+        <Icon name="up" size={18} />
+      </button>
+      <p className="sr-only" role="status">
+        {announce}
       </p>
     </>
   );

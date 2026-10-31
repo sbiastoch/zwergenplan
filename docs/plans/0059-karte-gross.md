@@ -1,6 +1,6 @@
 # Plan 0059 – Karte groß: nur Karte, Detail als Overlay
 
-Status: abgeschlossen, live seit 10be9c9 (2026-10-31)
+Status: in Umsetzung
 Datum: 2026-10-31
 
 Bezug:
@@ -276,3 +276,106 @@ Der erste Branch-Lauf war rot. `karte.spec.ts` „Tipp auf Marker öffnet das Or
 ## Live (2026-10-31)
 
 CI auf `main` grün (Lauf 41217898519), Deploy 10be9c9. `/browser-review live`: `karte-gross` und `anbieter-gross` mit echten Daten, 390 px hell und dunkel. Die Zahl im Ausschnitt (214 Angebote, 69 Anbieter) steht über der ausgeschriebenen Quellenangabe, der Knopf verdeckt keinen Marker. Restpunkte stehen in `docs/ideas.md`.
+
+## Nachtrag 1 (2026-10-31): Statusleiste durchsichtig, Zahl öffnet die Liste
+
+Feedback des Nutzers nach dem Livegang:
+
+1. „Auf dem iPhone kann die Karte in der Fullscreen-Ansicht ruhig oben den Notch auch umfließen.“
+2. „Ich hätte erwartet, dass wenn man unten links auf ‚83 Angebote …‘ klickt, sich dann die Angebote im Fenster öffnen, was von unten einfliegt.“
+
+### Befund
+
+- `index.html` hat schon `viewport-fit=cover`, und `body` hält `env(safe-area-inset-top)` als Innenabstand frei. Die große Karte (`position: fixed; inset: 0`) reicht also bis an alle Ränder, quer auch um die Notch.
+- Oben endet sie trotzdem an der Statusleiste:
+  - In Safari liegt dort die Leiste des Browsers. Die lässt sich nicht ändern.
+  - In der installierten App (`display: standalone`) ist die Statusleiste von iOS undurchsichtig, weil `apple-mobile-web-app-status-bar-style` fehlt. Plan 0011 hatte das bewusst offen gelassen („Die Statusleiste prüft die Geräteprüfung“).
+- Die Zahl unten links (`.bigmap-count`, `BigMapBar.tsx`) ist ein `<p role="status">` und lässt sich nicht antippen.
+
+### Entscheidungen
+
+#### N1 – Statusleiste durchsichtig (Nutzerentscheid)
+
+- **Rückfrage am 2026-10-31.** Gefragt war „durchsichtig für die ganze App, dafür ein dunkler Streifen im hellen Design“ oder „nur Safari und quer“. Der Nutzer wählte wörtlich „Installierte App, durchsichtig“.
+- **`index.html`:** `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`. iOS zeichnet die Seite dann unter die Statusleiste und zeigt Uhr und Akku immer weiß. Android und Safari im Browser ignorieren die Angabe.
+- **Lesbarkeit der weißen Uhr:**
+  - Neues Token `--statusbar` in `tokens.css`: hell `#13212e` (`--ink`), dunkel `transparent`. Dunkel ist der Hintergrund ohnehin dunkel.
+  - Das Token steht wie jedes Token dreifach: in `:root`, im `@media`-Zweig und in `[data-theme="dark"]`.
+  - `body::before` ist ein fester Streifen oben, `height: env(safe-area-inset-top)`, mit `background: var(--statusbar)` und `z-index: 31`, also über Tab-Leiste, Toast und Onboarding-Cover (`z-index: 30`, Review, Minor 6).
+  - Ohne Notch und außerhalb der installierten App ist `env(safe-area-inset-top)` in Safari hochkant 0, der Streifen ist dann nicht da.
+- **Vollbild-Dialoge** (`.detail` ohne `over-map`, `.dlg.onb`): Sie liegen in der Top-Layer über `body::before`. Deshalb bekommen sie denselben Streifen als `::before`. Sie halten den Abstand ohnehin schon frei (`padding-top: env(safe-area-inset-top)`).
+- **Große Karte:** Statt des vollen Streifens kommt ein Verlauf von `rgba(19, 33, 46, 0.5)` zu durchsichtig, `height: calc(env(safe-area-inset-top) * 1.5)`, ohne Notch also 0 (Browser-Review). So läuft die Karte unter Notch und Uhr weiter, und die weiße Uhr bleibt lesbar. Im dunklen Design gilt derselbe Verlauf, dort ist er kaum zu sehen.
+- **Prüfung:**
+  - Playwright setzt `env(safe-area-inset-*)` auf 0 (Plan 0007). Ein E2E-Test prüft deshalb das Meta-Tag im Build, das Token in beiden Darstellungen und den Streifen per `getComputedStyle(document.body, "::before")`: fest, `z-index` 31, groß ein Verlauf (Review, Minor 7 und 8).
+  - Wie es aussieht, zeigt nur das echte iPhone. Der Punkt kommt in die Restpunkte.
+  - Hinweis an den Nutzer: Die installierte App liest das Tag beim Start. Eventuell muss sie neu geöffnet oder neu zum Home-Bildschirm hinzugefügt werden.
+
+#### N2 – Die Zahl öffnet die Liste im Ausschnitt
+
+- **Knopf:** `.bigmap-count` wird ein `<button>` mit Zahl, Text und Pfeil nach oben (`aria-haspopup="dialog"`), `min-height: 44px`. Die Ansage bleibt in einer eigenen, unsichtbaren `role="status"`-Region daneben, denn ein Live-Region-Knopf würde jede Änderung als Knopfnamen vorlesen.
+- **Sheet:** `Dialog` mit `className="sheet over-map"` und dem Label der Zahl, also z. B. „214 Angebote im Kartenausschnitt“.
+  - Innen: Kopf als `h2` mit der Zahl, darunter die Liste, Fuß mit „Schließen“, gebaut wie das Orts-Sheet (`sheet-body`, `sheet-scroll`, `sheetfoot`).
+  - Die Höhe ist wie bei allen Sheets über der großen Karte höchstens `min(62dvh, 100dvh − 8rem)` (E4). Der Inhalt scrollt.
+- **Inhalt je Karte**, dieselben Bausteine wie unter der kleinen Karte:
+  - **Entdecken:** `ListView` mit `page.groups` (schon auf den Ausschnitt gefiltert, Plan 0056, E5), „Mehr laden“ inklusive. Ist der Ausschnitt leer, steht dort der Leerzustand „Im Kartenausschnitt gibt es gerade nichts.“
+  - **Merkliste:** `views.savedInView` als `OfferCard` mit `dated numbered`, wie in `SavedView`.
+  - **Anbieter:** `ProviderPanel` mit `view={providerView}`. Es ist derselbe Lader und derselbe geteilte Katalog-Zustand, also kein zweiter Request (`useProviderDirectory`).
+- **Zustand:** `bigList: boolean` in `App`. Er steht nicht in der URL, wie das Orts-Sheet (Plan 0005, E5), und fällt weg, sobald die große Karte schließt (`bigShown` false).
+- **Overlays darüber:** Ein Tipp auf eine Kachel öffnet das Detail über der Karte. Ein Tipp auf eine Anbieter-Zeile öffnet das Anbieter-Sheet. Beide stehen über dem Listen-Sheet (spätere `showModal` liegen oben). „Zurück“ schließt erst sie, dann bleibt die Liste offen.
+- **Ort markieren:** Kommt das Detail aus der Liste, markiert die Karte seinen Ort, fährt aber nicht (Review M1). Der Ort liegt schon im Ausschnitt, und eine Fahrt änderte über `onViewport` die Liste unter dem Detail: „Mehr laden“ zurück, Kachel weg, Zahl neu.
+  - `App` gibt `focusKey = placeKey(detailOffer.venue.geo)` an `MapScreen`, aber nur solange das Listen-Sheet offen ist (Review M2). Ein Detail aus einem Deep-Link markiert also nichts und bewegt nichts (E5, Invariante zur Merklisten-Karte in `docs/architecture.md`).
+  - In `useSelection` gilt `selected = sheetKey ?? (overlayOpen ? tapped ?? focusKey : undefined)`. Neu ist `revealsSelection(sheetKey, tapped)`: Nur ein Tipp oder ein Orts-Sheet fährt die Karte. `MapView` bekommt das als Pflicht-Prop `revealSelected`.
+  - Die Anbieterkarte bekommt kein `focusKey`, denn ein Anbieter hat mehrere Orte.
+- **Anbieter-Liste:** Das Suchfeld ist in der großen Karte verborgen. Deshalb bekommt `ProviderPanel` im Sheet `query=""`, und die Zeilen passen zur Zahl (Review M3). Die blassen Zeilen ohne kommende Termine zeigt das Sheet wie der Tab, die Zahl zählt sie nicht mit.
+- **„Alle zeigen“** im Sheet (Anbieter und leerer Ausschnitt in Entdecken) setzt den Fokus vorher auf die `h2` des Sheets (`tabIndex=-1`), nicht auf die verborgene Statuszeile (Review M3).
+- **Wartezustände:** In Entdecken nutzt das Sheet dieselbe Weiche wie die Liste unter der kleinen Karte, `listWaits` zeigt `ListPending` (Review, Minor 1).
+- **Toast und Ort im Baum:** Das Sheet hängt in `App` neben den Overlays, nicht im `overlay` von `BigSlot`. Sonst hängte React es beim Wechsel vom Platzhalter zur Karte neu ein. Es bekommt `toast={toast}`, und `dialogOpen` schließt es ein, damit „Rückgängig“ nicht inert hinter dem Modal liegt (Review, Minor 2 und 3).
+- **Zurück-Geste:** Die Liste steht nicht im Verlauf. Bei offener Liste schließt „Zurück“ die große Karte samt Liste, wie beim Orts-Sheet (Review, Minor 4).
+- **Locators:** Die verborgene Liste unter der Karte bleibt gemountet. Neue E2E-Locators beschränken sich deshalb auf `dialog[open]` bzw. den Dialog mit Namen (Review, Minor 11).
+- **Fokus:** Der Fokus kehrt beim Schließen auf die Zahl zurück (`fallbackFocus`).
+
+#### N3 – Budgets und Tests
+
+- **Start-JS:** Neu sind das Listen-Sheet und der Zustand in `App`, erwartet ≈ +0,4 kB. Gemessen 112,86 → 113,24 kB (+0,38 kB), CSS 13,97 → 14,09 kB. Gemessen wird mit `pnpm size`, die Zeile kommt in ADR 0012.
+- **Unit:**
+  - `use-selection.test.ts` bekommt `focusKey` und `revealsSelection`.
+- **E2E** in `karte-gross.spec.ts`:
+  1. Entdecken groß: Ein Tipp auf die Zahl öffnet das Sheet mit `over-map`, Überschrift und Zahl stimmen, die Zahl der Kacheln auch. Ein Tipp auf eine Kachel öffnet das Detail über der Liste, der Ort ist markiert, die Karte fährt nicht. „Zurück“ schließt das Detail, Liste und Zahl sind unverändert. „Schließen“ setzt den Fokus auf die Zahl.
+  2. Deep-Link `?ansicht=merkliste-karte&karte=gross&angebot=…`: kein Auswahl-Ring.
+  3. Merkliste und Anbieter: Das Sheet zeigt die gemerkten Angebote bzw. die Anbieter im Ausschnitt. Ein Suchtext aus dem Tab gilt im Sheet nicht, es hat kein Suchfeld.
+  4. `Esc` schließt die Liste, ein zweites `Esc` die große Karte.
+  5. Statusleiste: Meta-Tag, Token `--statusbar` hell `#13212e` (Rohtext der Custom Property) und dunkel `transparent`, auch über `data-theme`; Streifen fest mit `z-index` 31, groß ein Verlauf.
+- **Mobile-UX:** `mobile-ux.spec.ts` bekommt die Ansichten `karte-gross-liste` und `anbieter-karte-gross-liste`, hell und dunkel, 320 px und 200 %.
+- **Screenshots:** `scripts/screenshots.ts` bekommt `karte-gross-liste`.
+
+### Schritte
+
+1. `use-selection.test.ts` rot, dann `use-selection.ts`, `MapView` (`revealSelected`), `App` (Sheet, `focusKey`, `showAllFrom`), CSS, `index.html`.
+2. `pnpm verify` grün.
+3. `pnpm e2e:local e2e/karte-gross.spec.ts e2e/mobile-ux.spec.ts …` im Hintergrund, danach `pnpm e2e:local --affected`.
+4. `/arch-review`, `/browser-review` lokal mit `karte-gross-liste` und `anbieter-karte-gross-liste`.
+5. `pnpm size`, Zeile in ADR 0012.
+6. Branch `karte-gross-2`, Branch-CI, Fast-Forward nach `main`, CI auf `main`, `meta.json`, `/browser-review live`.
+
+### Review Nachtrag 1 (2026-10-31)
+
+Unabhängiger Review per `/plan-review`, Ergebnis „Freigabe mit Änderungen“, kein Blocker.
+
+- **M1, Fahrt ändert die Liste unter dem Detail:** eingearbeitet. Ein Detail aus der Liste markiert seinen Ort nur (`revealsSelection`), E2E-Fall 1 prüft Ort, Kacheln und Zahl.
+- **M2, `focusKey` für jedes Detail:** eingearbeitet. `focusKey` nur bei offenem Listen-Sheet, E2E-Fall 2.
+- **M3, Anbieter-Liste hängt am verborgenen Suchtext und Fokus:** eingearbeitet. `query=""` im Sheet, „Alle zeigen“ fokussiert die Überschrift des Sheets, E2E-Fall 3.
+- **Minor 1–11:** eingearbeitet (Wartezustand, Toast, Ort im Baum, Zurück-Geste, 44 px, `z-index` 31, Token-Test als Rohtext, Streifen-Test, blasse Zeilen, Schritte, Locators). Minor 7: Der Test läuft als E2E gegen den Build, nicht als Unit gegen die Quelle.
+
+### Arch-Review Nachtrag 1 (2026-10-31)
+
+Kein Blocker, kein Major. Eingearbeitet:
+
+- Minor 1: Die Liste in Entdecken baut `discoverList(onShowAll)` an beiden Stellen, samt Hinweis auf den Startpunkt bei „nah“.
+- Minor 2: „Alle zeigen“ auch im leeren Ausschnitt der Merkliste.
+- Minor 3: Der Kommentar zu `focusKey` sagt jetzt „ohne Fahrt“.
+- Minor 4: Mobile-UX-Ansicht `merkliste-karte-gross-liste`.
+- Minor 5: Das Budget kommt mit Schritt 5.
+
+### Restpunkte
+
+- Auf dem echten iPhone (installierte App) prüfen: Läuft die Karte unter der Notch weiter? Ist die Uhr auf dem Streifen bzw. Verlauf lesbar, hell und dunkel? Steht der Kopf der App nicht unter der Uhr?
