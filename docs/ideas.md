@@ -113,6 +113,15 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0057** (Merkliste als Wochenplaner, live seit 5534f02, 2026-10-31; Einzelheiten in den Nachträgen S1–S6 des Plans):
+  - **Spike an echten Geräten** (Plan, „Schritte“): Langes Halten aufs Herz in der installierten App am iPhone (Textauswahl, Lupe, Kontextmenü) und an Android (System-Long-Press, `contextmenu`); Herz mit VoiceOver bzw. TalkBack (Doppeltipp schaltet genau eine Stufe, Ansage „teilweise gedrückt“/„gedrückt“, „Rückgängig“ erreichbar); ob Chrome die Vibration aus dem Halte-Timer blockt, wenn das Halten die erste Berührung der Seite ist. Scheitert das Halten auf einer Plattform, wird es dort abgeschaltet (der zweite Tipp bleibt).
+  - **Kalender, heutiger Tag** (Browser-Review live): Die rote Wellenlinie unter dem Datum überdeckt die Kategorie-Formen, bei 320 px liegt das Plus halb darunter.
+  - **Wochenleiste bei 320 px** (Browser-Review live): Die sieben Tageszellen reichen bis etwa 4 px an den Rand statt 16 px; kein Querscrollen.
+  - **Toast mit „Rückgängig“ über offenen Sheets**: Er steht 6 s und verdeckt bei 320 px im Filter-Sheet „Zurücksetzen“ (nur optisch, Tipps gehen durch). Zusammen mit „Toast nicht über ein frisch geöffnetes Sheet tragen“ (oben) lösen.
+  - **Karten-Tests warten auf `loaded()` allein**: `e2e/startpunkt.spec.ts` und `e2e/saved.spec.ts` haben eigene `idle`-Kopien ohne `isMoving()`; bei Flakiness auf `mapIdle()` aus `e2e/fixtures.ts` umstellen (wie f3c0777, 367b6d2).
+  - **`scripts/lib/change-class.test.ts`** riss unter Maschinenlast (≈ 12–22) zweimal die 5-s-Grenze (allein ≈ 3,9 s); eigenes Zeitlimit mit Begründung wie `REFERENCE_TIMEOUT_MS`.
+  - **Fehlende Tests**: Platzhalter der Merklisten-Liste bei gesetzter Wegzeit-Grenze und ladender Tabelle (praktisch unerreichbar, die Grenze ist erst mit Tabelle wählbar); Layout-Test für den Toast ohne Aktion.
+  - **LCP-Puffer** im Smoke mit echten Daten lokal nur etwa 80 ms (Nachtrag S6). Der nächste merkliche Zuwachs am Start-JS braucht „Merkliste als Lazy-Chunk“ (oben) und eine Nutzerentscheidung.
 - **Plan 0056** (Karten-Feedback, live seit 669478b, 2026-10-30; Einzelheiten in „Umsetzungsnotizen“ des Plans):
   - **Padding beim Start am Startpunkt**: Der Start `{ around, radiusKm }` setzt Mitte und Zoom ohne Padding; bei 320 px liegt ein Cluster halb unter den Zoom-Knöpfen. Möglich: `easeTo`/Konstruktor mit `padding` (MapLibre verschiebt dann die Mitte), ohne den Radius zu verkleinern.
   - **Statuszeile bei 390 px**: „N Angebote im Kartenausschnitt“ bricht neben „Liste | Karte“ und dem Sortierknopf zweizeilig um; kürzer wäre z. B. „N im Ausschnitt“. Nach Rückmeldung.

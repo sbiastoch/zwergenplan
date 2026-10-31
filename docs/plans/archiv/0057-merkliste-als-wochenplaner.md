@@ -1,6 +1,6 @@
 # Plan 0057 – Merkliste als Wochenplaner: zwei Stufen, Abschnitte, Filter wie auf der Startseite
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 5534f02 (2026-10-31)
 Datum: 2026-10-30
 Bezug:
 - Plan 0025 (`docs/plans/archiv/0025-merkliste-als-planungszentrale.md`): Merkliste mit Liste | Karte | Kalender, eigener Filter (E6), Schnellwahlen „ab …“ (E7), keine Wegzeit-Grenze (E8), Export aller gemerkten (E9). Dieser Plan löst E6, E7, E8 und E9 teilweise ab.
