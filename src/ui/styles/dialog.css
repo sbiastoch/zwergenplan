@@ -31,6 +31,49 @@
     flex-direction: column;
     animation: slide 0.34s cubic-bezier(0.2, 1.1, 0.4, 1);
   }
+  /*
+   * Detail über der großen Karte (Plan 0059, E4): Sheet von unten wie .sheet, gut die halbe Höhe, darüber bleibt die
+   * Karte mit dem gewählten Ort sichtbar. `voll` zieht es bis auf einen Streifen Karte hoch.
+   */
+  .detail.over-map {
+    inset: auto 0 0 0;
+    height: min(62dvh, 100dvh - 8rem);
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    border-top: 2.5px solid var(--line);
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 -10px 30px -10px rgba(0, 0, 0, 0.4);
+    transition: height 0.25s ease;
+  }
+  .detail.over-map[open] {
+    animation: up 0.38s cubic-bezier(0.2, 1.25, 0.4, 1);
+  }
+  .detail.over-map.voll {
+    height: calc(100dvh - 6rem);
+  }
+  /* Orts- und Anbieter-Sheets ebenso hoch: Die Schwelle, ab der die Karte den Ort hochfährt, gilt für alle (Review M4) */
+  .sheet.over-map {
+    max-height: min(62dvh, 100dvh - 8rem);
+  }
+  /* leichter Schleier: Die Karte bleibt erkennbar, ein Tipp darauf schließt wie bisher */
+  .dlg.over-map::backdrop {
+    background: rgba(19, 33, 46, 0.15);
+  }
+  .detail-grab {
+    flex: none;
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  /* Block statt inline: Im Knopf hätte das <span> sonst keine Breite und Höhe (Browser-Review Plan 0059) */
+  .detail-grab .grab {
+    display: block;
+    margin: 10px auto 8px;
+  }
   /* Onboarding (Plan 0033, E3): Vollbild wie .detail, ohne Slide; der Dialog selbst scrollt. Cover und Ladezustand
      mit „Überspringen“ stehen im Start-CSS, weil sie vor der Chunk-CSS da sein müssen (Review H5). */
   .dlg.onb {

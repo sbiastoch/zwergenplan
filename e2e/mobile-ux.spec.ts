@@ -81,6 +81,24 @@ async function tapTreff(page: Page) {
   await page.mouse.click(box.x + 2 + point.x, box.y + 2 + point.y);
 }
 
+/** Karte groß (Plan 0059): „Groß“ tippen und warten, bis die Karte im Vollbild ruht */
+async function growMap(page: Page) {
+  await page.getByRole("button", { name: "Karte groß zeigen" }).click();
+  await expect(page.locator(".map-box")).toHaveClass(/\bbig\b/);
+  await mapSettled(page);
+}
+
+/** in der großen Karte auf einen Ort tippen (Rahmen ohne Rand bei 0/0) */
+async function tapBig(page: Page, at: { lat: number; lon: number }) {
+  await jumpProviderMap(page, at, 16);
+  const point = await page.evaluate(({ lat, lon }) => window.__zpMap?.project([lon, lat]), at);
+  if (!point) throw new Error("keine Karte");
+  await page.locator(".map-box .map-canvas canvas").click({ position: point });
+}
+
+/** Bibliothek der Fixtures: ein Angebot, der Tipp öffnet gleich das Detail */
+const BIBLIOTHEK_GEO = { lat: 49.4498, lon: 11.0812 };
+
 /** IDs der Fixture-Angebote für Merkliste und Deep-Link (Plan 0018) */
 const PEKIP_ID = "nle21y1x";
 const TREFF_ID = "lxizt974";
@@ -119,6 +137,11 @@ const MAP_VIEWS = new Set([
   "orts-sheet-wegzeit",
   "karte-fehler",
   "merkliste-karte",
+  "karte-gross",
+  "karte-gross-detail",
+  "karte-gross-detail-voll",
+  "karte-gross-orts-sheet",
+  "merkliste-karte-gross",
 ]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
@@ -691,6 +714,54 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" }).locator(".reach-long")).toContainText(
       "Bus\u00a0202E",
     );
+  },
+  // Karte groß (Plan 0059, E8 Nr. 7): Vollbild, Detail halb und ganz, Orts-Sheet, Merkliste und Anbieter
+  "karte-gross": async (page) => {
+    await openMap(page);
+    await growMap(page);
+  },
+  "karte-gross-detail": async (page) => {
+    await openMap(page);
+    await growMap(page);
+    await tapBig(page, BIBLIOTHEK_GEO);
+    await expect(page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" })).toHaveClass(/\bover-map\b/);
+  },
+  "karte-gross-detail-voll": async (page) => {
+    await openMap(page);
+    await growMap(page);
+    await tapBig(page, BIBLIOTHEK_GEO);
+    const detail = page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" });
+    await detail.getByRole("button", { name: "Detail ganz zeigen" }).click();
+    await expect(detail).toHaveClass(/\bvoll\b/);
+  },
+  "karte-gross-orts-sheet": async (page) => {
+    await openMap(page);
+    await growMap(page);
+    await tapBig(page, TREFF_GEO);
+    await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
+  },
+  "merkliste-karte-gross": async (page) => {
+    await page.evaluate(
+      (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+      JSON.stringify([PEKIP_ID, TREFF_ID]),
+    );
+    await page.goto("./?ansicht=merkliste-karte");
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await growMap(page);
+  },
+  "anbieter-karte-gross": async (page) => {
+    await openProviders(page);
+    await growMap(page);
+  },
+  // Anbieter-Sheet über der großen Karte (Arch-Review, Minor 6): `.sheet.over-map`, leichter Schleier
+  "anbieter-karte-gross-sheet": async (page) => {
+    await openProviders(page);
+    await growMap(page);
+    await jumpProviderMap(page, TREFF_GEO, 17);
+    const point = await page.evaluate(({ lat, lon }) => window.__zpMap?.project([lon, lat]), TREFF_GEO);
+    if (!point) throw new Error("keine Karte");
+    await page.locator(".map-box .map-canvas canvas").click({ position: point });
+    await expect(page.getByRole("dialog", { name: "Anbieter" })).toHaveClass(/\bover-map\b/);
   },
   "orts-sheet": async (page) => {
     await openMap(page);

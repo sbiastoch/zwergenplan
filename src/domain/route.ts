@@ -32,6 +32,11 @@ export type Section = Exclude<Tab, "karte" | "merkliste-karte" | "merkliste-kale
 /** Darstellungen der Merkliste (Plan 0025, E4): Liste, Karte, Kalender */
 export type SavedTab = Extract<Tab, "merkliste" | "merkliste-karte" | "merkliste-kalender">;
 
+/** Ansichten mit Karte (Plan 0059, E1): Nur zu ihnen gilt `karte=gross`. */
+export function hasMap(tab: Tab): boolean {
+  return tab === "karte" || tab === "anbieter" || tab === "merkliste-karte";
+}
+
 /** Gehört die Ansicht zur Merkliste? (Plan 0057, E9: zuletzt gezeigte Darstellung) */
 export function isSavedTab(tab: Tab): tab is SavedTab {
   return tabSection(tab) === "merkliste";
@@ -70,16 +75,24 @@ export interface Route {
    * und Zurücksetzen; in der URL steht nur der Wert, nie der Startpunkt (ADR 0017).
    */
   sort?: Sort;
+  /**
+   * Karte groß (Plan 0059, E1): nur die Darstellung, wie `ansicht=`, und nur zu einer Ansicht mit Karte (`hasMap`).
+   * Verrät nichts Privates; „Zurück“ schließt sie (`useRoute().closeBig`).
+   */
+  big?: true;
 }
 
 const SORTS = ["neu", "nah"] as const;
 export type Sort = (typeof SORTS)[number];
 const SORT_PARAM = "sortierung";
+const BIG_PARAM = "karte";
+const BIG_VALUE = "gross";
 
 export function parseRoute(search: string): Route {
   const p = new URLSearchParams(search);
   const tab = TABS.find((t) => t === p.get("ansicht")) ?? "entdecken";
   const sort = SORTS.find((s) => s === p.get(SORT_PARAM));
+  const big = hasMap(tab) && p.get(BIG_PARAM) === BIG_VALUE;
   const offerId = p.get(OFFER_PARAM) ?? "";
   const providerId = p.get(PROVIDER_PARAM) ?? "";
   // SHORT_ID_PATTERN ist eine Teilmenge von KEBAB_ID_PATTERN: Anbieter brauchen keinen eigenen Zweig
@@ -88,11 +101,27 @@ export function parseRoute(search: string): Route {
     SHORT_ID_PATTERN.test(offerId) || (offerId.length <= MAX_LEGACY_OFFER_ID && LEGACY_OFFER_ID_PATTERN.test(offerId));
   return {
     tab,
+    ...(big ? { big: true as const } : {}),
     ...(validOffer ? { offerId } : {}),
     ...(validProvider ? { providerId } : {}),
     filter: filterFromSearch(search),
     ...(sort ? { sort } : {}),
   };
+}
+
+/** Steht `karte=` in der Adresse, ohne dass die große Karte gilt? Dann schreibt `useRoute` sie kanonisch (Plan 0059, E1). */
+export function strayBig(search: string, route: Route): boolean {
+  return !route.big && new URLSearchParams(search).has(BIG_PARAM);
+}
+
+/**
+ * „Zurück“ aus der großen Karte (Plan 0059, Review 2, N1): Der ältere Verlaufseintrag kennt Filter und Sortierung von
+ * vor dem Öffnen. In der großen Karte gesetzte gelten weiter, solange es dieselbe Ansicht ist; sonst gilt der Eintrag.
+ */
+export function afterBigClosed(current: Route, popped: Route): Route {
+  if (!current.big || popped.big || popped.tab !== current.tab) return popped;
+  const { sort: _old, ...rest } = popped;
+  return { ...rest, filter: current.filter, ...(current.sort ? { sort: current.sort } : {}) };
 }
 
 /**
@@ -110,10 +139,11 @@ export function resolveRouteIds(route: Route): Route {
   };
 }
 
-/** Kanonischer Querystring ohne „?“: Filter, dann Ansicht, Sortierung, Anbieter, Angebot. */
+/** Kanonischer Querystring ohne „?“: Filter, dann Ansicht, große Karte, Sortierung, Anbieter, Angebot. */
 export function routeToSearch(route: Route): string {
   const parts = [filterToSearch(route.filter)];
   if (route.tab !== "entdecken") parts.push(`ansicht=${route.tab}`);
+  if (route.big && hasMap(route.tab)) parts.push(`${BIG_PARAM}=${BIG_VALUE}`);
   if (route.sort) parts.push(`${SORT_PARAM}=${route.sort}`);
   if (route.providerId) parts.push(`${PROVIDER_PARAM}=${route.providerId}`);
   if (route.offerId) parts.push(`${OFFER_PARAM}=${route.offerId}`);

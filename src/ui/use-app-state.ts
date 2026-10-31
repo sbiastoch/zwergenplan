@@ -20,7 +20,16 @@ import {
 import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
 import type { Origin } from "../domain/reach.ts";
-import { isLegacyView, parseRoute, type Route, resolveRouteIds, routeToSearch } from "../domain/route.ts";
+import {
+  afterBigClosed,
+  hasMap,
+  isLegacyView,
+  parseRoute,
+  type Route,
+  resolveRouteIds,
+  routeToSearch,
+  strayBig,
+} from "../domain/route.ts";
 import {
   cleanSavedProviders,
   cleanSavedState,
@@ -41,9 +50,11 @@ import { NO_TOAST, type ToastMessage, type ToastTone } from "./Toast.tsx";
 const DETAIL_STATE = { zpDetail: true } as const;
 /** Markiert einen History-Eintrag, den das Öffnen des Anbieter-Sheets erzeugt hat (Plan 0010, E3). */
 const PROVIDER_STATE = { zpProvider: true } as const;
+/** … und das Öffnen der großen Karte (Plan 0059, E1) */
+const BIG_STATE = { zpBig: true } as const;
 
 // `history.state` ist `any`: Gelesen werden nur unsere eigenen Marker, fremde Einträge ergeben `undefined`.
-const historyState = () => window.history.state as { zpDetail?: boolean; zpProvider?: boolean } | null;
+const historyState = () => window.history.state as { zpDetail?: boolean; zpProvider?: boolean; zpBig?: boolean } | null;
 
 function urlFor(route: Route): string {
   const search = routeToSearch(route);
@@ -60,6 +71,9 @@ export interface RouteApi {
   /** Anbieter-Sheet über dem aktuellen Tab öffnen; ein offenes Detail schließt (Plan 0010, E3) */
   openProvider: (providerId: string) => void;
   closeProvider: () => void;
+  /** Karte groß (Plan 0059, E1): eigener Eintrag, „Zurück“ schließt sie */
+  openBig: () => void;
+  closeBig: () => void;
 }
 
 /**
@@ -71,7 +85,8 @@ function routeFromLocation(): Route {
   const parsed = resolveRouteIds(raw);
   const renamed = parsed.offerId !== raw.offerId || parsed.providerId !== raw.providerId;
   // Alter Link auf den Tab „Kalender“ (Plan 0025, E8): Er landet in „Entdecken“, die URL wird kanonisch.
-  if (renamed || isLegacyView(window.location.search)) {
+  // `karte=gross` ohne Ansicht mit Karte gilt nicht und fällt auch aus der Adresse (Plan 0059, E1)
+  if (renamed || strayBig(window.location.search, parsed) || isLegacyView(window.location.search)) {
     window.history.replaceState(window.history.state, "", urlFor(parsed));
   }
   return parsed;
@@ -89,19 +104,31 @@ export function useRoute(): RouteApi {
   });
   // Aktueller Stand für Callbacks – History-Aufrufe gehören nicht in setState-Updater (StrictMode ruft die doppelt).
   const current = useRef(route);
-  const setRoute = useCallback((next: Route) => {
+  const setRoute = useCallback((wanted: Route) => {
+    // `big` gilt im Speicher nur zu einer Ansicht mit Karte (Plan 0059, E1, Review M2), wie in der URL
+    const { big: _big, ...rest } = wanted;
+    const next = wanted.big && !hasMap(wanted.tab) ? rest : wanted;
     current.current = next;
     setRouteState(next);
   }, []);
 
   useEffect(() => {
-    const onPop = () => setRoute(routeFromLocation());
+    const onPop = () => {
+      const popped = routeFromLocation();
+      // In der großen Karte gesetzte Filter überstehen „Zurück“ (Plan 0059, Review 2, N1)
+      const next = afterBigClosed(current.current, popped);
+      if (next !== popped) window.history.replaceState(window.history.state, "", urlFor(next));
+      setRoute(next);
+    };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, [setRoute]);
 
   const replace = useCallback(
-    (next: Route) => {
+    (wanted: Route) => {
+      // Ein Wechsel der Ansicht schließt die große Karte (Plan 0059, E6): Sie gehört zur Karte, aus der sie kam.
+      const { big: _big, ...rest } = wanted;
+      const next = wanted.tab === current.current.tab ? wanted : rest;
       setRoute(next);
       window.history.replaceState(window.history.state, "", urlFor(next));
     },
@@ -147,7 +174,23 @@ export function useRoute(): RouteApi {
     setRoute(rest);
   }, [setRoute]);
 
-  return { route, replace, openDetail, closeDetail, openProvider, closeProvider };
+  const openBig = useCallback(() => {
+    const next: Route = { ...current.current, big: true };
+    window.history.pushState(BIG_STATE, "", urlFor(next));
+    setRoute(next);
+  }, [setRoute]);
+
+  const closeBig = useCallback(() => {
+    if (historyState()?.zpBig) {
+      window.history.back(); // popstate setzt den Zustand
+      return;
+    }
+    const { big: _closed, ...rest } = current.current;
+    window.history.replaceState(null, "", urlFor(rest));
+    setRoute(rest);
+  }, [setRoute]);
+
+  return { route, replace, openDetail, closeDetail, openProvider, closeProvider, openBig, closeBig };
 }
 
 export function useBirthDate(): [string | undefined, (value: string | undefined) => void] {

@@ -4,7 +4,7 @@
  * (`karte-ui-only-lazy`, `map-only-lazy`). Ladekette: MapPanel.tsx (Start: `MapPanel`, `ProviderMapPanel`) →
  * karte/entry.ts (MapScreen bzw. ProviderMapScreen, Orts-Sheets) → map/MapView (MapLibre, Plan 0055, E5).
  */
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode, RefObject } from "react";
 import type { StartCamera } from "../domain/camera.ts";
 import type { Bounds, MapExtent } from "../domain/map-view.ts";
 import type { Place } from "../domain/places.ts";
@@ -14,8 +14,22 @@ import type { ProviderDirectoryData, SiteOffer } from "../domain/site-data.ts";
 import type { CardContext } from "./OfferCard.tsx";
 import type { ToastMessage } from "./Toast.tsx";
 
+/** Karte groß (Plan 0059), gleich für alle drei Karten; `App` reicht sie durch */
+export interface BigMapProps {
+  /** Vollbild: Rahmen `.map-box.big`, Kopfleiste und Zahl aus `overlay` */
+  big: boolean;
+  /** Knopf „Groß“ im kleinen Rahmen */
+  onBig: () => void;
+  /** Fokus-Ziel nach dem Schließen der großen Karte */
+  growRef: RefObject<HTMLButtonElement | null>;
+  /** Kopfleiste und Zahl der großen Karte (`BigMapBar`); nur mit `big` */
+  overlay: ReactNode;
+  /** Detail oder Anbieter-Sheet offen: Der getippte Ort bleibt markiert (E5) */
+  overlayOpen: boolean;
+}
+
 /** Props der Karten-Oberfläche (karte/MapScreen.tsx), durchgereicht von MapPanel.tsx */
-export interface MapScreenProps {
+export interface MapScreenProps extends BigMapProps {
   /** sichtbare Angebote (Filter, Alter, Wegzeit) */
   offers: readonly SiteOffer[];
   /** Datenbasis des Startausschnitts: alle kommenden Angebote, ohne Filter, Alter, Startpunkt (ADR 0008) */
@@ -40,7 +54,7 @@ export interface MapScreenProps {
 }
 
 /** Props der Anbieterkarte (karte/ProviderMapScreen.tsx, Plan 0055, E5), durchgereicht von `ProviderMapPanel` */
-export interface ProviderMapScreenProps {
+export interface ProviderMapScreenProps extends BigMapProps {
   /** Katalog, mit dem Datenstand von site.json abgeglichen (`useProviderDirectory`) */
   directory: ProviderDirectoryData;
   /** alle Angebote; „kommend“ (ohne Filter, ohne laufende Kurse) rechnet der Chunk selbst (N3) */
@@ -106,6 +120,10 @@ export interface MapViewProps {
   onViewport?: ((bounds: Bounds) => void) | undefined;
   /** Zähler: Jede Änderung fährt auf `overview` („Alle zeigen“, Plan 0055, N9; Plan 0056, N11) */
   resetKey?: number | undefined;
+  /** Karte groß (Plan 0059, E2): ein Finger bewegt sie, neu gewählte Orte rücken über das Sheet (E5) */
+  big: boolean;
+  /** Schlüssel des getippten Orts, solange sein Overlay offen ist: Auswahl-Ring (Plan 0059, E5) */
+  selected: string | undefined;
 }
 
 /** „webgl“: Der Browser kann die Karte nicht zeigen. „kacheln“: Stil oder Kacheln nicht ladbar. */

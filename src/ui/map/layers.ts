@@ -212,10 +212,18 @@ function providerLayers(colors: MapTokens): AddLayerObject[] {
   ];
 }
 
+/** Farbe des Auswahl-Rings (Plan 0059, E5) */
+const SELECTION_COLOR = "#ffd93b";
+
 export function addOwnLayers(
   map: MapLibre,
   colors: MapTokens,
-  data: { kind: "angebote" | "anbieter"; places: PointCollection<object>; origin: PointCollection<object> },
+  data: {
+    kind: "angebote" | "anbieter";
+    places: PointCollection<object>;
+    origin: PointCollection<object>;
+    selection: PointCollection<object>;
+  },
 ): void {
   if (data.kind === "anbieter") {
     map.addSource("anbieter-orte", {
@@ -237,6 +245,20 @@ export function addOwnLayers(
     });
   }
   map.addSource("startpunkt", { type: "geojson", data: data.origin });
+  map.addSource("auswahl", { type: "geojson", data: data.selection });
+  // Ring unter dem getippten Ort, solange sein Overlay offen ist (Plan 0059, E5): unter den Markern, damit Symbol und
+  // Zahl lesbar bleiben. Gelb wie der Sticker-Kreis im Logo, in hell und dunkel gleich; der Rand trägt den Kontrast.
+  map.addLayer({
+    id: "auswahl",
+    type: "circle",
+    source: "auswahl",
+    paint: {
+      "circle-radius": 26,
+      "circle-color": SELECTION_COLOR,
+      "circle-stroke-width": 2.5,
+      "circle-stroke-color": colors.line,
+    },
+  });
   for (const layer of data.kind === "anbieter" ? providerLayers(colors) : markerLayers(colors)) map.addLayer(layer);
   map.addLayer({
     id: "startpunkt",

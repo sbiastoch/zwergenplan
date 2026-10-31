@@ -110,6 +110,18 @@ export function originToFeatures(origin: Origin | undefined): PointCollection<Re
   return { type: "FeatureCollection", features: origin ? [point(origin.point, {})] : [] };
 }
 
+/**
+ * Quelle „auswahl“ (Plan 0059, E5): der getippte Ort, solange sein Overlay offen ist; ein Schlüssel ohne Ort (Daten
+ * gewechselt) zeichnet nichts.
+ */
+export function selectionToFeatures(
+  places: readonly { key: string; geo: GeoPoint }[],
+  key: string | undefined,
+): PointCollection<Record<string, never>> {
+  const hit = key === undefined ? undefined : places.find((p) => p.key === key);
+  return { type: "FeatureCollection", features: hit ? [point(hit.geo, {})] : [] };
+}
+
 /** Beim Tippen gewinnt der Treffer, dessen Mittelpunkt (Pixel) am nächsten liegt (E6). */
 export function nearestHit<T>(hits: readonly { x: number; y: number; value: T }[], at: { x: number; y: number }) {
   let best: { distance: number; value: T } | undefined;

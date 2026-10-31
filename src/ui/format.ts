@@ -711,6 +711,25 @@ export function inViewStatusParts(count: number, kind: "anbieter" | "angebote" |
   return [count, ` ${word} im Kartenausschnitt`];
 }
 
+/**
+ * Zahl unten links in der großen Karte (Plan 0059, E3; Arch-Review, Minor 1): dieselben Wörter wie die Statuszeile der
+ * jeweiligen kleinen Karte. Im Ausschnitt `inView`, sonst `total`; auf der Merkliste mit Filter „von `savedTotal`“.
+ */
+export function bigMapStatusParts(view: {
+  tab: "karte" | "anbieter" | "merkliste-karte";
+  narrowed: boolean;
+  inView: number;
+  total: number;
+  range?: DateRange | undefined;
+  savedTotal?: number | undefined;
+}): [number, string] {
+  const kind = view.tab === "anbieter" ? "anbieter" : view.tab === "karte" ? "angebote" : "gemerkte";
+  if (view.narrowed) return inViewStatusParts(view.inView, kind);
+  if (view.tab === "anbieter") return providerStatusParts(view.total);
+  if (view.tab === "karte") return listStatusParts(view.total, view.range);
+  return savedMapStatusParts(view.total, view.savedTotal);
+}
+
 /** Statuszeile im Tab „Anbieter“ „5 Anbieter“ (Plan 0010, E4; Plan 0056, E2); die Zahl getrennt, fett. */
 export function providerStatusParts(providers: number): [number, string] {
   return [providers, " Anbieter"];

@@ -164,7 +164,9 @@ describe("heavy.ts", () => {
     await new Promise((r) => h.on("exit", r));
     await until(() => !processAlive(watchdog));
     expect(existsSync(watchdogFile(dir, pgid))).toBe(false);
-  });
+    // wie der Fall darüber: Kindprozesse und Wächter brauchen unter der Last paralleler E2E-Läufe länger als 5 s
+    // (Stop-Gate, 2026-10-31, Plan 0059)
+  }, 15_000);
 
   it("reicht Argumente an `sh -c` unverändert durch (Arch-Review Etappe 4, M1)", () => {
     const r = spawnSync("node", [HEAVY, "sh", "-c", 'printf "%s|" "$@"', "e2e", "--project=pixel-7", "a b"], {

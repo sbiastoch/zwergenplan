@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { filterFromSearch } from "../domain/filter.ts";
 import { NO_TOAST, type ToastMessage } from "./Toast.tsx";
 import {
   LONG_TOAST_MS,
@@ -329,6 +330,60 @@ describe("useRoute: Anbieter-Sheet (Plan 0010, E3)", () => {
       renderRoute();
       expect(preloadProviderUi, search).not.toHaveBeenCalled();
     }
+  });
+});
+
+describe("useRoute: große Karte (Plan 0059, E1)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("openBig pusht einen eigenen Eintrag mit karte=gross hinter der Ansicht", () => {
+    const win = fakeWindow("?ansicht=karte&sortierung=neu");
+    vi.stubGlobal("window", win);
+    renderRoute().openBig();
+    expect(win.history.pushState).toHaveBeenCalledWith(
+      { zpBig: true },
+      "",
+      "/?ansicht=karte&karte=gross&sortierung=neu",
+    );
+  });
+
+  it("closeBig geht zurück, wenn der Eintrag von openBig kommt", () => {
+    const win = fakeWindow("?ansicht=anbieter");
+    vi.stubGlobal("window", win);
+    const api = renderRoute();
+    api.openBig();
+    api.closeBig();
+    expect(win.history.back).toHaveBeenCalledTimes(1);
+    expect(win.history.replaceState).not.toHaveBeenCalled();
+  });
+
+  it("ein Wechsel der Ansicht per replace lässt karte=gross fallen, ein Filterwechsel nicht", () => {
+    const win = fakeWindow("?ansicht=karte&karte=gross");
+    vi.stubGlobal("window", win);
+    const api = renderRoute();
+    api.replace({ ...api.route, filter: filterFromSearch("?kat=musik") });
+    expect(win.history.replaceState).toHaveBeenLastCalledWith(null, "", "/?kat=musik&ansicht=karte&karte=gross");
+    api.replace({ ...api.route, tab: "anbieter" });
+    expect(win.history.replaceState).toHaveBeenLastCalledWith(null, "", "/?ansicht=anbieter");
+  });
+
+  it("karte=gross ohne Ansicht mit Karte fällt beim Start aus der Adresse", () => {
+    const win = fakeWindow("?ansicht=merkliste&karte=gross");
+    vi.stubGlobal("window", win);
+    expect(renderRoute().route.big).toBeUndefined();
+    expect(win.history.replaceState).toHaveBeenCalledWith(null, "", "/?ansicht=merkliste");
+  });
+
+  it("closeBig ersetzt den Eintrag nach einem Deep-Link", () => {
+    const win = fakeWindow("?ansicht=merkliste-karte&karte=gross");
+    vi.stubGlobal("window", win);
+    const api = renderRoute();
+    expect(api.route.big).toBe(true);
+    api.closeBig();
+    expect(win.history.back).not.toHaveBeenCalled();
+    expect(win.history.replaceState).toHaveBeenCalledWith(null, "", "/?ansicht=merkliste-karte");
   });
 });
 

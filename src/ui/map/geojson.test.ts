@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { mainCategory, nearestHit, originToFeatures, placesToFeatures, providerPlacesToFeatures } from "./geojson.ts";
+import {
+  mainCategory,
+  nearestHit,
+  originToFeatures,
+  placesToFeatures,
+  providerPlacesToFeatures,
+  selectionToFeatures,
+} from "./geojson.ts";
 
 describe("GeoJSON für die Karte (Plan 0005, E6)", () => {
   const theater = {
@@ -129,5 +136,21 @@ describe("GeoJSON der Anbieterkarte (Plan 0055, E5)", () => {
       [[11, 49.4], { key: "49.4,11", anbieter: 2, blass: false }],
       [[11.1, 49.5], { key: "49.5,11.1", anbieter: 1, blass: true }],
     ]);
+  });
+});
+
+describe("Auswahl der großen Karte (Plan 0059, E5)", () => {
+  const places = [
+    { key: "a", geo: { lat: 49.45, lon: 11.06 } },
+    { key: "b", geo: { lat: 49.46, lon: 11.07 } },
+  ];
+
+  it("liefert genau den gewählten Ort", () => {
+    expect(selectionToFeatures(places, "b").features.map((f) => f.geometry.coordinates)).toEqual([[11.07, 49.46]]);
+  });
+
+  it("ist leer ohne Auswahl und bei einem unbekannten Schlüssel", () => {
+    expect(selectionToFeatures(places, undefined).features).toEqual([]);
+    expect(selectionToFeatures(places, "c").features).toEqual([]);
   });
 });

@@ -19,7 +19,7 @@ import { type MapExtent, viewNarrows } from "../domain/map-view.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
-import { isSavedTab, type SavedTab, type Sort, type Tab, tabSection } from "../domain/route.ts";
+import { hasMap, isSavedTab, type SavedTab, type Sort, type Tab, tabSection } from "../domain/route.ts";
 import {
   EMPTY_SAVED_FILTER,
   followUpFilter,
@@ -36,6 +36,7 @@ import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { type Category, withCategory } from "../domain/topics.ts";
 import { bellPush, preloadBell } from "./AppExtras.tsx";
+import { BigMapBar } from "./BigMapBar.tsx";
 import {
   Header,
   type QuickChip,
@@ -50,6 +51,7 @@ import {
   aboToast,
   ageChipLabel,
   ageWarnText,
+  bigMapStatusParts,
   DAYTIME_LABELS,
   inViewStatusParts,
   LIST_CHIP_LABELS,
@@ -134,7 +136,7 @@ const SAVED_SORT_TITLES: Record<SavedSort, string> = {
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [attempt, setAttempt] = useState(0);
-  const { route, replace, openDetail, closeDetail, openProvider, closeProvider } = useRoute();
+  const { route, replace, openDetail, closeDetail, openProvider, closeProvider, openBig, closeBig } = useRoute();
   const [birthDate, setBirthDateStored] = useBirthDate();
   const savedApi = useSaved();
   const savedIds = savedApi.state.ids;
@@ -446,6 +448,68 @@ export function App() {
   // Ansage erst, wenn die Karte ruht; der sichtbare Text ist dann `aria-hidden` (Review m8, Review 2, m4)
   const inViewAnnounce = useSettled(narrowed ? `${inViewCount}${inViewWords}` : "", ANNOUNCE_DELAY_MS);
   /*
+   * Karte groß (Plan 0059): nur zu einer Ansicht mit Karte. Die Statuszeile ist dann verborgen, die Zahl unten links in
+   * der Karte übernimmt Text und Ansage (E3), mit denselben Wörtern.
+   */
+  const big = route.big === true && hasMap(route.tab);
+  const savedMapNarrowed = route.tab === "merkliste-karte" && viewNarrows(mapView);
+  const bigTab = route.tab === "anbieter" || route.tab === "merkliste-karte" ? route.tab : "karte";
+  const [bigNumber, bigWords] = bigMapStatusParts(
+    bigTab === "anbieter"
+      ? { tab: bigTab, narrowed: providersNarrowed, inView: inViewCount, total: providerCount }
+      : bigTab === "merkliste-karte"
+        ? {
+            tab: bigTab,
+            narrowed: savedMapNarrowed,
+            inView: views.savedInView.length,
+            total: views.savedListVisible.length,
+            savedTotal: views.savedFiltered ? saved.length : undefined,
+          }
+        : { tab: bigTab, narrowed: offersNarrowed, inView: inViewCount, total: listCount, range: route.filter.range },
+  );
+  const bigCount = `${bigNumber}${bigWords}`;
+  const bigAnnounce = useSettled(big ? bigCount : "", ANNOUNCE_DELAY_MS);
+  /*
+   * Steht der große Rahmen wirklich (Review 2, M-b)? Beim Laden, bei Fehlern und ohne Gemerktes fehlt die Karte, dann
+   * bleibt die Seite sichtbar (`:has` in map.css); Detail-Sheet, Esc und Fokus richten sich danach.
+   */
+  const bigShown =
+    big &&
+    load.kind === "ready" &&
+    (route.tab === "anbieter" || (views.map !== undefined && (route.tab === "karte" || saved.length > 0)));
+  // Fokus (E3): nach dem Öffnen auf „Karte verkleinern“, nach dem Schließen (auch per „Zurück“) auf „Groß“
+  const growRef = useRef<HTMLButtonElement>(null);
+  const bigCloseRef = useRef<HTMLButtonElement>(null);
+  const wasBig = useRef(bigShown);
+  /*
+   * Der fixe Rahmen fällt aus dem Fluss, das Dokument wird kürzer: Scroll-Position vorher merken (Review M1), samt
+   * Ansicht. Nur zurück in dieselbe Ansicht scrollt dorthin (Review 2, M-a: „Anschluss suchen“ wechselt die Liste).
+   */
+  const scrollBeforeBig = useRef<{ top: number; tab: Tab }>(undefined);
+  const onBig = useCallback(() => {
+    scrollBeforeBig.current = { top: window.scrollY, tab: route.tab };
+    openBig();
+  }, [openBig, route.tab]);
+  const tab = route.tab;
+  useEffect(() => {
+    if (wasBig.current === bigShown) return;
+    wasBig.current = bigShown;
+    (bigShown ? bigCloseRef : growRef).current?.focus({ preventScroll: true });
+    if (bigShown) return;
+    const before = scrollBeforeBig.current;
+    scrollBeforeBig.current = undefined;
+    if (before?.tab === tab) window.scrollTo({ top: before.top });
+  }, [bigShown, tab]);
+  // Esc schließt die große Karte; ein offener Dialog fängt Esc selbst ab (`cancel`)
+  useEffect(() => {
+    if (!bigShown) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !document.querySelector("dialog[open]")) closeBig();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [bigShown, closeBig]);
+  /*
    * Nur der Rückfall auf die Luftlinie steht hinter der Zahl, kurz mit Grund (Plan 0056, E2; ADR 0039). U+00A0 vor dem
    * Punkt, damit er nie verwaist am Zeilenanfang steht; der Ausdruck ist ein Inline-Block (Plan 0020, E1).
    */
@@ -509,6 +573,8 @@ export function App() {
   }, [bellVisible]);
   const dialogOpen =
     sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined || onboarding !== "aus";
+  // Detail oder Anbieter-Sheet über der Karte: Der getippte Ort bleibt markiert (Plan 0059, E5)
+  const overlayOpen = detailOffer !== undefined || sheetProviderId !== undefined;
   const limit = route.filter.reachLimit;
   // Wegzeit-Grenze und Zeitraum gelten nur in „Entdecken“, nicht im Tab „Anbieter“ (Plan 0055, E3, Review M2)
   const inProviders = section === "anbieter";
@@ -638,9 +704,27 @@ export function App() {
    * sie am Startpunkt (`followOrigin`, ADR 0039); Rückfall, „Alle zeigen“ und die Merkliste nutzen alle kommenden
    * Angebote (`views.map.cameraOffers`), nie die Merkliste selbst.
    */
+  const bigOverlay = big && (
+    <BigMapBar
+      onClose={closeBig}
+      closeRef={bigCloseRef}
+      filter={
+        route.tab === "karte"
+          ? { count: activeFilterCount(route.filter, { limitActive: limitOn }), onOpen: () => setSheet("filter") }
+          : route.tab === "merkliste-karte"
+            ? { count: views.savedFilterCount, onOpen: () => setSheet("saved-filter") }
+            : undefined
+      }
+      count={bigCount}
+      announce={bigAnnounce}
+    />
+  );
+  // gemeinsam für alle drei Karten (Plan 0059, E3, E5)
+  const bigProps = { big, onBig, growRef, overlay: bigOverlay, overlayOpen };
   const mapPanel = (shown: readonly SiteOffer[], cardCtx: CardContext, followOrigin: boolean) =>
     views.map && (
       <MapPanel
+        {...bigProps}
         offers={shown}
         cameraOffers={views.map.cameraOffers}
         origin={origin}
@@ -713,6 +797,7 @@ export function App() {
         {/* Anbieterkarte unter der Suche, über der Statuszeile (Plan 0055, Mockup C); lädt mit dem Tab (ADR 0038) */}
         {load.kind === "ready" && route.tab === "anbieter" && (
           <ProviderMapPanel
+            {...bigProps}
             generatedAt={load.data.generatedAt}
             offers={offers}
             visible={views.providerVisible}
@@ -881,6 +966,7 @@ export function App() {
             visible={views.savedListVisible}
             inView={views.savedInView}
             narrowed={route.tab === "merkliste-karte" && viewNarrows(mapView)}
+            bigMap={big}
             onShowAll={showAll}
             filtered={views.savedFiltered}
             statusChip={
@@ -1004,6 +1090,7 @@ export function App() {
           calendar: route.tab === "merkliste-kalender",
         }}
         theme={theme}
+        overMap={bigShown ? { closeRef: bigCloseRef } : undefined}
         today={today}
         originApi={originApi}
         transit={transit}

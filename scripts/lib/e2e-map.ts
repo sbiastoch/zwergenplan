@@ -91,6 +91,15 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/anbieter\/ProviderScreen\.tsx$/,
     /^src\/domain\/(provider-places|provider-count|directory|camera|geo|map-view)\.ts$/,
   ],
+  // Karte groß (Plan 0059): Vollbild aller drei Karten, Kopfleiste (BigMapBar), Detail und Sheets über der Karte
+  // (Overlays, DetailDialog), Verlauf (use-app-state), Merkliste groß (SavedView), Auswahl und Reveal (karte/, map/).
+  "e2e/karte-gross.spec.ts": [
+    /^src\/ui\/(karte|map)\//,
+    /^src\/ui\/(BigMapBar|MapPanel|Overlays|DetailDialog|SavedView|App)\.tsx$/,
+    /^src\/ui\/(map-types|use-app-state)\.ts$/,
+    /^src\/ui\/styles\/(map|dialog|sheet)\.css$/,
+    /^src\/domain\/route\.ts$/,
+  ],
   // Karte: Lader (MapPanel, Lazy), Oberfläche karte/, MapLibre map/, Kacheln, Start am Startpunkt (ADR 0039;
   // origin-state), Wegzeit beim Öffnen (use-transit), Orts-Sheet mit Linien (ReachLong), Marker mit
   // Kategorie-Symbol (categories), Fehler beim Laden.

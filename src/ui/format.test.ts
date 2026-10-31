@@ -17,6 +17,7 @@ import {
   ageWarnText,
   ageWindowLabel,
   availabilityLabel,
+  bigMapStatusParts,
   clock,
   collectionToast,
   dayHeading,
@@ -1006,5 +1007,26 @@ describe("providerAboName (Plan 0054, E7)", () => {
     expect(providerAboName(undefined, true)).toBe("Anbieter ohne aktuelle Angebote");
     expect(providerAboName("Musikschule Beispiel (fiktiv)", false)).toBe("Anbieter-Abo");
     expect(providerAboName(undefined, false)).toBe("Anbieter-Abo");
+  });
+});
+
+describe("bigMapStatusParts (Plan 0059, E3)", () => {
+  const text = (view: Parameters<typeof bigMapStatusParts>[0]) => bigMapStatusParts(view).join("");
+
+  it("nennt im Ausschnitt dieselben Wörter wie die Statuszeile", () => {
+    expect(text({ tab: "karte", narrowed: true, inView: 4, total: 9 })).toBe("4 Angebote im Kartenausschnitt");
+    expect(text({ tab: "anbieter", narrowed: true, inView: 3, total: 9 })).toBe("3 Anbieter im Kartenausschnitt");
+    expect(text({ tab: "merkliste-karte", narrowed: true, inView: 1, total: 2 })).toBe(
+      "1 gemerkte im Kartenausschnitt",
+    );
+  });
+
+  it("ohne Einschränkung die Gesamtzahl, auf der Merkliste mit Filter „von …“", () => {
+    expect(text({ tab: "karte", narrowed: false, inView: 4, total: 9 })).toBe("9 Angebote");
+    expect(text({ tab: "anbieter", narrowed: false, inView: 3, total: 9 })).toBe("9 Anbieter");
+    expect(text({ tab: "merkliste-karte", narrowed: false, inView: 2, total: 2 })).toBe("2 Angebote gemerkt");
+    expect(text({ tab: "merkliste-karte", narrowed: false, inView: 0, total: 0, savedTotal: 2 })).toBe(
+      "0 von 2 gemerkten Angeboten",
+    );
   });
 });

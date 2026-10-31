@@ -15,15 +15,20 @@ import {
   providersInBounds,
   providersWithPlace,
 } from "../../domain/provider-places.ts";
+import { BigSlot } from "../BigMapBar.tsx";
 import { Dialog } from "../Dialog.tsx";
 import { LoadFailed, useLazy } from "../Lazy.tsx";
 import type { MapLayer, MapProblem, MapViewProps, ProviderMapScreenProps } from "../map-types.ts";
 import { ProviderPlaceSheet } from "./ProviderPlaceSheet.tsx";
 import { useInViewReport } from "./use-in-view.ts";
+import { useSelection } from "./use-selection.ts";
 
 async function loadMapView(): Promise<ComponentType<MapViewProps>> {
   return (await import("../map/MapView.tsx")).MapView;
 }
+
+const LIST_REST = "Alle Anbieter stehen in der Liste.";
+const BIG_REST = "Mit „Karte verkleinern“ stehen alle Anbieter in der Liste.";
 
 const NOTES: Record<MapProblem, string> = {
   webgl: "Dein Browser kann die Karte nicht zeigen.",
@@ -55,6 +60,7 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
   // Orts-Sheet: Sitzungszustand, nie in der URL (E4)
   const [placeKey, setPlaceKey] = useState<string>();
   const place = places.find((p) => p.key === placeKey);
+  const { selected, tap } = useSelection(placeKey, props.overlayOpen);
   const state = module.kind === "fehler" || problem ? "fehler" : ready && module.kind === "da" ? "bereit" : "laden";
 
   // Ausschnitt an die Liste (E4); neue Geometrie (Datenstand, Mitternacht) rechnet sofort neu
@@ -66,6 +72,8 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
   }, [place, onSheetOpen]);
   useEffect(() => () => onSheetOpen(false), [onSheetOpen]);
 
+  // In der großen Karte ist die Liste verborgen: Der Ausweg heißt „Karte verkleinern“ (Plan 0059, Review M6)
+  const rest = props.big ? BIG_REST : LIST_REST;
   const rebuild = () => {
     setProblem(undefined);
     setReady(false);
@@ -78,7 +86,7 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
 
   return (
     <>
-      <div className="map-box anbieter" data-state={state}>
+      <div className={props.big ? "map-box anbieter big" : "map-box anbieter"} data-state={state}>
         {module.kind === "da" && !problem && (
           <module.View
             key={build}
@@ -90,6 +98,7 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
             dark={props.dark}
             onPlace={(key) => {
               const hit = places.find((p) => p.key === key);
+              if (hit) tap(hit.key);
               const [only, ...more] = hit?.providers ?? [];
               // ein Anbieter: gleich sein Sheet, mehrere: das Orts-Sheet (E4)
               if (only && more.length === 0) onOpenProvider(only.id);
@@ -99,17 +108,20 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
             onProblem={setProblem}
             onViewport={onViewport}
             resetKey={props.resetKey}
+            big={props.big}
+            selected={selected}
           />
         )}
+        <BigSlot {...props} failed={state === "fehler"} />
         {state === "laden" && <p className="map-note">Karte wird geladen …</p>}
         {module.kind === "fehler" && (
           <LoadFailed attempt={attempt} retry={retry}>
-            Die Karte konnte nicht geladen werden. Alle Anbieter stehen in der Liste.
+            {`Die Karte konnte nicht geladen werden. ${rest}`}
           </LoadFailed>
         )}
         {problem && (
           <p className="map-note">
-            {NOTES[problem]} Alle Anbieter stehen in der Liste.
+            {NOTES[problem]} {rest}
             {problem === "kacheln" && (
               <button type="button" className="btn" onClick={rebuild}>
                 Nochmal versuchen
@@ -122,7 +134,7 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
         open={place !== undefined}
         onClose={() => setPlaceKey(undefined)}
         label={place?.name ?? "Ort"}
-        className="sheet"
+        className={props.big ? "sheet over-map" : "sheet"}
         toast={props.toast}
       >
         {place && (
