@@ -326,6 +326,22 @@ describe("runPflege, Trockenlauf (Plan 0049, S1)", () => {
     expect(run.states.nuernberg?.gepflegt).toEqual([{ anbieter: P, datum: TODAY }]);
   });
 
+  it("große Seite: in Teilen bewiesen (Vermerk), über MAX_INPUT_CHARS abgeschnitten", async () => {
+    const filler = (n: number) => `<p>${"Krabbeln und Spielen mit Babys. ".repeat(n)}</p>`;
+    const big = html(
+      `<h1>Babymassage</h1><p>Babymassage freitags 15:00 Uhr: 09.10., 16.10., 23.10.</p>${filler(1500)}`,
+    );
+    const split = await pflege({ pages: { ...PAGES, [`${URL_C}?utm_source=newsletter#termine`]: big } });
+    expect(split.run.rows[0]?.kandidaten[0]).toMatchObject({
+      ergebnis: "anhaengen",
+      hinweise: [expect.stringMatching(/^Eingabe in Teilen/)],
+    });
+    const huge = html(`<h1>Babymassage</h1><p>freitags 15:00 Uhr: 09.10., 16.10., 23.10.</p>${filler(12_000)}`);
+    const cut = await pflege({ pages: { ...PAGES, [`${URL_C}?utm_source=newsletter#termine`]: huge } });
+    expect(cut.run.rows[0]?.kandidaten[0]).toMatchObject({ ergebnis: "abgeschnitten" });
+    expect(cut.seen).toHaveLength(0);
+  });
+
   it("Zeitbudget: Lauf endet geordnet, der angefangene Anbieter gilt nicht als gepflegt", async () => {
     let t = 0;
     const { run } = await pflege({ pages: PAGES, clock: () => (t += 61 * 60_000) });

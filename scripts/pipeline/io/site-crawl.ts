@@ -100,10 +100,12 @@ export function crawlFetcher(
         return {
           ok: true,
           url,
-          finalUrl: r.finalUrl,
+          // Kennung ist das Ziel der HTTP-Weiterleitungen, nicht eine per Skript umgeschriebene Adresse (S1-Messung:
+          // die Buchungs-App von Ohana hängt die Query ein zweites Mal an)
+          finalUrl: res.finalUrl,
           contentType: r.contentType,
           browser: true,
-          page: extractPage(r.body, r.finalUrl),
+          page: extractPage(r.body, res.finalUrl),
           html: r.body,
           cost,
         };

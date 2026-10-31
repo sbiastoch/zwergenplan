@@ -148,4 +148,28 @@ describe("crawlFetcher", () => {
       browser: true,
     });
   });
+
+  it("Browser: Kennung ist das Ziel der HTTP-Weiterleitungen, nicht die per Skript umgeschriebene Adresse", async () => {
+    setAbruf("neu");
+    const f = fakeFetch({
+      "https://www.eversports.de/w/s?id=1": () =>
+        new Response("nein", { status: 403, headers: { "content-type": "text/html" } }),
+    });
+    const p = provider("s", "https://s.de/");
+    const scope = crawlScope(p, [p]);
+    const rewriting = {
+      render: async (url: string) => ({
+        status: 200,
+        finalUrl: `${url}?id=1`,
+        contentType: "text/html",
+        body: "<html><body>Kurse im Browser</body></html>",
+      }),
+    };
+    const one = crawlFetcher(scope, { queue: hostQueue(fakeClock()), browser: rewriting, fetchImpl: f.impl });
+    expect(await one("https://www.eversports.de/w/s?id=1")).toMatchObject({
+      ok: true,
+      browser: true,
+      finalUrl: "https://www.eversports.de/w/s?id=1",
+    });
+  });
 });

@@ -385,11 +385,12 @@ async function prove(
     return /Eingabe zu groß/.test(input.reason ?? "")
       ? done("abgeschnitten", `${input.reason}; partChars prüfen`, { hinweise })
       : done("fehler", input.reason ?? "Eingabe fehlt", { hinweise });
+  // eine geteilte Eingabe extrahiert der Nachtlauf in Teilen; der Beweis auch (S1-Messung: große Programmseiten)
   if (
     unit &&
     splitInput(unit.text, PART_MAX_CHARS, { pageUrls: unit.pages.map((p) => p.url), candidates: 0 }).parts.length > 1
   )
-    return done("abgeschnitten", `Eingabe wird geteilt (${unit.text.length} Zeichen); partChars prüfen`, { hinweise });
+    hinweise.push(`Eingabe in Teilen (${unit.text.length} Zeichen)`);
 
   // frisch je Kandidat: ein früherer Beweis darf nicht als Vorstand gelten (B1)
   const dir = join(o.runDir, "beweis", provider.id, String(c.n));
