@@ -111,10 +111,11 @@ test.describe("Startpunkt Gostenhof", () => {
   });
 });
 
-test("Sticker „Bücher“: nur die Bibliothek aktiv, die übrigen blass, „Filter zurücksetzen“", async ({ page }) => {
-  await openList(page, "kat=buecher");
+// Sticker „Musik“: nach dem Falten (Plan 0037, Nachtrag A) teilen Bibliothek und Theater „Kultur“, nur Musik trennt einen Anbieter
+test("Sticker „Musik“: nur die Musikschule aktiv, die übrigen blass, „Filter zurücksetzen“", async ({ page }) => {
+  await openList(page, "kat=musik");
   await expect(page.getByRole("status")).toContainText("1 Anbieter");
-  expect(await names(activeRows(page))).toEqual([BIBLIOTHEK]);
+  expect(await names(activeRows(page))).toEqual([MUSIKSCHULE]);
   // die vier ausgeblendeten stehen als eigene blasse Zeile, kein Zählsatz (Nutzer-Feedback 2026-10-29)
   await expect(idleRows(page)).toHaveCount(5);
   await expect(idleRows(page).filter({ hasText: "zur Auswahl" })).toHaveCount(4);
@@ -145,8 +146,8 @@ test.describe("Suche", () => {
     await expect(row(page, GEMEINDE)).toBeVisible();
   });
 
-  test("„theater“ bei Sticker „Bücher“: das Theater blass, „2 Angebote, keins passt zur Auswahl“", async ({ page }) => {
-    await openList(page, "kat=buecher");
+  test("„theater“ bei Sticker „Musik“: das Theater blass, „2 Angebote, keins passt zur Auswahl“", async ({ page }) => {
+    await openList(page, "kat=musik");
     await search(page).fill("theater");
     await expect(activeRows(page)).toHaveCount(0);
     await expect(idleRows(page)).toHaveCount(1);
@@ -170,7 +171,7 @@ test.describe("Anbieter-Sheet", () => {
     await openList(page);
     await row(page, THEATER).click();
     await expect(sheet(page).getByRole("heading", { level: 2 })).toHaveText(THEATER);
-    await expect(sheet(page).locator(".provider-cats")).toHaveText("Bühne & Konzert");
+    await expect(sheet(page).locator(".provider-cats")).toHaveText("Kultur & Kreativ");
     const website = sheet(page).getByRole("link", { name: "Website & Programm" });
     await expect(website).toHaveAttribute("href", "https://example.org/theater");
     await expect(website).toHaveAttribute("target", "_blank");
@@ -187,8 +188,8 @@ test.describe("Anbieter-Sheet", () => {
     await expect(sheet(page).getByText("Alle Angebote, auch die außerhalb deiner Auswahl.")).toHaveCount(0);
   });
 
-  test("mit Sticker „Bücher“: alle Theater-Angebote und der Hinweis", async ({ page }) => {
-    await openList(page, "kat=buecher");
+  test("mit Sticker „Musik“: alle Theater-Angebote und der Hinweis", async ({ page }) => {
+    await openList(page, "kat=musik");
     await search(page).fill("theater");
     await row(page, THEATER).click();
     await expect(sheet(page).getByTestId("offer")).toHaveCount(2);

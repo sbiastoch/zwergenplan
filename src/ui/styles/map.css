@@ -386,6 +386,16 @@
     box-shadow: 3px 3px 0 var(--shadow);
     font-size: 0.875rem;
     font-weight: 700;
+    /* Knopf (Nachtrag 1, N2): Zahl und Pfeil nach oben, mindestens 44 px hoch */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    text-align: left;
+  }
+  .bigmap-count:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--shadow);
   }
   /*
    * Solange die Quellenangabe ausgeschrieben ist (beim Öffnen, bis 5 s, oder nach Tipp auf „i“), steht die Zahl darüber,

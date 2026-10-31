@@ -84,6 +84,14 @@ describe("validateRaw", () => {
       expect(r.warnings).toEqual([]);
       expect(r.ok && r.batch.events[0]?.category).toBe("krabbel-spielgruppen");
     });
+
+    it("faltet einen Altwert und warnt nicht, wenn er gefaltet zum Thema passt (Nachtrag A, NA4)", () => {
+      const wald = { ...treff, category: "natur", topics: ["waldgruppe"] };
+      const r = validateRaw(batch([wald]), ctx);
+      expect(errors(r)).toEqual([]);
+      expect(r.warnings).toEqual([]);
+      expect(r.ok && r.batch.events[0]?.category).toBe("bewegung");
+    });
   });
 
   it("prüft Katalog-Referenzen", () => {

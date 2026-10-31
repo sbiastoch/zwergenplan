@@ -19,7 +19,7 @@ describe("Kachel im Vorschaubild (Plan 0026, Nachtrag A, E16)", () => {
     const html = offerCardHtml(preview("PEKiP-Gruppe Herbst"));
     expect(html).toContain('<article class="card k-babykurse">');
     expect(html).toContain(`<path class="shape-ink" d="${CATEGORY_SHAPES.babykurse}"/>`);
-    expect(html).toContain(">Babykurse</span>");
+    expect(html).toContain(">Baby- &amp; Elternkurse</span>");
     expect(html).toContain('<span class="when">Kurs ab Di 13. Okt., 8 Termine</span>');
     expect(html).toContain('<h3 class="ctitle">PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)</h3>');
     expect(html).toContain('<p class="meta">Familientreff Beispielhof (fiktiv), Altstadt</p>');

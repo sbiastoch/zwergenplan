@@ -44,8 +44,9 @@ it("Katalog der Fixtures enthält den Turnverein ohne Angebote", () => {
 
 const offers = fixtureSiteOffers();
 const upcoming = applyFilters(offers, EMPTY_FILTER, { now: FIXTURE_NOW });
+// Nach dem Falten (Plan 0037, Nachtrag A) teilen Bibliothek und Theater „buehne“; „regelmaessig“ trennt sie wieder.
 const visibleWith = (state: FilterState) => applyFilters(offers, state, { now: FIXTURE_NOW });
-const buecher: FilterState = { ...EMPTY_FILTER, categories: ["buecher"] };
+const kultur: FilterState = { ...EMPTY_FILTER, categories: ["buehne"], formats: ["regelmaessig"] };
 
 const noReach = () => undefined;
 const rows = (overrides: Partial<Parameters<typeof providerRows>[0]> = {}) =>
@@ -88,8 +89,8 @@ describe("providerRows", () => {
     expect(treff?.nearest).toBeUndefined();
   });
 
-  it("Sticker „Bücher“: nur die Bibliothek aktiv, die vier ausgeblendeten blass vor dem Turnverein", () => {
-    const result = rows({ visible: visibleWith(buecher) });
+  it("Sticker „Kultur“ und „Regelmäßig“: nur die Bibliothek aktiv, die vier ausgeblendeten blass vor dem Turnverein", () => {
+    const result = rows({ visible: visibleWith(kultur) });
     expect(ids(result.active)).toEqual([pid("stadtbibliothek-beispiel")]);
     // jede Zahl hat ihre Zeilen, kein Zählsatz mehr (Nutzer-Feedback 2026-10-29)
     expect(result.idle.map((r) => [r.provider.id, r.state])).toEqual([
@@ -101,16 +102,16 @@ describe("providerRows", () => {
     ]);
   });
 
-  it("Suche „theater“ bei Sticker „Bücher“: das Theater erscheint blass als ausgeblendet", () => {
-    const result = rows({ visible: visibleWith(buecher), query: "theater" });
+  it("Suche „theater“ bei Sticker „Kultur“ und „Regelmäßig“: das Theater erscheint blass als ausgeblendet", () => {
+    const result = rows({ visible: visibleWith(kultur), query: "theater" });
     expect(result.active).toEqual([]);
     expect(result.idle.map((r) => [r.provider.id, r.state, r.shown, r.upcoming])).toEqual([
       [pid("theater-beispiel"), "ausgeblendet", 0, 2],
     ]);
   });
 
-  it("Suche „beispiel“ bei Sticker „Bücher“: erst die vier ausgeblendeten, dann der Turnverein", () => {
-    const result = rows({ visible: visibleWith(buecher), query: "beispiel" });
+  it("Suche „beispiel“ bei Sticker „Kultur“ und „Regelmäßig“: erst die vier ausgeblendeten, dann der Turnverein", () => {
+    const result = rows({ visible: visibleWith(kultur), query: "beispiel" });
     expect(ids(result.active)).toEqual([pid("stadtbibliothek-beispiel")]);
     expect(result.idle.map((r) => [r.provider.id, r.state])).toEqual([
       [pid("gemeinde-beispiel"), "ausgeblendet"],
@@ -128,7 +129,7 @@ describe("providerRows", () => {
   });
 
   it("Stadtteile: aktiv aus den sichtbaren Angeboten, blass aus dem Katalog (district ?? Name)", () => {
-    const result = rows({ visible: visibleWith(buecher), query: "beispiel" });
+    const result = rows({ visible: visibleWith(kultur), query: "beispiel" });
     expect(result.active[0]?.places).toEqual(["Altstadt"]);
     expect(result.idle.at(-1)?.places).toEqual(["Schweinau", "Gymnastikraum Beispiel"]);
   });
@@ -214,7 +215,7 @@ describe("providerRows", () => {
   it("Invariante: active.length === Anzahl verschiedener Anbieter in visible", () => {
     const cases: Array<[SiteProvider[], SiteOffer[]]> = [
       [catalog, upcoming],
-      [catalog, visibleWith(buecher)],
+      [catalog, visibleWith(kultur)],
       [catalog.filter((p) => p.id !== pid("theater-beispiel")), upcoming],
       [[], visibleWith({ ...EMPTY_FILTER, categories: ["musik"] })],
     ];
@@ -263,7 +264,7 @@ describe("providerRows: gemerkte Anbieter (Plan 0025, E3)", () => {
   });
 
   it("ausgeblendet: bleibt unter saved, blass, und steht nicht noch einmal in idle", () => {
-    const result = rows({ visible: visibleWith(buecher), saved: [pid("theater-beispiel")] });
+    const result = rows({ visible: visibleWith(kultur), saved: [pid("theater-beispiel")] });
     expect(result.saved.map((r) => [r.provider.id, r.state, r.upcoming])).toEqual([
       [pid("theater-beispiel"), "ausgeblendet", 2],
     ]);
@@ -310,8 +311,8 @@ describe("providerRows mit Kartenausschnitt (Plan 0055, E2, E4)", () => {
   });
 
   it("ausgeblendete Zeilen nur im Ausschnitt", () => {
-    const buecher: FilterState = { ...EMPTY_FILTER, categories: ["buecher"] };
-    const visible = visibleWith(buecher);
+    const kultur: FilterState = { ...EMPTY_FILTER, categories: ["buehne"], formats: ["regelmaessig"] };
+    const visible = visibleWith(kultur);
     const hidden = (r: ReturnType<typeof rows>) => r.idle.filter((x) => x.state === "ausgeblendet");
     expect(hidden(rows({ visible }))).toHaveLength(4);
     expect(ids(hidden(rows({ visible, view })))).toEqual([treff]);
@@ -335,7 +336,10 @@ describe("providerRows mit Kartenausschnitt (Plan 0055, E2, E4)", () => {
 
   it("Invariante: aktive Zeilen = countProviders(visible, view) (Review M1)", () => {
     for (const saved of [[], [treff], [theater, bibliothek]]) {
-      for (const visible of [upcoming, visibleWith({ ...EMPTY_FILTER, categories: ["buecher"] })]) {
+      for (const visible of [
+        upcoming,
+        visibleWith({ ...EMPTY_FILTER, categories: ["buehne"], formats: ["regelmaessig"] }),
+      ]) {
         const result = rows({ visible, view, saved });
         const activeSaved = result.saved.filter((r) => r.state === "aktiv").length;
         expect(result.active.length + activeSaved).toBe(countProviders(visible, view));
@@ -369,8 +373,8 @@ describe("hasOffersOutside", () => {
     const own = providerOffers(offers, pid("theater-beispiel"), FIXTURE_NOW);
     expect(own.length).toBeGreaterThan(0);
     expect(hasOffersOutside(own, upcoming)).toBe(false);
-    expect(hasOffersOutside(own, visibleWith(buecher))).toBe(true);
-    expect(hasOffersOutside([], visibleWith(buecher))).toBe(false);
+    expect(hasOffersOutside(own, visibleWith(kultur))).toBe(true);
+    expect(hasOffersOutside([], visibleWith(kultur))).toBe(false);
   });
 });
 

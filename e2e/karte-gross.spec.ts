@@ -18,8 +18,8 @@ const TREFF_ID = "lxizt974";
 const mapBox = (page: Page) => page.locator(".map-box");
 const grow = (page: Page) => page.getByRole("button", { name: "Karte groß zeigen" });
 const shrink = (page: Page) => page.getByRole("button", { name: "Karte verkleinern" });
-/** sichtbare Zahl unten links, ohne die Ansage (`.sr-only`) */
-const count = (page: Page) => page.locator(".bigmap-count [aria-hidden]");
+/** Zahl unten links; seit Nachtrag 1 ein Knopf, der die Liste im Ausschnitt öffnet (die Ansage steht daneben) */
+const count = (page: Page) => page.locator(".bigmap-count");
 const tabBar = (page: Page) => page.getByRole("navigation", { name: "Hauptnavigation" });
 
 async function ready(page: Page, path: string) {
@@ -294,6 +294,122 @@ test.describe("Karte groß auf der Merkliste und im Tab „Anbieter“", () => {
     await page.goBack();
     await expect(providerSheet).toBeHidden();
     await expect(page).toHaveURL(/\?ansicht=anbieter&karte=gross$/);
+  });
+});
+
+test.describe("Liste im Ausschnitt und Statusleiste (Plan 0059, Nachtrag 1)", () => {
+  test("Entdecken: die Zahl öffnet die Liste von unten, eine Kachel das Detail darüber, Zurück lässt die Liste offen", async ({
+    page,
+  }) => {
+    await openBig(page);
+    await jump(page, BIBLIOTHEK, 15);
+    const label = ((await count(page).textContent()) ?? "").trim();
+    expect(label).toMatch(/^\d+ Angebote? im Kartenausschnitt$/);
+    await count(page).click();
+    const list = page.getByRole("dialog", { name: label });
+    await expect(list).toHaveClass(/\bover-map\b/);
+    await expect(list.getByRole("heading", { level: 2, name: label })).toBeVisible();
+    const cards = list.getByTestId("offer");
+    expect(await cards.count()).toBe(Number(label.split(" ")[0]));
+    await list.getByRole("button", { name: "Krabbelreime & Fingerspiele", exact: true }).click();
+    const detail = page.getByRole("dialog", { name: "Krabbelreime & Fingerspiele" });
+    await expect(detail).toHaveClass(/\bover-map\b/);
+    // Ort des Details aus der Liste markiert (focusKey), aber ohne Fahrt: Die Liste darunter bleibt (Review M1)
+    const before = await selection(page, BIBLIOTHEK);
+    await expect.poll(async () => (await selection(page, BIBLIOTHEK)).ring).toBe(1);
+    await mapIdle(page);
+    expect((await selection(page, BIBLIOTHEK)).y).toBeCloseTo(before.y, 0);
+    await page.goBack();
+    await expect(detail).toBeHidden();
+    await expect(list).toBeVisible();
+    await expect(cards).toHaveCount(Number(label.split(" ")[0]));
+    await expect(count(page)).toHaveText(label);
+    await list.getByRole("button", { name: "Schließen" }).click();
+    await expect(list).toBeHidden();
+    await expect(count(page)).toBeFocused();
+    await expect(page).toHaveURL(/karte=gross/);
+  });
+
+  test("Deep-Link groß mit Angebot: keine Auswahl, keine Fahrt (Review M2)", async ({ page }) => {
+    await page.addInitScript((ids) => localStorage.setItem("zwergenplan.merkliste", ids), JSON.stringify([PEKIP_ID]));
+    await page.goto(`./?ansicht=merkliste-karte&karte=gross&angebot=${PEKIP_ID}`);
+    await expect(page.locator("dialog[open].detail")).toBeVisible();
+    await expect(mapBox(page)).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await mapIdle(page);
+    const ring = await page.evaluate(
+      async () => (await window.__zpMap?.getSource("auswahl")?.getData())?.features.length,
+    );
+    expect(ring).toBe(0);
+  });
+
+  test("Esc schließt erst die Liste, dann die große Karte", async ({ page }) => {
+    await openBig(page);
+    await count(page).click();
+    await expect(page.locator("dialog[open].over-map")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.locator("dialog[open]")).toHaveCount(0);
+    await expect(page).toHaveURL(/karte=gross/);
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\?ansicht=karte$/);
+  });
+
+  test("Merkliste und Anbieter: die Liste zeigt die gemerkten Angebote bzw. die Anbieter im Ausschnitt", async ({
+    page,
+  }) => {
+    await page.addInitScript(
+      (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+      JSON.stringify([PEKIP_ID, TREFF_ID]),
+    );
+    await ready(page, "./?ansicht=merkliste-karte");
+    await grow(page).click();
+    await count(page).click();
+    const saved = page.locator("dialog[open].over-map");
+    await expect(saved.getByTestId("offer")).toHaveCount(2);
+    await saved.getByRole("button", { name: "Schließen" }).click();
+    await shrink(page).click();
+
+    // Der Suchtext gilt nur im Tab; über der großen Karte ist das Suchfeld verborgen (Review M3)
+    await ready(page, "./?ansicht=anbieter");
+    await page.getByRole("searchbox", { name: "Anbieter suchen" }).fill("theater");
+    await grow(page).click();
+    await mapIdle(page);
+    const label = ((await count(page).textContent()) ?? "").trim();
+    await count(page).click();
+    const providers = page.getByRole("dialog", { name: label });
+    await expect(providers.locator(".place:not(.idle)")).toHaveCount(Number(label.split(" ")[0]));
+    await expect(providers.getByRole("searchbox")).toHaveCount(0);
+  });
+
+  test("Statusleiste durchsichtig, dahinter hell ein dunkler Streifen, dunkel keiner (N1)", async ({ page }) => {
+    await page.goto("./");
+    await expect(page.locator('meta[name="apple-mobile-web-app-status-bar-style"]')).toHaveAttribute(
+      "content",
+      "black-translucent",
+    );
+    const token = () =>
+      page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--statusbar").trim());
+    expect(await token()).toBe("#13212e");
+    // Der Streifen liegt fest über allem (auch dem Onboarding-Cover); Breite und Höhe macht env(), in Playwright 0
+    const stripe = () =>
+      page.evaluate(() => {
+        const style = getComputedStyle(document.body, "::before");
+        return { position: style.position, z: style.zIndex, image: style.backgroundImage };
+      });
+    expect(await stripe()).toEqual({ position: "fixed", z: "31", image: "none" });
+    await page.evaluate(() => document.documentElement.setAttribute("data-theme", "dark"));
+    expect(await token()).toBe("transparent");
+    // Erst das System-Schema wechseln (die App setzt data-theme dabei neu), dann die Wahl nachstellen
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.evaluate(() => document.documentElement.removeAttribute("data-theme"));
+    expect(await token()).toBe("transparent");
+    await page.evaluate(() => document.documentElement.setAttribute("data-theme", "light"));
+    expect(await token()).toBe("#13212e");
+  });
+
+  test("große Karte: über der Notch nur ein Verlauf (N1)", async ({ page }) => {
+    await openBig(page);
+    const image = await page.evaluate(() => getComputedStyle(document.body, "::before").backgroundImage);
+    expect(image).toContain("linear-gradient");
   });
 });
 

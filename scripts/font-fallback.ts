@@ -108,11 +108,11 @@ const CLASSES: TextClass[] = [
     weight: 800,
     samples: [
       "Krabbel- & Spielgruppen",
-      "Babykurse",
+      "Baby- & Elternkurse",
       "Musik & Singen",
       "Treffs & Cafés",
-      "Bewegung & Turnen",
-      "Bücher & Vorlesen",
+      "Bewegung & Draußen",
+      "Kultur & Kreativ",
     ],
   },
   {

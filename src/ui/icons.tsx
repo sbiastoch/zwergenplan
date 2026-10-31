@@ -12,6 +12,8 @@ const PATHS = {
   back: "m15 5-7 7 7 7",
   next: "m9 5 7 7-7 7",
   down: "m6 9 6 6 6-6",
+  // Liste im Ausschnitt fährt von unten herein (Plan 0059, Nachtrag 1)
+  up: "m6 15 6-6 6 6",
   sliders: "M4 7h9M18 7h2M4 17h3M12 17h8",
   compass: "m15.5 8.5-2 5-5 2 2-5z",
   calendar: "M3.5 10h17M8 3v4M16 3v4",

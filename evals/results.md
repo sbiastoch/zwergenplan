@@ -77,7 +77,7 @@ Eine Zeile je Lauf von `pnpm eval` über alle Fälle in `evals/cases/`. Bewertet
 - **Fälle gültig**: Antwort bestand die Prüfung (ggf. nach der einen Wiederholung). **Aufrufe gültig**: Anteil der Modellaufrufe mit gültiger Antwort.
 - **Termine R/P**: Recall und Präzision der Termine (Zuordnung 1:1 über Ort und Beginn, nur Termine im Fenster des Falls), Mikro-Mittel über alle Fälle. Ein ungültiger Fall zählt mit 0 Treffern.
 - **Angebote R/P**: Angebote, die über gemeinsame Termine einander zugeordnet sind.
-- **format … category**: Feldtreffer je zugeordnetem Angebotspaar (Platzstand = `availability.status`, topics als Menge, `category` exakt; Plan 0037, E10). Zeilen vor Plan 0037 haben in `category` „–“.
+- **format … category**: Feldtreffer je zugeordnetem Angebotspaar (Platzstand = `availability.status`, topics als Menge, `category` exakt; Plan 0037, E10). Zeilen vor Plan 0037 haben in `category` „–“. Ab 2026-10-31 (ADR 0043) wird `category` auf sieben Kategorien gefaltet verglichen, bei unverändertem Prompt-Hash. Ein Anstieg ab dann ist eine Messänderung, kein Modellfortschritt.
 - **Kat. ohne Thema**: Anteil der vorhergesagten Angebote, deren `category` zu keinem ihrer Themen passt (Plan 0037, E10).
 - **Kosten**: Schätzung der CLI zum API-Gegenwert, nicht der Abo-Preis. **Dauer**: Summe der Aufrufdauern (Fälle laufen parallel).
 - **je Fall**: Termine R/P in Prozent; bei Fällen ohne erwartete Termine `FP n` = n falsch positive Termine. `fehlverortet n` (nur bei n > 0): n vorhergesagte Angebote entsprechen einem `excluded`-Eintrag der Falle `fremder-ort`, also einem Angebot an einem Ort außerhalb des Katalogauszugs (ähnlicher Titel und gemeinsamer Beginn; Plan 0049, Nachtrag 2, C).

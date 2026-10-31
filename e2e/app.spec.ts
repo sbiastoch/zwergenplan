@@ -386,10 +386,10 @@ test.describe("Eine Kategorie je Angebot (Plan 0037)", () => {
   }
 
   test("a) ohne Filter trägt das Babykonzert seine Hauptkategorie, im Detail ebenso", async ({ page }) => {
-    await expect(pill(page, "Babykonzert im Advent")).toHaveText("Bühne & Konzert");
+    await expect(pill(page, "Babykonzert im Advent")).toHaveText("Kultur & Kreativ");
     await offers(page).filter({ hasText: "Babykonzert im Advent" }).getByRole("heading").getByRole("button").click();
     const detail = page.getByRole("dialog", { name: "Babykonzert im Advent" });
-    await expect(detail.locator(".catname")).toHaveText("Bühne & Konzert");
+    await expect(detail.locator(".catname")).toHaveText("Kultur & Kreativ");
   });
 
   test("b) ?kat=musik zeigt nur Angebote mit Hauptkategorie Musik", async ({ page }) => {
@@ -400,15 +400,42 @@ test.describe("Eine Kategorie je Angebot (Plan 0037)", () => {
     for (const label of await offers(page).locator(".pill").allTextContents()) expect(label).toBe("Musik & Singen");
   });
 
-  test("c) ?kat=buecher: „Krabbelreime & Fingerspiele“ trägt „Bücher & Vorlesen“, hell und dunkel", async ({
+  // Nachtrag A: Das Fixture trägt noch den Altwert `buecher`; der Build faltet ihn. Der alte Link wählt „Kultur“;
+  // die URL schreibt die App erst beim nächsten Filterwechsel kanonisch.
+  test("c) ?kat=buecher wählt „Kultur“: „Krabbelreime & Fingerspiele“ trägt „Kultur & Kreativ“, hell und dunkel", async ({
     page,
   }) => {
     await page.goto("./?kat=buecher");
-    await expect(pill(page, "Krabbelreime & Fingerspiele")).toHaveText("Bücher & Vorlesen");
+    const pressed = page.getByRole("group", { name: "Kategorien" }).getByRole("button", { pressed: true });
+    await expect(pressed).toHaveCount(1);
+    await expect(pressed).toHaveAccessibleName(/Kultur/);
+    await expect(pill(page, "Krabbelreime & Fingerspiele")).toHaveText("Kultur & Kreativ");
+    await expect(pill(page, "Babykonzert im Advent")).toHaveText("Kultur & Kreativ");
     for (const colorScheme of ["light", "dark"] as const) {
       await page.emulateMedia({ colorScheme });
       await expectMobileUx(page);
     }
+  });
+
+  test("c2) alter Link ?kat=natur wählt „Bewegung“ und zeigt die Bewegungslandschaft (Plan 0037, Nachtrag A, NA6)", async ({
+    page,
+  }) => {
+    await page.goto("./?kat=natur");
+    const pressed = page.getByRole("group", { name: "Kategorien" }).getByRole("button", { pressed: true });
+    await expect(pressed).toHaveCount(1);
+    await expect(pressed).toHaveAccessibleName(/Bewegung/);
+    await expect(offers(page)).toHaveCount(1);
+    await expect(offers(page).locator(".pill")).toHaveText("Bewegung & Draußen");
+  });
+
+  test("c3) Altwert aus einem gecachten site.json wird gefaltet (Plan 0037, Nachtrag A, NA6)", async ({ page }) => {
+    await rewriteSite(page, (list) => {
+      const treff = list.find((o) => o["title"] === "Offener Krabbeltreff");
+      if (!treff) throw new Error("Krabbeltreff fehlt in den Fixture-Daten");
+      treff["category"] = "natur";
+    });
+    await page.goto("./");
+    await expect(pill(page, "Offener Krabbeltreff")).toHaveText("Bewegung & Draußen");
   });
 
   test("d1) ?kat=treffs-cafes: der Krabbeltreff fällt heraus, Leerzustand", async ({ page }) => {

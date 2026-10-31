@@ -83,6 +83,13 @@ describe("URL-Zustand", () => {
     });
   });
 
+  it("faltet alte Kategorien aus geteilten Links (Plan 0037, Nachtrag A, NA6)", () => {
+    expect(filterFromSearch("?kat=natur").categories).toEqual(["bewegung"]);
+    const merged = filterFromSearch("?kat=museum,buecher,buehne");
+    expect(merged.categories).toEqual(["buehne"]);
+    expect(filterToSearch(merged)).toBe("kat=buehne");
+  });
+
   it("liest die Wegzeit und schreibt sie kanonisch nach den Kosten (Plan 0009, E8)", () => {
     const state: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"], reachLimit: { kind: "minuten", value: 30 } };
     const search = filterToSearch(state);
@@ -121,7 +128,7 @@ describe("applyFilters", () => {
     expect(ids({ ...EMPTY_FILTER, formats: ["kurs", "einmalig"], cost: ["kostenlos"] })).toEqual([
       "babykonzert-advent",
     ]);
-    expect(ids({ ...EMPTY_FILTER, categories: ["buecher", "buehne"] })).toEqual([
+    expect(ids({ ...EMPTY_FILTER, categories: ["buehne"] })).toEqual([
       "krabbelreime",
       "kuckuck-im-nest",
       "babykonzert-advent",
@@ -173,10 +180,10 @@ describe("matchesFilter", () => {
     expect(matching({ ...EMPTY_FILTER, formats: ["kurs", "einmalig"], cost: ["kostenlos"] })).toEqual(
       ["babykonzert-advent", "vergangen"].sort(),
     );
-    expect(matching({ ...EMPTY_FILTER, categories: ["buecher", "buehne"] })).toEqual(
+    expect(matching({ ...EMPTY_FILTER, categories: ["buehne"] })).toEqual(
       ["krabbelreime", "kuckuck-im-nest", "babykonzert-advent"].sort(),
     );
-    // nur die Hauptkategorie zählt (Plan 0037, E9): Babykonzert ist buehne, Krabbelreime buecher
+    // nur die Hauptkategorie zählt (Plan 0037, E9): Babykonzert und Krabbelreime sind buehne (Krabbelreime gefaltet aus buecher)
     expect(matching({ ...EMPTY_FILTER, categories: ["musik"] })).toEqual(["musikgarten-1"]);
     expect(matching({ ...EMPTY_FILTER, categories: ["krabbel-spielgruppen"] })).toEqual(["krabbeltreff"]);
   });
@@ -442,7 +449,7 @@ describe("fromProviders (Plan 0054, Nachtrag A, N1)", () => {
 describe("providerFilter (Plan 0055, E3)", () => {
   it("behält im Tab „Anbieter“ nur die Kategorien", () => {
     const full: FilterState = {
-      categories: ["musik", "buecher"],
+      categories: ["musik", "buehne"],
       formats: ["kurs"],
       registration: ["ohne-anmeldung"],
       cost: ["kostenlos"],
@@ -450,7 +457,7 @@ describe("providerFilter (Plan 0055, E3)", () => {
       reachLimit: { kind: "minuten", value: 20 },
       range: { from: "2026-10-06", to: "2026-10-12" },
     };
-    expect(providerFilter(full)).toEqual({ ...EMPTY_FILTER, categories: ["musik", "buecher"] });
+    expect(providerFilter(full)).toEqual({ ...EMPTY_FILTER, categories: ["musik", "buehne"] });
     expect(providerFilter(EMPTY_FILTER)).toEqual(EMPTY_FILTER);
   });
 });

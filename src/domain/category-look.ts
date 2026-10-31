@@ -13,12 +13,7 @@ const SHAPES = {
   triangle: "M12 3l10 17H2z",
   drop: "M12 2c4 5 7 8.5 7 12a7 7 0 0 1-14 0c0-3.5 3-7 7-12z",
   star: "M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z",
-  hexagon: "M12 2l8.7 5v10L12 22l-8.7-5V7z",
-  diamond: "M12 2l10 10-10 10L2 12z",
-  arch: "M4 21V11a8 8 0 0 1 16 0v10z",
   sparkle: "M12 1c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z",
-  leaf: "M4 20C4 9 10 4 21 3c-1 11-6 17-17 17z",
-  plus: "M9 3h6v6h6v6h-6v6H9v-6H3V9h6z",
 } as const;
 
 export const CATEGORY_SHAPES: Record<Category, string> = {
@@ -28,10 +23,5 @@ export const CATEGORY_SHAPES: Record<Category, string> = {
   bewegung: SHAPES.triangle,
   wasser: SHAPES.drop,
   musik: SHAPES.star,
-  kreativ: SHAPES.hexagon,
-  buecher: SHAPES.diamond,
-  museum: SHAPES.arch,
   buehne: SHAPES.sparkle,
-  natur: SHAPES.leaf,
-  beratung: SHAPES.plus,
 };

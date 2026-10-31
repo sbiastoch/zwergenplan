@@ -130,7 +130,7 @@ test.describe("Tab „Anbieter“ (E2, E4)", () => {
   });
 
   test("Einzahl in der Statuszeile: „1 Anbieter“", async ({ page }) => {
-    await ready(page, "./?kat=buecher&ansicht=anbieter");
+    await ready(page, "./?kat=musik&ansicht=anbieter");
     await expect(page.getByRole("status")).toHaveText("1 Anbieter");
   });
 

@@ -18,6 +18,37 @@
     overflow-wrap: anywhere;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
   }
+  /*
+   * Durchsichtige Statusleiste der installierten App am iPhone (Plan 0059, Nachtrag 1, N1): iOS zeigt die Uhr weiß.
+   * Hell liegt ein dunkler Streifen dahinter, dunkel keiner. Ohne Notch bzw. in Safari ist die Höhe 0.
+   */
+  body::before,
+  .dlg.detail:not(.over-map)::before,
+  .dlg.onb::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* über dem Onboarding-Cover (z-index 30), sonst stünde die weiße Uhr auf hellem Grund (Review N1, Minor 6) */
+    z-index: 31;
+    height: env(safe-area-inset-top);
+    background: var(--statusbar);
+    pointer-events: none;
+    /*
+     * Ohne Text, aber mit Zeile: Mit der geerbten Webschrift lud der Streifen sie schon vor „load“ und hielt so den
+     * Seitenaufbau auf (font-swap.spec, LCP im Smoke; CI des Nachtrags). Systemschrift lädt nichts.
+     */
+    font: 0 / 0 sans-serif;
+  }
+  /*
+   * große Karte: nur ein Verlauf, die Karte läuft unter Notch und Uhr weiter. Seine Höhe hängt allein an der Safe-Area,
+   * ohne Notch (Android, Safari, Desktop) ist er also nicht da (Browser-Review Nachtrag 1).
+   */
+  :root:has(.map-box.big) body::before {
+    height: calc(env(safe-area-inset-top) * 1.5);
+    background: linear-gradient(rgba(19, 33, 46, 0.5), transparent);
+  }
 
   button,
   input,

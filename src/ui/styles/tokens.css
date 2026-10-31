@@ -248,6 +248,8 @@
  * Tokens hell auf :root, dunkel per System oder data-theme (gesetzt vom Inline-Skript in index.html).
  */
 :root {
+  /* Streifen hinter der weißen Uhr der durchsichtigen Statusleiste (Plan 0059, Nachtrag 1, N1); dunkel nicht nötig */
+  --statusbar: #13212e;
   --bg: #e8f1ff;
   --dotc: rgba(19, 33, 46, 0.13);
   --surface: #fff;
@@ -259,6 +261,8 @@
   --edge2: rgba(19, 33, 46, 0.28);
   --line: #13212e;
   --shadow: #13212e;
+  /* Grün der Grundkarte (Parks, Wald), hell und dunkel gleich; bis Plan 0037, Nachtrag A, die Farbe von .k-natur */
+  --map-green: #a6db5e;
   --primary: #13212e;
   --on-primary: #fff;
   --tape: #ffe38a;
@@ -289,6 +293,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --statusbar: transparent;
     --bg: #0e1620;
     --dotc: rgba(238, 243, 248, 0.08);
     --surface: #1b2733;
@@ -321,6 +326,7 @@
 }
 
 :root[data-theme="dark"] {
+  --statusbar: transparent;
   --bg: #0e1620;
   --dotc: rgba(238, 243, 248, 0.08);
   --surface: #1b2733;
@@ -389,21 +395,6 @@
 .k-musik {
   --k: #ff7070;
 }
-.k-kreativ {
-  --k: #ffd93b;
-}
-.k-buecher {
-  --k: #7bd389;
-}
-.k-museum {
-  --k: #e3a872;
-}
 .k-buehne {
   --k: #ee8bfa;
-}
-.k-natur {
-  --k: #a6db5e;
-}
-.k-beratung {
-  --k: #a3bdd0;
 }

@@ -60,7 +60,7 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
   // Orts-Sheet: Sitzungszustand, nie in der URL (E4)
   const [placeKey, setPlaceKey] = useState<string>();
   const place = places.find((p) => p.key === placeKey);
-  const { selected, tap } = useSelection(placeKey, props.overlayOpen);
+  const { selected, reveal, tap } = useSelection(placeKey, props.overlayOpen);
   const state = module.kind === "fehler" || problem ? "fehler" : ready && module.kind === "da" ? "bereit" : "laden";
 
   // Ausschnitt an die Liste (E4); neue Geometrie (Datenstand, Mitternacht) rechnet sofort neu
@@ -110,6 +110,7 @@ export function ProviderMapScreen(props: ProviderMapScreenProps) {
             resetKey={props.resetKey}
             big={props.big}
             selected={selected}
+            revealSelected={reveal}
           />
         )}
         <BigSlot {...props} failed={state === "fehler"} />

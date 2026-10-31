@@ -140,7 +140,7 @@ Nutzer (2026-10-12): „Angebote können mehrere Kategorien haben, es wird aber 
 
 Dann:
 
-- `RawEvent.category` wird Pflicht. Die Zusatzprüfung in `checkExtraction` (E3), der Rückfall und der Zähler (E5), `fallbackCategory` und das Kompatibilitätsnetz (E13) entfallen.
+- `RawEvent.category` wird Pflicht. Die Zusatzprüfung in `checkExtraction` (E3), der Rückfall und der Zähler (E5), `fallbackCategory` und der Themen-Rückfall im Kompatibilitätsnetz (E13) entfallen. **Nachtrag A (NA6):** `withCategory` und `adoptSite` bleiben und falten weiter alte Kategoriewerte aus einem gecachten `site.json` mit `foldCategory`.
 - Das ist eine weitere Schemaänderung, also kein Kleinänderungs-Weg (Sperrliste in `scripts/change-size.ts`). Sie ist aber hier geplant und braucht keinen neuen Plan, nur ein kurzes `/arch-review`.
 - Bleibt der Zähler oder die Prüfung von `data/raw` 14 Tage nach Stufe A über 0, weil ein Anbieter dauerhaft scheitert, entscheidet der Nutzer: Katalogpflege (Anbieter reparieren oder entfernen, Skill) oder Stufe C vertagen. Das wird ein Restpunkt in `docs/ideas.md`.
 
@@ -245,7 +245,7 @@ In `scripts/pipeline/prompt/extract.md`:
   - Alles, was danach Angebote liest, sieht damit `category`: Liste, Filter, Detail, Kalender, Karte und Anbieter-Sheet.
   - **Nicht in `src/data/site.ts`:** `src/data` darf aus `src/domain` zur Laufzeit nur `geo.ts` importieren (`.dependency-cruiser.cjs`, `data-domain-runtime-allowlist`, ADR 0010).
   - Der Service Worker (`push-tailor.ts`) braucht das nicht: Ohne `category` passt ein Kategorie-Abo dort nur nicht, ein Fehler entsteht nicht.
-  - Das Netz (`adoptSite`, `withCategory`) entfällt in Stufe C.
+  - Der Themen-Rückfall im Netz (`adoptSite`, `withCategory`) entfällt in Stufe C. Das Falten alter Werte bleibt (Nachtrag A, NA6).
 
 ### E14 – Fixtures
 
@@ -264,6 +264,8 @@ In `scripts/pipeline/prompt/extract.md`:
 | Babykonzert im Advent | konzert, musik | `buehne` | war Musik & Singen |
 
 Damit decken die Fixtures beide Arten ab: Angebote, deren Etikett gleich bleibt, und drei, deren Etikett sich ändert und die aus einem Nebenfilter fallen.
+
+Nachtrag A (2026-10-31): `tests/fixtures/offers.json` behält den Altwert `buecher` für die Krabbelreime. Der Fixture-Build faltet ihn zu `buehne`, so prüft das E2E das Falten mit.
 
 ## Dateien
 
@@ -299,7 +301,7 @@ Damit decken die Fixtures beide Arten ab: Angebote, deren Etikett gleich bleibt,
 | E2E | `e2e/app.spec.ts`, `e2e/push.spec.ts`, `e2e/anbieter-inhalt.spec.ts` (Tests B) |
 | Doku | E12: `docs/architecture.md`, Plan 0014 (Hinweis), `docs/ideas.md` |
 
-**Stufe C (Übergang abbauen)**: `scripts/pipeline/lib/raw.ts`, `lib/extract.ts`, `lib/build-offers.ts`, `lib/report.ts`, `io/nightly.ts`, `lib/eval-score.ts`, `src/domain/topics.ts`, `src/ui/App.tsx` (`adoptSite`), `schema/*.json`, Tests dazu, `docs/ideas.md` (Restpunkt streichen), ADR 0030 (Nachtrag „Übergang abgeschlossen“).
+**Stufe C (Übergang abbauen)**: `scripts/pipeline/lib/raw.ts`, `lib/extract.ts`, `lib/build-offers.ts`, `lib/report.ts`, `io/nightly.ts`, `lib/eval-score.ts`, `src/domain/topics.ts`, `src/ui/App.tsx` (`adoptSite` nur ohne Themen-Rückfall, das Falten bleibt: Nachtrag A, NA6), `schema/*.json`, Tests dazu, `docs/ideas.md` (Restpunkt streichen), ADR 0030 (Nachtrag „Übergang abgeschlossen“).
 
 Keine neue Abhängigkeit, kein neues Modul, keine neue Spec.
 
@@ -394,7 +396,7 @@ Keine neue Abhängigkeit, kein neues Modul, keine neue Spec.
 
 **Stufe C**
 
-21. `raw.test.ts`: Event ohne `category` ist ungültig, auch in `pending.events` (`providerRawIssues`). `build-offers.test.ts`: Fälle 5b und 5e entfallen. `report.test.ts`: die Zeile entfällt. `topics.test.ts`: `withCategory` und `fallbackCategory` entfallen. `app.spec.ts`: der Fall „site.json ohne category“ (Test 17) entfällt. `extract.test.ts`: „category fehlt“ kommt jetzt aus `validateRaw`. Der **Schema-Hash-Test** (Test 4) bleibt unverändert grün.
+21. `raw.test.ts`: Event ohne `category` ist ungültig, auch in `pending.events` (`providerRawIssues`). `build-offers.test.ts`: Fälle 5b und 5e entfallen. `report.test.ts`: die Zeile entfällt. `topics.test.ts`: `fallbackCategory` und der Rückfall-Fall von `withCategory` entfallen, der Fall „faltet einen Altwert“ bleibt (Nachtrag A); ebenso bleibt E2E c3 in `app.spec.ts`. `app.spec.ts`: der Fall „site.json ohne category“ (Test 17) entfällt. `extract.test.ts`: „category fehlt“ kommt jetzt aus `validateRaw`. Der **Schema-Hash-Test** (Test 4) bleibt unverändert grün.
 
 ## Schritte
 
@@ -566,3 +568,199 @@ Abgelehnt: keine.
     - „Musikspielerei …“ (6) wurde `babykurse` statt `musik`.
   - UI-Minor, schon vor dem Plan so: Bei langen Etiketten rutscht die Uhrzeit in eine eigene Zeile.
 - **Offen bis Stufe C:** frühestens 2026-10-19, Voraussetzungen aus E7. `data/raw` hatte am 2026-10-12 noch 22 Events ohne `category`.
+
+## Nachtrag A (2026-10-31): Sieben statt zwölf Kategorien
+
+### Anlass
+
+Nutzermeldung 2026-10-31: „Beratung, Natur, Bücher, Museum, Kreativ passen als Kategorien nicht wirklich, dafür gibt es zu wenig Einträge.“
+
+### Befund (`data/offers.json` auf `origin/main` `e7f46cf`, 436 Angebote)
+
+| Kategorie | Angebote | Inhalt der kleinen |
+|---|---|---|
+| bewegung | 119 | |
+| musik | 87 | |
+| babykurse | 58 | |
+| krabbel-spielgruppen | 54 | |
+| wasser | 36 | |
+| buehne | 26 | |
+| treffs-cafes | 25 | |
+| natur | 9 | nur Waldgruppen (FBS, Mutherstudio, Eibach, Zoff & Harmonie) |
+| kreativ | 7 | Malen, Weihnachtswerkstatt; 6 von 7 FBS |
+| beratung | 7 | Kochkurse, Beikost, Geschwisterkurs, Stoffwindel-Info |
+| museum | 5 | 4 Termine „Baby & Museum“, 1 Opernführung |
+| buecher | 3 | Bücherzwerge, Lesestart, Lesestunde |
+
+Die fünf kleinen Kategorien haben zusammen 31 Angebote (7 %), belegen aber 5 von 12 Stickern, 5 Zeilen im Filter-Sheet und 5 Kartenfarben. Ein Filter mit 3 Treffern ist meist leer, sobald Zeitraum oder Wegzeit dazukommen.
+
+### Entscheidungen
+
+#### NA1 – Zuordnung (Nutzerentscheid 2026-10-31)
+
+| ID | Label | Kurzlabel | nimmt auf | Stand `e7f46cf` |
+|---|---|---|---|---|
+| `babykurse` | Baby- & Elternkurse | Babykurse | `beratung` | 65 |
+| `krabbel-spielgruppen` | Krabbel- & Spielgruppen | Krabbeln | – | 54 |
+| `treffs-cafes` | Treffs & Cafés | Treffs | – | 25 |
+| `bewegung` | Bewegung & Draußen | Bewegung | `natur` | 128 |
+| `wasser` | Wasser | Wasser | – | 36 |
+| `musik` | Musik & Singen | Musik | – | 87 |
+| `buehne` | Kultur & Kreativ | Kultur | `museum`, `buecher`, `kreativ` | 41 |
+
+Die Reihenfolge von `CATEGORIES` folgt der Tabelle, also der bisherigen ohne die fünf entfallenden. Sie bestimmt Sticker, Filter-Sheet, den Gleichstand der Kartenmarker und die Reihenfolge im Anbieter-Sheet.
+
+#### NA2 – IDs bleiben, nur die Labels wechseln
+
+Die sieben Kategorien behalten **bestehende** IDs, auch `buehne` für „Kultur & Kreativ“. Gründe:
+
+- **Alter Code, neue Daten.** Der Client prüft `site.json` nicht (`src/data/site.ts` castet nach `SiteData`). Ein Tab oder Service Worker von vor dem Deploy, der danach `site.json` holt, rechnet mit `CATEGORY_UI[category].shape`. Eine neue ID wie `kultur` wäre dort `undefined`, die Liste bräche. Mit alten IDs zeigt alter Code nur alte Labels („Bühne & Konzert“ an einem Museumsangebot), bis er sich aktualisiert.
+- `?kat=buehne`, `?kat=bewegung` und `?kat=babykurse` in geteilten Links bleiben gültig und treffen jetzt mehr.
+- Kosten: Die ID `buehne` passt nicht mehr wörtlich zum Label. Ein Kommentar an `CATEGORIES` sagt das. Umbenennen wäre eine eigene Migration mit Übergangsnetz und lohnt nicht.
+
+#### NA3 – Keine Neu-Extraktion: Das Modell wählt weiter aus zwölf Werten, der Datenvertrag faltet
+
+Jede Änderung an Prompt oder Antwortschema extrahiert alle Anbieter neu (Plan 0032, N3; oben A6: $0,91). Das ist auch ein ID-Risiko (ADR 0041). Dieser Nachtrag ändert deshalb **weder** `scripts/pipeline/prompt/extract.md` **noch** das Antwortschema der Extraktion:
+
+- `src/domain/topics.ts` bekommt:
+  - `EXTRACT_CATEGORIES`: die zwölf bisherigen Werte in **der bisherigen Reihenfolge**, mit Kommentar „Teil des Cache-Schlüssels der Extraktion, nur zusammen mit einer Neu-Extraktion ändern“.
+  - `FOLD: Record<ExtractCategory, Category>`, eine vollständige Tabelle über alle zwölf Werte (die sieben bleibenden auf sich selbst, `natur` → `bewegung`, `kreativ`/`buecher`/`museum` → `buehne`, `beratung` → `babykurse`). `tsc` prüft die Vollständigkeit. Nicht exportiert (knip).
+  - `foldCategory(c: ExtractCategory): Category` = `FOLD[c]`, eine reine Funktion ohne `as`.
+  - Ein Test sichert zu, dass jeder Wert aus `CATEGORIES` in `EXTRACT_CATEGORIES` liegt.
+- `src/domain/schema.ts`: `CategoryField = z.enum(EXTRACT_CATEGORIES).transform(foldCategory)`. Die Ausgabe ist `Category` (sieben Werte), die Eingabe nimmt alte und neue Werte. Damit gilt:
+  - `data/offers.json` mit alten Werten (bis zum nächsten Nachtlauf) und `data/raw/` (nie von Hand umgeschrieben) bleiben gültig. `pnpm verify` bleibt auf dem Branch grün, kein `--no-verify` wie in B.
+  - Alles, was über `OffersFile` oder `RawEvent` liest (`validateDataset` und damit der Build von `site.json`, Nachtlauf, ID-Gate, Evals), sieht nur noch sieben Werte. Der nächste Nachtlauf schreibt `data/offers.json` mit sieben Werten. Neue Rohstände in `data/raw/` sind ebenfalls gefaltet, weil `checkExtraction` geparste Events zurückgibt (`extract.ts`) und `refresh` sie schreibt. Alte Rohstände behalten ihre Werte bis zur nächsten Extraktion. Beides ist gültig.
+  - `schema/*.json` wird mit `io: "input"` exportiert (`scripts/export-schema.ts`) und zeigt weiter die zwölf Eingabewerte. Der Export ändert sich dadurch voraussichtlich nicht; die Schema-Drift-Prüfung zeigt es.
+- `scripts/pipeline/lib/extract.ts` bleibt unverändert (Umsetzung, siehe unten): `ExtractResponse` nimmt weiter `CategoryField`. Mit `io: "input"` exportiert Zod dafür das Eingabe-Enum der zwölf Werte, das JSON-Schema für `--json-schema` bleibt also Byte für Byte gleich, und `checkExtraction` faltet sofort. **Abnahme:** Der Hash-Test in `scripts/pipeline/lib/extract.test.ts` bleibt bei `ab413b808c90`, ohne Änderung am Test. Ändert er sich, ist der Ansatz falsch, und es wird nicht committet.
+- Die Regeln im Prompt bleiben feiner als nötig (etwa `natur` gegen `bewegung`). Das schadet nicht: Gefaltet landen beide in derselben Kategorie. Den Prompt auf sieben Werte zu kürzen ist ein Restpunkt für die nächste ohnehin fällige Neu-Extraktion (`docs/ideas.md`).
+
+#### NA4 – Themen
+
+`TOPIC_CATEGORIES` zeigt auf die sieben Kategorien: `waldgruppe`, `tiere-natur` → `bewegung`; `kreativ`, `bibliothek`, `vorlesen`, `museum` → `buehne`; `beratung`, `hebamme`, `erste-hilfe`, `beikost` → `babykurse`. `categoriesOf`, die Warnung „Kategorie passt zu keinem Thema“ (`scripts/pipeline/lib/raw.ts`) und `categoryConflicts` der Evals vergleichen so gefaltete mit gefalteten Werten. Die Konfliktquote kann dadurch nur sinken.
+
+#### NA5 – Evals
+
+`EvalOffer.category` nutzt `CategoryField`, Soll und Ist werden also beide gefaltet. Die Eval-Fälle bleiben unverändert. Die Trefferquote `category` kann steigen, weil Verwechslungen innerhalb einer Gruppe nicht mehr zählen. Im Eval-Verlauf ist das eine Messänderung, kein Modellfortschritt. Ein Satz dazu kommt in den Skill (Abschnitt zu den Evals).
+
+#### NA6 – Browser: alte Stände und alte Links
+
+- **Neuer Code, alte Daten:** `site.json` wird aus `data/offers.json` über `validateDataset` gebaut und ist damit schon gefaltet, auch vor dem nächsten Nachtlauf. Ein `site.json` mit Altwerten kann nur aus dem Datencache des Service Workers kommen. Dafür faltet `withCategory` (`topics.ts`, aufgerufen von `adoptSite` in `src/ui/App.tsx`) zusätzlich mit `foldCategory`; `LooseSiteData` nimmt `category?: ExtractCategory`. In Stufe C entfällt deshalb nur der Themen-Rückfall, das Falten bleibt. Das steht im Kommentar an `adoptSite`.
+- **Alter Code, neue Daten:** siehe NA2, kein Absturz.
+- **Links:** `filterFromSearch` (`src/domain/filter.ts`) faltet `kat=` vor `parseList`: `kat=natur` wird `bewegung`, `kat=museum,buecher` wird einmal `buehne`. Ein alter Link bleibt in der Adresszeile stehen, bis sich der Filter ändert; dann schreibt die App die neuen IDs. Andere Stellen speichern keine Kategorien: Der Filter steht nur in der URL, Such-Abos entfallen seit ADR 0042.
+- `src/sw/` liest keine Kategorie, keine Änderung.
+
+#### NA7 – Darstellung
+
+- `CATEGORY_UI` (`src/ui/categories.ts`), `CATEGORY_SHAPES` (`src/domain/category-look.ts`) und die Klassen `.k-*` in `src/ui/styles/tokens.css` (eine Definition je Kategorie) verlieren die fünf entfallenden Einträge.
+- **Grün der Grundkarte:** `src/ui/map/basemap.ts` nimmt heute `tokens.categories.natur` als Farbe für Parks und Wald. Der Wert `#a6db5e` wird ein eigenes Token `--map-green` in `tokens.css`, `readMapTokens`/`MapTokens` lesen es. Die Farbe bleibt gleich, sie ist also keine neue Farbe. `basemap.test.ts` und die Stelle in `docs/architecture.md`, die das Kartengrün beschreibt, ziehen mit.
+- `scripts/font-fallback.ts`: Die Messproben nennen alte Labels. Sie werden auf die neuen umgestellt, mit dem längsten Label „Baby- & Elternkurse“.
+- Das Kurzlabel von `babykurse` bleibt „Babykurse“. „Kurse“ heißt schon der Format-Schnellfilter (`src/ui/Chrome.tsx`). Form und Farbe von `bewegung`, `babykurse` und `buehne` bleiben. Ob die Bühnen-Form für „Kultur & Kreativ“ trägt, prüft `/browser-review`. Ein Befund geht als Frage an den Nutzer, es wird nichts selbst neu gezeichnet.
+- Kartenmarker: `src/ui/map/marker-images.ts` und `src/ui/map/layers.ts` laufen über `CATEGORIES` und erzeugen so sieben Bilder. Der Kommentar „alle 12 Bilder“ in `layers.ts` wird angepasst.
+- Die Kurzlabel „Kurse“ und „Kultur“ sind kürzer als heute. Die Sticker-Leiste wird mit sieben statt zwölf Stickern deutlich kürzer.
+
+#### NA8 – Doku
+
+- **Neues ADR 0043** „Sieben Kategorien, gefaltet im Datenvertrag“. Es ändert ADR 0030, Punkt 1 („einer der zwölf Werte“), und hält NA2 und NA3 fest: IDs bleiben, das Modell wählt aus zwölf, `CategoryField` faltet. ADR 0030 bekommt im Status „Geändert durch ADR 0043“, ADR 0003 (Punkt „Themen und Kategorien“, „12 Filter-Kategorien“) einen Hinweis.
+- Kommentare „12 Kategorien“ in `topics.ts` und `categories.ts`.
+- `docs/architecture.md`: Die Stelle zu `adoptSite` („füllt bis Stufe C“) sagt, dass das Falten bleibt.
+- `evals/results.md`: Ein Hinweis zur ersten Zeile nach dem Deploy sagt, dass `category` gefaltet gezählt wird, bei gleichem Prompt-Hash.
+- Skill `babyevents-nuernberg`: wo Kategorien genannt sind, die Faltung erwähnen.
+- `docs/ideas.md`: Restpunkt „Prompt auf sieben Kategorien kürzen, bei der nächsten ohnehin fälligen Neu-Extraktion“.
+
+### Nicht-Ziele
+
+- Prompt, Antwortschema, `data/raw/` und Eval-Fälle ändern.
+- Neue IDs (etwa `kultur`), neue Formen oder Farben.
+- Das Themen-Vokabular ändern.
+- Die offene Datenfrage aus B7 (Grabblmusik, Musikspielerei).
+
+### Tests (test-first, je zuerst rot)
+
+1. `src/domain/topics.test.ts`: `CATEGORIES` hat sieben Werte in der Reihenfolge aus NA1. `foldCategory` bildet jeden der fünf Altwerte wie in NA1 ab und lässt die sieben unverändert. Jeder Wert von `TOPIC_CATEGORIES` liegt in `CATEGORIES`. `EXTRACT_CATEGORIES` ist genau die alte Zwölferliste in alter Reihenfolge.
+2. `src/domain/schema.test.ts`: `OffersFile` parst ein Angebot mit `category: "natur"` zu `"bewegung"` und mit `"museum"` zu `"buehne"`. Ein unbekannter Wert (`"glaube"`) ist ein Fehler.
+3. `scripts/pipeline/lib/extract.test.ts`: Der Hash des Antwortschemas bleibt `ab413b808c90` (bestehender Test, wird nicht angepasst). Eine Modellantwort mit `"category": "beratung"` wird angenommen.
+4. `scripts/pipeline/lib/raw.test.ts`: Ein Rohevent mit `category: "natur"` und Thema `waldgruppe` erzeugt keine Warnung „passt zu keinem Thema“.
+5. Rohformat und Build: Ein Rohstand aus JSON mit `kreativ` wird über das Parsen (`ProviderRaw` bzw. `validateRaw`, oder `nightly.test.ts` mit Datei) gelesen und landet in `offers.json` als `buehne`. Ein Literal direkt an `buildOffers` scheitert an `tsc` und prüft das Falten nicht.
+6. `eval-score.test.ts`: Soll `museum`, Ist `buecher` zählt als Treffer.
+7. `src/domain/filter.test.ts`: `?kat=natur` ergibt `categories: ["bewegung"]`, `?kat=museum,buecher,buehne` ergibt `["buehne"]`, und der Rückweg schreibt `kat=buehne`.
+8. `withCategory` (`topics.test.ts`): Ein Angebot mit `category: "kreativ"` wird `buehne`. Ohne `category` greift weiter der Themen-Rückfall, gefaltet.
+9. **Bestehende Tests mit neuem Sinn** (Review, Major 3). Durch das Falten `buecher` → `buehne` gibt es in den Fixtures keine Kategorie mehr, die nur die Bibliothek trifft (`tests/fixtures/offers.json`: Bibliothek `buecher`, Theater `buehne`). Tests, die „Bibliothek aktiv, Theater blass“ prüfen, nehmen künftig eine Kategorie, die die beiden trennt (`musik` oder `babykurse`, je nach Fixture). Die Wahl steht dann im Umsetzungs-Abschnitt.
+   - E2E: `e2e/app.spec.ts` (Gruppe „Hauptkategorie“: Test c `?kat=buecher` wird `?kat=buehne` mit „Kultur & Kreativ“; Label „Bühne & Konzert“ wird „Kultur & Kreativ“; neu: `?kat=natur` landet auf `?kat=bewegung`), `e2e/anbieter-inhalt.spec.ts` (Bücher-Fälle neu entwerfen), `e2e/anbieter.spec.ts`, `e2e/anbieter-karte.spec.ts`, `e2e/merkliste-anbieter.spec.ts`, `e2e/push.spec.ts`, `e2e/mobile-ux.spec.ts` (Zahl ausgeblendeter Sticker), `e2e/karte.spec.ts` (sieben Bilder und Farb-Tokens).
+   - Unit: `filter.test.ts`, `directory.test.ts`, `provider-places.test.ts`, `route.test.ts`, `use-offer-views.test.ts`, `map/geojson.test.ts`, `map/basemap.test.ts`, `dataset.test.ts`, `topics.test.ts`, `build-offers.test.ts`, `og-card.test.ts`, `share-pages.test.ts`, dazu alle, die `tsc` danach meldet.
+10. Fixtures: `tests/fixtures/offers.json` behält Altwerte (`buecher`). So prüft der E2E-Build das Falten mit. Ein Satz dazu in E14.
+
+### Dateien
+
+- `src/domain/topics.ts`, `src/domain/schema.ts`, `src/domain/category-look.ts`, `src/domain/filter.ts`
+- `src/ui/categories.ts`, `src/ui/App.tsx` (Typ von `LooseSiteData`, Kommentar), `src/ui/map/layers.ts` (Kommentar), `src/ui/styles/tokens.css`
+- `scripts/pipeline/lib/extract.test.ts` (Enum-Test auf `EXTRACT_CATEGORIES`)
+- Tests wie oben, `e2e/app.spec.ts`, `e2e/karte.spec.ts`
+- ADR 0043 (neu), ADR 0030, ADR 0003, Skill, `docs/ideas.md`
+
+### Schritte
+
+1. Tests 1–8 rot, dann `topics.ts`, `schema.ts`, `extract.ts`, `filter.ts` und `App.tsx` grün. Der Hash-Test bleibt unverändert grün.
+2. Darstellung (NA7), Kommentare, Schema-Export prüfen.
+3. `pnpm verify` grün. Die E2E-Specs aus Test 9 sind mehr als 8, deshalb laufen sie ausdrücklich genannt in zwei Läufen zu je höchstens 8 (`pnpm e2e:local e2e/app.spec.ts e2e/anbieter-inhalt.spec.ts …`, im Hintergrund). Die übrigen Specs prüft die volle Suite der CI auf `main`.
+4. ADR 0043 und Doku (NA8).
+5. `/arch-review` (Schemaänderung). `/browser-review` lokal: Sticker-Leiste bei 320, 360 und 390 px hell und dunkel, Filter-Sheet, Etikett auf Kachel und Detail, Karte mit sieben Markerfarben und unverändertem Parkgrün, Anbieter-Sheet, `?kat=natur`, Querformat (sieben Sticker ohne Scrollen, linksbündig).
+6. Branch pushen, CI grün, Fast-Forward nach `main`, CI auf `main` grün, `meta.json` zeigt den Commit, `/browser-review live`. Nach dem nächsten Nachtlauf prüfen, dass `data/offers.json` nur noch sieben Werte hat.
+
+### Risiken
+
+- **Der Hash ändert sich doch**, weil Zod für `z.enum(EXTRACT_CATEGORIES)` ein anderes JSON-Schema erzeugt als bisher für `CategoryField`: Test 3 fängt das. Dann Abbruch und Neuplanung, kein Commit.
+- **`transform` im Datenvertrag:** Eingabe- und Ausgabetyp von `OffersFile` unterscheiden sich (`z.input` gegen `z.infer`). Der Nachtlauf schreibt den Ausgabetyp, und der ist gültige Eingabe. Stellen, die einen Eingabetyp als `Offer` behandeln, meldet `tsc`.
+- **Stufe C** von Plan 0037 entfernt `withCategory`. Das Falten in `adoptSite` muss bleiben, solange ein `site.json` mit Altwerten im Cache liegen kann. Das steht als Hinweis bei Stufe C.
+
+### Review Nachtrag A (2026-10-31) – Verdict: Freigabe mit Änderungen → eingearbeitet
+
+Der Reviewer hatte keine Shell, seine Aussagen beruhen auf dem Lesen des Codes. Bestätigt: Der Hash bleibt bei gleicher Enum-Reihenfolge gleich (alle `toJSONSchema`-Aufrufe nutzen `io: "input"`). `transform` trägt durch `pick`, `omit`, `extend` und `refine`. IDs hängen nicht an `category`. Alte Tabs brechen bei bleibenden IDs nicht.
+
+Übernommen:
+
+- **Major 1, Grün der Grundkarte:** `basemap.ts` nutzt `tokens.categories.natur`. Gelöst mit eigenem Token `--map-green` (gleicher Wert `#a6db5e`) in NA7, dazu `basemap.test.ts` und `docs/architecture.md`.
+- **Major 2, „Kurse“ doppelt:** Das Kurzlabel bleibt „Babykurse“ wie heute (NA1, NA7). Damit gibt es keine Nutzerfrage, denn es ändert sich nichts gegenüber heute.
+- **Major 3, Folgen für die Tests:** Liste der betroffenen Specs und Unit-Tests mit neuem Sinn in Test 9. Schritt 3 nennt die E2E-Läufe ausdrücklich, weil es mehr als 8 Specs sind.
+- **Minor 4:** `foldCategory` über eine vollständige, nicht exportierte Tabelle `FOLD: Record<ExtractCategory, Category>` statt `in`. Dazu ein Test, dass `CATEGORIES` in `EXTRACT_CATEGORIES` liegt.
+- **Minor 5:** NA3 richtiggestellt: Neue Rohstände sind gefaltet.
+- **Minor 6:** Test 5 läuft über das Parsen.
+- **Minor 7:** „hell und dunkel“ bei `.k-*` gestrichen.
+- **Minor 8, 11:** `docs/architecture.md` und `evals/results.md` in NA8.
+- **Minor 9:** `scripts/font-fallback.ts` in NA7.
+- **Minor 10:** Querformat im Browser-Review. `pnpm verify` gilt nach jedem Schritt, wie in CLAUDE.md, Schritt 3.
+
+Abgelehnt: nichts.
+
+### Umsetzung Nachtrag A (2026-10-31)
+
+- **Abweichung `extract.ts`:** unverändert. `ExtractResponse` nimmt weiter `CategoryField`, jetzt mit `transform`. Der Export mit `io: "input"` zeigt das Eingabe-Enum der zwölf Werte, der Hash-Test blieb ohne Änderung bei `ab413b808c90`. `checkExtraction` faltet damit sofort, neue Rohstände sind gefaltet. Nur der Enum-Test in `extract.test.ts` vergleicht jetzt mit `EXTRACT_CATEGORIES`. Der Schema-Export `schema/*.json` ist unverändert (Schema-Drift grün).
+- **Abweichung URL:** Die App schreibt die URL beim Laden nicht kanonisch. `?kat=natur` wählt den Sticker „Bewegung“, die Adresszeile ändert sich erst beim nächsten Filterwechsel. E2E c und c2 prüfen deshalb den gedrückten Sticker statt der URL (NA6 angepasst).
+- **Test-first:** Tests 1, 2, 7 und 8 waren vor der Umsetzung rot. Die Tests 3, 4 und 6 (Pipeline) kamen erst nach der Umstellung von `CategoryField` und waren deshalb nicht vorher rot.
+- **Wahl in Test 9:**
+  - Unit (`directory.test.ts`, `provider-places.test.ts`): `kultur` = `buehne` + Format `regelmaessig`. Das trifft nur die Bibliothek, so bleiben die Erwartungen gleich.
+  - E2E im Tab „Anbieter“ (`anbieter-inhalt`, `anbieter`, `anbieter-karte`, `merkliste-anbieter`, `mobile-ux`): `kat=musik`. Dort wirkt nur der Kategoriefilter (Plan 0055, E3), und Musik trennt als einzige Kategorie genau einen Anbieter (Musikschule) heraus.
+  - `use-offer-views.test.ts`: `wasser` (in den Fixtures leer).
+  - `push.spec.ts`: `kat=bewegung` statt `kat=natur`.
+  - E2E neu: c2 (alter Link `?kat=natur`) und c3 (Altwert `natur` in einem umgeschriebenen `site.json`).
+- **Prüfung:**
+  - `pnpm verify` grün.
+  - E2E lokal (pixel-7) in zwei Läufen: app, anbieter-inhalt, anbieter-karte, anbieter, karte, merkliste-anbieter, push, mobile-ux (455 grün, 2 rot wegen der URL-Annahme, danach behoben), dann app, theme, karte-gross, layout, teilen, detail, merkliste-kalender (250 grün).
+- **Arch-Review (2026-10-31): keine Blocker, Nacharbeit an Doku.**
+  - Major 1, behoben: Stufe C (E7, E13, Dateien, Test 21) entfernt nur den Themen-Rückfall, das Falten in `withCategory` und `adoptSite` bleibt.
+  - Minor, behoben:
+    - NA3 und Dateien an den Code angepasst (`extract.ts` unverändert).
+    - Dieser Umsetzungs-Abschnitt.
+    - `buecher` in `provider-places.test.ts` heißt jetzt `kultur`.
+    - Statuszeile von ADR 0003 ohne Doppelung.
+    - NA6 zur URL.
+- **Browser-Review lokal (2026-10-31, Fixture-Build): bestanden.**
+  - Ansichten start, filter, detail, karte-gross und anbieter-sheet bei 320, 360, 365, 390, 412 und 915×412 px, jeweils hell und dunkel.
+  - Querformat: Alle sieben Sticker passen linksbündig ohne Scrollen.
+  - Filter-Sheet: „Baby- & Elternkurse“ und „Bewegung & Draußen“ ohne Umbruch.
+  - Kachel, Detail und Anbieter-Sheet zeigen „Kultur & Kreativ“, das Funkeln der früheren Bühne trägt.
+  - Kartenmarker in den sieben Farben.
+  - Das Parkgrün ist lokal ohne Kacheln nicht sichtbar. Es prüfen `karte.spec.ts` (Token gelesen) und `basemap.test.ts`, live folgt ein Blick darauf.
+  - Checkliste: Lesbarkeit gut, Touch-Ziele unverändert, keine abgeschnittenen Labels, Dunkelmodus ohne Kontrastloch, Pressed-State der Sticker unverändert.
+- **Live seit `569aa0c` (2026-10-31).** Die Branch-CI war grün; ein abgebrochener Shard (chromium 2/4) lief beim zweiten Versuch grün. Danach `origin/main` (Plan 0049, S1) eingeführt, Konflikt nur in einer Importzeile von `io/extract.test.ts`. Die CI auf `main` ist grün, `meta.json` zeigt `569aa0c`.
+- **Kurzcheck live (2026-10-31): bestanden.** `site.json` hat sieben Werte (bewegung 128, musik 87, babykurse 65, krabbel-spielgruppen 54, buehne 41, wasser 36, treffs-cafes 25). Der Build faltet also schon, bevor der Nachtlauf `data/offers.json` umschreibt. Screenshots start, filter und karte-gross bei 390 px, hell und dunkel: Etiketten „Bewegung & Draußen“, sieben Markerfarben, Parkgrün unverändert.
+- **Offen:** Nach dem nächsten Nachtlauf prüfen, dass `data/offers.json` nur noch sieben Werte hat. Der Nachtrag selbst ist damit abgeschlossen. Der Plan bleibt `in Umsetzung` wegen Stufe C.

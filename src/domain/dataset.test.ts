@@ -411,7 +411,7 @@ describe("Themen und Kategorien", () => {
     expect(CATEGORIES.filter((c) => !used.has(c))).toEqual([]);
   });
   it("leitet Kategorien kanonisch sortiert und ohne Dubletten ab", () => {
-    expect(categoriesOf(["singen", "vorlesen", "musik", "vaeter"])).toEqual(["musik", "buecher"]);
+    expect(categoriesOf(["singen", "vorlesen", "musik", "vaeter"])).toEqual(["musik", "buehne"]);
   });
 });
 
@@ -422,7 +422,7 @@ describe("Hauptkategorie category (Plan 0037, E1)", () => {
       if (first) first["category"] = category;
     });
 
-  it("ist gültig mit einer der 12 Kategorien", () => {
+  it("ist gültig mit einer der sieben Kategorien", () => {
     expect(errorsOf(withCategory("buehne"))).toBe("");
   });
 
@@ -445,5 +445,17 @@ describe("Hauptkategorie category (Plan 0037, E1)", () => {
 
   it("lehnt Werte außerhalb von CATEGORIES ab", () => {
     expect(errorsOf(withCategory("glaube"))).toContain("category");
+  });
+
+  it.each([
+    ["natur", "bewegung"],
+    ["museum", "buehne"],
+    ["buecher", "buehne"],
+    ["kreativ", "buehne"],
+    ["beratung", "babykurse"],
+  ])("faltet den Altwert %s zu %s (Nachtrag A, NA3)", (old, folded) => {
+    const r = withCategory(old);
+    expect(errorsOf(r)).toBe("");
+    expect(r.ok && r.offers.offers[0]?.category).toBe(folded);
   });
 });

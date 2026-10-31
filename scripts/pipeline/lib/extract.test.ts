@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { CATEGORIES } from "../../../src/domain/topics.ts";
+import { EXTRACT_CATEGORIES } from "../../../src/domain/topics.ts";
 import { EXTRACT_KEY_PARTS } from "../io/extract.ts";
 import {
   checkExtraction,
@@ -61,6 +61,12 @@ describe("checkExtraction", () => {
   it("gültige Antwort: providerId setzt der Code", () => {
     const r = checkExtraction({ events: [treff] }, ctx);
     expect(r.ok && r.events).toEqual([{ ...treff, providerId: "familientreff-beispiel" }]);
+  });
+
+  it("nimmt eine der zwölf Kategorien der Extraktion und faltet sie (Plan 0037, Nachtrag A, NA3)", () => {
+    const r = checkExtraction({ events: [{ ...treff, category: "beratung", topics: ["beikost"] }] }, ctx);
+    expect(errorsOf(r)).toEqual([]);
+    expect(r.ok && r.events[0]?.category).toBe("babykurse");
   });
 
   it("via setzt der Code aus dem Kandidaten, dessen detailUrl die sourceUrl ist", () => {
@@ -165,7 +171,7 @@ describe("extractResponseSchema", () => {
     };
     const item = schema.properties.events.items;
     expect(item.required).toContain("category");
-    expect(item.properties["category"]?.enum).toEqual([...CATEGORIES]);
+    expect(item.properties["category"]?.enum).toEqual([...EXTRACT_CATEGORIES]);
   });
 
   it("Hash des Antwortschemas ist festgehalten: Er ist Teil des Cache-Schlüssels (Plan 0037, E3)", () => {

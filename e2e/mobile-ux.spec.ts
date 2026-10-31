@@ -141,7 +141,9 @@ const MAP_VIEWS = new Set([
   "karte-gross-detail",
   "karte-gross-detail-voll",
   "karte-gross-orts-sheet",
+  "karte-gross-liste",
   "merkliste-karte-gross",
+  "merkliste-karte-gross-liste",
 ]);
 
 /** Ansichten mit absichtlich gescheitertem Request: Der Browser meldet ihn in der Konsole (nur diese Muster). */
@@ -608,9 +610,9 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await openProviders(page);
     await expect(providerRow(page, "Kleines Theater")).toContainText("5 Min.");
   },
-  // Sticker „Bücher“: eine aktive Zeile, „Filter zurücksetzen“, vier ausgeblendete und der Turnverein blass
+  // Sticker „Musik“: eine aktive Zeile, „Filter zurücksetzen“, vier ausgeblendete und der Turnverein blass
   "anbieter-filter": async (page) => {
-    await page.goto("./?kat=buecher&ansicht=anbieter");
+    await page.goto("./?kat=musik&ansicht=anbieter");
     await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();
     await expect(page.locator(".place.idle")).toHaveCount(5);
   },
@@ -740,6 +742,19 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await tapBig(page, TREFF_GEO);
     await expect(page.getByRole("dialog", { name: "Familientreff Beispielhof" })).toBeVisible();
   },
+  // Liste im Ausschnitt über der großen Karte (Plan 0059, Nachtrag 1, N2)
+  "karte-gross-liste": async (page) => {
+    await openMap(page);
+    await growMap(page);
+    await page.locator(".bigmap-count").click();
+    await expect(page.locator("dialog[open].over-map").getByTestId("offer").first()).toBeVisible();
+  },
+  "anbieter-karte-gross-liste": async (page) => {
+    await openProviders(page);
+    await growMap(page);
+    await page.locator(".bigmap-count").click();
+    await expect(page.locator("dialog[open].over-map .place").first()).toBeVisible();
+  },
   "merkliste-karte-gross": async (page) => {
     await page.evaluate(
       (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
@@ -748,6 +763,17 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.goto("./?ansicht=merkliste-karte");
     await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
     await growMap(page);
+  },
+  "merkliste-karte-gross-liste": async (page) => {
+    await page.evaluate(
+      (ids) => localStorage.setItem("zwergenplan.merkliste", ids),
+      JSON.stringify([PEKIP_ID, TREFF_ID]),
+    );
+    await page.goto("./?ansicht=merkliste-karte");
+    await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+    await growMap(page);
+    await page.locator(".bigmap-count").click();
+    await expect(page.locator("dialog[open].over-map").getByTestId("offer").first()).toBeVisible();
   },
   "anbieter-karte-gross": async (page) => {
     await openProviders(page);
