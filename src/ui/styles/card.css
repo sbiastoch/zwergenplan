@@ -258,6 +258,8 @@
   }
   .heart.inline {
     position: static;
+    /* `top`/`right` gelten nur der Karte; unten wird das Inline-Herz `relative`, dann verschöben sie es */
+    inset: auto;
   }
   /* Glocke (Plan 0054, E1): wie das Herz, abonniert gelb; `slap` beim Abonnieren nur noch hier (Plan 0057, E2) */
   .bell[aria-pressed="true"] .hs {

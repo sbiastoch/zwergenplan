@@ -94,6 +94,19 @@ test.describe("Knopf „Teilen“ (E6)", () => {
     await expect(page.getByRole("dialog", { name: "Link zum Teilen" })).toBeHidden();
   });
 
+  test("Teilen und Herz stehen im Detailkopf auf einer Linie, ohne sich zu überdecken", async ({ page }) => {
+    // Regression: `.heart` hat für die Karte `top`/`right`; als `position: relative` verschoben sie das Herz im Kopf
+    await home(page);
+    const dialog = await openDetail(page, KRABBEL);
+    // erst nach der Einblendung messen, sonst ist der Dialog noch verschoben
+    await dialog.evaluate((el) => Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)));
+    const share = await dialog.getByRole("button", { name: "Teilen" }).boundingBox();
+    const heart = await dialog.getByRole("button", { name: `${KRABBEL} merken` }).boundingBox();
+    if (!share || !heart) throw new Error("Knöpfe im Detailkopf fehlen");
+    expect(heart.x).toBeGreaterThanOrEqual(share.x + share.width);
+    expect(Math.abs(heart.y + heart.height / 2 - (share.y + share.height / 2))).toBeLessThanOrEqual(1);
+  });
+
   test("ohne Teilen-Menü wird kopiert, der Toast steht im Detail", async ({ page }) => {
     await stubShare(page, "none");
     await home(page);
