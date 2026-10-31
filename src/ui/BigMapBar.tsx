@@ -10,8 +10,7 @@ import type { BigMapProps } from "./map-types.ts";
 function GrowButton({ onClick, buttonRef }: { onClick: () => void; buttonRef: RefObject<HTMLButtonElement | null> }) {
   return (
     <button ref={buttonRef} type="button" className="map-grow" onClick={onClick} aria-label="Karte groß zeigen">
-      <Icon name="expand" size={18} />
-      Groß
+      <Icon name="expand" size={20} />
     </button>
   );
 }
