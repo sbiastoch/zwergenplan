@@ -20,14 +20,16 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { OffersFile } from "../../src/domain/schema.ts";
+import { withoutGitEnv } from "../lib/git-env.ts";
 import { ROOT } from "./io/files.ts";
 import { loadFreeDays } from "./io/holidays.ts";
 import { nightlyWindow } from "./lib/build-offers.ts";
 
 const OUT = join(ROOT, "scripts/pipeline/fixtures/id-continuity");
-// offers.json ist größer als der Standardpuffer von execFileSync (1 MB)
+// offers.json ist größer als der Standardpuffer von execFileSync (1 MB); eigenes `cwd`, also ohne geerbte GIT_*
+// (CLAUDE.md, „git in Tests“): Aus einem Hook gestartet läse es sonst das Repo des Hooks statt ROOT
 const run = (...args: string[]) =>
-  execFileSync("git", args, { cwd: ROOT, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+  execFileSync("git", args, { cwd: ROOT, env: withoutGitEnv(), encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
 
 const commit = run("log", "-1", "--format=%h", "--", "data/offers.json").trim();
 const show = (rev: string, path: string) => run("show", `${rev}:${path}`);

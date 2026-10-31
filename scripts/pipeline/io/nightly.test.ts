@@ -234,6 +234,18 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(again.cached).toBeGreaterThan(0);
   });
 
+  it("Abrufart des Laufs landet in partsHash, nicht in inputHash (Arch-Review 2, M2)", async () => {
+    const unitAfter = async (abruf?: "alt" | "neu") => {
+      const dirsOf = tempData();
+      await runNightly({ ...options(dirsOf, fakeExtractor().extractor), ...(abruf ? { abruf } : {}) });
+      const raw = readRaw(join(dirsOf.dataDir, "raw"), "familientreff-beispiel");
+      return raw && isV2(raw) ? Object.values(raw.units)[0] : undefined;
+    };
+    const [none, alt] = [await unitAfter(), await unitAfter("alt")];
+    expect(alt?.inputHash).toBe(none?.inputHash);
+    expect(alt?.partsHash).not.toBe(none?.partsHash);
+  });
+
   it("Anbieter mit coveredBy und Terminseite: kein Absturz, nur die Einheit kandidaten (Arch-Review 2, B1)", async () => {
     const dirsOf = tempData();
     const file = join(dirsOf.dataDir, "providers.yaml");

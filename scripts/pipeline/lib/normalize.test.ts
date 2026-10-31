@@ -164,6 +164,16 @@ describe("extractKey (Plan 0032, E4)", () => {
     });
   });
 
+  it("Abrufart geht in die Fassung, nicht in den Schlüssel (Arch-Review 2, M2)", () => {
+    const neu = extractKey(input, parts, today);
+    const alt = extractKey(input, parts, { ...today, fassung: { abruf: "alt" } });
+    expect(alt.hash).toBe(neu.hash);
+    expect(alt.dated).toEqual(neu.dated);
+    expect(alt.parts).not.toBe(neu.parts);
+    // Standard (Abruf neu wie im Nachtlauf) lässt die Fassung bitgleich: kein Gate nach dem Umbau
+    expect(extractKey(input, parts, { ...today, fassung: {} }).parts).toBe(neu.parts);
+  });
+
   it("catalogExcerpt: ohne notes (ADR 0025, Punkt 5), sonst der ganze Eintrag", () => {
     const [p] = loadFixtures().providers;
     if (!p) throw new Error("Fixture fehlt");

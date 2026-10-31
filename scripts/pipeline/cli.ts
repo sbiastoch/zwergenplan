@@ -350,6 +350,8 @@ async function nightly() {
     judge: createJudge(),
     accepted: (providerId, heldSince) => acceptanceFor(acceptance, providerId, heldSince, date),
     ...(umstellen ? { forceMigrate: umstellen } : {}),
+    // Abrufart gehört zur Fassung des ID-Gates (Arch-Review 2, M2); `beide` gibt es nur bei fetch
+    abruf: abrufValue === "neu" ? "neu" : "alt",
     budgetMin,
     brakes: brakes.brakes,
     dataDir: join(ROOT, "data"),

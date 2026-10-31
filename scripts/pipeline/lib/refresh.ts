@@ -85,6 +85,11 @@ export interface RefreshContext {
   freeDays: ExpandWindow["freeDays"];
   /** ID-Gate (Plan 0049, Nachtrag 2, B5): ein gehaltenes Ergebnis übernehmen, `data/id-hinnehmen.yaml` */
   acceptHeld?: boolean;
+  /**
+   * Abrufart des Laufs (`--abruf`, `io/http.ts`): Teil der Fassung, nicht des Schlüssels (Arch-Review 2, M2). Ohne
+   * Angabe gilt die des Nachtlaufs (`FASSUNG_STANDARD`).
+   */
+  abruf?: "alt" | "neu";
 }
 
 /** Was mit der Einheit geschah, für Bericht und Statistik. */
@@ -128,7 +133,7 @@ function keyOf(ctx: RefreshContext): ExtractKey {
   return extractKey(
     { pages: ctx.unit.pages, candidates: ctx.unit.candidates },
     { ...ctx.keyParts, catalog: catalogExcerpt(ctx.excerpt) },
-    { today: ctx.today },
+    { today: ctx.today, ...(ctx.abruf ? { fassung: { abruf: ctx.abruf } } : {}) },
   );
 }
 

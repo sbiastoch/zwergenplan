@@ -832,6 +832,18 @@ describe("ID-Gate: Fassung und Halten (Plan 0049, Nachtrag 2, B1/B4)", () => {
     expect(isGated(legacy, nextOf(run(ctx({ prev: legacy, fetched: changed }), ok(renamed))))).toBe(true);
   });
 
+  it("andere Abrufart ist eine andere Fassung: gleicher Schlüssel, anderes partsHash, also gated (Arch-Review 2, M2)", () => {
+    const prev = current();
+    const neu = run(ctx({ prev, fetched: changed, abruf: "neu" }), ok(renamed));
+    const alt = run(ctx({ prev, fetched: changed, abruf: "alt" }), ok(renamed));
+    expect(nextOf(alt).inputHash).toBe(nextOf(neu).inputHash);
+    expect(nextOf(alt).partsHash).not.toBe(nextOf(neu).partsHash);
+    expect(isGated(prev, nextOf(neu))).toBe(false);
+    expect(isGated(prev, nextOf(alt))).toBe(true);
+    // ohne Angabe gilt der Abruf des Nachtlaufs (neu)
+    expect(nextOf(run(ctx({ prev, fetched: changed }), ok(renamed))).partsHash).toBe(nextOf(neu).partsHash);
+  });
+
   it("nicht gated: neue Einheit, unverändert, zurückgehaltener Einbruch", () => {
     const prev = current();
     expect(isGated(undefined, nextOf(run(ctx({ prev: undefined }), ok(renamed))))).toBe(false);

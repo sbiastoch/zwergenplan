@@ -250,6 +250,15 @@ describe("refreshProvider je Einheit (Plan 0048, E1, E5, E7)", () => {
     expect(f.seen[0]?.text).toContain("Neues Programm 0");
   });
 
+  it("Abrufart des Laufs geht in partsHash, nicht in inputHash; ohne Angabe wie neu (Arch-Review 2, M2)", async () => {
+    const extracted = async (abruf?: "alt" | "neu") =>
+      (await run(fake(ok(2, "haiku"), ok(2, "sonnet")), abruf ? { abruf } : {})).u();
+    const [none, neu, alt] = [await extracted(), await extracted("neu"), await extracted("alt")];
+    expect(alt?.inputHash).toBe(neu?.inputHash);
+    expect(alt?.partsHash).not.toBe(neu?.partsHash);
+    expect(none?.partsHash).toBe(neu?.partsHash);
+  });
+
   it("Abbruch über mayContinue nach zwei von drei Einheiten: zwei neue, eine alte, Datei gültig", async () => {
     let left = 2;
     const f = fake(ok(3, "haiku", "Neu"), ok(3, "sonnet"));
