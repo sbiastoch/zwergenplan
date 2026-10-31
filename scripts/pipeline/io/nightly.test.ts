@@ -963,6 +963,19 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     },
   );
 
+  it("Richter wirft: gehalten mit grenze, der Lauf baut trotzdem", async () => {
+    const { dirsOf, ids } = await baseline();
+    const judge: Judge = async () => {
+      throw new Error("CLI nicht gefunden");
+    };
+    const { r } = await gateNight(dirsOf, { judge });
+    expect(r.build.errors).toEqual([]);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    expect(rawUnit(dirsOf)?.held?.reason).toBe("grenze");
+    expect(r.idGate?.[0]).toMatchObject({ outcome: "gehalten", held: "grenze" });
+    expect(r.idGate?.[0]?.note).toContain("CLI nicht gefunden");
+  });
+
   it("Grenze des Richters (JUDGE_BRAKES) erreicht: die nächste Einheit wird ohne Aufruf gehalten", async () => {
     const { dirsOf, ids } = await baseline(true);
     // der erste Aufruf (Einheiten nach Kennung: erst Seite B) verbraucht das ganze Token-Budget des Richters

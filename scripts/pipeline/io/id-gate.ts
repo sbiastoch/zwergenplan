@@ -147,7 +147,13 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
       previous: o.previous,
       window,
     });
-    const r = await o.judge(input, o.signal);
+    let r: Awaited<ReturnType<Judge>>;
+    try {
+      r = await o.judge(input, o.signal);
+    } catch (e) {
+      // Ein Programmfehler oder Abbruch im Richter darf den Lauf nicht kippen: Halten wie bei jedem anderen Fehler
+      r = { outcome: { kind: "fehler", reason: `Richter: ${e instanceof Error ? e.message : String(e)}` }, calls: [] };
+    }
     out.calls.push(...r.calls);
     if (r.outcome.kind !== "ok") {
       if (r.outcome.kind === "abort") stopped = true;
