@@ -121,7 +121,7 @@ function fake(
   };
 }
 
-const DATA: MirrorData = { birthDate: "2025-08-05", searches: '["kat=musik"]', origin: "gostenhof", providers: [] };
+const DATA: MirrorData = { birthDate: "2025-08-05", providers: [] };
 
 describe("support", () => {
   it("ohne Registrierung ist es „kein-sw“, ohne zu warten", async () => {
@@ -233,8 +233,6 @@ describe("enable", () => {
     expect(Object.fromEntries(f.store)).toEqual({
       endpoint: "https://web.push.apple.com/neu",
       birthDate: "2025-08-05",
-      searches: '["kat=musik"]',
-      origin: "gostenhof",
     });
   });
 
@@ -317,7 +315,7 @@ describe("reconcile (Abgleich beim Öffnen des Kind-Sheets)", () => {
     f.store.set("endpoint", "https://web.push.apple.com/a");
     expect(await createPush(f.env).reconcile(DATA)).toBe(true);
     expect(f.requests).toEqual([]);
-    expect(f.store.get("origin")).toBe("gostenhof");
+    expect(f.store.get("birthDate")).toBe("2025-08-05");
   });
 
   it("mit ausgetauschtem Endpoint: neues Abo melden, altes abmelden", async () => {
@@ -352,17 +350,17 @@ describe("mirror", () => {
     f.setSub("https://web.push.apple.com/a");
     f.store.set("endpoint", "https://web.push.apple.com/a");
     const push = createPush(f.env);
-    await push.reconcile({ birthDate: undefined, searches: null, origin: undefined, providers: [] });
+    await push.reconcile({ birthDate: undefined, providers: [] });
     writes.length = 0;
     await push.mirror(DATA);
-    expect(writes.sort()).toEqual(["birthDate", "origin", "searches"]);
+    expect(writes).toEqual(["birthDate"]);
     writes.length = 0;
     await push.mirror(DATA);
     expect(writes).toEqual([]);
-    await push.mirror({ ...DATA, birthDate: undefined, origin: { source: "standort", lat: 49.452, lon: 11.077 } });
-    expect(writes.sort()).toEqual(["birthDate", "origin"]);
+    await push.mirror({ ...DATA, birthDate: undefined, providers: ["anb-a"] });
+    expect(writes.sort()).toEqual(["birthDate", "providers"]);
     expect(f.store.has("birthDate")).toBe(false);
-    expect(f.store.get("origin")).toEqual({ source: "standort", lat: 49.452, lon: 11.077 });
+    expect(f.store.get("providers")).toEqual(["anb-a"]);
   });
 });
 
@@ -397,7 +395,7 @@ describe("mirrorIfSubscribed (Plan 0035, E9): einmal am Ende des Onboardings, oh
     expect(f.requests).toEqual([]);
   });
 
-  it("mit Abo: schreibt Geburtsdatum, Such-Abos und Startpunkt, kein Request; gleiche Daten erneut: nichts", async () => {
+  it("mit Abo: schreibt Geburtsdatum und Anbieter-Abos, löscht die Altlast, kein Request; erneut: nichts", async () => {
     const f = fake();
     f.setSub("https://web.push.apple.com/a");
     f.store.set("endpoint", "https://web.push.apple.com/a");
@@ -406,13 +404,31 @@ describe("mirrorIfSubscribed (Plan 0035, E9): einmal am Ende des Onboardings, oh
     await push.mirrorIfSubscribed(DATA);
     expect(writes.sort()).toEqual(["birthDate", "origin", "providers", "searches"]);
     expect(f.store.get("birthDate")).toBe("2025-08-05");
-    expect(f.store.get("searches")).toBe('["kat=musik"]');
-    expect(f.store.get("origin")).toBe("gostenhof");
+    expect(f.store.has("searches")).toBe(false);
+    expect(f.store.has("origin")).toBe(false);
     expect(f.store.get("endpoint")).toBe("https://web.push.apple.com/a");
     writes.length = 0;
     await push.mirrorIfSubscribed(DATA);
     expect(writes).toEqual([]);
     expect(f.requests).toEqual([]);
+  });
+});
+
+describe("Altlast Startpunkt und Such-Abos (Plan 0054, Nachtrag A, N4)", () => {
+  it("das erste Spiegeln je Instanz löscht `searches` und `origin`, spätere nicht mehr", async () => {
+    const f = fake();
+    f.setSub("https://web.push.apple.com/a");
+    f.store.set("endpoint", "https://web.push.apple.com/a");
+    f.store.set("origin", "gostenhof");
+    f.store.set("searches", '["kat=musik"]');
+    const push = createPush(f.env);
+    await push.mirrorIfSubscribed(DATA);
+    expect(f.store.has("origin")).toBe(false);
+    expect(f.store.has("searches")).toBe(false);
+    // ein fremder Schreiber (alte App-Fassung in einem zweiten Tab) wird nicht bei jedem Spiegeln bekämpft
+    f.store.set("origin", "gostenhof");
+    await push.mirrorIfSubscribed(DATA);
+    expect(f.store.get("origin")).toBe("gostenhof");
   });
 });
 
@@ -431,7 +447,7 @@ describe("mirror nach dem Ausschalten (E6: geleert heißt geleert)", () => {
     let late: Promise<void> | undefined;
     f.env.store.clear = async () => {
       // Ein Rendern mit noch eingeschaltetem Schalter, während das Leeren läuft (CI-Lauf 37765545767)
-      late = push.mirror({ ...DATA, origin: "st-johannis" });
+      late = push.mirror({ ...DATA, birthDate: "2024-01-01" });
       await clear();
     };
     await push.disable();
@@ -458,12 +474,7 @@ describe("mirror nach dem Ausschalten (E6: geleert heißt geleert)", () => {
       await clear();
       release();
     };
-    const inFlight = push.mirror({
-      birthDate: undefined,
-      searches: '["kat=natur"]',
-      origin: "st-johannis",
-      providers: [],
-    });
+    const inFlight = push.mirror({ birthDate: "2024-01-01", providers: ["anb-a"] });
     await push.disable();
     await inFlight;
     expect(f.store.size).toBe(0);
@@ -477,8 +488,8 @@ describe("mirror nach dem Ausschalten (E6: geleert heißt geleert)", () => {
     await push.mirror(DATA);
     expect(f.store.size).toBe(0);
     await push.enable(DATA);
-    await push.mirror({ ...DATA, origin: "st-johannis" });
-    expect(f.store.get("origin")).toBe("st-johannis");
+    await push.mirror({ ...DATA, birthDate: "2024-01-01" });
+    expect(f.store.get("birthDate")).toBe("2024-01-01");
   });
 });
 

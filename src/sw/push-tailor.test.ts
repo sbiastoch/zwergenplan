@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { placeKey } from "../domain/place-key.ts";
-import type { Origin, ReachFn } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { originFromStored } from "../domain/stored-origin.ts";
 import { FIXTURE_NOW, type FixtureKey, fixtureKey, fixtureSiteOffers } from "../domain/test-fixtures.ts";
 import { type TailorEnv, tailorPush } from "./push-tailor.ts";
 
@@ -17,29 +14,9 @@ const allIds = offers.map((o) => o.id);
 const unlisted = offers.map(({ listedAt: _, ...o }) => o);
 const without = (...keys: FixtureKey[]) => allIds.filter((i) => !keys.map(id).includes(i));
 
-/** Wegzeit wie in filter.test.ts: Bibliothek 15,6 Min., Musikschule 29,6 Min. */
-const MINUTES: Record<string, number> = {
-  "theater-beispiel-buehne": 3.6,
-  "familientreff-beispiel-haus": 13.6,
-  "stadtbibliothek-beispiel-zentrum": 15.6,
-  "musikschule-beispiel-sued": 29.6,
-  "gemeinde-beispiel-gemeindehaus": 32.6,
-};
-const byPlace = new Map(offers.map((o: SiteOffer) => [placeKey(o.venue.geo), MINUTES[o.venueId] ?? Number.NaN]));
-const wegzeit: ReachFn = ({ geo }) => ({
-  kind: "oepnv",
-  minutes: byPlace.get(placeKey(geo)) ?? Number.NaN,
-  byFoot: false,
-});
-
-const FRESH_TABLE = { version: 2, id: "frisch" };
-const STALE_TABLE = { version: 2, id: "alt" };
-
 function env(
   stored: Record<string, unknown>,
   options: {
-    tableFails?: boolean;
-    cached?: unknown;
     siteFails?: boolean;
     hang?: boolean;
     setFails?: boolean;
@@ -47,19 +24,15 @@ function env(
   } = {},
 ) {
   const writes: [string, unknown][] = [];
-  const reachCalls: { table: unknown; origin: Origin }[] = [];
+  const fetched: string[] = [];
   const e: TailorEnv = {
     timeoutMs: 5000,
     fetchJson: async (path) => {
+      fetched.push(path);
       if (options.hang) return new Promise(() => undefined);
-      if (path === "data/site.json") {
-        if (options.siteFails) throw new TypeError("offline");
-        return { offers: options.site ?? offers };
-      }
-      if (options.tableFails) throw new TypeError("offline");
-      return FRESH_TABLE;
+      if (options.siteFails) throw new TypeError("offline");
+      return { offers: options.site ?? offers };
     },
-    cachedJson: async () => options.cached,
     store: {
       get: async (key) => stored[key],
       set: async (key, value) => {
@@ -67,12 +40,8 @@ function env(
         writes.push([key, value]);
       },
     },
-    reachFor: (table, _offers, origin) => {
-      reachCalls.push({ table, origin });
-      return wegzeit;
-    },
   };
-  return { e, writes, reachCalls };
+  return { e, writes, fetched };
 }
 
 const run = (e: TailorEnv, test = false) => tailorPush({ now: FIXTURE_NOW, test, env: e });
@@ -96,14 +65,21 @@ describe("tailorPush", () => {
     expect(writes).toEqual([["seenIds", allIds]]);
   });
 
-  it("mit Abo und Alter", async () => {
+  it("holt nur site.json, keine Wegzeit-Tabelle (Plan 0054, Nachtrag A, N3)", async () => {
+    const { e, fetched } = env({ seenIds: [], origin: "gostenhof", searches: '["kat=musik&wegzeit=20"]' });
+    await run(e);
+    expect(fetched).toEqual(["data/site.json"]);
+  });
+
+  it("Anbieter-Abo und Alter", async () => {
+    const providers = [offers.find((o) => o.id === id("musikgarten-1"))?.providerId];
     const { e } = env({
       seenIds: without("musikgarten-1", "krabbelreime", "pekip-herbst"),
-      searches: '["kat=musik,buecher"]',
+      providers,
       birthDate: "2025-08-05",
     });
     const result = await run(e);
-    expect(result.kind === "text" && result.text.title).toBe("2 neue Angebote für deine Abos");
+    expect(result.kind === "text" && result.text.title).toBe("1 neues Angebot von deinen Anbietern");
   });
 
   it("liest die Anbieter-Abos aus dem Geräte-Speicher (Plan 0054, E3)", async () => {
@@ -122,39 +98,21 @@ describe("tailorPush", () => {
     expect(result.kind === "text" && result.text.title).toBe("2 neue Angebote im Zwergenplan");
   });
 
-  it("Abo mit Wegzeit ab einem Stadtteil: die Musikschule (29,6 Min.) fällt heraus", async () => {
-    const { e, reachCalls } = env({
-      seenIds: without("musikgarten-1", "krabbelreime"),
-      searches: '["kat=musik,buecher&wegzeit=20"]',
-      origin: "gostenhof",
-    });
-    const result = await run(e);
-    expect(result.kind === "text" && result.text.hits).toEqual([id("krabbelreime")]);
-    expect(reachCalls).toHaveLength(1);
-    expect(reachCalls[0]?.table).toBe(FRESH_TABLE);
-    expect(reachCalls[0]?.origin).toMatchObject({ source: "stadtteil", districtId: "gostenhof" });
-  });
-
-  it("Abo mit Wegzeit ohne Startpunkt: die Grenze wirkt nicht", async () => {
-    const { e, reachCalls } = env({
-      seenIds: without("musikgarten-1", "krabbelreime"),
-      searches: '["kat=musik,buecher&wegzeit=20"]',
-    });
-    const result = await run(e);
-    expect(result.kind === "text" && result.text.hits).toHaveLength(2);
-    expect(reachCalls).toEqual([]);
-  });
-
-  it("nimmt die Tabelle aus dem Netz, nur bei Netzfehler die Kopie (eine alte Kopie passt oft nicht mehr)", async () => {
-    const fresh = env({ seenIds: [], origin: "gostenhof" }, { cached: STALE_TABLE });
-    await run(fresh.e);
-    expect(fresh.reachCalls[0]?.table).toBe(FRESH_TABLE);
-    const offline = env({ seenIds: [], origin: "gostenhof" }, { tableFails: true, cached: STALE_TABLE });
-    await run(offline.e);
-    expect(offline.reachCalls[0]?.table).toBe(STALE_TABLE);
-    const nothing = env({ seenIds: [], origin: "gostenhof" }, { tableFails: true });
-    expect((await run(nothing.e)).kind).toBe("text");
-    expect(nothing.reachCalls).toEqual([]);
+  it("löscht die Altlast Startpunkt und Such-Abos aus dem Geräte-Speicher, auch beim Testversand (Review M1)", async () => {
+    const stored = { seenIds: without("krabbelreime"), origin: "gostenhof", searches: '["kat=musik"]' };
+    const normal = env(stored);
+    expect((await run(normal.e)).kind).toBe("text");
+    expect(normal.writes).toEqual([
+      ["origin", undefined],
+      ["searches", undefined],
+      ["seenIds", allIds],
+    ]);
+    const test = env(stored);
+    await run(test.e, true);
+    expect(test.writes).toEqual([
+      ["origin", undefined],
+      ["searches", undefined],
+    ]);
   });
 
   it("ohne gesehene IDs: zugeschnitten über listedAt (Plan 0043, E3), die IDs werden geschrieben", async () => {
@@ -214,29 +172,5 @@ describe("tailorPush", () => {
     await vi.advanceTimersByTimeAsync(5000);
     expect(await result).toEqual({ kind: "zeit" });
     expect(writes).toEqual([]);
-  });
-});
-
-describe("originFromStored", () => {
-  it("Stadtteil-ID → Punkt des Stadtteils", () => {
-    expect(originFromStored("gostenhof")).toMatchObject({ source: "stadtteil", districtId: "gostenhof" });
-    expect(originFromStored("gibt-es-nicht")).toBeUndefined();
-  });
-
-  it("gespeicherter Punkt → erneut gerundet, nur in der Stadt (wie storedPointOrigin)", () => {
-    expect(originFromStored({ source: "standort", lat: 49.45234, lon: 11.07689 })).toMatchObject({
-      source: "standort",
-      point: { lat: 49.452, lon: 11.077 },
-    });
-    expect(originFromStored({ source: "karte", lat: 49.452, lon: 11.077 })?.source).toBe("karte");
-    // dieselben Fälle wie storedPointOrigin in origin-state.test.ts: außerhalb, kaputt, unbekannte Quelle
-    expect(originFromStored({ source: "standort", lat: 48.137, lon: 11.575 })).toBeUndefined();
-    expect(originFromStored({ source: "karte", lat: 0, lon: 0 })).toBeUndefined();
-    expect(originFromStored({ source: "standort", lat: Number.NaN, lon: 11.077 })).toBeUndefined();
-    expect(originFromStored({ source: "standort", lat: "49", lon: 11 })).toBeUndefined();
-    expect(originFromStored({ source: "stadtteil", lat: 49.452, lon: 11.077 })).toBeUndefined();
-    expect(originFromStored({ source: "standort", lat: Number.POSITIVE_INFINITY, lon: 11 })).toBeUndefined();
-    expect(originFromStored(null)).toBeUndefined();
-    expect(originFromStored(42)).toBeUndefined();
   });
 });

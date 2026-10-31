@@ -5,7 +5,6 @@ import type { Section, Tab } from "../domain/route.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { CATEGORY_UI } from "./categories.ts";
 import { Icon, Logo } from "./icons.tsx";
-import { BellButton } from "./OfferCard.tsx";
 
 /** Kopf: Marke und Kind-Knopf. Die Darstellung (hell/dunkel) steht nur im Kind-Sheet (Plan 0020, E2). */
 export function Header({ ageLabel, onKid }: { ageLabel: string; onKid: () => void }) {
@@ -92,7 +91,7 @@ export function startQuickChips(filter: FilterState, onChange: (f: FilterState) 
 
 /**
  * Knopf „Filter“ mit Badge und Chips, waagrecht scrollend (Plan 0003, E16). Startseite und Merkliste (Plan 0057, E5)
- * geben Chips, Zahl im Badge und Namen der Gruppe; die Glocke gibt es nur auf der Startseite.
+ * geben Chips, Zahl im Badge und Namen der Gruppe.
  */
 export function QuickFilters({
   chips,
@@ -100,7 +99,6 @@ export function QuickFilters({
   legend = "Schnellfilter",
   onOpenSheet,
   sheetButton,
-  bell,
 }: {
   chips: readonly QuickChip[];
   /** Zahl im Badge (`activeFilterCount`; die Wegzeit-Grenze zählt nur, wenn sie wirkt, Plan 0009, E8) */
@@ -110,45 +108,30 @@ export function QuickFilters({
   onOpenSheet: () => void;
   /** der Knopf „Alle Filter“, Fokus-Rückweg für das Kind-Sheet */
   sheetButton?: Ref<HTMLButtonElement>;
-  /** Glocke der Suche (Plan 0054, E6): nur im Tab „Angebote“ und nur mit einem Filter außer Zeitraum und Tageszeit */
-  bell?: { label: string; subscribed: boolean; busy: boolean; onToggle: () => void } | undefined;
 }) {
   return (
-    // Die Glocke ist kein Filter: rechts neben der scrollenden Gruppe, nicht darin (Plan 0054, E6)
-    <div className="quickbar">
-      <fieldset className="plain">
-        <legend className="sr-only">{legend}</legend>
-        <div className="chips">
-          <button
-            ref={sheetButton}
-            type="button"
-            className={count > 0 ? "chip on" : "chip"}
-            onClick={onOpenSheet}
-            aria-label={`Alle Filter, ${count} aktiv`}
-          >
-            <Icon name="sliders" size={20} />
-            Filter
-            {count > 0 && <span className="badge">{count}</span>}
+    <fieldset className="plain">
+      <legend className="sr-only">{legend}</legend>
+      <div className="chips">
+        <button
+          ref={sheetButton}
+          type="button"
+          className={count > 0 ? "chip on" : "chip"}
+          onClick={onOpenSheet}
+          aria-label={`Alle Filter, ${count} aktiv`}
+        >
+          <Icon name="sliders" size={20} />
+          Filter
+          {count > 0 && <span className="badge">{count}</span>}
+        </button>
+        {chips.map((chip) => (
+          <button key={chip.label} type="button" className="chip" aria-pressed={chip.on} onClick={chip.toggle}>
+            {chip.on && <Icon name="check" size={18} />}
+            {chip.label}
           </button>
-          {chips.map((chip) => (
-            <button key={chip.label} type="button" className="chip" aria-pressed={chip.on} onClick={chip.toggle}>
-              {chip.on && <Icon name="check" size={18} />}
-              {chip.label}
-            </button>
-          ))}
-        </div>
-      </fieldset>
-      {bell && (
-        <BellButton
-          inline
-          className="quick-bell"
-          label={`Suche „${bell.label}“`}
-          subscribed={bell.subscribed}
-          busy={bell.busy}
-          onToggle={bell.onToggle}
-        />
-      )}
-    </div>
+        ))}
+      </div>
+    </fieldset>
   );
 }
 

@@ -1,18 +1,15 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { filterFromSearch } from "../domain/filter.ts";
 import { NO_TOAST, type ToastMessage } from "./Toast.tsx";
 import {
   LONG_TOAST_MS,
   type OriginApi,
   type RouteApi,
-  type SearchAbos,
   useOrigin,
   useRoute,
   useSaved,
   useSavedProviders,
-  useSearchAbos,
   useToast,
 } from "./use-app-state.ts";
 
@@ -452,52 +449,6 @@ describe("useSaved und useSavedProviders: Umschreiben nach ADR 0022", () => {
     expect(JSON.parse(storage.getItem("zwergenplan.anbieter-merkliste") ?? "")).toEqual([THEATER]);
     setItem.mockClear();
     renderSaved(useSavedProviders);
-    expect(setItem).not.toHaveBeenCalled();
-  });
-});
-
-describe("useSearchAbos (Plan 0054, E6)", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  function render(): SearchAbos {
-    let result: SearchAbos | undefined;
-    function Probe() {
-      result = useSearchAbos();
-      return null;
-    }
-    renderToStaticMarkup(createElement(Probe));
-    if (!result) throw new Error("Hook nicht gerendert");
-    return result;
-  }
-  const KEY_ABOS = "zwergenplan.such-abos";
-  const filter = (search: string) => filterFromSearch(search);
-
-  it("liest die gespeicherte Liste, schaltet eine Suche an und wieder aus und schreibt den Speicher", () => {
-    const storage = fakeStorage();
-    storage.setItem(KEY_ABOS, JSON.stringify(["kat=musik"]));
-    vi.stubGlobal("localStorage", storage);
-    const abos = render();
-    expect(abos.list).toEqual(["kat=musik"]);
-    expect(abos.toggle(filter("kat=natur"))).toBe("neu");
-    expect(JSON.parse(storage.getItem(KEY_ABOS) ?? "")).toEqual(["kat=musik", "kat=natur"]);
-    // ohne Zeitraum: dieselbe Suche mit Zeitraum ist dasselbe Abo (Plan 0023, E12)
-    expect(abos.toggle(filter("kat=natur&von=2026-10-05&bis=2026-10-11"))).toBe("entfernt");
-    expect(JSON.parse(storage.getItem(KEY_ABOS) ?? "")).toEqual(["kat=musik"]);
-    abos.remove("kat=musik");
-    expect(storage.getItem(KEY_ABOS)).toBeNull();
-  });
-
-  it("meldet „voll“ beim sechsten Abo und „leer“ ohne Filter, ohne zu schreiben", () => {
-    const storage = fakeStorage();
-    const five = ["kat=musik", "kat=natur", "kat=buehne", "kat=babykurse", "kat=buecher"];
-    storage.setItem(KEY_ABOS, JSON.stringify(five));
-    vi.stubGlobal("localStorage", storage);
-    const abos = render();
-    const setItem = vi.spyOn(storage, "setItem");
-    expect(abos.toggle(filter("format=kurs"))).toBe("voll");
-    expect(abos.toggle(filter(""))).toBe("leer");
     expect(setItem).not.toHaveBeenCalled();
   });
 });

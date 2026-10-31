@@ -11,7 +11,6 @@ import {
   routeToSearch,
   tabSection,
 } from "./route.ts";
-import { searchOf } from "./searches.ts";
 
 const offerId = "4tpu5qaq";
 const TABS = ["entdecken", "karte", "anbieter", "merkliste", "merkliste-karte", "merkliste-kalender"] as const;
@@ -166,9 +165,8 @@ describe("URL-Route", () => {
     expect(routeToSearch(parseRoute(`?sortierung=neu&kat=musik&ansicht=karte&angebot=${offerId}`))).toBe(
       `kat=musik&ansicht=karte&sortierung=neu&angebot=${offerId}`,
     );
-    // kein Filter: zählt nicht im Filter, steht nicht im Such-Abo
+    // kein Filter: zählt nicht im Filter
     expect(parseRoute("?sortierung=neu").filter).toEqual(EMPTY_FILTER);
-    expect(searchOf(parseRoute("?kat=musik&sortierung=neu").filter)).toBe("kat=musik");
   });
 
   it("kennt kein Geburtsdatum", () => {

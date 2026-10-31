@@ -8,7 +8,6 @@ import { type AgeCheck, fittingSessions } from "../domain/age.ts";
 import { courseProgress, rhythm, sessionIndex, uniformTimes, upcomingSessions, weekDays } from "../domain/agenda.ts";
 import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange, Daytime } from "../domain/date-range.ts";
-import { filterFromSearch } from "../domain/filter.ts";
 import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
 import { type ListGroupHead, METER_BANDS, NEW_DAYS } from "../domain/listing.ts";
 import {
@@ -22,10 +21,9 @@ import {
 import { regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
 import { type ExportSelection, type SavedListChip, type SavedStage, SOON_DAYS } from "../domain/saved.ts";
-import type { Cost, Format, Registration, Session } from "../domain/schema.ts";
+import type { Format, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinDate, berlinIsoDate, daysBetween, isoWeekday, parseIsoDate } from "../domain/time.ts";
-import { CATEGORY_LABELS } from "../domain/topics.ts";
 import type { TransitLineNames, TransitOther, TransitSource } from "../domain/transit-types.ts";
 import type { ReachMode } from "./use-transit.ts";
 
@@ -738,25 +736,6 @@ export const DAYTIME_LABELS: Record<Daytime, string> = {
   nachmittags: "Nachmittags",
 };
 export const DAYTIME_HINT = "Beginn vor 12 Uhr, 12–15 Uhr, ab 15 Uhr";
-const REGISTRATION_LABELS: Record<Registration, string> = {
-  "ohne-anmeldung": "Ohne Anmeldung",
-  "mit-anmeldung": "Mit Anmeldung",
-};
-const COST_LABELS: Record<Cost, string> = { kostenlos: "Kostenlos", kostenpflichtig: "Kostenpflichtig" };
-
-/** Ein Such-Abo in Worten (Plan 0017, E6): „Musik & Singen, Natur & Draußen · Kurs · Ohne Anmeldung · bis 20 Min.“ */
-export function searchLabel(search: string): string {
-  const f = filterFromSearch(search);
-  return [
-    f.categories.map((c) => CATEGORY_LABELS[c]).join(", "),
-    f.formats.map((x) => FORMAT_LABELS[x]).join(", "),
-    f.registration.map((x) => REGISTRATION_LABELS[x]).join(", "),
-    f.cost.map((x) => COST_LABELS[x]).join(", "),
-    f.reachLimit ? `bis ${f.reachLimit.value} Min.` : "",
-  ]
-    .filter(Boolean)
-    .join(" · ");
-}
 
 /** Push-Zustand nach einem Glocken-Tipp (`bellPush` in AppExtras.tsx); die Probleme wie `PushProblem` in src/data/push.ts */
 export type BellPush = "an" | "eingeschaltet" | "aus" | "nein" | "verweigert" | "abo" | "netz" | "server";
@@ -777,25 +756,17 @@ export interface AboToast {
 }
 
 /**
- * Rückmeldung nach einem Glocken-Tipp (Plan 0054, E5). `push` ist das Ergebnis von `bellPush`, `undefined`, wenn der
- * Chunk nicht lud. `noOrigin`: Such-Abo mit Wegzeit, aber ohne gespeicherten Startpunkt. `iosTab`: iPhone im
- * Browser-Tab; dort gibt es kein Push, und die installierte App hat einen eigenen Speicher, das Abo zieht nicht mit.
- * `daytime`: Such-Abo bei gewählter Tageszeit; das Abo nimmt sie nicht mit (`searchOf`, Plan 0057, E7), der Toast sagt
- * es und steht dafür lang.
+ * Rückmeldung nach einem Glocken-Tipp (Plan 0054, E5; seit Nachtrag A nur für Anbieter). `push` ist das Ergebnis von
+ * `bellPush`, `undefined`, wenn der Chunk nicht lud. `iosTab`: iPhone im Browser-Tab; dort gibt es kein Push, und die
+ * installierte App hat einen eigenen Speicher, das Abo zieht nicht mit.
  */
 export function aboToast(
-  kind: "anbieter" | "suche",
   subscribed: boolean,
   push: BellPush | undefined,
-  {
-    noOrigin = false,
-    iosTab = false,
-    daytime = false,
-  }: { noOrigin?: boolean; iosTab?: boolean; daytime?: boolean } = {},
+  { iosTab = false }: { iosTab?: boolean } = {},
 ): AboToast {
   if (!subscribed) return { text: "Abo beendet" };
-  const what =
-    kind === "anbieter" ? "Anbieter abonniert" : daytime ? "Suche abonniert, ohne Tageszeit" : "Suche abonniert";
+  const what = "Anbieter abonniert";
   const long = 6000;
   if (push === "verweigert") {
     return {
@@ -818,12 +789,7 @@ export function aboToast(
       tone: "hint",
     };
   }
-  if (noOrigin) return { text: `${what}. Die Wegzeit wirkt in der Push-Nachricht ab einem Startpunkt.`, ms: long };
   if (push === "eingeschaltet") return { text: `${what} – die wöchentliche Push-Nachricht ist jetzt an`, ms: long };
-  if (push === "an") {
-    const text = `${what} – Neues kommt in die wöchentliche Push-Nachricht`;
-    return daytime ? { text, ms: long } : { text };
-  }
-  if (kind === "anbieter") return { text: `${what} – steht jetzt oben im Tab „Anbieter“` };
-  return daytime ? { text: what, ms: long } : { text: what };
+  if (push === "an") return { text: `${what} – Neues kommt in die wöchentliche Push-Nachricht` };
+  return { text: `${what} – steht jetzt oben im Tab „Anbieter“` };
 }

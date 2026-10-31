@@ -1,7 +1,7 @@
 /**
  * Alles, was nur auf diesem Gerät bleibt (localStorage): Geburtsdatum, Merkliste (samt Vorgemerktem), gemerkte Anbieter,
  * Darstellung, Startpunkt (Stadtteil-ID oder gerundeter Punkt, ADR 0017), dazu das Flag „Onboarding erledigt“ (ohne Personenbezug,
- * Plan 0033, E2; versioniert seit Plan 0035, E4). Die Such-Abos liegen in `searches-store.ts`. Nichts davon gelangt in URL,
+ * Plan 0033, E2; versioniert seit Plan 0035, E4). Nichts davon gelangt in URL,
  * Logs oder Requests (docs/architecture.md). Jeder Zugriff ist gekapselt: Im privaten Modus o. ä. gilt die
  * Einstellung nur für die Sitzung.
  */
@@ -39,6 +39,14 @@ function write(key: string, value: string | undefined): void {
   } catch {
     // privater Modus o. ä.
   }
+}
+
+/**
+ * Altlast (Plan 0054, Nachtrag A; ADR 0042): Such-Abos gibt es nicht mehr. `App` löscht ihren Schlüssel beim Start,
+ * lokal und ohne Request; entfernen nach einem halben Jahr (`docs/ideas.md`).
+ */
+export function forgetSearchAbos(): void {
+  write("zwergenplan.such-abos", undefined);
 }
 
 export function loadBirthDate(): string | undefined {

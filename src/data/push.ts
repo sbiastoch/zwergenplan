@@ -3,7 +3,7 @@
  * `Notification`, außer der Erlaubnis im Glocken-Tipp (`pushPermission`, `askPushPermission` in `pwa-start.ts`, ADR 0037). Liest die Registrierung selbst (`getRegistration`, im Tipp `ready`), nur für `pushManager`;
  * registrieren und aktualisieren bleibt `pwa.ts` (ADR 0014, Punkt 6). Lazy im Chunk „Als App“, nie beim App-Start.
  *
- * Der Worker bekommt nur das Abo. Geburtsdatum, Such- und Anbieter-Abos und Startpunkt landen nur im Geräte-Speicher, für den
+ * Der Worker bekommt nur das Abo. Geburtsdatum und Anbieter-Abos landen nur im Geräte-Speicher, für den
  * Zuschnitt im Service Worker. Die Umgebung ist injizierbar wie in `geolocation.ts`.
  */
 import { PUSH_WORKER_URL, VAPID_PUBLIC_KEY } from "../../site.config.ts";
@@ -11,7 +11,6 @@ import type { PushCapability, PushSupport } from "../domain/pwa.ts";
 import type { DeviceKey } from "./device-store.ts";
 // benannt statt `import * as`: ein Namensraum-Objekt zöge den Export-Helfer von rolldown in den Einstieg (+0,07 kB)
 import { clear, get, set } from "./device-store.ts";
-import type { StoredOriginPoint } from "./preferences.ts";
 
 export type PushProblem = "verweigert" | "abo" | "netz" | "server";
 
@@ -62,12 +61,9 @@ export interface PushEnv {
   };
 }
 
-/** Was in den Geräte-Speicher gespiegelt wird; `origin` genau wie im `localStorage` (ADR 0017) */
+/** Was in den Geräte-Speicher gespiegelt wird (ADR 0042: ohne Startpunkt und Such-Abos) */
 export interface MirrorData {
   birthDate: string | undefined;
-  /** rohe Liste aus `searches-store.ts` */
-  searches: string | null;
-  origin: string | StoredOriginPoint | undefined;
   /** Anbieter-Abos (`publicId`, bereinigt, Plan 0054, E3); leer löscht den Schlüssel */
   providers: readonly string[];
 }
@@ -114,7 +110,12 @@ async function sha256Hex(text: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-const MIRRORED = ["birthDate", "searches", "origin", "providers"] as const;
+const MIRRORED = ["birthDate", "providers"] as const;
+/**
+ * Altlast (Plan 0054, Nachtrag A; ADR 0042): Startpunkt und Such-Abos lagen bis dahin im Geräte-Speicher. Das erste
+ * Spiegeln je Instanz löscht sie (über `written` nur einmal); den Rest erledigt der Service Worker beim Push.
+ */
+const LEGACY = ["searches", "origin"] as const;
 
 /**
  * Kann dieses Gerät Push (Plan 0033, E1, E8)? Für den App-Schritt des Onboardings. Anders als `support()` ohne Blick auf
@@ -133,7 +134,7 @@ export function createPush(env: PushEnv = browserEnv()) {
   /**
    * Spiegeln erlaubt? Erst wenn Einschalten oder Abgleich ein Abo bestätigt; beim Ausschalten sofort (synchron) aus.
    * Sonst füllt ein Spiegeln, das während des Leerens läuft oder startet, den Speicher wieder: `written` ist dann leer,
-   * also schreibt es Startpunkt und Such-Abos neu, obwohl Push aus ist (CI-Lauf 37765545767, E6).
+   * also schreibt es Geburtsdatum und Abos neu, obwohl Push aus ist (CI-Lauf 37765545767, E6).
    */
   let mirroring = false;
   /**
@@ -167,10 +168,10 @@ export function createPush(env: PushEnv = browserEnv()) {
   };
 
   async function mirror(data: MirrorData): Promise<void> {
-    for (const key of MIRRORED) {
+    for (const key of [...MIRRORED, ...LEGACY]) {
       // nach jedem `await` neu prüfen: das Ausschalten kann dazwischenkommen
       if (!mirroring) return;
-      const raw = data[key];
+      const raw = key === "searches" || key === "origin" ? undefined : data[key];
       const value = Array.isArray(raw) && raw.length === 0 ? undefined : (raw ?? undefined);
       const text = JSON.stringify(value) ?? "";
       if (written.get(key) === text) continue;

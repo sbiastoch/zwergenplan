@@ -1,14 +1,12 @@
 /**
  * Die Wochen-Nachricht auf dem Gerät (Plan 0017, E3, E4; Plan 0043, E2, E3): was „neu“ heißt und der zugeschnittene
- * Text nach Such-Abos und Alter. Rein, `now` kommt immer von außen. Nur der Service Worker und die CI nutzen es
+ * Text nach Anbieter-Abos und Alter. Rein, `now` kommt immer von außen. Nur der Service Worker und die CI nutzen es
  * (`push-domain-not-in-start`).
  */
 import { ageInMonths, sessionFit, startFitsAge } from "./age.ts";
 import { nextSession, startedCourse } from "./agenda.ts";
-import { type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId } from "./ids.ts";
 import { listingWeek } from "./listing.ts";
-import type { ReachFn, ReachTarget } from "./reach.ts";
 import type { Offer, Session } from "./schema.ts";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -42,25 +40,21 @@ function startsInWeek(session: Session, now: Date): boolean {
   return start >= now.getTime() && start < now.getTime() + WEEK_MS;
 }
 
-export interface WeeklyInput<T extends Offer & { venue: ReachTarget }> {
+export interface WeeklyInput<T extends Offer> {
   /** neue, noch nicht beendete Angebote (aus `newOfferIds`) */
   fresh: readonly T[];
   /** `offersInWeek(site.offers, now)` */
   week: readonly T[];
-  /** Such-Abos; leer = keins */
-  searches: readonly FilterState[];
-  /** Anbieter-Abos (`publicId`, Plan 0054, E2); fehlt oder leer = keins */
+  /** Anbieter-Abos (`publicId`, Plan 0054, E2, Nachtrag A); fehlt oder leer = keins */
   providers?: readonly string[] | undefined;
   birthDate?: string | undefined;
-  /** Wegzeit ab dem gespeicherten Startpunkt (ADR 0017); ohne wirkt die Wegzeit-Grenze nicht (wie in der Liste) */
-  reach?: ReachFn | undefined;
   now: Date;
 }
 
 export interface WeeklyText {
   title: string;
   body: string;
-  /** IDs der passenden neuen Angebote: erst die abonnierter Anbieter, dann die übrigen, je in Datenreihenfolge */
+  /** IDs der passenden neuen Angebote in Datenreihenfolge */
   hits: string[];
 }
 
@@ -82,39 +76,32 @@ function titleList(offers: readonly Offer[]): string {
 }
 
 /**
- * Der zugeschnittene Text (E4), immer einer. Passt heißt: (keine Abos oder ein Abo passt) und (kein gültiges Alter
+ * Der zugeschnittene Text (E4), immer einer. Passt heißt: (kein Abo oder von einem abonnierten Anbieter) und (kein gültiges Alter
  * oder der Beginn passt zum Alter, `startFitsAge`). Die Wochenzahl verlangt bei regelmäßigen Angeboten zusätzlich einen
  * passenden Termin in den 7 Tagen (Plan 0043, E2). Vor der Geburt zählt nur das Alter nicht, die Abos wirken weiter.
- * Abos sind Such- und Anbieter-Abos (Plan 0054, E2): Ein Angebot passt zu einem Abo, wenn es von einem abonnierten
- * Anbieter stammt oder zu einer Suche passt. Treffer der Anbieter stehen vorn.
+ * Abos sind seit Plan 0054, Nachtrag A (ADR 0042) nur Anbieter-Abos, Such-Abos gibt es nicht mehr.
  */
-export function weeklyText<T extends Offer & { venue: ReachTarget }>({
+export function weeklyText<T extends Offer>({
   fresh,
   week,
-  searches,
   providers = [],
   birthDate,
-  reach,
   now,
 }: WeeklyInput<T>): WeeklyText {
   const months = birthDate === undefined ? -1 : ageInMonths(birthDate, now);
   const byAge = birthDate !== undefined && months >= 0;
-  const byAbo = searches.length + providers.length > 0;
-  const own = (o: T) => providers.includes(o.providerId);
-  const fits = (o: T) =>
-    (!byAbo || own(o) || searches.some((s) => matchesFilter(o, s, reach))) &&
-    (!byAge || startFitsAge(o, birthDate, now));
+  const byAbo = providers.length > 0;
+  const fits = (o: T) => (!byAbo || providers.includes(o.providerId)) && (!byAge || startFitsAge(o, birthDate, now));
   // `sessionFit` ist die eine Quelle der Prüfung je Termin (Kurse und Einzeltermine prüft es nicht, ADR 0007)
   const sessionFits = byAge ? sessionFit(birthDate) : undefined;
   const fitsInWeek = (o: T) => !sessionFits || o.sessions.some((s) => startsInWeek(s, now) && sessionFits(o, s));
-  const matched = fresh.filter(fits);
-  const hits = [...matched.filter(own), ...matched.filter((o) => !own(o))];
+  const hits = fresh.filter(fits);
   const n = hits.length;
   if (n > 0) {
     const one = n === 1;
     const count = one ? "1 neues Angebot" : `${n} neue Angebote`;
     const title = byAbo
-      ? `${count} ${hits.every(own) ? "von deinen Anbietern" : "für deine Abos"}`
+      ? `${count} von deinen Anbietern`
       : byAge
         ? `${count} ${one ? "passt" : "passen"} zu ${ageWords(months, "dativ")}`
         : `${count} im Zwergenplan`;
@@ -123,7 +110,7 @@ export function weeklyText<T extends Offer & { venue: ReachTarget }>({
   const m = week.filter((o) => fits(o) && fitsInWeek(o)).length;
   const filtered = byAbo || byAge;
   const title = byAbo
-    ? "Diese Woche nichts Neues für deine Abos"
+    ? "Diese Woche nichts Neues von deinen Anbietern"
     : byAge
       ? `Diese Woche nichts Neues für ${ageWords(months, "akkusativ")}`
       : "Diese Woche nichts Neues";

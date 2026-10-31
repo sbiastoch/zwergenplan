@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ONBOARDING_FLAG } from "../../e2e/onboarding-flag.ts";
 import {
+  forgetSearchAbos,
   loadOnboardingDone,
   loadOriginDistrict,
   loadOriginPoint,
@@ -145,6 +146,29 @@ describe("Startpunkt-Punkt (Plan 0016, E1)", () => {
     expect(loadOriginPoint()).toBeUndefined();
     expect(() => saveOrigin({ source: "standort", lat: 49.452, lon: 11.077 })).not.toThrow();
     expect(() => saveOrigin(undefined)).not.toThrow();
+  });
+});
+
+describe("Altlast Such-Abos (Plan 0054, Nachtrag A)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("forgetSearchAbos entfernt den Schlüssel und lässt alles andere stehen", () => {
+    const storage = fakeStorage();
+    storage.data.set("zwergenplan.such-abos", '["kat=musik"]');
+    storage.data.set("zwergenplan.anbieter-merkliste", '["anb-a"]');
+    vi.stubGlobal("localStorage", storage);
+    forgetSearchAbos();
+    expect([...storage.data.keys()]).toEqual(["zwergenplan.anbieter-merkliste"]);
+  });
+
+  it("wirft nicht, wenn der Speicher gesperrt ist", () => {
+    const fail = () => {
+      throw new Error("gesperrt");
+    };
+    vi.stubGlobal("localStorage", { getItem: fail, setItem: fail, removeItem: fail });
+    expect(() => forgetSearchAbos()).not.toThrow();
   });
 });
 

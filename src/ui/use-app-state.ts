@@ -17,10 +17,8 @@ import {
   saveTheme,
   type ThemeChoice,
 } from "../data/preferences.ts";
-import { loadSearchesRaw, saveSearches } from "../data/searches-store.ts";
 import { absoluteUrl, shareLink } from "../data/share.ts";
 import { districtById } from "../domain/districts.ts";
-import type { FilterState } from "../domain/filter.ts";
 import type { Origin } from "../domain/reach.ts";
 import { isLegacyView, parseRoute, type Route, resolveRouteIds, routeToSearch } from "../domain/route.ts";
 import {
@@ -33,7 +31,6 @@ import {
   toggleId,
   withStage,
 } from "../domain/saved.ts";
-import { addSearch, hasSearch, parseSearches, removeSearch, type SearchOutcome, searchOf } from "../domain/searches.ts";
 import { sameMinute } from "../domain/time.ts";
 import { SHARE_COPIED } from "./format.ts";
 import { initialOriginState, originReducer, storedPointOrigin } from "./origin-state.ts";
@@ -228,42 +225,6 @@ export function useSavedProviders(): [string[], (id: string) => boolean] {
     return next.includes(id);
   }, []);
   return [ids, toggle];
-}
-
-export interface SearchAbos {
-  list: readonly string[];
-  /** schaltet das Abo der Suche um; „voll“ und „leer“ ändern nichts */
-  toggle: (filter: FilterState) => SearchOutcome | "entfernt";
-  remove: (search: string) => void;
-}
-
-/**
- * Such-Abos (Plan 0054, E6): State für die Glocke über der Liste und die Verwaltung im Kind-Sheet, gebaut wie
- * `useSavedProviders`. Gespeichert roh in `searches-store.ts`, gelesen mit `parseSearches` wie im Service Worker.
- */
-export function useSearchAbos(): SearchAbos {
-  const [list, setList] = useState(() => parseSearches(loadSearchesRaw()));
-  const listRef = useRef(list);
-  listRef.current = list;
-  const store = useCallback((next: string[]) => {
-    listRef.current = next;
-    setList(next);
-    saveSearches(next);
-  }, []);
-  const toggle = useCallback(
-    (filter: FilterState) => {
-      if (hasSearch(listRef.current, filter)) {
-        store(removeSearch(listRef.current, searchOf(filter)));
-        return "entfernt" as const;
-      }
-      const { list: next, outcome } = addSearch(listRef.current, filter);
-      if (outcome === "neu") store(next);
-      return outcome;
-    },
-    [store],
-  );
-  const remove = useCallback((search: string) => store(removeSearch(listRef.current, search)), [store]);
-  return { list, toggle, remove };
 }
 
 const darkQuery = () => window.matchMedia("(prefers-color-scheme: dark)");

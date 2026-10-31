@@ -38,7 +38,7 @@ const menu = (page: Page) => page.getByRole("menu", { name: "Sortieren nach" });
 const titles = (page: Page) => page.getByTestId("offer").getByRole("heading", { level: 3 });
 
 test.describe("Filter der Merkliste (E5)", () => {
-  test("Sheet wie auf der Startseite: Art und Tageszeit wirken, Badge zählt, „Zurücksetzen“; kein Alter, keine Glocke", async ({
+  test("Sheet wie auf der Startseite: Art und Tageszeit wirken, Badge zählt, „Zurücksetzen“; kein Alter", async ({
     page,
   }) => {
     // mit Geburtsdatum: Auf der Startseite hätte das Sheet den Alter-Abschnitt
@@ -48,7 +48,6 @@ test.describe("Filter der Merkliste (E5)", () => {
     // Tageszeit in der Liste nur im Sheet (Plan 0058, E1)
     await expect(chip(page, "Vormittags")).toHaveCount(0);
     await expect(page.getByRole("group", { name: "Kategorien" })).toHaveCount(0);
-    await expect(page.locator(".quick-bell")).toHaveCount(0);
 
     await filterButton(page).click();
     await expect(sheet(page)).toBeVisible();

@@ -226,23 +226,6 @@
   .chips::-webkit-scrollbar {
     display: none;
   }
-  /* Schnellfilter und Glocke der Suche (Plan 0054, E6): Die Chips scrollen, die Glocke steht fest rechts daneben */
-  .quickbar {
-    display: flex;
-    align-items: flex-start;
-  }
-  .quickbar > fieldset {
-    flex: 1;
-    min-width: 0;
-  }
-  /* die Chips laufen vor der Glocke weich aus, statt hart an ihr abzubrechen (Browser-Review Plan 0054, F1) */
-  .quickbar:has(.quick-bell) .chips {
-    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
-  }
-  .quick-bell {
-    flex: none;
-    margin: 6px 12px 0 0;
-  }
   .chip {
     flex: none;
     min-height: 44px;

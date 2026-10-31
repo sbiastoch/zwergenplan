@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { iosTab } from "../data/platform.ts";
-import { loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/preferences.ts";
+import { forgetSearchAbos, loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/preferences.ts";
 import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
@@ -31,7 +31,6 @@ import {
   savedRule,
   toggleId,
 } from "../domain/saved.ts";
-import { searchOf } from "../domain/searches.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
@@ -62,7 +61,6 @@ import {
   providerStatusParts,
   reachNote,
   STAGE_UNDONE,
-  searchLabel,
   stageToast,
   standDate,
 } from "./format.ts";
@@ -88,7 +86,6 @@ import {
   useRoute,
   useSaved,
   useSavedProviders,
-  useSearchAbos,
   useTheme,
   useToast,
 } from "./use-app-state.ts";
@@ -195,6 +192,8 @@ export function App() {
     return "auto";
   });
 
+  // Altlast Such-Abos (Plan 0054, Nachtrag A; ADR 0042): einmal beim Start löschen, lokal
+  useEffect(forgetSearchAbos, []);
   useEffect(() => {
     // `attempt` startet das Laden neu („Nochmal versuchen“)
     void attempt;
@@ -387,13 +386,13 @@ export function App() {
   const [bellBusy, setBellBusy] = useState(false);
   const bellBusyRef = useRef(false);
   const afterBell = useCallback(
-    (kind: "anbieter" | "suche", subscribed: boolean, hints: { noOrigin?: boolean; daytime?: boolean } = {}) => {
+    (subscribed: boolean) => {
       bellBusyRef.current = true;
       setBellBusy(true);
       void bellPush(subscribed).then((push) => {
         bellBusyRef.current = false;
         setBellBusy(false);
-        const { text, ms, tone } = aboToast(kind, subscribed, push, { ...hints, iosTab: iosTab() });
+        const { text, ms, tone } = aboToast(subscribed, push, { iosTab: iosTab() });
         say(text, ms, tone);
       });
     },
@@ -401,22 +400,10 @@ export function App() {
   );
   const onToggleProvider = useCallback(
     (providerId: string) => {
-      if (!bellBusyRef.current) afterBell("anbieter", toggleSavedProvider(providerId));
+      if (!bellBusyRef.current) afterBell(toggleSavedProvider(providerId));
     },
     [afterBell, toggleSavedProvider],
   );
-  const searchAbos = useSearchAbos();
-  const onToggleSearch = () => {
-    if (bellBusyRef.current) return;
-    const outcome = searchAbos.toggle(route.filter);
-    if (outcome === "voll") say("Höchstens 5 Such-Abos. Erst eins entfernen.", undefined, "hint");
-    else if (outcome === "neu" || outcome === "entfernt") {
-      afterBell("suche", outcome === "neu", {
-        noOrigin: route.filter.reachLimit !== undefined && origin === undefined,
-        daytime: route.filter.daytimes.length > 0,
-      });
-    }
-  };
 
   const ctx: CardContext = {
     now,
@@ -466,7 +453,6 @@ export function App() {
   // Tab-Leisten-Eintrag laufen über `section`, sonst griffen sie auf der Merklisten-Karte falsch (Review M1).
   const section = tabSection(route.tab);
   // Suche ohne Zeitraum (Plan 0023, E12); die Glocke nur im Tab „Angebote“ (Plan 0054, E6)
-  const currentSearch = section === "entdecken" ? searchOf(route.filter) : "";
   // Liste | Karte steht rechts neben der Statuszeile und bricht bei wenig Platz darunter (Plan 0005, E5). Kein
   // Scroll nach oben: Das gibt es nur beim Tab-Wechsel (Plan 0025, E4).
   const viewToggle = (
@@ -510,7 +496,7 @@ export function App() {
   // erst mit den Daten; `anbieter=` bleibt in der URL, „Nochmal versuchen“ öffnet es dann.
   const sheetProviderId = load.kind === "error" ? undefined : route.providerId;
   // Sichtbare Glocke: App-Chunk vorladen, damit ein Tipp Push synchron einschalten kann (Plan 0054, E5; ADR 0037)
-  const bellVisible = currentSearch !== "" || section === "anbieter" || sheetProviderId !== undefined;
+  const bellVisible = section === "anbieter" || sheetProviderId !== undefined;
   useEffect(() => {
     if (bellVisible) preloadBell();
   }, [bellVisible]);
@@ -692,16 +678,6 @@ export function App() {
           count={activeFilterCount(route.filter, { limitActive: limitOn })}
           onOpenSheet={() => setSheet("filter")}
           sheetButton={filterButton}
-          bell={
-            currentSearch
-              ? {
-                  label: searchLabel(currentSearch),
-                  subscribed: searchAbos.list.includes(currentSearch),
-                  busy: bellBusy,
-                  onToggle: onToggleSearch,
-                }
-              : undefined
-          }
         />
       )}
       <main className="body">
@@ -965,12 +941,9 @@ export function App() {
       <Overlays
         toast={toast}
         abos={{
-          searches: searchAbos.list,
           providers: savedProviders,
           providerName: (id) => offers.find((o) => o.providerId === id)?.providerName,
           ready: load.kind === "ready",
-          hasOrigin: origin !== undefined,
-          removeSearch: searchAbos.remove,
           removeProvider: toggleSavedProvider,
         }}
         sheet={sheet}

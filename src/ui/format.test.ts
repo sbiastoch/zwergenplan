@@ -51,7 +51,6 @@ import {
   savedHiddenNote,
   savedMapStatusParts,
   savedStatusParts,
-  searchLabel,
   selectionHeading,
   seriesToast,
   shortDate,
@@ -955,82 +954,49 @@ describe("Kalender-Export nach Alter (Plan 0018, E4)", () => {
   });
 });
 
-describe("searchLabel", () => {
-  it("nennt alle Dimensionen in der Reihenfolge des Filters", () => {
-    expect(searchLabel("kat=musik,natur&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20")).toBe(
-      "Musik & Singen, Natur & Draußen · Kurs · Ohne Anmeldung · Kostenlos · bis 20 Min.",
-    );
-  });
-
-  it("lässt leere Dimensionen weg", () => {
-    expect(searchLabel("kat=buehne")).toBe("Bühne & Konzert");
-    expect(searchLabel("format=regelmaessig,einmalig&wegzeit=45")).toBe("Regelmäßig, Einmalig · bis 45 Min.");
-    expect(searchLabel("")).toBe("");
-  });
-});
-
-describe("aboToast (Plan 0054, E5)", () => {
+describe("aboToast (Plan 0054, E5, Nachtrag A)", () => {
   it("Abo beenden: immer kurz, egal wie Push steht", () => {
-    expect(aboToast("anbieter", false, "an")).toEqual({ text: "Abo beendet" });
-    expect(aboToast("suche", false, undefined)).toEqual({ text: "Abo beendet" });
+    expect(aboToast(false, "an")).toEqual({ text: "Abo beendet" });
+    expect(aboToast(false, undefined)).toEqual({ text: "Abo beendet" });
+    expect(aboToast(false, "nein", { iosTab: true })).toEqual({ text: "Abo beendet" });
   });
 
   it("Push an: Neues kommt in die Nachricht", () => {
-    expect(aboToast("anbieter", true, "an").text).toBe(
-      "Anbieter abonniert – Neues kommt in die wöchentliche Push-Nachricht",
-    );
+    expect(aboToast(true, "an")).toEqual({
+      text: "Anbieter abonniert – Neues kommt in die wöchentliche Push-Nachricht",
+    });
   });
 
   it("eben eingeschaltet: lang, ohne Hinweis-Ton", () => {
-    expect(aboToast("suche", true, "eingeschaltet")).toEqual({
-      text: "Suche abonniert – die wöchentliche Push-Nachricht ist jetzt an",
+    expect(aboToast(true, "eingeschaltet")).toEqual({
+      text: "Anbieter abonniert – die wöchentliche Push-Nachricht ist jetzt an",
       ms: 6000,
     });
   });
 
   it("verweigert und gescheitert: Hinweis, lang", () => {
-    expect(aboToast("anbieter", true, "verweigert")).toMatchObject({ tone: "hint", ms: 6000 });
-    expect(aboToast("anbieter", true, "verweigert").text).toContain("blockiert");
+    expect(aboToast(true, "verweigert")).toMatchObject({ tone: "hint", ms: 6000 });
+    expect(aboToast(true, "verweigert").text).toContain("blockiert");
     for (const problem of ["abo", "netz", "server"] as const) {
-      expect(aboToast("suche", true, problem)).toMatchObject({ tone: "hint", ms: 6000 });
+      expect(aboToast(true, problem)).toMatchObject({ tone: "hint", ms: 6000 });
     }
   });
 
-  it("kein Push möglich oder Chunk nicht geladen: neutral, Anbieter mit Hinweis auf den Tab", () => {
-    expect(aboToast("anbieter", true, "nein").text).toBe("Anbieter abonniert – steht jetzt oben im Tab „Anbieter“");
-    expect(aboToast("suche", true, undefined).text).toBe("Suche abonniert");
+  it("kein Push möglich oder Chunk nicht geladen: Hinweis auf den Tab", () => {
+    expect(aboToast(true, "nein").text).toBe("Anbieter abonniert – steht jetzt oben im Tab „Anbieter“");
+    expect(aboToast(true, undefined).text).toBe("Anbieter abonniert – steht jetzt oben im Tab „Anbieter“");
   });
 
   it("iPhone im Browser-Tab ohne Push: Hinweis auf die installierte App, dort neu abonnieren", () => {
-    expect(aboToast("anbieter", true, "nein", { iosTab: true })).toEqual({
+    expect(aboToast(true, "nein", { iosTab: true })).toEqual({
       text: "Anbieter abonniert. Push-Nachrichten gibt es auf dem iPhone in der installierten App – dort bitte noch einmal abonnieren.",
       ms: 6000,
       tone: "hint",
     });
-    expect(aboToast("suche", true, "nein", { noOrigin: true, iosTab: true }).text).toContain("installierten App");
     // Chunk nicht geladen: kein Urteil über Push, neutral wie bisher
-    expect(aboToast("suche", true, undefined, { iosTab: true }).text).toBe("Suche abonniert");
-    expect(aboToast("anbieter", false, "nein", { iosTab: true })).toEqual({ text: "Abo beendet" });
-  });
-
-  it("Such-Abo mit Wegzeit ohne Startpunkt nennt das, solange Push nicht scheiterte", () => {
-    expect(aboToast("suche", true, "an", { noOrigin: true }).text).toContain("ab einem Startpunkt");
-    expect(aboToast("suche", true, "verweigert", { noOrigin: true }).text).toContain("blockiert");
-  });
-
-  it("Such-Abo mit Tageszeit sagt, dass sie nicht mitkommt (Plan 0057, E7)", () => {
-    expect(aboToast("suche", true, "nein", { daytime: true })).toEqual({
-      text: "Suche abonniert, ohne Tageszeit",
-      ms: 6000,
-    });
-    expect(aboToast("suche", true, "an", { daytime: true })).toEqual({
-      text: "Suche abonniert, ohne Tageszeit – Neues kommt in die wöchentliche Push-Nachricht",
-      ms: 6000,
-    });
-    expect(aboToast("suche", true, "verweigert", { daytime: true }).text).toMatch(
-      /^Suche abonniert, ohne Tageszeit\. /,
+    expect(aboToast(true, undefined, { iosTab: true }).text).toBe(
+      "Anbieter abonniert – steht jetzt oben im Tab „Anbieter“",
     );
-    expect(aboToast("suche", false, "an", { daytime: true })).toEqual({ text: "Abo beendet" });
   });
 });
 
@@ -1040,13 +1006,5 @@ describe("providerAboName (Plan 0054, E7)", () => {
     expect(providerAboName(undefined, true)).toBe("Anbieter ohne aktuelle Angebote");
     expect(providerAboName("Musikschule Beispiel (fiktiv)", false)).toBe("Anbieter-Abo");
     expect(providerAboName(undefined, false)).toBe("Anbieter-Abo");
-  });
-});
-
-describe("searchLabel mit Mehrfachwerten", () => {
-  it("trennt Werte einer Dimension mit Komma, Dimensionen mit Punkt", () => {
-    expect(searchLabel("anmeldung=ohne-anmeldung,mit-anmeldung&kosten=kostenlos")).toBe(
-      "Mit Anmeldung, Ohne Anmeldung · Kostenlos",
-    );
   });
 });

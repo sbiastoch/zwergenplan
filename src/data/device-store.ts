@@ -4,7 +4,10 @@
  * lesen kann. Gefüllt nur, solange Push an ist; beim Abschalten geleert. Nichts davon verlässt das Gerät.
  */
 
-/** Was gespiegelt wird (E6); `seenIds` schreibt nur der Service Worker (E3) */
+/**
+ * Was gespiegelt wird (E6); `seenIds` schreibt nur der Service Worker (E3). `searches` und `origin` sind Altlast (Plan
+ * 0054, Nachtrag A; ADR 0042): Sie werden nur noch gelöscht.
+ */
 const DEVICE_KEYS = ["birthDate", "searches", "origin", "providers", "seenIds", "endpoint"] as const;
 export type DeviceKey = (typeof DEVICE_KEYS)[number];
 

@@ -6,33 +6,28 @@
 import { useId, useRef, useState } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import { ageInMonths } from "../domain/age.ts";
-import { filterFromSearch } from "../domain/filter.ts";
 import { ABOUT_DATA_PATH, IMPRINT_PATH } from "../domain/share.ts";
 import type { TransitSource } from "../domain/transit-types.ts";
 import { useAppExtras } from "./AppExtras.tsx";
 import { BIRTH_DATE_INVALID, useBirthDateInput } from "./birth-date-input.ts";
 import { markAutofocus } from "./Dialog.tsx";
-import { plural, providerAboName, searchLabel } from "./format.ts";
+import { plural, providerAboName } from "./format.ts";
 import { OriginPicker } from "./OriginPicker.tsx";
 import type { OriginApi } from "./use-app-state.ts";
 import type { ReachMode } from "./use-transit.ts";
 
 /** Abos für die Verwaltung im Kind-Sheet (Plan 0054, E7), aus dem State der App */
 export interface AboListProps {
-  searches: readonly string[];
   providers: readonly string[];
   /** Name aus den geladenen Angeboten; `undefined`: kein kommendes Angebot */
   providerName: (providerId: string) => string | undefined;
   /** Angebote geladen? Sonst steht kein Name, auch nicht „ohne aktuelle Angebote“ (Review 2, Nr. 3) */
   ready: boolean;
-  /** gespeicherter Startpunkt da? Sonst wirkt die Wegzeit eines Such-Abos nicht */
-  hasOrigin: boolean;
-  removeSearch: (search: string) => void;
   removeProvider: (providerId: string) => void;
 }
 
 /**
- * Verwaltung der Abos (Plan 0054, E7): Such- und Anbieter-Abos mit „Entfernen“. Im Start, damit sie auch ohne Push
+ * Verwaltung der Abos (Plan 0054, E7; seit Nachtrag A nur Anbieter-Abos) mit „Entfernen“. Im Start, damit sie auch ohne Push
  * und offline da ist; abonniert wird an der Glocke. Spiegeln braucht es hier nicht, das macht der Push-Teil des
  * Sheets nach jedem Rendern.
  */
@@ -43,7 +38,7 @@ function AboList({ abos, birthDate }: { abos: AboListProps; birthDate: string | 
     // Der Knopf verschwindet mit der Zeile; ohne Ziel fiele der Fokus im Modal auf <body>
     heading.current?.focus({ preventScroll: true });
   };
-  const empty = abos.searches.length === 0 && abos.providers.length === 0;
+  const empty = abos.providers.length === 0;
   return (
     <section className="abo-list" aria-labelledby="abo-h">
       <h3 id="abo-h" ref={heading} tabIndex={-1}>
@@ -51,7 +46,7 @@ function AboList({ abos, birthDate }: { abos: AboListProps; birthDate: string | 
       </h3>
       {empty ? (
         <p className="small">
-          Noch keine. Tippe auf die Glocke bei einem Anbieter oder über der Liste.{" "}
+          Noch keine. Tippe auf die Glocke bei einem Anbieter.{" "}
           {birthDate ? "Bis dahin zählt in der Push-Nachricht nur das Alter." : "Bis dahin kommen alle neuen Angebote."}
         </p>
       ) : (
@@ -71,28 +66,6 @@ function AboList({ abos, birthDate }: { abos: AboListProps; birthDate: string | 
                   className="btn"
                   aria-label={`Abo ${spoken} beenden`}
                   onClick={() => removed(() => abos.removeProvider(id))}
-                >
-                  Entfernen
-                </button>
-              </li>
-            );
-          })}
-          {abos.searches.map((search) => {
-            const label = searchLabel(search);
-            return (
-              <li key={`s:${search}`}>
-                <span className="push-label">
-                  {label}
-                  <small>
-                    Suche
-                    {!abos.hasOrigin && filterFromSearch(search).reachLimit && " · Wegzeit wirkt ab einem Startpunkt"}
-                  </small>
-                </span>
-                <button
-                  type="button"
-                  className="btn"
-                  aria-label={`Such-Abo ${label} beenden`}
-                  onClick={() => removed(() => abos.removeSearch(search))}
                 >
                   Entfernen
                 </button>

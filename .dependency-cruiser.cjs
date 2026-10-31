@@ -238,10 +238,10 @@ module.exports = {
       name: "onboarding-apart-from-app",
       severity: "error",
       comment:
-        "Onboarding- und App-Chunk teilen kein Modul, das nur sie nutzen (Plan 0033, E4, Review M2): Rolldown legte es als eigenen Chunk direkt nach assets/ (Chunk-Wächter). Den App-Teil (Installationszustand, pushCapability, AppStep) reicht der Lader als Prop herein; aus PWA-Kern, Push, Geräte-Speicher und deren Domäne nur Typen. Such-Abos liegen seit Plan 0054 (E6) im Start.",
+        "Onboarding- und App-Chunk teilen kein Modul, das nur sie nutzen (Plan 0033, E4, Review M2): Rolldown legte es als eigenen Chunk direkt nach assets/ (Chunk-Wächter). Den App-Teil (Installationszustand, pushCapability, AppStep) reicht der Lader als Prop herein; aus PWA-Kern, Push, Geräte-Speicher und deren Domäne nur Typen.",
       from: { path: "^src/(ui/onboarding/|domain/onboarding\\.ts$)" },
       to: {
-        path: "^src/(data/(pwa|push|device-store)|domain/(pwa|stored-origin))\\.ts$",
+        path: "^src/(data/(pwa|push|device-store)|domain/pwa)\\.ts$",
         dependencyTypesNot: ["type-only"],
       },
     },
@@ -370,12 +370,12 @@ module.exports = {
       name: "push-domain-not-in-start",
       severity: "error",
       comment:
-        "Domäne der Wochen-Nachricht (Plan 0017, E9): news.ts nutzen nur Service Worker und CI, stored-origin.ts dazu die App-Extras-Oberfläche (Lazy-Chunk). Aus dem übrigen src/ landeten sie im Start-Bundle. searches.ts liegt seit Plan 0054 (E6, ADR 0037) im Start: Die Glocke über der Liste braucht es. scripts/ bleibt frei; Tests ausgenommen.",
+        "Domäne der Wochen-Nachricht (Plan 0017, E9): news.ts nutzen nur Service Worker und CI. Aus dem übrigen src/ landete sie im Start-Bundle. Such-Abos und stored-origin.ts gibt es seit Plan 0054, Nachtrag A (ADR 0042) nicht mehr. scripts/ bleibt frei; Tests ausgenommen.",
       from: {
         path: "^src/",
-        pathNot: ["^src/sw/", "^src/ui/app-extras/", "^src/domain/(news|stored-origin)\\.ts$", "\\.test\\.ts$"],
+        pathNot: ["^src/sw/", "^src/ui/app-extras/", "^src/domain/news\\.ts$", "\\.test\\.ts$"],
       },
-      to: { path: "^src/domain/(news|stored-origin)\\.ts$" },
+      to: { path: "^src/domain/news\\.ts$" },
     },
     {
       name: "push-news-not-in-app",

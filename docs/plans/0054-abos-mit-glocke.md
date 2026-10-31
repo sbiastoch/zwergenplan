@@ -345,7 +345,7 @@ Wunsch des Nutzers vom 2026-10-31: „Bei Entdecken sollte man auch nur nach Ang
 - **Altlast löscht auch der Service Worker** (Review M1): `mirror()` läuft nur bei offenem Kind-Sheet, am Ende des Onboardings und nach einem Glocken-Tipp. Bei vielen Nutzern mit Push bliebe der Startpunkt sonst liegen. Deshalb gilt:
   - `tailorPush` löscht bei jedem Push `origin` und `searches`, auch beim Testversand. Das ist keine Nutzerangabe, sondern Aufräumen.
   - `TailorEnv.store.set` erlaubt dafür `"origin" | "searches"` mit `undefined`.
-  - Der `activate`-Handler in `src/sw/sw.ts` löscht beide Schlüssel ebenfalls, einmal beim Update des Service Workers. So liegt der Startpunkt spätestens nach dem nächsten Update nicht mehr in der IndexedDB.
+  - Kein Löschen im `activate`-Handler (Umsetzung): Die Altlast liegt nur auf Geräten mit eingeschaltetem Push, und dort löscht sie spätestens der nächste Samstags-Push. Ein Löschen im `activate` legte bei allen anderen eine leere IndexedDB an.
   - Unit-Test in `push-tailor.test.ts`.
 - Privatsphäre: Der Startpunkt liegt bei eingeschaltetem Push nicht mehr in der IndexedDB. Damit fällt die Ergänzung zu ADR 0017 (Punkte 1 und 3) aus ADR 0014 weg.
 
@@ -430,7 +430,7 @@ Jeder Schritt endet mit `pnpm verify` grün.
 ### Review Nachtrag A (2026-10-31) – Verdict: Freigabe mit Änderungen → eingearbeitet
 
 Übernommen:
-- **M1**: Die Altlast `origin`/`searches` löscht auch der Service Worker (`tailorPush`, `activate`), siehe N3.
+- **M1**: Die Altlast `origin`/`searches` löscht auch der Service Worker in `tailorPush`, siehe N3.
 - **M2**: Der Chip filtert `filtered` vor `ageVisibility`, `upcoming`/`cameraOffers` bleiben unberührt (N1). Dazu ein Varianten-Test und ein E2E, dass keine Requests und gleiche Kacheln entstehen.
 - **M3**: N6 nennt ADR 0027, ADR 0011, Punkt 6, und die übrigen Stellen in `architecture.md` (Invariante „Startpunkt“, Push-Requests, `localStorage`-Schlüssel).
 - **M4**: Neuer E2E-Test: `SAME_REQUESTS` ist nur noch `site.json`.
