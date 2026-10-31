@@ -167,6 +167,13 @@ export function App() {
   const [savedSort, setSavedSort] = useState<SavedSort>("termine");
   // Schnellfilter der Liste (Plan 0058, E1): nur im Speicher, wirken nur in der Liste
   const [listChips, setListChips] = useState<readonly SavedListChip[]>([]);
+  // Chip „Meine Anbieter“ in „Entdecken“ (Plan 0054, Nachtrag A, N1): nur im Speicher, nie in der URL; ohne Abo aus
+  const [ownProvidersOn, setOwnProvidersOn] = useState(false);
+  const ownActive = ownProvidersOn && savedProviders.length > 0;
+  useEffect(() => {
+    // das letzte Abo beendet: Ein späteres neues Abo zeigt den Chip nicht schon gedrückt (Review m4)
+    if (savedProviders.length === 0) setOwnProvidersOn(false);
+  }, [savedProviders.length]);
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. Aus der
   // Aufforderung „Wovon aus gerechnet?“ geht er stattdessen auf die Statuszeile (`originFromPrompt`, Plan 0043, E7).
   const filterButton = useRef<HTMLButtonElement>(null);
@@ -255,6 +262,7 @@ export function App() {
     listChips,
     // Kalender und Karte der Merkliste warten nicht: Die Grenze zählt dort erst mit Wegzeit (Plan 0057, E7a)
     savedLimitActive: route.tab === "merkliste" ? limitOn : reachMode?.kind === "oepnv",
+    ownProviders: ownActive ? savedProviders : undefined,
     now,
     reach: transit.reach,
     mapView,
@@ -593,10 +601,12 @@ export function App() {
   /** „Zurücksetzen“: URL-Filter leer, Altersfilter wieder an – zurück auf den Standard (Plan 0021, E2) */
   const resetFilters = () => {
     setFilter(EMPTY_FILTER);
+    setOwnProvidersOn(false);
     views.setAgeOnly(true);
   };
-  // Zurücksetzen nur mit aktiven URL-Filtern; fürs Alter gibt es „Auch unpassende zeigen“ (Plan 0021, E4).
-  const resetIfActive = activeFilterCount(route.filter, { limitActive: limitOn }) > 0 ? resetFilters : undefined;
+  // Zurücksetzen nur mit aktiven Filtern (URL oder „Meine Anbieter“); fürs Alter gibt es „Auch unpassende zeigen“ (Plan 0021, E4).
+  const resetIfActive =
+    activeFilterCount(route.filter, { limitActive: limitOn }) > 0 || ownActive ? resetFilters : undefined;
   // Im Tab „Anbieter“ zählen und fallen nur die Kategorien; die übrigen Filter bleiben für „Entdecken“ (Plan 0055, E3)
   const resetProviderFilter =
     activeFilterCount(providerFilter(route.filter), { limitActive: false }) > 0
@@ -674,7 +684,22 @@ export function App() {
       {/* Kosten, Anmeldung, Format, Wegzeit und Zeitraum beschreiben Termine, nicht Anbieter (Plan 0055, E3) */}
       {section === "entdecken" && (
         <QuickFilters
-          chips={startQuickChips(route.filter, setFilter)}
+          chips={[
+            // erster Chip nach „Filter“, nur mit mindestens einem Anbieter-Abo (Plan 0054, Nachtrag A, N1)
+            ...(savedProviders.length > 0
+              ? [
+                  {
+                    label: "Meine Anbieter",
+                    on: ownActive,
+                    toggle: () => {
+                      setOwnProvidersOn(!ownActive);
+                      views.resetPage();
+                    },
+                  },
+                ]
+              : []),
+            ...startQuickChips(route.filter, setFilter),
+          ]}
           count={activeFilterCount(route.filter, { limitActive: limitOn })}
           onOpenSheet={() => setSheet("filter")}
           sheetButton={filterButton}
@@ -960,7 +985,7 @@ export function App() {
         onUnknownProvider={dropProvider}
         generatedAt={load.kind === "ready" ? load.data.generatedAt : undefined}
         offers={offers}
-        visible={inProviders ? views.providerVisible : visible}
+        visible={views.providerVisible}
         ctx={ctx}
         say={say}
         filter={route.filter}

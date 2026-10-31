@@ -39,7 +39,15 @@ const sheet = (page: Page) => page.getByRole("dialog", { name: "Kind und Einstel
 const section = (page: Page) => sheet(page).getByRole("region", { name: "Als App" });
 const pushSwitch = (page: Page) => section(page).getByRole("switch", { name: "Wöchentliche Push-Nachricht" });
 /** Glocke der Suche in der Schnellfilter-Zeile (Plan 0054, E6) */
-const searchBell = (page: Page) => page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ });
+/** Glocke eines Fixture-Anbieters im Tab „Anbieter“ (`fv3fpfp2`) */
+const theaterBell = (page: Page) =>
+  page.getByRole("button", { name: "Kleines Theater Beispiel (fiktiv) abonnieren", exact: true });
+/** zwei Anbieter-Abos vor dem ersten Laden (Theater und Familientreff aus den Fixtures) */
+async function presetProviders(page: Page) {
+  await page.addInitScript(() =>
+    localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fv3fpfp2", "b5nuus36"])),
+  );
+}
 /** Verwaltung der Abos im Kind-Sheet (Plan 0054, E7) */
 const aboList = (page: Page) => sheet(page).getByRole("region", { name: "Deine Abos" });
 
@@ -177,7 +185,7 @@ function payload({ test: isTest = false, sentAt = SENT_AT }: { test?: boolean; s
 
 /**
  * Push zustellen und die angezeigte Nachricht lesen (danach geschlossen). Zählt dabei die Requests des Service
- * Workers auf `data/` (Privatsphäre: je Push genau einer auf site.json und wegzeit.json, ohne Query).
+ * Workers auf `data/` (Privatsphäre: je Push genau einer auf site.json, ohne Query; ADR 0042).
  */
 async function deliver(
   page: Page,
@@ -232,41 +240,34 @@ test.beforeEach(async ({ page }) => {
   await fakePushManager(page);
 });
 
-test("Glocke der Suche bei ausgeschaltetem Push: schaltet ihn ein und spiegelt; Verwaltung im Sheet (Plan 0054, E5–E7)", async ({
+test("Anbieter-Glocke bei ausgeschaltetem Push: schaltet ihn ein und spiegelt; Verwaltung im Sheet (Plan 0054, E5–E7)", async ({
   page,
   context,
   pushLog,
 }) => {
-  await installed(page, context, "./?kat=musik&wegzeit=20");
-  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "false");
-  await searchBell(page).click();
-  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "true");
-  // Wegzeit ohne Startpunkt: der Toast sagt es (E5)
-  await expect(
-    page.getByText("Suche abonniert. Die Wegzeit wirkt in der Push-Nachricht ab einem Startpunkt."),
-  ).toBeVisible();
-  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik&wegzeit=20"]');
+  await installed(page, context, "./?ansicht=anbieter");
+  await expect(theaterBell(page)).toHaveAttribute("aria-pressed", "false");
+  await theaterBell(page).click();
+  await expect(theaterBell(page)).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("Anbieter abonniert – die wöchentliche Push-Nachricht ist jetzt an")).toBeVisible();
   // Push war aus: der Tipp hat ihn eingeschaltet wie der Schalter, genau ein POST /abo
   await expect.poll(() => pushLog.length).toBe(1);
   expect(pushLog[0]).toMatchObject({ method: "POST", path: "/abo" });
-  await expect.poll(() => readStore(page)).toMatchObject({ endpoint: ENDPOINT, searches: '["kat=musik&wegzeit=20"]' });
+  await expect.poll(() => readStore(page)).toMatchObject({ endpoint: ENDPOINT, providers: ["fv3fpfp2"] });
 
   await openKidSheet(page);
   await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
-  // abonniert wird nur noch an der Glocke
-  await expect(sheet(page).getByText("Aktuelle Suche")).toHaveCount(0);
   const item = aboList(page).getByRole("listitem");
   await expect(item).toHaveCount(1);
-  await expect(item).toContainText("Musik & Singen · bis 20 Min.");
-  await expect(item).toContainText("Wegzeit wirkt ab einem Startpunkt");
-  await aboList(page).getByRole("button", { name: "Such-Abo Musik & Singen · bis 20 Min. beenden" }).click();
+  await expect(item).toContainText("Kleines Theater Beispiel (fiktiv)");
+  await aboList(page).getByRole("button", { name: "Abo Kleines Theater Beispiel (fiktiv) beenden" }).click();
   await expect(aboList(page).getByRole("listitem")).toHaveCount(0);
   // Der Knopf verschwindet mit der Zeile: Fokus auf der Überschrift, nicht auf <body> (Review 2, Nr. 3)
   await expect(aboList(page).getByRole("heading", { name: "Deine Abos" })).toBeFocused();
   // das offene Sheet spiegelt die Änderung
-  await expect.poll(async () => (await readStore(page))["searches"]).toBeUndefined();
+  await expect.poll(async () => (await readStore(page))["providers"]).toBeUndefined();
   await sheet(page).getByRole("button", { name: "Fertig" }).click();
-  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "false");
+  await expect(theaterBell(page)).toHaveAttribute("aria-pressed", "false");
   expect(pushLog).toHaveLength(1);
 });
 
@@ -332,18 +333,15 @@ test.describe("Onboarding (Plan 0033, E8)", () => {
   });
 });
 
-test("ohne Filter keine Glocke der Suche, auch nicht mit nur einem Zeitraum; die Verwaltung erklärt den Weg (Plan 0054, E6, E7)", async ({
+test("ohne Abo erklärt die Verwaltung den Weg; keine Glocke an der Schnellfilter-Zeile (Plan 0054, E7, Nachtrag A)", async ({
   page,
   context,
 }) => {
-  await installed(page, context);
+  await installed(page, context, "./?kat=musik&format=kurs");
   await expect(page.getByRole("group", { name: "Schnellfilter" })).toBeVisible();
-  await expect(searchBell(page)).toHaveCount(0);
-  await page.goto("./?von=2026-10-05&bis=2026-10-11");
-  await expect(page.getByRole("group", { name: "Schnellfilter" })).toBeVisible();
-  await expect(searchBell(page)).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /abonnieren$/ })).toHaveCount(0);
   await openKidSheet(page);
-  await expect(aboList(page)).toContainText("Noch keine. Tippe auf die Glocke bei einem Anbieter oder über der Liste.");
+  await expect(aboList(page)).toContainText("Noch keine. Tippe auf die Glocke bei einem Anbieter.");
 });
 
 test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen Sheet; Ausschalten räumt auf (E6)", async ({
@@ -356,7 +354,6 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
     sessionStorage.setItem("__e2eSeeded", "1");
     localStorage.setItem("zwergenplan.geburtsdatum", "2025-08-05");
     localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof");
-    localStorage.setItem("zwergenplan.such-abos", '["kat=musik"]');
   });
   await installed(page, context, "./?kat=natur");
   await openKidSheet(page);
@@ -375,24 +372,20 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
     .toEqual({
       endpoint: ENDPOINT,
       birthDate: "2025-08-05",
-      origin: "gostenhof",
-      searches: '["kat=musik"]',
     });
   await expect(section(page)).toContainText(/Geräte-Kennung: [0-9a-f]{8}/);
 
   // Änderungen im offenen Sheet kommen sofort an (Runde 3 M3)
   await sheet(page).getByLabel("Stadtteil").selectOption("st-johannis");
   await sheet(page).getByLabel("Geburtsdatum").fill("");
-  await expect
-    .poll(() => readStore(page))
-    .toEqual({ endpoint: ENDPOINT, origin: "st-johannis", searches: '["kat=musik"]' });
+  await expect.poll(() => readStore(page)).toEqual({ endpoint: ENDPOINT });
 
   await pushSwitch(page).click();
   await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "false");
   await expect.poll(() => readStore(page)).toEqual({});
   expect(pushLog.at(-1)).toEqual({ method: "DELETE", path: "/abo", body: { endpoint: ENDPOINT } });
-  // Die Such-Abos gehören dem Nutzer, nicht dem Push
-  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["kat=musik"]');
+  // Der Startpunkt gehört dem Nutzer und bleibt im localStorage, kommt aber nie in den Geräte-Speicher (ADR 0042)
+  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.entfernung-ab"))).toBe("st-johannis");
 });
 
 test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0035, E9)", () => {
@@ -430,15 +423,11 @@ test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0035, E9)"
     await openKidSheet(page);
     await pushSwitch(page).click();
     await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");
-    await expect
-      .poll(() => readStore(page))
-      .toEqual({ endpoint: ENDPOINT, birthDate: "2025-08-05", origin: "gostenhof" });
+    await expect.poll(() => readStore(page)).toEqual({ endpoint: ENDPOINT, birthDate: "2025-08-05" });
     const requests = pushLog.length;
 
     await onboardingWithNewValues(page);
-    await expect
-      .poll(() => readStore(page))
-      .toEqual({ endpoint: ENDPOINT, birthDate: "2026-03-01", origin: "st-johannis" });
+    await expect.poll(() => readStore(page)).toEqual({ endpoint: ENDPOINT, birthDate: "2026-03-01" });
     expect(pushLog.slice(requests), "kein Request seit dem Neuladen").toEqual([]);
   });
 
@@ -453,7 +442,7 @@ test.describe("Onboarding spiegelt am Ende einmal, ohne Request (Plan 0035, E9)"
   });
 });
 
-test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requests für alle gleich (E10)", async ({
+test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Anbieter; nur site.json, für alle gleich (E10)", async ({
   page,
   context,
 }) => {
@@ -464,7 +453,8 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   const session = await cdpFor(page, context);
   // Ziel jedes Tipps: „Neu eingestellt“ (Plan 0043, E6; ADR 0014, Nachtrag)
   const startPage = new URL("./?sortierung=neu", test.info().project.use.baseURL ?? "").href;
-  const SAME_REQUESTS = ["/data/site.json", "/data/wegzeit.json"];
+  // je Push genau ein Request, keine Wegzeit-Tabelle, mit und ohne Startpunkt und Abo gleich (ADR 0042, Review M4)
+  const SAME_REQUESTS = ["/data/site.json"];
 
   // ohne Abos und Alter: alle neuen
   await writeStore(page, { seenIds: seen });
@@ -491,33 +481,13 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
   expect(probe.title).toBe("2 neue Angebote passen zu 14 Monaten");
   expect((await readStore(page))["seenIds"]).toEqual(seen);
 
-  // Abo mit Wegzeit ab Gostenhof: die Musikschule (29,6 Min.) fällt heraus; Requests wie ohne Startpunkt
-  // Krabbelreime ist seit Plan 0037 buecher: das Abo nennt Musik und Bücher (E9)
-  await writeStore(page, { seenIds: seen, searches: '["kat=musik,buecher&wegzeit=20"]', origin: "gostenhof" });
-  const withReach = await deliver(page, context, session);
-  expect(withReach).toEqual({
-    title: "1 neues Angebot für deine Abos",
-    body: "Krabbelreime & Fingerspiele",
-    navigate: startPage,
-    requests: SAME_REQUESTS,
-  });
-
-  // gespeicherter Standort (gerundeter Punkt, ADR 0017) statt Stadtteil: ebenfalls Wegzeit, dieselben Requests
-  await writeStore(page, {
-    seenIds: seen,
-    searches: '["kat=musik,buecher&wegzeit=20"]',
-    origin: { source: "standort", lat: 49.448, lon: 11.058 },
-  });
-  const withPoint = await deliver(page, context, session);
-  expect(withPoint.title).toBe("1 neues Angebot für deine Abos");
-  expect(withPoint.requests).toEqual(SAME_REQUESTS);
-
   // Anbieter-Abo (Plan 0054, E2): nur die neuen Angebote dieses Anbieters, dieselben Requests
   const provider: string = await page.evaluate(async () => {
     const site = await (await fetch("data/site.json")).json();
     return site.offers.find((o: { title: string }) => o.title.startsWith("Musikgarten")).providerId;
   });
-  await writeStore(page, { seenIds: seen, providers: [provider] });
+  // dazu die Altlast Startpunkt und Such-Abo im Geräte-Speicher: Sie zählt nicht und wird gelöscht (Review M1)
+  await writeStore(page, { seenIds: seen, providers: [provider], origin: "gostenhof", searches: '["kat=buecher"]' });
   const withProvider = await deliver(page, context, session);
   expect(withProvider).toEqual({
     title: "1 neues Angebot von deinen Anbietern",
@@ -525,6 +495,9 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
     navigate: startPage,
     requests: SAME_REQUESTS,
   });
+  const store = await readStore(page);
+  expect(store).not.toHaveProperty("origin");
+  expect(store).not.toHaveProperty("searches");
 
   // ohne gesehene IDs (erste Nachricht nach dem Einschalten): zugeschnitten über `listedAt` (Plan 0043, E3)
   await writeStore(page, { birthDate: "2025-08-05" });
@@ -536,20 +509,15 @@ test("Zuschnitt im Service Worker: neu, nichts Neues, Testversand, Wegzeit; Requ
 });
 
 for (const colorScheme of ["light", "dark"] as const) {
-  test(`Push-Teil mit langem Abo: Gates (${colorScheme === "light" ? "hell" : "dunkel"}, E7)`, async ({
+  test(`Push-Teil mit zwei Anbieter-Abos: Gates (${colorScheme === "light" ? "hell" : "dunkel"}, E7)`, async ({
     page,
     context,
   }) => {
     await page.emulateMedia({ colorScheme });
-    await installed(
-      page,
-      context,
-      "./?kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
-    );
-    await searchBell(page).click();
-    await expect(searchBell(page)).toHaveAttribute("aria-pressed", "true");
+    await presetProviders(page);
+    await installed(page, context);
     await openKidSheet(page);
-    await expect(aboList(page).getByRole("listitem")).toHaveCount(1);
+    await expect(aboList(page).getByRole("listitem")).toHaveCount(2);
     await expectMobileUx(page);
   });
 }
@@ -650,23 +618,15 @@ for (const state of Object.keys(MATRIX) as MatrixState[]) {
   });
 }
 
-test("Push-Teil mit langem Abo und zwei Anbieter-Abos: 320 px und 200 % (E7; Plan 0054, Review 2, Nr. 12)", async ({
+test("Push-Teil mit zwei Anbieter-Abos: 320 px und 200 % (E7; Plan 0054, Review 2, Nr. 12)", async ({
   page,
   context,
 }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  await page.addInitScript(() =>
-    localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fv3fpfp2", "b5nuus36"])),
-  );
-  await installed(
-    page,
-    context,
-    "./?kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
-  );
-  await searchBell(page).click();
-  await expect(searchBell(page)).toHaveAttribute("aria-pressed", "true");
+  await presetProviders(page);
+  await installed(page, context);
   await openKidSheet(page);
-  await expect(aboList(page).getByRole("listitem")).toHaveCount(3);
+  await expect(aboList(page).getByRole("listitem")).toHaveCount(2);
   await setTextScale(page, 2);
   await expectNoHorizontalScroll(page);
   await expectTextFits(page, { scale: 2 });

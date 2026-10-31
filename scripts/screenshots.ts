@@ -6,7 +6,7 @@
  * E5–E7a), detail, filter, filter-tageszeit (Plan 0057, E7), kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
  * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
- * (Plan 0017, 0054: Abos im Kind-Sheet mit langem Such-Abo), onboarding (Plan 0033, E15: alle Schritte der Einführung
+ * (Plan 0017, 0054: Abos im Kind-Sheet), meine-anbieter (Plan 0054, Nachtrag A: Chip gedrückt), onboarding (Plan 0033, E15: alle Schritte der Einführung
  * beim ersten Öffnen, je ein Bild mit Endung -1, -2, …; mit Android-User-Agent, in der Headless-Shell also App-Schritt
  * mit Menü-Hinweis und „verweigert“).
  * Lokal kommen die Kartenkacheln aus tests/fixtures/karte/ (wie in E2E), live echt von OpenFreeMap.
@@ -215,18 +215,13 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.locator(".source-note a").nth(1).waitFor();
     await license.scrollIntoViewIfNeeded();
   },
-  // Push-Teil (Plan 0017, E7): lange Suche abonniert, Abschnitt „Als App“ im Blick. Mit der Headless-Shell sind
+  // Push-Teil (Plan 0017, E7): zwei Anbieter-Abos, Abschnitt „Als App“ im Blick. Mit der Headless-Shell sind
   // Benachrichtigungen immer abgelehnt, man sieht also den Zustand „verweigert“ (Schalter gesperrt).
   push: async (page) => {
-    await page.goto(
-      new URL(
-        "?kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
-        page.url(),
-      ).href,
+    await page.evaluate(() =>
+      localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fv3fpfp2", "b5nuus36"])),
     );
-    // abonniert wird an der Glocke der Schnellfilter-Zeile, verwaltet im Kind-Sheet (Plan 0054, E6, E7)
-    const bell = page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ });
-    if ((await bell.count()) && (await bell.getAttribute("aria-pressed")) !== "true") await bell.click();
+    await page.reload();
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     await page.locator('html[data-push="bereit"]').waitFor();
     await page.getByRole("heading", { name: "Deine Abos" }).scrollIntoViewIfNeeded();
@@ -266,12 +261,12 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("region", { name: "Anbieter" }).locator(".place").first().click();
     await page.getByRole("dialog", { name: "Anbieter" }).getByRole("heading", { level: 2 }).waitFor();
   },
-  // Glocke der Suche gedrückt neben den Schnellfiltern, mit Toast (Plan 0054, E6)
-  glocke: async (page) => {
-    await page.goto(new URL("?kat=musik&format=kurs", page.url()).href);
-    const bell = page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ });
-    await bell.click();
-    await page.getByText(/^Suche abonniert/).waitFor();
+  // Chip „Meine Anbieter“ gedrückt in der Schnellfilter-Zeile (Plan 0054, Nachtrag A, N1)
+  "meine-anbieter": async (page) => {
+    await page.evaluate(() => localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fv3fpfp2"])));
+    await page.reload();
+    await page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: "Meine Anbieter" }).click();
+    await page.getByTestId("offer").nth(1).waitFor();
   },
   // Tab „Anbieter“ mit zwei Abos oben, Glocken gedrückt (Plan 0054, E1)
   "anbieter-abos": async (page) => {

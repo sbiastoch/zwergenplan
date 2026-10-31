@@ -372,29 +372,30 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     // Push-Teil entschieden (Plan 0017, E7): data-push in jedem Zweig, auch wenn der Abschnitt leer bleibt
     await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
   },
-  // Plan 0054, E7: Verwaltung der Abos mit langem Such-Abo (Wegzeit ohne Startpunkt) und zwei Anbieter-Abos, eins ohne
-  // Angebote; ohne Push, also auf allen Geräten
+  // Plan 0054, E7: Verwaltung der Abos mit zwei Anbieter-Abos, eins ohne Angebote; ohne Push, also auf allen Geräten
   "kind-sheet-abos": async (page) => {
     await page.evaluate(() => {
-      localStorage.setItem(
-        "zwergenplan.such-abos",
-        JSON.stringify([
-          "kat=musik,natur,krabbel-spielgruppen&format=kurs&anmeldung=ohne-anmeldung&kosten=kostenlos&wegzeit=20",
-        ]),
-      );
       localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fqq3o4y8", "fkbg3oeb"]));
     });
     await page.reload();
     await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
     const abos = page.getByRole("dialog").getByRole("region", { name: "Deine Abos" });
-    await expect(abos.getByRole("listitem")).toHaveCount(3);
-    await expect(abos).toContainText("Wegzeit wirkt ab einem Startpunkt");
+    await expect(abos.getByRole("listitem")).toHaveCount(2);
     // Name aus site.json; der Turnverein hat keine Termine (Plan 0054, E7)
     await expect(abos).toContainText("Anbieter ohne aktuelle Angebote");
     await expect(abos.getByRole("listitem").first()).not.toContainText("Anbieter ohne aktuelle Angebote");
     await expect(page.locator(".app-pending")).toHaveCount(0);
     await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
     await abos.scrollIntoViewIfNeeded();
+  },
+  // Plan 0054, Nachtrag A: Chipzeile mit gedrücktem Chip „Meine Anbieter“ (Theater, zwei Angebote)
+  "meine-anbieter": async (page) => {
+    await page.evaluate(() => localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fv3fpfp2"])));
+    await page.reload();
+    const own = page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: "Meine Anbieter" });
+    await own.click();
+    await expect(own).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("offer")).toHaveCount(2);
   },
   // Plan 0004/0009: längere Meta-Zeile „Anbieter · Stadtteil · 15 Min.“ (die Statuszeile nur mit Zahl, Plan 0056, E2)
   "entdecken-wegzeit": async (page) => {

@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-11), mit Plan 0033 (Onboarding beim ersten Öffnen). **Ändert** ADR 0013, Punkt 5 („Auch dieser Kern lädt lazy nach `load`“) für den Ladezeitpunkt des Moduls; die Registrierung des Service Workers bleibt nach `load`. Details in Plan 0033, E2, E4 und E8.
 
+**Teilweise ersetzt durch ADR 0042** (2026-10-31): Vorladen bei sichtbarer Glocke nur noch für Tab „Anbieter“ und Anbieter-Sheet; die Glocke der Suche gibt es nicht mehr.
+
 ## Kontext
 
 - Plan 0033 zeigt beim ersten Öffnen ein Onboarding. Sein letzter Schritt „App“ braucht den Installationszustand (`install` aus `src/data/pwa.ts`) und den Push-Schalter (`AppStep` in `src/ui/app-extras/AppSection.tsx`). Beide liegen im Lazy-Chunk `assets/app/`. Ein statischer Import zwischen zwei Lazy-Chunks schreibt `__vite__mapDeps` in den Einstieg (ADR 0013, Konsequenzen), also holt der Lader `src/ui/Onboarding.tsx` beide Chunks parallel und reicht den App-Teil als Prop herein.

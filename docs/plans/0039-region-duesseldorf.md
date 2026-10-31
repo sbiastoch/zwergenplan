@@ -47,7 +47,7 @@ Zwei Inventare (Browser/Domäne und Pipeline/Transit) und eine Vermessung des VR
 |---|---|---|
 | `src/domain/regions.ts` | `REGION_IDS = ["fuerth", "nuernberg"]`, `Region { name, bbox, population, kreis }`; Kopf „Ferienland, Kamera und Suchname gibt es nicht … beide Regionen liegen in Bayern und im VGN“; jede bbox in `NUERNBERG_BBOX` | ja: E1, E2 |
 | `src/domain/geo.ts` | `NUERNBERG_BBOX`, `inBounds(p, bbox = NUERNBERG_BBOX)` | ja: E3 (Standard-bbox entfällt) |
-| `inBounds` mit Standard-bbox | `src/data/geolocation.ts:71` (Standort), `src/ui/use-app-state.ts:368` (Kartenmitte), `src/ui/origin-state.ts:40` (gespeicherter Punkt, Start-Chunk), `src/domain/stored-origin.ts:22` (gespeicherter Punkt im Service Worker), `src/domain/schema.ts:325` (`Timetable`-Steige), `scripts/pipeline/lib/gtfs.ts:336` (Auszug) | ja: E3 |
+| `inBounds` mit Standard-bbox | `src/data/geolocation.ts:71` (Standort), `src/ui/use-app-state.ts:368` (Kartenmitte), `src/ui/origin-state.ts:40` (gespeicherter Punkt, Start-Chunk), stored-origin.ts (gespeicherter Punkt im Service Worker; entfallen mit Plan 0054, Nachtrag A), `src/domain/schema.ts:325` (`Timetable`-Steige), `scripts/pipeline/lib/gtfs.ts:336` (Auszug) | ja: E3 |
 | `src/domain/site-data.ts` | `SiteOffer` und `SiteProvider` ohne Region; ADR 0029, Punkt 2: „`region` erreicht die Website nicht“ | ja: E7 |
 | `public/data/site.json` | ein Request (Frühstart im Inline-Skript von `index.html`), 484 Angebote, 116 kB gzip, Budget 250 kB | ja: wächst mit Düsseldorf (E7) |
 | Wegzeit `public/data/wegzeit.json`, `linien.json` | eine Tabelle (747 Zeilen × 82 Orte), **60,7 kB gzip von 64 kB**; Linien 36,6 kB von 40 kB (seit Plan 0051: Budgets 120 kB bzw. 72 kB; am 2026-10-27 bei 89 Orten 65,1 bzw. 40,1 kB); ein `source`, ein `serviceDay` je Datei | ja: E5 |
@@ -133,7 +133,7 @@ duesseldorf: { name: "Düsseldorf", bbox: DUESSELDORF_BBOX, population: 619_000,
 |---|---|
 | `src/data/geolocation.ts` (Standort) | `requestPosition(bbox)`: Der Aufrufer in `src/ui` übergibt `NETWORKS[network].bbox`; `src/data` importiert zur Laufzeit weiter nur `geo.ts` (Regel `data-domain-runtime-allowlist`, ADR 0010; Review M4). Sonst `reason: "outside"` wie bisher |
 | `src/ui/use-app-state.ts` (`setMapCenter`) | Netz-bbox des gewählten Netzes |
-| `src/ui/origin-state.ts`, `src/domain/stored-origin.ts` (gespeicherter Punkt, ADR 0017, Punkt 5) | Netz-bbox des gewählten Netzes; liegt der Punkt woanders, gilt kein Startpunkt (wie heute außerhalb) |
+| `src/ui/origin-state.ts`, stored-origin.ts (entfallen mit Plan 0054, Nachtrag A) (gespeicherter Punkt, ADR 0017, Punkt 5) | Netz-bbox des gewählten Netzes; liegt der Punkt woanders, gilt kein Startpunkt (wie heute außerhalb) |
 | `src/domain/schema.ts` `Timetable` | bbox des Netzes, dessen Auszug geprüft wird (`timetableSchema(network)` bzw. Prüfung in `parseTimetable(text, network)`) |
 | `scripts/pipeline/lib/gtfs.ts` | bbox aus dem Feed-Eintrag (E4) |
 
@@ -340,7 +340,7 @@ Noch offen:
 | `src/domain/camera.ts`, `.test.ts` | `home` aus dem Netz, Orte des Netzes (E8) |
 | `src/domain/site-data.ts`, `.test.ts` | `network` je Angebot und Anbieter (E7) |
 | `src/domain/schema.ts` | `Timetable`-Prüfung mit Netz-bbox; Kommentar ohne „VGN“ (E3, E4); `region`-Enum wächst → `pnpm schema:export` |
-| `src/domain/stored-origin.ts`, `src/ui/origin-state.ts` | Netz-bbox (E3) |
+| stored-origin.ts (entfallen mit Plan 0054, Nachtrag A), `src/ui/origin-state.ts` | Netz-bbox (E3) |
 | `src/domain/news.ts` bzw. `src/sw/push-tailor.ts`, Tests | Filter nach Netz, Tabelle des Netzes (E9) |
 | `src/domain/transit-types.ts`, `src/domain/transit.ts` | unverändertes Format; ggf. Pfad-Hilfe `transitPaths(network)` |
 | `src/data/preferences.ts` | Schlüssel `zwergenplan.stadt`, `loadCity`/`saveCity` (E8) |
@@ -402,7 +402,7 @@ Noch offen:
    - `scripts/transit/table.test.ts`: `tableRows` mit Präfixen nur eines Netzes.
    - `build-data`-Gates (reine Funktion, etwa `transitGates(stats, network)`): Ein Netz ohne Orte (0 Zellen) ergibt eine Warnung statt Rot; ein Netz mit Orten und lauter Zellen ohne Linie bleibt rot (Review B1).
    - `lib/extract.test.ts`: `{region}` wird ersetzt; kein `{region}` bleibt im Prompt.
-6. **Browser-Domäne:** `format.test.ts` (Texte E12 je Netz); `push-tailor.test.ts` bzw. `news.test.ts` (Filter nach Netz, `seenIds` über alle); `stored-origin.test.ts`, `origin-state.test.ts` (Punkt außerhalb des gewählten Netzes ⇒ kein Startpunkt).
+6. **Browser-Domäne:** `format.test.ts` (Texte E12 je Netz); `push-tailor.test.ts` bzw. `news.test.ts` (Filter nach Netz, `seenIds` über alle); `origin-state.test.ts` (Punkt außerhalb des gewählten Netzes ⇒ kein Startpunkt).
 7. **E2E:**
    - `onboarding.spec.ts`: drei Kacheln (Düsseldorf, Nürnberg gewählt, Fürth); Düsseldorf wählen → Weg-Schritt nur mit Düsseldorfer Stadtteilen; „Stadtmitte (Düsseldorf)“ wählen → Minuten-Chips aktiv, Liste zeigt nur Düsseldorfer Fixture-Angebote, `zwergenplan.stadt` = `duesseldorf`.
    - `startpunkt.spec.ts`: Netzwechsel im Kind-Sheet löscht einen Nürnberger Stadtteil, lädt `wegzeit/vrr.json` genau einmal, keine weiteren Requests ab der Wahl eines Startpunkts. Ohne gespeicherte Stadt wird `wegzeit/vgn.json` geladen.

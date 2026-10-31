@@ -7,6 +7,7 @@ import {
   type FilterState,
   filterFromSearch,
   filterToSearch,
+  fromProviders,
   inDaytime,
   matchesFilter,
   providerFilter,
@@ -420,6 +421,21 @@ describe("Schnellwahlen „ab …“ (Plan 0025, E7; Plan 0057, E5)", () => {
     };
     expect(quickRangeOn(withEnd, nov)).toBe(false);
     expect(toggleQuickRange(withEnd, nov)).toEqual({ ...EMPTY_FILTER, formats: ["kurs"], range: nov });
+  });
+});
+
+describe("fromProviders (Plan 0054, Nachtrag A, N1)", () => {
+  it("behält nur Angebote der abonnierten Anbieter, in Datenreihenfolge", () => {
+    const [first, ...rest] = [...new Set(offers.map((o) => o.providerId))];
+    const kept = fromProviders(offers, [first ?? ""]);
+    expect(kept.length).toBeGreaterThan(0);
+    expect(kept.every((o) => o.providerId === first)).toBe(true);
+    expect(kept).toEqual(offers.filter((o) => o.providerId === first));
+    expect(fromProviders(offers, [first ?? "", ...rest])).toEqual(offers);
+  });
+
+  it("ein unbekannter Anbieter trifft nichts", () => {
+    expect(fromProviders(offers, ["unbekannt"])).toEqual([]);
   });
 });
 

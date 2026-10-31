@@ -122,6 +122,15 @@ export function activeFilterCount(state: FilterState, { limitActive }: { limitAc
 }
 
 /**
+ * Chip „Meine Anbieter“ in „Entdecken“ (Plan 0054, Nachtrag A, N1): nur Angebote abonnierter Anbieter. Kein Teil von
+ * `FilterState`, denn er steht nie in der URL (ein geteilter Link zeigte beim Empfänger dessen Abos).
+ */
+export function fromProviders<T extends Offer>(offers: readonly T[], providerIds: readonly string[]): T[] {
+  const ids = new Set(providerIds);
+  return offers.filter((o) => ids.has(o.providerId));
+}
+
+/**
  * Filter im Tab „Anbieter“ (Plan 0055, E3): nur die Kategorien. Kosten, Anmeldung, Format, Wegzeit-Grenze, Zeitraum und
  * Tageszeit beschreiben einzelne Termine, nicht Anbieter; sie bleiben in der URL und wirken weiter in „Entdecken“.
  */

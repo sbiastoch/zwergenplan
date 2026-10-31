@@ -1,6 +1,6 @@
 # ADR 0037 – Abos mit Glocke: Anbieter im Zuschnitt der Wochen-Nachricht, Such-Abos im Start
 
-Status: **angenommen** (2026-10-29, mit Plan 0054).
+Status: **angenommen** (2026-10-29, mit Plan 0054). **Teilweise ersetzt durch ADR 0042** (2026-10-31): Punkte 2 und 7, Such-Abos entfallen.
 - **Ändert** ADR 0014, Punkt 4: Anbieter-Abos liegen bei eingeschaltetem Push zusätzlich im Geräte-Speicher. Gespiegelt wird auch nach jedem Glocken-Tipp, nicht nur bei offenem Kind-Sheet. Ein Glocken-Tipp bei ausgeschaltetem Push schaltet ihn ein, mit Erlaubnis-Dialog und Anmeldung beim Push-Worker wie der Schalter.
 - **Ändert** ADR 0013 (Precache-Liste): Der Chunk `assets/app/AppSection-*` steht in `startChunks`. Damit ändert sich auch ADR 0027, Konsequenzen („Die Precache-Liste … ändert sich nicht“).
 - **Ändert** ADR 0027: Der App-Chunk lädt zusätzlich vor, sobald eine Glocke sichtbar ist. Das ist der Tab „Anbieter“, das Anbieter-Sheet oder die Glocke der Suche.

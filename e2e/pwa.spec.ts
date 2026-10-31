@@ -5,7 +5,7 @@
  */
 import { readFileSync } from "node:fs";
 import type { BrowserContext, Page } from "@playwright/test";
-import { expect, MAP_READY, test } from "./fixtures.ts";
+import { expect, MAP_READY, mapSettled, test } from "./fixtures.ts";
 import { expectMobileUx } from "./mobile-ux.ts";
 
 /** Fixture-Datenstand (tests/fixtures/offers.json, generatedAt 5.10.2026) */
@@ -188,25 +188,26 @@ test.describe("offline", () => {
   });
 
   // Plan 0054, E4: Der App-Chunk liegt im Precache. Ein Glocken-Tipp offline lädt ihn ohne Fehler, und das Kind-Sheet
-  // zeigt danach „Als App“ statt eines vergifteten import() (LoadFailed). Im Ablauf scheitern offline nur die Wegzeit-
+  // zeigt danach „Als App“ statt eines vergifteten import() (LoadFailed). Seit Nachtrag A gibt es nur Anbieter-Glocken;
+  // `anbieter.json` hält der Service Worker nicht vor, also öffnet der Tab online und erst danach geht das Netz weg. Im Ablauf scheitern offline nur die Wegzeit-
   // Tabelle und ihr Chunk (nicht im Precache, Plan 0009, E9; im Trace belegt): erlaubt, der App-Chunk nicht.
   test.describe(() => {
     // ein Muster: ein Array mit zwei Einträgen liest Playwright als [Wert, Optionen]
-    test.use({ allowedConsoleErrors: [/\/(data\/wegzeit\.json|assets\/oepnv\/\S+\.js)\b/] });
+    test.use({ allowedConsoleErrors: [/\/(data\/wegzeit\.json|assets\/oepnv\/\S+\.js)\b/], tiles: "mock" });
     test("Glocke offline, dann Kind-Sheet: Abschnitt „Als App“ lädt (Plan 0054, E4)", async ({ page, context }) => {
       await installed(page);
+      await page.goto("./?ansicht=anbieter");
+      await mapSettled(page);
       await context.setOffline(true);
-      await page.goto("./?format=kurs");
-      await expect(page.getByRole("status")).toContainText(OFFLINE_NOTE);
-      const bell = page.getByRole("button", { name: "Suche „Kurs“ abonnieren" });
+      const bell = page.getByRole("button", { name: "Kleines Theater Beispiel (fiktiv) abonnieren", exact: true });
       await bell.click();
       await expect(bell).toHaveAttribute("aria-pressed", "true");
-      await expect(page.getByText(/^Suche abonniert/)).toBeVisible();
+      await expect(page.getByText(/^Anbieter abonniert/)).toBeVisible();
       await page.getByRole("button", { name: /^Kind und Einstellungen/ }).click();
       const sheet = page.getByRole("dialog", { name: "Kind und Einstellungen" });
       await expect(page.locator("html")).toHaveAttribute("data-push", "bereit");
       await expect(sheet.getByText("Der Abschnitt „Als App“ konnte nicht geladen werden.")).toHaveCount(0);
-      await expect(sheet.getByRole("region", { name: "Deine Abos" })).toContainText("Kurs");
+      await expect(sheet.getByRole("region", { name: "Deine Abos" })).toContainText("Kleines Theater Beispiel");
     });
   });
 

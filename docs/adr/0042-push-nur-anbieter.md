@@ -18,7 +18,7 @@ Status: **angenommen** (2026-10-31, mit Plan 0054, Nachtrag A), Nutzerentscheid 
 
 1. **Zuschnitt** (`weeklyText`, `src/domain/news.ts`): Ein neues Angebot ist ein Treffer, wenn das Alter passt und es von einem abonnierten Anbieter stammt. Ohne Anbieter-Abo zählt wie bisher jedes neue Angebot, dann filtert nur das Alter. Mit Abo heißt der Titel „… von deinen Anbietern“.
 2. **Service Worker**: Er lädt je Push genau einmal `data/site.json`, bedingt und für alle gleich. Er liest Geburtsdatum, Anbieter-Abos und gesehene IDs. Wegzeit-Tabelle und Startpunkt braucht er nicht mehr.
-3. **Spiegel**: Gespiegelt werden `birthDate` und `providers`. Die Altlast `searches` und `origin` löschen Fenster (`mirror()`) und Service Worker (bei jedem Push und beim `activate`).
+3. **Spiegel**: Gespiegelt werden `birthDate` und `providers`. Die Altlast `searches` und `origin` löschen das Fenster (erstes `mirror()` je Instanz) und der Service Worker bei jedem Push. Nur Geräte mit eingeschaltetem Push haben sie; ein Löschen im `activate` legte bei allen anderen eine leere IndexedDB an.
 4. **Such-Abos entfallen**: `src/domain/searches.ts` und `src/data/searches-store.ts` werden entfernt. `zwergenplan.such-abos` wird beim Start gelöscht.
 5. **Chip „Meine Anbieter“** in „Entdecken“: Er filtert Liste und Karte auf die abonnierten Anbieter. Sein Zustand lebt nur im Speicher, nie in der URL, und Kamera und Kachel-Requests hängen nicht davon ab.
 

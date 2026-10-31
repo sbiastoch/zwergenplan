@@ -18,7 +18,7 @@ import {
 } from "../domain/agenda.ts";
 import { type CalendarSelection, clampDay } from "../domain/calendar.ts";
 import { quickRanges } from "../domain/date-range.ts";
-import { applyFilters, EMPTY_FILTER, inDaytime, providerFilter } from "../domain/filter.ts";
+import { applyFilters, EMPTY_FILTER, fromProviders, inDaytime, providerFilter } from "../domain/filter.ts";
 import { groupByListing, groupByReach, type ListGroup } from "../domain/listing.ts";
 import { isOutside, type MapExtent } from "../domain/map-view.ts";
 import { placeKey } from "../domain/place-key.ts";
@@ -56,6 +56,11 @@ export interface OfferViewsInput {
   savedFilter?: SavedFilter;
   /** Sortierung der Liste der Merkliste (Plan 0057, E6), lebt in `App`; ohne Angabe „Nächste Termine“ */
   savedSort?: SavedSort;
+  /**
+   * Chip „Meine Anbieter“ (Plan 0054, Nachtrag A, N1): die abonnierten Anbieter, wenn der Chip wirkt, sonst `undefined`.
+   * Schränkt nur `visible` ein, nie `upcoming` (Kamera der Karte, Review M2) und nicht den Tab „Anbieter“.
+   */
+  ownProviders?: readonly string[] | undefined;
   /** Schnellfilter der Liste der Merkliste (Plan 0058, E1), lebt in `App`; wirkt nur auf dem Tab „merkliste“ */
   listChips?: readonly SavedListChip[];
   /**
@@ -82,7 +87,7 @@ export interface OfferViews {
   listUnfitIds: ReadonlySet<string>;
   /**
    * Im Tab „Anbieter“ (Plan 0055, E3): sichtbar nur nach Kategorie und Alter (`providerFilter`), ohne Wegzeit-Grenze
-   * und Zeitraum. Außerhalb des Tabs dieselben Werte wie `visible` und `unfitCount`.
+   * und Zeitraum. Außerhalb des Tabs dieselben Werte wie `visible` und `unfitCount`, aber ohne den Chip „Meine Anbieter“ (Plan 0054, Nachtrag A, Review m5).
    */
   providerVisible: readonly SiteOffer[];
   providerUnfitCount: number;
@@ -205,6 +210,7 @@ export function useOfferViews({
   savedSort = "termine",
   listChips = NO_CHIPS,
   savedLimitActive = false,
+  ownProviders,
   now,
   reach,
   mapView,
@@ -217,9 +223,14 @@ export function useOfferViews({
 
   // mit laufenden Kursen (Plan 0053, E1): Markierung gemerkter Kurse, Datenende und Startausschnitt wie bisher
   const upcoming = useMemo(() => applyFilters(offers, EMPTY_FILTER, { now, runningCourses: true }), [offers, now]);
-  const filtered = useMemo(
+  const filteredAll = useMemo(
     () => applyFilters(offers, route.filter, { now, reach }),
     [offers, route.filter, now, reach],
+  );
+  // „Meine Anbieter“ vor dem Alter, sonst zählte `unfitCount` fremde Anbieter mit (Review M2)
+  const filtered = useMemo(
+    () => (ownProviders ? fromProviders(filteredAll, ownProviders) : filteredAll),
+    [filteredAll, ownProviders],
   );
   // Zeitraum und Tageszeit bestimmen, welcher Termin zählt (Plan 0057, E7): Markierung und gezeigter Termin
   const { range, daytimes } = route.filter;
@@ -227,6 +238,11 @@ export function useOfferViews({
   const { visible, unfitCount, unfitIds, listUnfitIds } = useMemo(
     () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, ...rule }),
     [filtered, upcoming, birthDate, now, ageOnly, rule],
+  );
+  // Ohne Chip (Review m5): Das Anbieter-Sheet fragt, ob Angebote außerhalb der Filter liegen; der Chip zählt dort nicht
+  const withoutOwn = useMemo(
+    () => (ownProviders ? ageVisibility(filteredAll, upcoming, birthDate, now, { ageOnly, ...rule }) : undefined),
+    [ownProviders, filteredAll, upcoming, birthDate, now, ageOnly, rule],
   );
   const providerTab = route.tab === "anbieter";
   const providerView = useMemo(() => {
@@ -391,8 +407,8 @@ export function useOfferViews({
     unfitCount,
     unfitIds,
     listUnfitIds,
-    providerVisible: providerView?.visible ?? visible,
-    providerUnfitCount: providerView?.unfitCount ?? unfitCount,
+    providerVisible: providerView?.visible ?? withoutOwn?.visible ?? visible,
+    providerUnfitCount: providerView?.unfitCount ?? withoutOwn?.unfitCount ?? unfitCount,
     ageOnly,
     setAgeOnly,
     inView,

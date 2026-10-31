@@ -6,10 +6,11 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Anbieter vorschlagen** über ein GitHub-Issue-Template (Name, Programm-URL). Ein Agent arbeitet die Vorschläge ab.
 - **Mehrere Kinder / Geschwister**: Ein Angebot passt, wenn es für eines der Kinder passt.
 - **Abo-Feeds (webcal)** für vordefinierte Filter-Sets.
-- **Wochen-Nachricht nur bei Treffern (Stufe 3)**: Filterung beim Absender. Dazu bekäme der Push-Worker Such-Abos, Startpunkt-Stadtteil und Geburtsmonat; eigenes ADR, ändert die Privatsphäre-Invarianten (Plan 0017, „Stufe 3“).
-- **Such-Abos als Schnellwahl in der Liste** (Plan 0017, Nicht-Ziel): heute schneiden die Abos nur die Wochen-Nachricht zu.
-- **Tageszeit in Such-Abos und Push** (Plan 0057, Nicht-Ziel): `searchOf` streicht `tageszeit=` wie den Zeitraum, die Wochen-Nachricht kennt keine Termine je Tageszeit. Dafür bräuchte `news.ts` die Kandidaten-Regel (`candidateSessions`) im Service Worker.
+- **Wochen-Nachricht nur bei Treffern (Stufe 3)**: Filterung beim Absender. Dazu bekäme der Push-Worker Anbieter-Abos und Geburtsmonat; eigenes ADR, ändert die Privatsphäre-Invarianten (Plan 0017, „Stufe 3“).
 - **Stufen im Teilen-Fragment (Format v2)** (Plan 0057, Nicht-Ziel; ADR 0040): Das künftige Fragment `#merkliste=1.…` (ADR 0020, Punkt 8) kennt keine Stufen; ein Import übernähme alles als „vorgemerkt“. Ein Format v2 trüge „fest eingeplant“ mit, oder man entscheidet bewusst, die Stufen nicht zu teilen.
+- **„Meine Anbieter“ im Filter-Sheet und über das Neuladen** (Plan 0054, Nachtrag A, Nicht-Ziel): Der Chip lebt nur als React-State und steht nicht im Sheet.
+- **Push-Ziel mit „Meine Anbieter“** (Plan 0054, Nachtrag A, Nicht-Ziel): Ein Tipp auf die Wochen-Nachricht öffnet „Neu eingestellt“ ohne den Chip.
+- **Altlast Such-Abos entfernen** (Plan 0054, Nachtrag A, ab etwa 2027-05): `forgetSearchAbos` (`src/data/preferences.ts`), `LEGACY` in `src/data/push.ts` und `LEGACY_KEYS` in `src/sw/push-tailor.ts` löschen nur noch Reste aus der Zeit vor ADR 0042.
 - **Toast nicht über ein frisch geöffnetes Sheet tragen** (Browser-Review Plan 0054, F2): Ein langer Hinweis nach dem Glocken-Tipp (6 s) liegt noch über dem Kind-Sheet, wenn man es gleich öffnet. Beim Öffnen eines Dialogs den App-Toast schließen oder kürzen.
 - **Bestandsnutzer auf die Glocke hinweisen** (Plan 0054, U1): Gemerkte Anbieter sind seit Plan 0054 Abos und schneiden die Wochen-Nachricht zu. Ein einmaliger Hinweis in der App (oder eine Nachricht an Familie und Freunde) erklärt das.
 - **Sheet „Neu seit der letzten Wochen-Nachricht“** (≈ 0,1 kB Start-JS: Flag `neu`, Lazy-Einstieg in `App`): erst mit freiem Start-Budget, etwa nach „Merkliste als Lazy-Chunk“ (Plan 0017, Nutzerentscheidung 4).

@@ -1,6 +1,6 @@
 /** Entdecken: Liste nach Tagen, Filter, Alter (Plan 0003, E7–E11, E16). Fixtures, Uhr Mo 5.10.2026 12:00. */
 import type { Page } from "@playwright/test";
-import { expect, mapSettled, test } from "./fixtures.ts";
+import { expect, mapSettled, startPreloads, test } from "./fixtures.ts";
 import { expectAccessible, expectMobileUx } from "./mobile-ux.ts";
 
 // Der Tab „Anbieter“ zeigt die Anbieterkarte, Kacheln aus tests/fixtures/karte/ (Plan 0055, E8)
@@ -72,44 +72,53 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });
 
-test("Glocke der Suche (Plan 0054, E6): erst mit Filter, abonniert über das Neuladen, beim sechsten Abo „voll“", async ({
-  page,
-}) => {
-  const bell = page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ });
-  await expect(bell).toHaveCount(0);
-  await page.getByRole("button", { name: "Kurse", exact: true }).click();
-  await expect(page).toHaveURL(/\?format=kurs$/);
-  await expect(page.getByRole("button", { name: "Suche „Kurs“ abonnieren" })).toHaveAttribute("aria-pressed", "false");
-  // die Glocke ist kein Filter: außerhalb der Gruppe „Schnellfilter“
-  await expect(
-    page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: /abonnieren/ }),
-  ).toHaveCount(0);
-  await bell.click();
-  await expect(bell).toHaveAttribute("aria-pressed", "true");
-  // ohne Push (headless) bleibt es beim Abo; der Rest des Texts hängt am Push-Zustand (E5)
-  await expect(page.getByText(/^Suche abonniert/)).toBeVisible();
-  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["format=kurs"]');
-  await page.reload();
-  await expect(bell).toHaveAttribute("aria-pressed", "true");
-  // in den anderen Tabs keine Glocke der Suche
-  await page
-    .getByRole("navigation", { name: "Hauptnavigation" })
-    .getByRole("button", { name: /^Anbieter/ })
-    .click();
-  await expect(bell).toHaveCount(0);
-  // WebKit meldet abgebrochene Kachel-Requests beim Navigieren als Fehler: erst die Anbieterkarte ruhen lassen (Plan 0055)
-  await mapSettled(page);
+test("Chip „Meine Anbieter“ (Plan 0054, Nachtrag A): nur mit Abo, Liste und Karte, nicht in der URL, kein Request; Such-Abos gelöscht", {
+  tag: OWN_START,
+}, async ({ page }) => {
+  const own = page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: "Meine Anbieter" });
+  // ohne Abo kein Chip
+  await page.goto("./");
+  await expect(offers(page)).toHaveCount(8);
+  await expect(own).toHaveCount(0);
 
-  await page.evaluate(() =>
-    localStorage.setItem(
-      "zwergenplan.such-abos",
-      JSON.stringify(["kat=musik", "kat=natur", "kat=buehne", "kat=babykurse", "kat=buecher"]),
-    ),
-  );
-  await page.goto("./?format=einmalig");
-  await bell.click();
-  await expect(page.getByText("Höchstens 5 Such-Abos. Erst eins entfernen.")).toBeVisible();
-  await expect(bell).toHaveAttribute("aria-pressed", "false");
+  // „Kleines Theater Beispiel“ (fv3fpfp2) hat zwei Angebote; dazu die Altlast der Such-Abos (ADR 0042)
+  await page.addInitScript(() => {
+    localStorage.setItem("zwergenplan.anbieter-merkliste", JSON.stringify(["fv3fpfp2"]));
+    localStorage.setItem("zwergenplan.such-abos", '["format=kurs"]');
+  });
+  // Export-Code und PWA-Kern laden im Leerlauf nach, für alle gleich: erst danach zählen
+  const preloads = startPreloads(page);
+  await page.reload();
+  await preloads;
+  await expect(offers(page)).toHaveCount(8);
+  await expect.poll(() => page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBeNull();
+  await expect(own).toHaveAttribute("aria-pressed", "false");
+
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    requests.push(request.url());
+  });
+  await own.click();
+  await expect(own).toHaveAttribute("aria-pressed", "true");
+  await expect(offers(page)).toHaveCount(2);
+  await expect(page.getByRole("status")).toHaveText("2 Angebote");
+  await expect(page).toHaveURL((url) => url.pathname === "/" && url.search === "");
+  // kein Badge: der Chip steht nicht im Filter-Sheet (wie Plan 0058, E1)
+  await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
+  expect(requests).toEqual([]);
+
+  // Karte: dieselbe Auswahl
+  await page.getByRole("button", { name: "Karte", exact: true }).click();
+  await mapSettled(page);
+  await expect(page.getByRole("status")).toHaveText("2 Angebote");
+  await page.getByRole("button", { name: "Liste", exact: true }).click();
+
+  // mit einem Filter leer: „Filter zurücksetzen“ schaltet auch den Chip aus
+  await page.getByRole("button", { name: "Kurse", exact: true }).click();
+  await expect(offers(page)).toHaveCount(0);
+  await page.getByRole("button", { name: "Filter zurücksetzen" }).click();
+  await expect(own).toHaveAttribute("aria-pressed", "false");
+  await expect(offers(page)).toHaveCount(8);
 });
 
 test("Schnellfilter und Sticker stehen in der URL und überleben ein Neuladen", async ({ page }) => {
@@ -143,7 +152,7 @@ test("Filter-Sheet wirkt sofort, Einfachwahl bei Anmeldung, Zurücksetzen leert"
   await expect(page).toHaveURL((url) => url.pathname === "/" && url.search === "");
 });
 
-test("Tageszeit im Filter-Sheet (Plan 0057, E7): URL, gleiche Zahl in Liste, Statuszeile und Karte, keine Glocke", async ({
+test("Tageszeit im Filter-Sheet (Plan 0057, E7): URL, gleiche Zahl in Liste, Statuszeile und Karte", async ({
   page,
 }) => {
   await page.getByRole("button", { name: /^Alle Filter/ }).click();
@@ -170,11 +179,10 @@ test("Tageszeit im Filter-Sheet (Plan 0057, E7): URL, gleiche Zahl in Liste, Sta
   await expect(offers(page)).toHaveCount(6);
   await expect(offers(page).filter({ hasText: "Musikgarten" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Alle Filter, 1 aktiv" })).toBeVisible();
-  // keine Tageszeit-Chips in der Chipzeile, und ohne anderen Filter keine Glocke (searchOf streicht die Tageszeit)
+  // keine Tageszeit-Chips in der Chipzeile
   await expect(
     page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: "Vormittags" }),
   ).toHaveCount(0);
-  await expect(page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ })).toHaveCount(0);
 
   await page.getByRole("button", { name: "Karte", exact: true }).click();
   await expect(page).toHaveURL(/\?tageszeit=vormittags&ansicht=karte$/);
@@ -182,15 +190,6 @@ test("Tageszeit im Filter-Sheet (Plan 0057, E7): URL, gleiche Zahl in Liste, Sta
   await expect(page.getByRole("status")).toHaveText("6 Angebote");
   await expect(offers(page)).toHaveCount(6);
   await page.getByRole("button", { name: "Liste", exact: true }).click();
-
-  // mit einem anderen Filter erscheint die Glocke; das Abo nimmt die Tageszeit nicht mit und sagt es
-  await page.getByRole("button", { name: "Kurse", exact: true }).click();
-  await expect(page).toHaveURL(/\?format=kurs&tageszeit=vormittags$/);
-  await expect(offers(page)).toHaveCount(1);
-  const bell = page.getByRole("button", { name: "Suche „Kurs“ abonnieren" });
-  await bell.click();
-  await expect(page.getByText(/^Suche abonniert, ohne Tageszeit/)).toBeVisible();
-  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["format=kurs"]');
 });
 
 test("Geburtsdatum filtert nach Alter, ohne Zusatzzeile, bleibt lokal und steht nie in der URL", async ({ page }) => {

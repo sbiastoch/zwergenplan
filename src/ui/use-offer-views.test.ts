@@ -70,6 +70,26 @@ const ids = (offers: readonly SiteOffer[]) => offers.map((o) => o.title);
 const savedTitles = (v: OfferViews) => ids(v.saved.map((o) => o.offer));
 
 describe("useOfferViews", () => {
+  describe("Chip „Meine Anbieter“ (Plan 0054, Nachtrag A, N1)", () => {
+    const fremd = { ...offer("fremd", "2026-10-11", { minMonths: 0, maxMonths: 12 }), providerId: "fremd" };
+    const offers = [BABY, GROSS, fremd];
+
+    it("schränkt visible und unfitCount auf die Anbieter ein, vor dem Alter", () => {
+      const v = render({ offers, ownProviders: ["fremd"], birthDate: "2026-04-20" });
+      expect(ids(v.visible)).toEqual(["fremd"]);
+      expect(v.unfitCount).toBe(0);
+      const all = render({ offers, birthDate: "2026-04-20" });
+      expect(ids(all.visible)).toEqual(["baby", "fremd"]);
+      expect(all.unfitCount).toBe(1);
+    });
+
+    it("providerVisible bleibt ohne Chip, für das Anbieter-Sheet (Review m5) und den Tab „Anbieter“", () => {
+      expect(ids(render({ offers, ownProviders: ["fremd"] }).providerVisible)).toEqual(["baby", "gross", "fremd"]);
+      const tab = render({ offers, ownProviders: ["fremd"], route: { tab: "anbieter", filter: EMPTY_FILTER } });
+      expect(ids(tab.providerVisible)).toEqual(["baby", "gross", "fremd"]);
+    });
+  });
+
   it("zeigt kommende Angebote, gruppiert nach Tag, ohne Kind alles", () => {
     const v = render({});
     expect(ids(v.visible)).toEqual(["baby", "gross"]);
@@ -445,6 +465,8 @@ describe("useOfferViews", () => {
           reach: wegzeit,
           birthDate: "2026-05-01",
         },
+        // „Meine Anbieter“ (Plan 0054, Nachtrag A, Review M2): kein Request hängt an den Abos
+        { route: { tab: "karte", filter: EMPTY_FILTER }, ownProviders: ["fremd"] },
       ];
       for (const variant of variants) {
         const v = render({ offers: all, ...variant });
