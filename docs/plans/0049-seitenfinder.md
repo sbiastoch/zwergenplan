@@ -759,6 +759,20 @@ Gebaut auf `plan-0050`, teils parallel in eigenen Worktrees (Richter, ID-Kontinu
 - **Nachprüfung** (`recheck`, Test-Review): Nach allen Urteilen baut das Gate erneut. Eine ID, die dabei ohne Urteil fehlt, hält die Einheit mit `grenze`. Solche Fälle entstehen beim Halten einer anderen gated Einheit oder wenn ein Erbe an einer Dublette scheitert.
 - **Fehlerpfade** (Arch-Review M3, m1): Wirft das Gate, ist ein Zustand inkonsistent oder scheitert ein Build ((b) oder die Nachprüfung), werden alle gated Einheiten mit `grenze` gehalten. Der Lauf baut dann den alten Stand dieser Einheiten und kippt nicht.
 - **Frist des Richters** (Arch-Review M2): bis Laufbudget + `JUDGE_BUDGET_MIN` ab Laufstart, per `AbortSignal.timeout`. So bleibt die Marge des Jobs wie ohne Richter.
+- **Arch-Review 2** (letzter erlaubter Durchgang), alles behoben bzw. dokumentiert:
+  - B1 `held.since` beginnt neu, sobald eine neue verlorene ID dazukommt (sonst deckte ein alter Eintrag in `data/id-hinnehmen.yaml` sie mit);
+  - M1 eine im Katalog ersetzte Seiten-URL bleibt bewusst ohne Gate (Katalogänderung, ADR 0041, Punkt 2);
+  - M2 die Abrufart ist Teil der Fassung (`extractKey`, `opts.fassung`; Standard `neu` ohne Wirkung auf den Hash);
+  - m2 letzter Ausweg `revertAll`, wenn auch das Halten scheitert;
+  - m1, m3, m6 als Grenzen in ADR 0041; m4, m5 im Skill; m7 `withoutGitEnv` im Einfrier-Skript.
+- **Restpunkte** (für `docs/ideas.md` beim Abschluss):
+  - `held.lost` wird beim Halten im Fehlerpfad (`holdAll`, `lost: []`) geleert. Ein Hinnehmen läuft dann ins Leere, und der Richter urteilt erneut; sicher, aber unnötig.
+  - `revertAll` setzt auch eine gerade entfernte Einheit zurück; die Entfernung folgt eine Nacht später.
+  - `results[anbieter]` im Bericht zeigt bei gehaltener Einheit weiter z. B. `extrahiert`; nur `units` zeigt `gehalten`.
+  - `pageChanged` setzt der Nachtlauf nicht; der Richter liest „unbekannt“.
+  - Der Richter sieht nur seine Einheit. Zieht eine neue Fassung ein Angebot auf eine andere Seite um, ist ein falsches `entfallen` möglich.
+  - Die ID-Kontinuität wäre mit mehreren eingefrorenen Nachtläufen schärfer.
+  - Neue Anbieter aus dem Entdecken tragen die Fassung `neu`, der Nachtlauf läuft bis Plan 0048, N1 mit `alt`: Ihre erste Änderung der Seite geht einmal durchs Gate.
 - **Refactorings unterwegs:**
   - `buildFromState` und `nightlyWindow` (`lib/build-offers.ts`) ersetzen doppelte Rechnungen in `io/nightly.ts`.
   - `callRecordOf` ist der gemeinsame Teil von Extraktion und Richter.
