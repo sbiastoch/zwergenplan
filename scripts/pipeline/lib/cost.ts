@@ -115,8 +115,10 @@ export const DISCOVER_BRAKES: Brakes = { maxCalls: 1500, maxTokens: 150_000_000 
 export const JUDGE_BRAKES: Brakes = { maxCalls: 60, maxTokens: 6_000_000 };
 
 /**
- * Zeitbudget des Richters in Minuten: innerhalb der 40 Minuten Marge zwischen `budget_min` (50) und `timeout` (90)
- * des Jobs in `.github/workflows/nightly.yml`, damit Build, Commit und Push danach noch Zeit haben.
+ * Frist des Richters in Minuten nach dem Zeitbudget des Laufs, gerechnet ab Laufstart (`runNightly`, Arch-Review M2):
+ * Der Überhang der Schleife (bis zu zwei laufende Aufrufe à 15 Min. nach dem Budget) und der Richter teilen sich die
+ * 40 Minuten Marge zwischen `budget_min` und `timeout` des Jobs in `.github/workflows/nightly.yml`; ein Aufruf über
+ * die Frist hinaus bricht ab. So bleibt vor Build, Gates, Commit und Push dieselbe Zeit wie ohne Richter.
  */
 export const JUDGE_BUDGET_MIN = 20;
 

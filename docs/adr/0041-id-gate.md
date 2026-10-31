@@ -14,9 +14,9 @@ Status: **angenommen** (2026-10-31, mit Plan 0049, Nachtrag 2, Schritt B), Nutze
 
 ## Entscheidung
 
-1. **Fassung je Einheit.** `UnitState.partsHash` ist der Hash über die `KeyParts` und `INPUT_EPOCH` der Eingabe, aus der `events` stammen. Er ist nicht Teil des Cache-Schlüssels, löst also selbst keine Neuextraktion aus. `INPUT_EPOCH` (`lib/normalize.ts`) steigt, wenn sich der Code ändert, der den Eingabetext erzeugt; ein Pin-Test erzwingt das.
+1. **Fassung je Einheit.** `UnitState.partsHash` ist der Hash über die `KeyParts` und `INPUT_EPOCH` der Eingabe, aus der `events` stammen. Er ist nicht Teil des Cache-Schlüssels, löst also selbst keine Neuextraktion aus. `INPUT_EPOCH` (`lib/normalize.ts`) steigt, wenn sich der Code ändert, der den Eingabetext erzeugt; ein Pin-Test erzwingt das. Nicht pinbar ist die Abrufart (`--abruf alt|neu`); beim Umschalten steigt die Epoche von Hand. Das Fallback-Modell gehört bewusst nicht zur Fassung: Der zweite Versuch läuft nur nach einer Schlüsseländerung und mit demselben Schlüssel.
 2. **Gated** ist eine Einheit, die einen Vorstand hat und ein Ergebnis einer anderen Fassung übernimmt. Ein fehlendes `partsHash` zählt als andere Fassung. Gleichgültig ist, ob sich die Seite zugleich geändert hat. Sonst ginge der Verlust mit der nächsten kleinen Änderung der Seite doch durch.
-3. **Verlust** ist eine ID mit künftigem Termin im Vorstand, die im Build mit allen neuen Ergebnissen fehlt, im Build mit dem alten Stand der gated Einheiten aber vorkommt. Verluste aus Einheiten, die nicht gated sind, bleiben erlaubt (Änderung der Seite, ADR 0022).
+3. **Verlust** ist eine ID mit künftigem Termin im Vorstand, die im Build mit allen neuen Ergebnissen fehlt, im Build mit dem alten Stand der gated Einheiten aber vorkommt. Da sich die beiden Builds nur in den gated Einheiten unterscheiden, kommt jeder solche Verlust von einer neuen Fassung. Stammt das Angebot im zweiten Build aus einer Einheit ohne neue Fassung (über `mergeParts` vereinigt), kann der Richter dort nicht urteilen; die erste gated Einheit des Anbieters wird gehalten (`crossUnit`). Verluste aus Einheiten mit geänderter Seite, aber gleicher Fassung, bleiben erlaubt (ADR 0022).
 4. **Richter.** Für jede gated Einheit mit Verlusten urteilt ein Opus-Modell (`LLM_MODEL_JUDGE`) je verlorener ID:
    - `gleich`: Das neue Event erbt die ID (`RawEvent.keepIds`, je Beginn).
    - `fehlerhaft`: Das alte Angebot steht so nicht auf der Seite oder widerspricht dem Katalog. Die ID fällt weg.
@@ -28,6 +28,7 @@ Status: **angenommen** (2026-10-31, mit Plan 0049, Nachtrag 2, Schritt B), Nutze
 8. **Nur im Nachtlauf.** Entdecken und der Ertragsbeweis der Pflege extrahieren ohne Vorstand und haben kein Gate.
 9. **Schattenlauf** vor jeder Umstellung von Prompt, Schema, Modell oder `INPUT_EPOCH`: `pnpm pipeline nightly --dry-run` mit der neuen Fassung zählt übernommen, geerbt, weggefallen und gehalten; das Ergebnis steht im Commit der Umstellung.
 10. **Build-Code.** Ein Test über eine eingefrorene Kopie von `data/raw` und `data/offers.json` verlangt, dass der Build ohne neue Eingabe keine ID mit künftigem Termin verliert.
+11. **Fehler halten.** Scheitert ein Build des Gates oder wirft es, werden alle gated Einheiten mit `grenze` gehalten; der Lauf baut dann den alten Stand dieser Einheiten. Der Richter urteilt nur bis Laufbudget + `JUDGE_BUDGET_MIN` ab Laufstart, ein laufender Aufruf bricht dort ab.
 
 ## Alternativen
 

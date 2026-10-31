@@ -54,8 +54,36 @@ const titled = (loss: UnitLoss, verdicts?: readonly Verdict[]) =>
     return { id: offer.id, title: offer.title, ...(v ? { kind: v.kind } : {}), ...(reason ? { reason } : {}) };
   });
 
+/**
+ * Fehler im Gate (Programmfehler, inkonsistenter Zustand) dürfen den Nachtlauf nicht kippen und keine ID kosten
+ * (Arch-Review M3): Dann werden alle gated Einheiten mit `grenze` gehalten, der Build danach ist der Stand (b).
+ */
 export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
-  const out: IdGateResult = { raws: {}, entries: [], calls: [], held: {} };
+  const calls: CallRecord[] = [];
+  try {
+    return await gate(o, calls);
+  } catch (e) {
+    const out: IdGateResult = { raws: {}, entries: [], calls, held: {} };
+    holdAll(o, out, gatedUnits(o.prev, o.next), `ID-Gate: ${e instanceof Error ? e.message : String(e)}`);
+    return out;
+  }
+}
+
+/** Alle noch nicht gehaltenen gated Einheiten mit `grenze` halten (Ergebnis wie Stand (b)). */
+function holdAll(o: IdGateOptions, out: IdGateResult, gated: ReturnType<typeof gatedUnits>, why: string): void {
+  for (const [providerId, units] of gated)
+    for (const unit of [...units].sort())
+      if (!out.held[providerId]?.includes(unit))
+        holdAfterCheck(o, out, { providerId, unit, lost: [] }, unit, "grenze", why);
+}
+
+/** Inkonsistenter Zustand im Gate: nie still durchlassen (Arch-Review m1), sondern über `runIdGate` halten. */
+function inconsistent(what: string): never {
+  throw new Error(`inkonsistenter Zustand: ${what}`);
+}
+
+async function gate(o: IdGateOptions, calls: CallRecord[]): Promise<IdGateResult> {
+  const out: IdGateResult = { raws: {}, entries: [], calls, held: {} };
   const gated = gatedUnits(o.prev, o.next);
   if (gated.size === 0) return out;
   const build = (raws: Readonly<Record<string, ProviderRaw>>) =>
@@ -72,9 +100,7 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
   // Ohne gültigen Stand (b) gibt es keinen Vergleich: alle gated Einheiten halten (nächste Nacht erneut). Der Build
   // danach scheitert dann wie (b) und schreibt keine offers.json; die IDs bleiben so sicher (ADR 0041)
   if (!b.file) {
-    const why = `Vergleichsstand (b) gescheitert: ${b.report.errors.slice(0, 2).join("; ")}`;
-    for (const [providerId, units] of gated)
-      for (const unit of [...units].sort()) holdAfterCheck(o, out, { providerId, unit, lost: [] }, unit, "grenze", why);
+    holdAll(o, out, gated, `Vergleichsstand (b) gescheitert: ${b.report.errors.slice(0, 2).join("; ")}`);
     return out;
   }
   const a = build(o.next);
@@ -100,10 +126,11 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
     const raw = out.raws[loss.providerId] ?? o.next[loss.providerId];
     const prevRaw = o.prev[loss.providerId];
     const provider = byId.get(loss.providerId);
-    if (!raw || !isV2(raw) || !prevRaw || !isV2(prevRaw) || provider?.role !== "anbieter") continue;
+    if (!raw || !isV2(raw) || !prevRaw || !isV2(prevRaw) || provider?.role !== "anbieter")
+      inconsistent(`${loss.providerId} ohne Zustand V2 oder nicht im Katalog`);
     const prevUnit = prevRaw.units[loss.unit];
     const nextUnit = raw.units[loss.unit];
-    if (!prevUnit || !nextUnit) continue;
+    if (!prevUnit || !nextUnit) inconsistent(`${loss.providerId} ${loss.unit} fehlt`);
     const set = (state: UnitState) => {
       out.raws[loss.providerId] = { ...raw, units: { ...raw.units, [loss.unit]: state } };
     };
@@ -227,8 +254,11 @@ function recheck(p: {
   const isHeld = (providerId: string, unit: string) => out.held[providerId]?.includes(unit) ?? false;
   for (;;) {
     const c = p.build({ ...o.next, ...out.raws });
-    // scheitert der Build, schreibt der Nachtlauf ohnehin keine offers.json
-    if (!c.file) return;
+    // Scheitert die Mischung aus übernommenen und gehaltenen Einheiten (Arch-Review M3), alles halten: Das ist (b)
+    if (!c.file) {
+      holdAll(o, out, p.gated, `Build nach den Urteilen gescheitert: ${c.report.errors.slice(0, 2).join("; ")}`);
+      return;
+    }
     const missing = unitLosses({
       previous: o.previous,
       a: c.file,
@@ -263,11 +293,13 @@ function holdAfterCheck(
   const prevRaw = o.prev[loss.providerId];
   const raw = out.raws[loss.providerId] ?? o.next[loss.providerId];
   const fresh = o.next[loss.providerId];
-  if (!prevRaw || !isV2(prevRaw) || !raw || !isV2(raw) || !fresh || !isV2(fresh)) return false;
+  if (!prevRaw || !isV2(prevRaw) || !raw || !isV2(raw) || !fresh || !isV2(fresh))
+    inconsistent(`${loss.providerId} ohne Zustand V2`);
   const prevUnit = prevRaw.units[unit];
   // das Ergebnis der neuen Fassung ohne `keepIds`: Das Erbe gilt nur mit dem Urteil, das hier nicht trug
   const nextUnit = fresh.units[unit];
-  if (!prevUnit || !nextUnit || nextUnit.inputHash === undefined || nextUnit.model === undefined) return false;
+  if (!prevUnit || !nextUnit || nextUnit.inputHash === undefined || nextUnit.model === undefined)
+    inconsistent(`${loss.providerId} ${unit} ohne alten oder neuen Stand`);
   const ids = loss.lost.map((x) => x.id);
   out.raws[loss.providerId] = {
     ...raw,

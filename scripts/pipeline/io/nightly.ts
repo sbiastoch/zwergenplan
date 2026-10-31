@@ -214,10 +214,15 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const sources = Object.fromEntries(
     Object.entries(fetched.adapters).flatMap(([name, a]) => (isSource(name) ? [[name, a.status]] : [])),
   );
+  // einmal bestimmt: Die Builds des ID-Gates und der Build danach rechnen mit demselben Stand (Altbestand, listedAt)
+  const generatedAt = o.now();
   let idGate: NightlyReport["idGate"];
   if (o.judge) {
-    // ID-Gate (ADR 0041): nach allen Anbietern, vor dem Build; eigene Bremse und eigenes Zeitbudget
-    const judgeStarted = performance.now();
+    // ID-Gate (ADR 0041): nach allen Anbietern, vor dem Build; eigene Bremse. Frist ab Laufstart (Arch-Review M2): Der
+    // Richter urteilt nur bis Budget + JUDGE_BUDGET_MIN, ein laufender Aufruf bricht dort ab (Halten mit `grenze`).
+    // Läuft die Schleife schon länger (Überhang bis Budget + 30), urteilt er gar nicht; die Marge des Jobs reicht so.
+    const restMs = Math.max(0, Math.floor((o.budgetMin + JUDGE_BUDGET_MIN - elapsedMin()) * 60_000));
+    const judgeSignal = AbortSignal.any([controller.signal, AbortSignal.timeout(restMs)]);
     const gate = await runIdGate({
       prev: before,
       next: { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(outDir) : {}) },
@@ -225,14 +230,13 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
       previous,
       today: o.today,
       now: fetchedAt,
-      generatedAt: o.now(),
+      generatedAt,
       freeDays,
       sources,
       inputs: fetched.inputs,
       judge: o.judge,
-      signal: controller.signal,
-      mayJudge: (own) =>
-        (performance.now() - judgeStarted) / 60_000 < JUDGE_BUDGET_MIN && judgeBrakeHit(own) === undefined,
+      signal: judgeSignal,
+      mayJudge: (own) => !judgeSignal.aborted && judgeBrakeHit(own) === undefined,
       accepted: o.accepted ?? (() => undefined),
     });
     calls.push(...gate.calls);
@@ -246,7 +250,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     catalog,
     previous,
     today: o.today,
-    now: o.now,
+    now: () => generatedAt,
     sources,
     ...(o.dryRun ? { dryRun: { overlayDir: outDir, target: join(o.runDir, "offers.json") } } : {}),
     freeDays: async () => freeDays,

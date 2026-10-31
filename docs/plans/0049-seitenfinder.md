@@ -234,6 +234,7 @@ Dazu:
 | `evals/results.md` | Abschnitt „Seitenfinder“ | S1–S3 |
 | Skill (Abschnitte 1 und 2: Pflege-Issue, Seite ablehnen, Revert nach dem Nachtlauf), `docs/architecture.md`, `CLAUDE.md` („Daten“: `pflege` hängt Programmseiten an) | Doku | S2, S3 |
 | `scripts/pipeline/lib/judge.ts`, `scripts/pipeline/io/judge.ts`, `scripts/pipeline/prompt/judge.md` (neu) | Richter des ID-Gates | Nachtrag 2, B |
+| `scripts/pipeline/lib/id-gate.ts`, `scripts/pipeline/io/id-gate.ts` (neu) | Gate: gated Einheiten, Stand (b), Verluste, Nachprüfung, Halten | Nachtrag 2, B |
 | `scripts/pipeline/lib/raw.ts`, `lib/refresh.ts`, `lib/normalize.ts`, `lib/extract.ts`, `lib/build-offers.ts`, `lib/stable-ids.ts`, `lib/watch.ts`, `lib/cost.ts`, `io/refresh.ts`, `io/nightly.ts`, `cli.ts`, `.github/workflows/nightly.yml` | `partsHash`, `INPUT_EPOCH`, `held`, `keepIds`, `mergeUnitStates`, zwei Builds, Grenzen des Richters, Wächter `ids` | Nachtrag 2, B |
 | `data/id-hinnehmen.yaml` (neu), `scripts/validate-data.ts`, `CLAUDE.md` | Hinnehmen von Hand | Nachtrag 2, B |
 | `scripts/pipeline/id-continuity.test.ts`, `scripts/pipeline/freeze-id-continuity.ts`, `scripts/pipeline/fixtures/` (neu) | ID-Kontinuität des Build-Codes, Pin-Test `INPUT_EPOCH` | Nachtrag 2, B |
@@ -754,6 +755,10 @@ Gebaut auf `plan-0050`, teils parallel in eigenen Worktrees (Richter, ID-Kontinu
     - der Nachtlauf nachgebaut aus seinem Vorstand.
   - Befund: Der heutige Build verliert keine IDs (436 von 436).
   - Grenze: Eine leicht verschärfte Schwelle (`SAME_SESSIONS` 0,99) bemerkt der Test nicht, weil die eingefrorenen Übergänge keine Grenzfälle enthalten; erst eine abgeschaltete Stufe 1 macht ihn rot. Mehrere eingefrorene Läufe würden ihn schärfen (Restpunkt).
+- **B2, Ursprung in einer Einheit ohne neue Fassung** (Test-Review): Der Text oben erlaubte diesen Verlust. Da sich (a) und (b) aber nur in den gated Einheiten unterscheiden, kommt er immer von einer neuen Fassung. `unitLosses` hängt ihn deshalb an die erste gated Einheit (`crossUnit`), `runIdGate` hält sie mit `unklar`.
+- **Nachprüfung** (`recheck`, Test-Review): Nach allen Urteilen baut das Gate erneut. Eine ID, die dabei ohne Urteil fehlt, hält die Einheit mit `grenze`. Solche Fälle entstehen beim Halten einer anderen gated Einheit oder wenn ein Erbe an einer Dublette scheitert.
+- **Fehlerpfade** (Arch-Review M3, m1): Wirft das Gate, ist ein Zustand inkonsistent oder scheitert ein Build ((b) oder die Nachprüfung), werden alle gated Einheiten mit `grenze` gehalten. Der Lauf baut dann den alten Stand dieser Einheiten und kippt nicht.
+- **Frist des Richters** (Arch-Review M2): bis Laufbudget + `JUDGE_BUDGET_MIN` ab Laufstart, per `AbortSignal.timeout`. So bleibt die Marge des Jobs wie ohne Richter.
 - **Refactorings unterwegs:**
   - `buildFromState` und `nightlyWindow` (`lib/build-offers.ts`) ersetzen doppelte Rechnungen in `io/nightly.ts`.
   - `callRecordOf` ist der gemeinsame Teil von Extraktion und Richter.
