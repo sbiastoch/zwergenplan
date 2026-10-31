@@ -1,6 +1,6 @@
 # Plan 0058 – Schnellfilter statt Abschnitte in der Liste der Merkliste
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 1f8fba7 (2026-10-31)
 
 ## Anlass
 
