@@ -14,8 +14,10 @@ import { afterEach, describe, expect, it } from "vitest";
 import { parse, stringify } from "yaml";
 import { validateDataset } from "../../../src/domain/dataset.ts";
 import type { Provider } from "../../../src/domain/schema.ts";
-import type { ExtractOutcome, Extractor, ExtractResult } from "../lib/extract.ts";
+import { JUDGE_BRAKES } from "../lib/cost.ts";
+import type { CallRecord, ExtractOutcome, Extractor, ExtractResult } from "../lib/extract.ts";
 import type { PageOutcome } from "../lib/fetch.ts";
+import type { Judge, JudgeInput, JudgeResult, Verdict } from "../lib/judge.ts";
 import { isV2, type ProviderRaw, providerStatus, RawEvent } from "../lib/raw.ts";
 import type { FetchPlan } from "../lib/select.ts";
 import { watchFindings } from "../lib/watch.ts";
@@ -676,5 +678,460 @@ describe("runBuildOnly (nightly --build-only, Arch-Review S5, M1)", () => {
     expect(ids(after.offers)).toEqual(ids(before.offers));
     // kein Modell, keine Kostenzeile über die des Nachtlaufs hinaus
     expect(readFileSync(join(dirsOf.dataDir, "kosten.csv"), "utf8").trimEnd().split("\n")).toHaveLength(2);
+  });
+});
+
+describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
+  const only = ["familientreff-beispiel"];
+  const PROVIDER = "familientreff-beispiel";
+  const A = "https://example.org/familientreff/programm";
+  const B = "https://example.org/familientreff/kurse";
+  const UNIT_A = `seite:${A}`;
+  const UNIT_B = `seite:${B}`;
+  /** neue Fassung der Pipeline: anderer Prompt, also anderer Schlüssel und anderes `partsHash` */
+  const NEW_PARTS = { ...KEY_PARTS, prompt: "Prompt 2" };
+  /**
+   * Die neue Fassung formuliert um: anderer Titel und eine Viertelstunde später. So greift keine Stufe der Zuordnung
+   * (Stufe 1 braucht gleiche Termine, Stufe 2 einen ähnlichen Titel), und die IDs gingen ohne Gate verloren.
+   */
+  const renamed = treffs.map((e, k) => ({
+    ...e,
+    title: `Spielgruppe Zwerge ${k + 1}`,
+    schedule: { ...e.schedule, start: `1${k + 1}:15`, end: `1${k + 1}:50` },
+  }));
+  const massage = RawEvent.parse({
+    ...treff,
+    title: "Babymassage",
+    sourceUrl: B,
+    schedule: { ...treff.schedule, weekdays: ["FR"], until: "2027-03-26" },
+  });
+  const massageNeu = RawEvent.parse({
+    ...massage,
+    title: "Sanfte Berührung 4",
+    schedule: { ...massage.schedule, start: "15:00", end: "15:45" },
+  });
+
+  const call = (step: CallRecord["step"], providerId: string, tokens = 100): CallRecord => ({
+    step,
+    providerId,
+    model: step === "judge" ? "opus" : "haiku",
+    inputTokens: tokens,
+    outputTokens: 10,
+    cacheReadTokens: 0,
+    cacheCreationTokens: 0,
+    webSearchRequests: 0,
+    turns: 1,
+    durationMs: 1,
+    costUsd: 0.01,
+    result: "ok",
+  });
+  /** Fake-Richter: urteilt je Eingabe über `answer`; merkt sich die Eingaben */
+  function fakeJudge(answer: (input: JudgeInput) => JudgeResult["outcome"], tokens = 100) {
+    const seen: JudgeInput[] = [];
+    const judge: Judge = async (input) => {
+      seen.push(input);
+      return { outcome: answer(input), calls: [call("judge", input.providerId, tokens)] };
+    };
+    return { judge, seen };
+  }
+  const lastWord = (s: string) => s.split(" ").at(-1);
+  /** `gleich` je verlorenem Angebot: das freie neue Event mit derselben Nummer am Titelende */
+  const sameByNumber = (input: JudgeInput): JudgeResult["outcome"] => ({
+    kind: "ok",
+    verdicts: input.lost.map((l): Verdict => {
+      const f = input.fresh.find((x) => lastWord(x.event.title) === lastWord(l.title) && !x.taken);
+      return f?.starts[0]
+        ? { id: l.id, kind: "gleich", index: f.index, start: f.starts[0] }
+        : { id: l.id, kind: "unklar" };
+    }),
+  });
+  const all =
+    (kind: "fehlerhaft" | "entfallen" | "unklar") =>
+    (input: JudgeInput): JudgeResult["outcome"] => ({
+      kind: "ok",
+      verdicts: input.lost.map(
+        (l): Verdict => (kind === "unklar" ? { id: l.id, kind } : { id: l.id, kind, reason: `Grund ${l.title}` }),
+      ),
+    });
+
+  /** Extraktor je Einheit; zählt Aufrufe */
+  function unitExtractor(eventsOf: (unit: string) => RawEvent[]) {
+    const seen: string[] = [];
+    const extractor: Extractor = async (input) => {
+      seen.push(input.unit ?? "");
+      return {
+        outcome: { kind: "ok", events: eventsOf(input.unit ?? ""), model: "haiku" },
+        calls: [call("extract", input.provider.id)],
+      };
+    };
+    return { extractor, seen };
+  }
+
+  type Dirs = ReturnType<typeof tempData>;
+  const idsByTitle = (dirsOf: Dirs, file = join(dirsOf.dataDir, "offers.json")) =>
+    Object.fromEntries(
+      (readPreviousOffers(file)?.offers ?? []).filter((o) => o.providerId === PROVIDER).map((o) => [o.title, o.id]),
+    );
+  function rawUnit(dirsOf: Dirs, unit = UNIT_A, dir = join(dirsOf.dataDir, "raw")) {
+    const r = readRaw(dir, PROVIDER);
+    return r && isV2(r) ? r.units[unit] : undefined;
+  }
+  const byId = (ids: Record<string, string>) => Object.entries(ids).sort(([, a], [, b]) => a.localeCompare(b));
+  const expectInherited = (dirsOf: Dirs, ids: Record<string, string>, file?: string) => {
+    const now = idsByTitle(dirsOf, file);
+    for (const k of [1, 2, 3]) expect(now[`Spielgruppe Zwerge ${k}`]).toBe(ids[`Offener Krabbeltreff ${k}`]);
+  };
+
+  function addPageB(dirsOf: Dirs) {
+    const file = join(dirsOf.dataDir, "providers.yaml");
+    const entries = parse(readFileSync(file, "utf8")) as Array<{ id: string; programme: object[] }>;
+    entries.find((p) => p.id === PROVIDER)?.programme.push({ url: B, kind: "html", use: "termine" });
+    writeFileSync(file, stringify(entries));
+  }
+
+  /** Nacht 0 mit der alten Fassung: Treffs, mit `withB` die Babymassage auf Seite B */
+  async function baseline(withB = false) {
+    const dirsOf = tempData();
+    if (withB) addPageB(dirsOf);
+    const { extractor } = unitExtractor((u) => (u === UNIT_B ? [massage] : treffs));
+    const r = await runNightly({ ...options(dirsOf, extractor), only, forceMigrate: only });
+    expect(r.build.errors).toEqual([]);
+    const ids = idsByTitle(dirsOf);
+    expect(Object.keys(ids).sort()).toEqual([...treffs.map((t) => t.title), ...(withB ? ["Babymassage"] : [])].sort());
+    return { dirsOf, ids };
+  }
+
+  /** eine Nacht, Standard: neue Fassung, Seite A formuliert um, Seite B unverändert */
+  async function gateNight(
+    dirsOf: Dirs,
+    o: {
+      events?: (unit: string) => RawEvent[];
+      judge?: Judge;
+      text?: (url: string) => string;
+      keyParts?: typeof KEY_PARTS;
+      extra?: Partial<Parameters<typeof runNightly>[0]>;
+    } = {},
+  ) {
+    const ex = unitExtractor(o.events ?? ((u) => (u === UNIT_B ? [massage] : renamed)));
+    const r = await runNightly({
+      ...options(dirsOf, ex.extractor),
+      only,
+      keyParts: o.keyParts ?? NEW_PARTS,
+      ...(o.judge ? { judge: o.judge } : {}),
+      ...(o.text ? { fetch: fakeFetch([], o.text) } : {}),
+      ...o.extra,
+    });
+    return { r, seen: ex.seen };
+  }
+
+  it("ohne Richter wie vor dem Gate: die Umformulierung kostet die IDs (Gegenprobe, dass der Fall trägt)", async () => {
+    const { dirsOf, ids } = await baseline();
+    const { r } = await gateNight(dirsOf);
+    expect(r.idGate).toBeUndefined();
+    const now = idsByTitle(dirsOf);
+    expect(Object.keys(now).sort()).toEqual(renamed.map((e) => e.title).sort());
+    for (const id of Object.values(ids)) expect(Object.values(now)).not.toContain(id);
+    expect(rawUnit(dirsOf)?.events.map((e) => e.title)).toEqual(renamed.map((e) => e.title));
+  });
+
+  it("Prompt-Wechsel benennt um, Richter gleich: gleiche IDs in offers.json, keepIds in data/raw, Bericht uebernommen", async () => {
+    const { dirsOf, ids } = await baseline();
+    const j = fakeJudge(sameByNumber);
+    const { r } = await gateNight(dirsOf, { judge: j.judge });
+    expect(j.seen.map((x) => x.unit)).toEqual([UNIT_A]);
+    expect(j.seen[0]?.lost.map((l) => l.id).sort()).toEqual(Object.values(ids).sort());
+    expect(j.seen[0]?.fresh.map((f) => f.taken)).toEqual([false, false, false]);
+    expectInherited(dirsOf, ids);
+    const unit = rawUnit(dirsOf);
+    expect(unit?.held).toBeUndefined();
+    expect(unit?.events.map((e) => Object.values(e.keepIds ?? {}))).toEqual(
+      [1, 2, 3].map((k) => [ids[`Offener Krabbeltreff ${k}`]]),
+    );
+    expect(r.idGate).toEqual([
+      {
+        provider: PROVIDER,
+        unit: UNIT_A,
+        outcome: "uebernommen",
+        ids: byId(ids).map(([title, id]) => ({ id, title, kind: "gleich" })),
+      },
+    ]);
+    expect(r.calls.filter((c) => c.step === "judge")).toHaveLength(1);
+    const report = JSON.parse(readFileSync(join(dirsOf.runDir, "nightly.json"), "utf8"));
+    expect(report.idGate).toEqual(r.idGate);
+    // --build-only ist deterministisch: keepIds stehen in data/raw
+    const now = idsByTitle(dirsOf);
+    await runBuildOnly({ dataDir: dirsOf.dataDir, today: TODAY, now: NOW, freeDays: async () => ({}) });
+    expect(idsByTitle(dirsOf)).toEqual(now);
+    // die nächste Nacht mit derselben Fassung und Seite: unverändert, kein Richter, IDs bleiben
+    const j2 = fakeJudge(all("unklar"));
+    const again = await gateNight(dirsOf, { judge: j2.judge });
+    expect(again.seen).toEqual([]);
+    expect(j2.seen).toEqual([]);
+    expect(idsByTitle(dirsOf)).toEqual(now);
+  });
+
+  it.each(["fehlerhaft", "entfallen"] as const)("Richter %s: IDs fallen weg, Grund im Bericht", async (kind) => {
+    const { dirsOf, ids } = await baseline();
+    const { r } = await gateNight(dirsOf, { judge: fakeJudge(all(kind)).judge });
+    const now = idsByTitle(dirsOf);
+    expect(Object.keys(now).sort()).toEqual(renamed.map((e) => e.title).sort());
+    for (const id of Object.values(ids)) expect(Object.values(now)).not.toContain(id);
+    expect(r.idGate?.[0]).toMatchObject({ outcome: "uebernommen", unit: UNIT_A });
+    expect(r.idGate?.[0]?.ids.map((x) => [x.id, x.kind, x.reason])).toEqual(
+      byId(ids).map(([title, id]) => [id, kind, `Grund ${title}`]),
+    );
+    expect(rawUnit(dirsOf)?.events.some((e) => e.keepIds)).toBe(false);
+  });
+
+  it("Richter unklar: Einheit gehalten, IDs bleiben, Wächter ids; zweite Nacht gleiche Eingabe ohne Extraktion und Richter", async () => {
+    const { dirsOf, ids } = await baseline();
+    const before = rawUnit(dirsOf);
+    const { r } = await gateNight(dirsOf, { judge: fakeJudge(all("unklar")).judge });
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    const held = rawUnit(dirsOf);
+    expect(held?.events).toEqual(before?.events);
+    expect(held?.inputHash).toBe(before?.inputHash);
+    expect(held?.partsHash).toBe(before?.partsHash);
+    expect(held?.held).toMatchObject({ reason: "unklar", since: NOW(), model: "haiku" });
+    expect(held?.held?.events.map((e) => e.title)).toEqual(renamed.map((e) => e.title));
+    expect([...(held?.held?.lost ?? [])].sort()).toEqual(Object.values(ids).sort());
+    expect(r.units?.[PROVIDER]?.[UNIT_A]).toBe("gehalten");
+    expect(r.idGate).toEqual([expect.objectContaining({ outcome: "gehalten", held: "unklar", unit: UNIT_A })]);
+    const findings = watchFindings({
+      raws: readRawDir(join(dirsOf.dataDir, "raw")),
+      catalog: readCatalog(join(dirsOf.dataDir, "providers.yaml")),
+      discover: [],
+      today: TODAY,
+    }).filter((f) => f.subject === PROVIDER);
+    expect(findings.map((f) => f.kind)).toContain("ids");
+
+    const j2 = fakeJudge(all("unklar"));
+    const second = await gateNight(dirsOf, { judge: j2.judge });
+    expect(second.seen).toEqual([]);
+    expect(j2.seen).toEqual([]);
+    expect(second.r.units?.[PROVIDER]?.[UNIT_A]).toBe("gehalten");
+    expect(second.r.idGate).toBeUndefined();
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    expect(rawUnit(dirsOf)?.held?.since).toBe(NOW());
+  });
+
+  it("gehalten, am nächsten Tag ändert sich eine Zeile der Seite: neu extrahiert, wieder gerichtet, IDs bleiben (Review N2, B1)", async () => {
+    const { dirsOf, ids } = await baseline();
+    await gateNight(dirsOf, { judge: fakeJudge(all("unklar")).judge });
+    const j = fakeJudge(all("unklar"));
+    const n2 = await gateNight(dirsOf, {
+      judge: j.judge,
+      text: (url) => `Programm ${url} (noch 2 Plätze frei)`,
+      extra: { today: "2026-10-07", now: () => "2026-10-07T03:00:00+02:00" },
+    });
+    expect(n2.seen).toEqual([UNIT_A]);
+    expect(j.seen).toHaveLength(1);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    const unit = rawUnit(dirsOf);
+    expect(unit?.events.map((e) => e.title)).toEqual(treffs.map((e) => e.title));
+    // `since` bleibt der Beginn des Haltens; der neue Schlüssel steht in `held`
+    expect(unit?.held?.since).toBe(NOW());
+    expect(unit?.held?.inputHash).not.toBe(unit?.inputHash);
+    // mit gleich am dritten Tag: übernommen, die IDs wandern mit
+    await gateNight(dirsOf, {
+      judge: fakeJudge(sameByNumber).judge,
+      text: (url) => `Programm ${url} (noch 1 Platz frei)`,
+      extra: { today: "2026-10-08", now: () => "2026-10-08T03:00:00+02:00" },
+    });
+    expectInherited(dirsOf, ids);
+    expect(rawUnit(dirsOf)?.held).toBeUndefined();
+  });
+
+  it.each([
+    ["fehler", (): JudgeResult["outcome"] => ({ kind: "fehler", reason: "Richter kaputt" })],
+    ["abort", (): JudgeResult["outcome"] => ({ kind: "abort", abort: "limit" })],
+  ] as const)(
+    "Richter liefert %s: gehalten mit grenze; nächste Nacht ohne Extraktion erneut gerichtet",
+    async (_, outcome) => {
+      const { dirsOf, ids } = await baseline();
+      const { r } = await gateNight(dirsOf, { judge: fakeJudge(outcome).judge });
+      expect(idsByTitle(dirsOf)).toEqual(ids);
+      expect(rawUnit(dirsOf)?.held?.reason).toBe("grenze");
+      expect(r.idGate).toEqual([expect.objectContaining({ outcome: "gehalten", held: "grenze" })]);
+      const j = fakeJudge(sameByNumber);
+      const n2 = await gateNight(dirsOf, { judge: j.judge });
+      expect(n2.seen).toEqual([]);
+      expect(j.seen).toHaveLength(1);
+      expect(n2.r.units?.[PROVIDER]?.[UNIT_A]).toBe("gehalten-uebernommen");
+      expectInherited(dirsOf, ids);
+      expect(rawUnit(dirsOf)?.held).toBeUndefined();
+    },
+  );
+
+  it("Grenze des Richters (JUDGE_BRAKES) erreicht: die nächste Einheit wird ohne Aufruf gehalten", async () => {
+    const { dirsOf, ids } = await baseline(true);
+    // der erste Aufruf (Einheiten nach Kennung: erst Seite B) verbraucht das ganze Token-Budget des Richters
+    const j = fakeJudge(sameByNumber, JUDGE_BRAKES.maxTokens * 10);
+    const { r } = await gateNight(dirsOf, { judge: j.judge, events: (u) => (u === UNIT_B ? [massageNeu] : renamed) });
+    expect(j.seen.map((x) => x.unit)).toEqual([UNIT_B]);
+    // Babymassage → „Sanfte Berührung 4“: anderer Titel, keine Nummer → unklar; Seite A ohne Aufruf: grenze
+    const now = idsByTitle(dirsOf);
+    expect(now).toEqual(ids);
+    expect(rawUnit(dirsOf, UNIT_A)?.held?.reason).toBe("grenze");
+    expect(rawUnit(dirsOf, UNIT_B)?.held?.reason).toBe("unklar");
+    expect(r.idGate?.map((e) => [e.unit, e.outcome, e.held])).toEqual([
+      [UNIT_B, "gehalten", "unklar"],
+      [UNIT_A, "gehalten", "grenze"],
+    ]);
+    expect(r.calls.filter((c) => c.step === "judge")).toHaveLength(1);
+    // die Grenze des Richters ist nicht die Bremse des Nachtlaufs
+    expect(r.brake).toBeUndefined();
+  });
+
+  it("Hinnehmen (accepted): gehaltenes Ergebnis ohne Richter übernommen, Bericht hingenommen", async () => {
+    const { dirsOf, ids } = await baseline();
+    await gateNight(dirsOf, { judge: fakeJudge(all("unklar")).judge });
+    const j = fakeJudge(all("unklar"));
+    const asked: Array<[string, string]> = [];
+    const { r, seen } = await gateNight(dirsOf, {
+      judge: j.judge,
+      extra: {
+        accepted: (p, since) => {
+          asked.push([p, since]);
+          return { grund: "Umformulierung geprüft" };
+        },
+      },
+    });
+    expect(seen).toEqual([]);
+    expect(j.seen).toEqual([]);
+    expect(asked[0]).toEqual([PROVIDER, NOW()]);
+    const now = idsByTitle(dirsOf);
+    expect(Object.keys(now).sort()).toEqual(renamed.map((e) => e.title).sort());
+    for (const id of Object.values(ids)) expect(Object.values(now)).not.toContain(id);
+    expect(r.idGate).toEqual([
+      expect.objectContaining({ outcome: "hingenommen", unit: UNIT_A, note: "Umformulierung geprüft" }),
+    ]);
+    expect(r.idGate?.[0]?.ids.map((x) => x.id)).toEqual(byId(ids).map(([, id]) => id));
+    expect(rawUnit(dirsOf)?.held).toBeUndefined();
+  });
+
+  it("Einzeltermine: je Termin ein Angebot, je Termin ein Urteil gleich@Beginn, jede ID bleibt", async () => {
+    const dirsOf = tempData();
+    const concert = (title: string, at: string) =>
+      RawEvent.parse({
+        ...treff,
+        title,
+        format: "einmalig",
+        registration: "mit-anmeldung",
+        schedule: {
+          kind: "dates",
+          dates: ["2026-10-10", "2026-10-17", "2026-10-24"].map((d) => ({ start: `${d}T${at}`, end: `${d}T11:30` })),
+        },
+      });
+    const old = concert("Konzert für Babys", "10:00");
+    await runNightly({
+      ...options(dirsOf, unitExtractor(() => [old]).extractor),
+      only,
+      forceMigrate: only,
+    });
+    const before = (readPreviousOffers(join(dirsOf.dataDir, "offers.json"))?.offers ?? []).filter(
+      (o) => o.providerId === PROVIDER,
+    );
+    expect(before).toHaveLength(3);
+    const j = fakeJudge((input) => ({
+      kind: "ok",
+      // je verlorenem Termin der neue Beginn am selben Tag
+      verdicts: input.lost.map((l): Verdict => {
+        const day = l.starts[0]?.slice(0, 10);
+        const start = input.fresh[0]?.starts.find((s) => s.slice(0, 10) === day);
+        return start ? { id: l.id, kind: "gleich", index: 0, start } : { id: l.id, kind: "unklar" };
+      }),
+    }));
+    const { r } = await gateNight(dirsOf, { judge: j.judge, events: () => [concert("Musik im Kinderwagen", "10:30")] });
+    expect(j.seen[0]?.lost).toHaveLength(3);
+    expect(j.seen[0]?.fresh[0]?.starts).toHaveLength(3);
+    expect(r.idGate?.[0]?.outcome).toBe("uebernommen");
+    const after = (readPreviousOffers(join(dirsOf.dataDir, "offers.json"))?.offers ?? []).filter(
+      (o) => o.providerId === PROVIDER,
+    );
+    const dayToId = (offers: typeof after) =>
+      Object.fromEntries(offers.map((o) => [o.sessions[0]?.start.slice(0, 10), o.id]));
+    expect(after.every((o) => o.title === "Musik im Kinderwagen")).toBe(true);
+    expect(dayToId(after)).toEqual(dayToId(before));
+  });
+
+  it("neue Einheit (zusätzliche Programmseite): nicht gated, die übrige Einheit mit geändertem Auszug schon", async () => {
+    const { dirsOf, ids } = await baseline();
+    addPageB(dirsOf);
+    const j = fakeJudge(all("unklar"));
+    // alte Fassung von Prompt, Schema und Modell: Nur der Auszug ändert sich (Anhängen durch den Seitenfinder)
+    const { r, seen } = await gateNight(dirsOf, { judge: j.judge, keyParts: KEY_PARTS });
+    expect([...seen].sort()).toEqual([UNIT_A, UNIT_B].sort());
+    expect(j.seen.map((x) => x.unit)).toEqual([UNIT_A]);
+    const now = idsByTitle(dirsOf);
+    expect(now["Babymassage"]).toBeDefined();
+    for (const t of treffs) expect(now[t.title]).toBe(ids[t.title]);
+    expect(rawUnit(dirsOf, UNIT_B)?.held).toBeUndefined();
+    expect(rawUnit(dirsOf, UNIT_B)?.events.map((e) => e.title)).toEqual(["Babymassage"]);
+    expect(rawUnit(dirsOf, UNIT_A)?.held?.reason).toBe("unklar");
+    expect(r.idGate?.map((e) => e.unit)).toEqual([UNIT_A]);
+  });
+
+  it("Trockenlauf: Gate schreibt ins Overlay, data/raw und data/offers.json bleiben", async () => {
+    const { dirsOf, ids } = await baseline();
+    const rawFile = join(dirsOf.dataDir, "raw", `${PROVIDER}.json`);
+    const rawBefore = readFileSync(rawFile, "utf8");
+    const offersBefore = readFileSync(join(dirsOf.dataDir, "offers.json"), "utf8");
+    const { r } = await gateNight(dirsOf, { judge: fakeJudge(sameByNumber).judge, extra: { dryRun: true } });
+    expect(readFileSync(rawFile, "utf8")).toBe(rawBefore);
+    expect(readFileSync(join(dirsOf.dataDir, "offers.json"), "utf8")).toBe(offersBefore);
+    expect(r.idGate?.[0]?.outcome).toBe("uebernommen");
+    expectInherited(dirsOf, ids, join(dirsOf.runDir, "offers.json"));
+    expect(rawUnit(dirsOf, UNIT_A, join(dirsOf.runDir, "raw"))?.events.every((e) => e.keepIds)).toBe(true);
+  });
+
+  it("Trockenlauf mit unklar: Overlay hält die Einheit, IDs im Trockenergebnis bleiben", async () => {
+    const { dirsOf, ids } = await baseline();
+    await gateNight(dirsOf, { judge: fakeJudge(all("unklar")).judge, extra: { dryRun: true } });
+    expect(idsByTitle(dirsOf, join(dirsOf.runDir, "offers.json"))).toEqual(ids);
+    expect(rawUnit(dirsOf, UNIT_A, join(dirsOf.runDir, "raw"))?.held?.reason).toBe("unklar");
+    expect(rawUnit(dirsOf)?.held).toBeUndefined();
+  });
+
+  it("erste Nacht nach dem Deploy: Vorstand ohne partsHash, Seite unverändert → kein Aufruf, partsHash nachgetragen", async () => {
+    const { dirsOf, ids } = await baseline();
+    const rawFile = join(dirsOf.dataDir, "raw", `${PROVIDER}.json`);
+    const raw = JSON.parse(readFileSync(rawFile, "utf8"));
+    const parts = raw.units[UNIT_A].partsHash;
+    expect(parts).toBeDefined();
+    delete raw.units[UNIT_A].partsHash;
+    writeFileSync(rawFile, JSON.stringify(raw));
+    const j = fakeJudge(all("unklar"));
+    const { r, seen } = await gateNight(dirsOf, { judge: j.judge, keyParts: KEY_PARTS });
+    expect(seen).toEqual([]);
+    expect(j.seen).toEqual([]);
+    expect(r.idGate).toBeUndefined();
+    expect(rawUnit(dirsOf)?.partsHash).toBe(parts);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+  });
+
+  it("erste Nacht nach dem Deploy, Seite geändert: fehlendes partsHash zählt als andere Fassung (gerichtet)", async () => {
+    const { dirsOf, ids } = await baseline();
+    const rawFile = join(dirsOf.dataDir, "raw", `${PROVIDER}.json`);
+    const raw = JSON.parse(readFileSync(rawFile, "utf8"));
+    delete raw.units[UNIT_A].partsHash;
+    writeFileSync(rawFile, JSON.stringify(raw));
+    const j = fakeJudge(all("unklar"));
+    await gateNight(dirsOf, { judge: j.judge, keyParts: KEY_PARTS, text: (url) => `Programm ${url} neu` });
+    expect(j.seen).toHaveLength(1);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+  });
+
+  it("gleiche Fassung, Seite geändert: kein Gate, Verluste wie bisher erlaubt (ADR 0022)", async () => {
+    const { dirsOf } = await baseline();
+    const j = fakeJudge(all("unklar"));
+    const { r } = await gateNight(dirsOf, {
+      judge: j.judge,
+      keyParts: KEY_PARTS,
+      text: (url) => `Programm ${url} neu`,
+    });
+    expect(j.seen).toEqual([]);
+    expect(r.idGate).toBeUndefined();
+    expect(Object.keys(idsByTitle(dirsOf)).sort()).toEqual(renamed.map((e) => e.title).sort());
   });
 });
