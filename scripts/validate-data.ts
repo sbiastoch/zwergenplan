@@ -7,6 +7,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { parse } from "yaml";
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
+import { berlinIsoDate } from "../src/domain/time.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
 import { DiscoverState, reservedConflicts } from "./pipeline/lib/discover-state.ts";
@@ -85,9 +86,10 @@ function discoverIssues(): string[] {
 
 /**
  * Hinnehmen-Datei `data/id-hinnehmen.yaml` (ADR 0041, Punkt 7): von Hand gepflegt, deshalb hier geprüft (Schema
- * `IdAcceptance`, Anbieter im Katalog). Fehlt sie, ist nichts hingenommen.
+ * `IdAcceptance`, Anbieter im Katalog, kein Datum nach `today`). Fehlt sie, ist nichts hingenommen. `today` ist der
+ * Berliner Tag der echten Uhr, auch für Fixtures: Die eingefrorene Uhr gilt nur im Browser (`e2e/fixtures.ts`).
  */
-function acceptanceIssues(): string[] {
+function acceptanceIssues(today: string): string[] {
   const file = new URL(source === "fixture" ? "tests/fixtures/id-hinnehmen.yaml" : "data/id-hinnehmen.yaml", ROOT);
   if (!existsSync(file)) return [];
   const label = "data/id-hinnehmen.yaml";
@@ -98,7 +100,7 @@ function acceptanceIssues(): string[] {
     return [`${label}: Lesefehler: ${(e as Error).message}`];
   }
   const anbieter = new Set(result.ok ? result.providers.filter((p) => p.role === "anbieter").map((p) => p.id) : []);
-  return idAcceptanceIssues(label, input, anbieter);
+  return idAcceptanceIssues(label, input, anbieter, today);
 }
 
 /**
@@ -129,7 +131,7 @@ const errors = [
   ...rawIssues(),
   ...discoverIssues(),
   ...unitIssues,
-  ...acceptanceIssues(),
+  ...acceptanceIssues(berlinIsoDate(now)),
 ];
 const warnings = [
   ...plausibility.warnings,

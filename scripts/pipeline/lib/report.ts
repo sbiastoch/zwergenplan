@@ -440,7 +440,7 @@ export function nightlyCommitMessage(r: NightlyReport, raws: Readonly<Record<str
   ];
   if (failing.length > 0) lines.push(`Fehler: ${failing.join(", ")}`);
   lines.push(...categoryLines(r, raws));
-  if (r.idGate && r.idGate.length > 0) lines.push(idGateLine(r.idGate));
+  if (r.idGate && r.idGate.length > 0) lines.push(...idGateLines(r.idGate));
   if (r.abort || r.brake || r.budgetHit)
     lines.push(`Vorzeitig beendet: ${r.abort ?? r.brake ?? "Zeitbudget"} (Rest unverändert)`);
   lines.push(
@@ -474,11 +474,30 @@ function idGateSection(entries: readonly IdGateEntry[]): string[] {
   return out;
 }
 
-/** Zeile im Commit-Text: Summen je Urteil über alle gerichteten Einheiten. */
-function idGateLine(entries: readonly IdGateEntry[]): string {
+/**
+ * Zeilen im Commit-Text: Summen je Urteil über alle gerichteten Einheiten, dazu jedes Hinnehmen mit Grund und jede
+ * weggefallene ID mit Urteil (Arch-Review B, M4). Was geerbt oder gehalten ist, steht nur im Bericht.
+ */
+function idGateLines(entries: readonly IdGateEntry[]): string[] {
   const ids = entries.flatMap((e) => e.ids.map((id) => ({ outcome: e.outcome, kind: id.kind })));
   const n = (f: (x: (typeof ids)[number]) => boolean) => ids.filter(f).length;
-  return `ID-Gate: ${n((x) => x.outcome !== "gehalten" && x.kind === "gleich")} geerbt, ${n(
+  const sum = `ID-Gate: ${n((x) => x.outcome !== "gehalten" && x.kind === "gleich")} geerbt, ${n(
     (x) => x.outcome !== "gehalten" && x.kind !== "gleich",
   )} weggefallen, ${n((x) => x.outcome === "gehalten")} gehalten (ADR 0041)`;
+  const who = (e: IdGateEntry) => (e.unit === "" ? e.provider : `${e.provider} ${e.unit}`);
+  const accepted = entries
+    .filter((e) => e.outcome === "hingenommen")
+    .map((e) => `Hingenommen ${who(e)}: ${e.ids.map((id) => id.id).join(", ")} (${(e.note ?? "").slice(0, 80)})`);
+  const dropped = entries.flatMap((e) =>
+    e.outcome === "gehalten"
+      ? []
+      : e.ids.flatMap((id) =>
+          id.kind === "fehlerhaft" || id.kind === "entfallen"
+            ? [
+                `Weggefallen ${who(e)}: ${id.id} „${id.title.slice(0, 80)}“ (${id.kind}: ${(id.reason ?? "").slice(0, 80)})`,
+              ]
+            : [],
+        ),
+  );
+  return [sum, ...accepted, ...dropped];
 }

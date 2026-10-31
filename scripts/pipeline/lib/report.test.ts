@@ -241,6 +241,48 @@ describe("nightlyCommitMessage (Commit des Nachtlaufs)", () => {
     expect(body.join("\n")).toContain("Schätzung API-Gegenwert");
   });
 
+  it("ID-Gate: Summenzeile, je Hinnehmen eine Zeile und je weggefallener ID eine Zeile (Arch-Review B, M4)", () => {
+    const long = "x".repeat(200);
+    const r = report({
+      idGate: [
+        {
+          provider: "fz",
+          unit: "",
+          outcome: "uebernommen",
+          ids: [
+            { id: "fz-aaa", title: "PEKiP", kind: "gleich", reason: "derselbe Kurs" },
+            { id: "fz-bbb", title: "Babymassage", kind: "entfallen", reason: "nicht mehr im Programm" },
+            { id: "fz-ccc", title: "Krabbeln", kind: "fehlerhaft", reason: long },
+          ],
+        },
+        {
+          provider: "kita",
+          unit: "kurse",
+          outcome: "hingenommen",
+          ids: [
+            { id: "kita-1", title: "Turnen" },
+            { id: "kita-2", title: "Singen" },
+          ],
+          note: "Seite neu aufgebaut",
+        },
+        {
+          provider: "fbs",
+          unit: "",
+          outcome: "gehalten",
+          held: "unklar",
+          ids: [{ id: "fbs-1", title: "Spielgruppe" }],
+        },
+      ],
+    });
+    const body = nightlyCommitMessage(r, {}).split("\n");
+    expect(body).toContain("ID-Gate: 1 geerbt, 4 weggefallen, 1 gehalten (ADR 0041)");
+    expect(body).toContain("Hingenommen kita kurse: kita-1, kita-2 (Seite neu aufgebaut)");
+    expect(body).toContain("Weggefallen fz: fz-bbb „Babymassage“ (entfallen: nicht mehr im Programm)");
+    expect(body).toContain(`Weggefallen fz: fz-ccc „Krabbeln“ (fehlerhaft: ${"x".repeat(80)})`);
+    expect(body.filter((l) => l.startsWith("Weggefallen"))).toHaveLength(2);
+    expect(body.join("\n")).not.toContain("fbs-1");
+  });
+
   it("changedProviders zählt übernommene neue Stände", () => {
     expect(changedProviders(report({ results: { a: "extrahiert", b: "pending-uebernommen", c: "einbruch" } }))).toBe(2);
   });

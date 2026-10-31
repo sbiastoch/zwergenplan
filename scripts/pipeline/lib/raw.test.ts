@@ -325,6 +325,24 @@ describe("ProviderRaw Version 2 (Plan 0048, E4)", () => {
     expect(issues(v2({ "falsch:x": ok })).length).toBeGreaterThan(0);
   });
 
+  it("fremde Events auch in pending und held (Arch-Review B, m4)", () => {
+    const foreign = { ...treff, providerId: "x" };
+    const key = { inputHash: "b".repeat(64), model: "opus", events: [foreign] };
+    const held = { ...key, since: T, reason: "unklar", lost: ["ab12cd34"] };
+    expect(issues(v2({ "seite:a": { ...ok, pending: key } }))).toEqual([
+      "f.json: Event „Offener Krabbeltreff“ gehört zu x",
+    ]);
+    expect(issues(v2({ "seite:a": { ...ok, held } }))).toEqual(["f.json: Event „Offener Krabbeltreff“ gehört zu x"]);
+  });
+
+  it("keepIds: Schlüssel ist ein Zeitpunkt mit Offset (Arch-Review B, m5)", () => {
+    const withKeep = (keepIds: Record<string, string>) =>
+      issues(v2({ "seite:a": { ...ok, status: "ok", events: [{ ...treff, keepIds }] } }));
+    expect(withKeep({ "2026-11-02T15:00:00+01:00": "ab12cd34" })).toEqual([]);
+    expect(withKeep({ "2026-11-02T15:00": "ab12cd34" }).join("\n")).toMatch(/keepIds/);
+    expect(withKeep({ montags: "ab12cd34" }).join("\n")).toMatch(/keepIds/);
+  });
+
   it("V1 bleibt gültig bis S5", () => {
     expect(issues({ ...ok, sources: [] })).toEqual([]);
   });
@@ -349,6 +367,8 @@ describe("ProviderRaw Version 2 (Plan 0048, E4)", () => {
 
 describe("Hinnehmen-Datei data/id-hinnehmen.yaml (ADR 0041, Punkt 7; Plan 0049, Nachtrag 2, B5)", () => {
   const entry = { anbieter: "familientreff-beispiel", grund: "Kurs neu zugeschnitten", datum: "2026-11-02" };
+  /** Tag des Laufs bzw. der Prüfung; alle Einträge oben liegen davor */
+  const TODAY = "2026-11-30";
 
   it("Schema: Liste von {anbieter, grund, datum}, keine weiteren Felder", () => {
     expect(IdAcceptance.parse([entry])).toEqual([entry]);
@@ -365,13 +385,13 @@ describe("Hinnehmen-Datei data/id-hinnehmen.yaml (ADR 0041, Punkt 7; Plan 0049, 
     const earlier = { ...entry, grund: "alt", datum: "2026-10-31" };
     const sameDay = { ...entry, grund: "am selben Tag", datum: "2026-11-01" };
     const later = { ...entry, grund: "später", datum: "2026-11-05" };
-    expect(acceptanceFor([], "familientreff-beispiel", since)).toBeUndefined();
-    expect(acceptanceFor([other, earlier], "familientreff-beispiel", since)).toBeUndefined();
-    expect(acceptanceFor([sameDay], "familientreff-beispiel", since)).toEqual({
+    expect(acceptanceFor([], "familientreff-beispiel", since, TODAY)).toBeUndefined();
+    expect(acceptanceFor([other, earlier], "familientreff-beispiel", since, TODAY)).toBeUndefined();
+    expect(acceptanceFor([sameDay], "familientreff-beispiel", since, TODAY)).toEqual({
       grund: "am selben Tag",
       datum: "2026-11-01",
     });
-    expect(acceptanceFor([later, sameDay, earlier], "familientreff-beispiel", since)).toEqual({
+    expect(acceptanceFor([later, sameDay, earlier], "familientreff-beispiel", since, TODAY)).toEqual({
       grund: "später",
       datum: "2026-11-05",
     });
@@ -380,18 +400,37 @@ describe("Hinnehmen-Datei data/id-hinnehmen.yaml (ADR 0041, Punkt 7; Plan 0049, 
   it("acceptanceFor: Tag nach Europe/Berlin, nicht nach UTC", () => {
     // 2026-10-31T23:30Z ist in Berlin schon der 1.11.: Ein Eintrag vom 31.10. stammt von vor dem Halten
     const since = "2026-10-31T23:30:00Z";
-    expect(acceptanceFor([{ ...entry, datum: "2026-10-31" }], "familientreff-beispiel", since)).toBeUndefined();
-    expect(acceptanceFor([{ ...entry, datum: "2026-11-01" }], "familientreff-beispiel", since)?.datum).toBe(
+    expect(acceptanceFor([{ ...entry, datum: "2026-10-31" }], "familientreff-beispiel", since, TODAY)).toBeUndefined();
+    expect(acceptanceFor([{ ...entry, datum: "2026-11-01" }], "familientreff-beispiel", since, TODAY)?.datum).toBe(
       "2026-11-01",
     );
   });
 
+  it("acceptanceFor: ein Eintrag mit Datum nach dem Lauf zählt nicht (Arch-Review B, M5)", () => {
+    const since = "2026-11-01T03:00:00+01:00";
+    const future = { ...entry, datum: "2026-12-24" };
+    expect(acceptanceFor([future], "familientreff-beispiel", since, TODAY)).toBeUndefined();
+    expect(acceptanceFor([future, { ...entry, datum: TODAY }], "familientreff-beispiel", since, TODAY)?.datum).toBe(
+      TODAY,
+    );
+  });
+
+  it("idAcceptanceIssues: Datum in der Zukunft ist ein Fehler (Arch-Review B, M5)", () => {
+    const anbieter = new Set(["familientreff-beispiel"]);
+    expect(idAcceptanceIssues("h.yaml", [{ ...entry, datum: TODAY }], anbieter, TODAY)).toEqual([]);
+    expect(idAcceptanceIssues("h.yaml", [entry, { ...entry, datum: "2026-12-01" }], anbieter, TODAY)).toEqual([
+      "h.yaml: Eintrag 2: Datum 2026-12-01 in der Zukunft – nimmt spätere Verluste ungeprüft hin",
+    ]);
+  });
+
   it("idAcceptanceIssues: Schemafehler mit Pfad, unbekannter Anbieter", () => {
     const anbieter = new Set(["familientreff-beispiel"]);
-    expect(idAcceptanceIssues("h.yaml", [entry], anbieter)).toEqual([]);
-    expect(idAcceptanceIssues("h.yaml", [{ ...entry, datum: "morgen" }], anbieter)[0]).toMatch(/^h\.yaml: 0\.datum: /);
-    expect(idAcceptanceIssues("h.yaml", { a: 1 }, anbieter)[0]).toMatch(/^h\.yaml: \(Wurzel\): /);
-    expect(idAcceptanceIssues("h.yaml", [entry, { ...entry, anbieter: "weg" }], anbieter)).toEqual([
+    expect(idAcceptanceIssues("h.yaml", [entry], anbieter, TODAY)).toEqual([]);
+    expect(idAcceptanceIssues("h.yaml", [{ ...entry, datum: "morgen" }], anbieter, TODAY)[0]).toMatch(
+      /^h\.yaml: 0\.datum: /,
+    );
+    expect(idAcceptanceIssues("h.yaml", { a: 1 }, anbieter, TODAY)[0]).toMatch(/^h\.yaml: \(Wurzel\): /);
+    expect(idAcceptanceIssues("h.yaml", [entry, { ...entry, anbieter: "weg" }], anbieter, TODAY)).toEqual([
       "h.yaml: Eintrag 2: weg ist kein Anbieter im Katalog",
     ]);
   });
