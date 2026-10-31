@@ -177,8 +177,14 @@ export interface ExtractKey {
  * Fassung des Codes, der den Eingabetext erzeugt (`extractPage`, `programmeText`, `normalizeText`, PDF, iCal,
  * `ORDER_FREE_KEY`, Abrufart; Plan 0049, Nachtrag 2, B1). Ändert sich dieser Code, ändert sich jeder Schlüssel, ohne dass
  * sich Katalog, Prompt, Schema oder Modell ändern; ohne neue Epoche liefe die Neuextraktion am ID-Gate vorbei. Erhöhen,
- * wenn der Pin-Test in `normalize.test.ts` rot wird. Geht nur in `partsHashOf` ein, nicht in den Schlüssel: Sonst
+ * wenn der Pin-Test in `input-epoch.test.ts` rot wird. Geht nur in `partsHashOf` ein, nicht in den Schlüssel: Sonst
  * extrahierte jede neue Epoche alles neu, auch wo der Text gleich bleibt.
+ *
+ * Grenzen des Pins (Arch-Review B, M1):
+ * - Die Abrufart (`--abruf alt|neu`, `io/http.ts`) liegt vor `programmeText` und ist nicht pinbar. Wer sie für den
+ *   Nachtlauf umschaltet, erhöht die Epoche von Hand im selben Commit.
+ * - `LLM_MODEL_FALLBACK` gehört bewusst nicht zur Fassung: Der zweite Versuch läuft nur nach einer Schlüsseländerung,
+ *   mit demselben Schlüssel wie der erste; das Gate hat dann schon über die Fassung des Laufs entschieden.
  */
 export const INPUT_EPOCH = 1;
 

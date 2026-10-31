@@ -49,6 +49,19 @@ export function readIdAcceptance(dataDir: string): IdAcceptance {
   }
 }
 
+/**
+ * Wie `readIdAcceptance`, für den Nachtlauf: Eine kaputte Datei bricht ihn nicht ab (Arch-Review B, m6). `warn`
+ * bekommt den Fehler, und es gilt die leere Liste, also nichts hingenommen; rot wird dann `data:validate`.
+ */
+export function readIdAcceptanceOrWarn(dataDir: string, warn: (message: string) => void): IdAcceptance {
+  try {
+    return readIdAcceptance(dataDir);
+  } catch (e) {
+    warn((e as Error).message);
+    return [];
+  }
+}
+
 export function readPreviousOffers(file: string = OFFERS): OffersFile | undefined {
   if (!existsSync(file)) return undefined;
   return OffersFileSchema.parse(readJson(file));

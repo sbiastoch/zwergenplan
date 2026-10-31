@@ -102,7 +102,7 @@ import {
   git,
   ROOT,
   readCatalog,
-  readIdAcceptance,
+  readIdAcceptanceOrWarn,
   readJson,
   readPreviousOffers,
   readRawDir,
@@ -338,7 +338,9 @@ async function nightly() {
   // Modell und Effort gehören in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
   const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
   const effort = effortOf(process.env);
-  const acceptance = readIdAcceptance(join(ROOT, "data"));
+  const acceptance = readIdAcceptanceOrWarn(join(ROOT, "data"), (m) =>
+    print(`::warning::Hinnehmen-Datei unlesbar, nichts hingenommen: ${m}`),
+  );
   const r = await runNightly({
     extractor: createExtractor({ model }),
     keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },
@@ -346,7 +348,7 @@ async function nightly() {
     strongRetry: true,
     // ID-Gate (ADR 0041): Richter mit LLM_MODEL_JUDGE (Standard opus), Hinnehmen aus data/id-hinnehmen.yaml
     judge: createJudge(),
-    accepted: (providerId, heldSince) => acceptanceFor(acceptance, providerId, heldSince),
+    accepted: (providerId, heldSince) => acceptanceFor(acceptance, providerId, heldSince, date),
     ...(umstellen ? { forceMigrate: umstellen } : {}),
     budgetMin,
     brakes: brakes.brakes,

@@ -12,6 +12,9 @@ import { categoriesOf } from "../../../src/domain/topics.ts";
 import { LocalDateTime, SOURCES } from "./candidate.ts";
 import { type ExpandWindow, expandSchedule, Schedule } from "./schedule.ts";
 
+/** Zeitpunkt mit Offset, wie `Session.start` (CLAUDE.md, Stolperfallen) */
+const Instant = z.iso.datetime({ offset: true, local: false });
+
 export const RawEvent = OfferFields.pick({
   providerId: true,
   venueId: true,
@@ -45,7 +48,7 @@ export const RawEvent = OfferFields.pick({
    * dieses Termins behält, weil der Richter es als dasselbe erkannt hat. Setzt der Code, nie das Modell: Das
    * Antwortschema lässt das Feld weg (`ExtractResponse`), sonst könnte das Modell IDs vergeben.
    */
-  keepIds: z.record(z.string(), z.string().min(1)).optional(),
+  keepIds: z.record(Instant, z.string().min(1)).optional(),
 });
 export type RawEvent = z.infer<typeof RawEvent>;
 
@@ -67,7 +70,6 @@ export const RawBatch = z.strictObject({
 });
 export type RawBatch = z.infer<typeof RawBatch>;
 
-const Instant = z.iso.datetime({ offset: true, local: false });
 const DatedKey = z.record(z.iso.date(), z.string().min(1));
 
 const Pending = z.strictObject({
@@ -316,7 +318,9 @@ export function providerRawIssues(label: string, id: string, raw: unknown, anbie
   const issues: string[] = [];
   if (!anbieter.has(id)) issues.push(`${label}: ${id} ist kein Anbieter im Katalog (räumt der nächste Nachtlauf weg)`);
   const states = isV2(r.data) ? Object.values(r.data.units) : [r.data];
-  for (const e of states.flatMap((s) => [...s.events, ...(s.pending?.events ?? [])]))
+  // auch zurückgehaltene und gehaltene Stände: Sie werden später übernommen (Arch-Review B, m4)
+  const held = (s: (typeof states)[number]) => ("held" in s ? (s.held?.events ?? []) : []);
+  for (const e of states.flatMap((s) => [...s.events, ...(s.pending?.events ?? []), ...held(s)]))
     if (e.providerId !== id) issues.push(`${label}: Event „${e.title}“ gehört zu ${e.providerId}`);
   return issues;
 }
@@ -451,25 +455,38 @@ export type IdAcceptance = z.infer<typeof IdAcceptance>;
 
 /**
  * Eintrag, der das `held` eines Anbieters seit `heldSince` (Instant) hinnimmt: `datum` ≥ Berliner Datum von
- * `heldSince`; bei mehreren der späteste.
+ * `heldSince`; bei mehreren der späteste. Ein Eintrag mit `datum` nach `today` (Tag des Laufs) zählt nicht: Er nähme
+ * Verluste hin, die noch niemand gesehen hat (Arch-Review B, M5; `data:validate` meldet ihn als Fehler).
  */
 export function acceptanceFor(
   entries: IdAcceptance,
   providerId: string,
   heldSince: string,
+  today: string,
 ): { grund: string; datum: string } | undefined {
   const day = berlinIsoDate(heldSince);
   const hit = entries
-    .filter((e) => e.anbieter === providerId && e.datum >= day)
+    .filter((e) => e.anbieter === providerId && e.datum >= day && e.datum <= today)
     .sort((a, b) => b.datum.localeCompare(a.datum))[0];
   return hit && { grund: hit.grund, datum: hit.datum };
 }
 
-/** Befunde für `pnpm data:validate`: Schema, und jede `anbieter`-ID steht im Katalog */
-export function idAcceptanceIssues(label: string, input: unknown, providerIds: ReadonlySet<string>): string[] {
+/**
+ * Befunde für `pnpm data:validate`: Schema, jede `anbieter`-ID steht im Katalog, und kein `datum` liegt nach `today`
+ * (YYYY-MM-DD, Europe/Berlin): Ein Datum in der Zukunft nähme auch Verluste bis dahin ungeprüft hin (Arch-Review B, M5).
+ */
+export function idAcceptanceIssues(
+  label: string,
+  input: unknown,
+  providerIds: ReadonlySet<string>,
+  today: string,
+): string[] {
   const r = IdAcceptance.safeParse(input);
   if (!r.success) return r.error.issues.map((i) => `${label}: ${i.path.join(".") || "(Wurzel)"}: ${i.message}`);
-  return r.data.flatMap((e, i) =>
-    providerIds.has(e.anbieter) ? [] : [`${label}: Eintrag ${i + 1}: ${e.anbieter} ist kein Anbieter im Katalog`],
-  );
+  return r.data.flatMap((e, i) => [
+    ...(providerIds.has(e.anbieter) ? [] : [`${label}: Eintrag ${i + 1}: ${e.anbieter} ist kein Anbieter im Katalog`]),
+    ...(e.datum > today
+      ? [`${label}: Eintrag ${i + 1}: Datum ${e.datum} in der Zukunft – nimmt spätere Verluste ungeprüft hin`]
+      : []),
+  ]);
 }
