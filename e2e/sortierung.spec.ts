@@ -155,7 +155,7 @@ test("Deep-Link ?sortierung=neu öffnet sortiert; der Tab-Wechsel behält die Wa
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   await expect(page).toHaveURL(/ansicht=merkliste&sortierung=neu$/);
   // Die Liste der Merkliste hat ihren eigenen Knopf (Plan 0057, E6), Kalender und Karte keinen
-  await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Nächste Termine");
+  await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Was ist zu tun");
   const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
   await views.getByRole("button", { name: "Kalender", exact: true }).click();
   await expect(sortButton(page)).toHaveCount(0);

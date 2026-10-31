@@ -2,7 +2,7 @@
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,merkliste-kalender,…] [--text=200]   Standard: lokale Preview mit
  * Fixtures
- * Ansichten: start, merkliste, merkliste-sortieren, merkliste-filter, merkliste-filter-kalender, merkliste-nah (Plan 0057,
+ * Ansichten: start, merkliste, merkliste-zutun, merkliste-laeuft (Plan 0057, E8), merkliste-sortieren, merkliste-filter, merkliste-filter-kalender, merkliste-nah (Plan 0057,
  * E5–E7a), detail, filter, filter-tageszeit (Plan 0057, E7), kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
  * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
@@ -134,6 +134,27 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Merkliste filtern" });
     await sheet.getByRole("heading", { name: "Zeitraum" }).scrollIntoViewIfNeeded();
+  },
+  // „Was ist zu tun“ (Plan 0057, E8): alle gemerkt, Abschnitte mit Zahlmarke und Marke „in N Tagen“
+  "merkliste-zutun": async (page) => {
+    for (const heart of await page.getByRole("button", { name: / merken$/ }).all()) await heart.click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+  },
+  // „Läuft gerade“ mit „Anschluss suchen“: lokal am Di 27.10., wenn PEKiP läuft. Ein laufender Kurs steht nicht mehr in
+  // „Angebote“, deshalb lokal gemerkt über den Speicher (Fixture-IDs: PEKiP, Musikgarten, Krabbeltreff)
+  "merkliste-laeuft": async (page) => {
+    if (isLocal) {
+      await page.clock.setFixedTime(new Date("2026-10-27T08:00:00+01:00"));
+      await page.evaluate(() =>
+        localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["nle21y1x", "qxdibmkc", "lxizt974"])),
+      );
+      await page.reload();
+      await ready(page);
+    } else {
+      for (const heart of await page.getByRole("button", { name: / merken$/ }).all()) await heart.click();
+    }
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("region", { name: /^Läuft gerade/ }).scrollIntoViewIfNeeded();
   },
   // „Nächstgelegen“ ohne Startpunkt: „Wovon aus gerechnet?“ über der Liste nach Terminen (Plan 0057, E7a)
   "merkliste-nah": async (page) => {

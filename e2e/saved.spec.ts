@@ -60,11 +60,11 @@ test("Herz: Tipp merkt vor, zweiter plant fest ein, dritter entfernt; Badge zäh
   await expect(page).toHaveURL(/ansicht=merkliste$/);
   await expect(page.getByRole("heading", { level: 2, name: "Meine Merkliste" })).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(2);
-  // nach Terminen mit Tagesköpfen wie auf der Startseite (Plan 0057, E6)
-  await expect(page.getByRole("region", { name: /^Mittwoch, 7\. Oktober/ }).getByTestId("offer")).toContainText(
-    "Offener Krabbeltreff",
-  );
-  await expect(page.getByTestId("offer").first()).toContainText("10:00–11:30 Uhr");
+  // „Was ist zu tun“ (Plan 0057, E8): PEKiP beginnt in 8 Tagen, der Treff geht spontan; Kacheln mit Datum
+  await expect(page.getByRole("region", { name: /^Demnächst/ }).getByTestId("offer")).toContainText("PEKiP");
+  const treff = page.getByRole("region", { name: /^Spontan möglich/ }).getByTestId("offer");
+  await expect(treff).toContainText("Offener Krabbeltreff");
+  await expect(treff.locator(".when")).toHaveText(/^Mi 7\.10\. · 10/);
   await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
   expect(
     await page.evaluate(() => [
@@ -299,7 +299,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     const cards = page.getByTestId("offer");
     await expect(cards.nth(0)).toContainText("PEKiP");
     await expect(cards.nth(1)).toContainText("Offener Krabbeltreff");
-    await expect(page.getByRole("region", { name: /^Mittwoch, 21\. Oktober/ })).toContainText("Offener Krabbeltreff");
+    await expect(cards.nth(1).locator(".when")).toHaveText(/^Mi 21\.10\. · /);
     await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 11 Terminen gemerkt");
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
     expect(await vevents(download)).toBe(11);
@@ -706,10 +706,11 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
     const cards = page.getByTestId("offer");
     await expect(cards).toHaveCount(2);
     await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten passen");
-    // Der Treff steht am Termin im Zeitraum, nicht am nächsten (Mi 7.10.)
-    await expect(cards.nth(0)).toContainText("Offener Krabbeltreff");
-    await expect(page.getByRole("region", { name: /^Mittwoch, 4\. November/ })).toContainText("Offener Krabbeltreff");
-    await expect(cards.nth(1)).toContainText("Musikgarten");
+    // „Was ist zu tun“: erst anmelden (Musikgarten), dann spontan; der Treff steht am Termin im Zeitraum, nicht am
+    // nächsten (Mi 7.10.)
+    await expect(cards.nth(0)).toContainText("Musikgarten");
+    await expect(cards.nth(1)).toContainText("Offener Krabbeltreff");
+    await expect(cards.nth(1).locator(".when")).toHaveText(/^Mi 4\.11\. · /);
     await expect(cards.filter({ hasText: "PEKiP" })).toHaveCount(0);
 
     // Einfachwahl; ein zweiter Tipp hebt die Schnellwahl auf

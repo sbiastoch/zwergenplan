@@ -57,6 +57,10 @@ interface OfferCardProps {
    * („place“) fehlen Ort und Entfernung in der Meta-Zeile, im Anbieter-Sheet („provider“) der Anbietername.
    */
   context?: "place" | "provider";
+  /** Marke „heute“, „morgen“, „in 5 Tagen“ im Abschnitt „Demnächst“ (Plan 0057, E8) */
+  soon?: string | undefined;
+  /** Fußzeile „Endet Di 1.12.“ mit „Anschluss suchen“ im Abschnitt „Läuft gerade“ (Plan 0057, E8) */
+  followUp?: { ends: string; onSearch: () => void } | undefined;
 }
 
 export function OfferCard({
@@ -67,6 +71,8 @@ export function OfferCard({
   markTentative = false,
   calendarDay,
   context,
+  soon,
+  followUp,
 }: OfferCardProps) {
   const { offer, session } = item;
   const [fresh] = useState(ctx.animate);
@@ -120,6 +126,7 @@ export function OfferCard({
           )}
         </p>
         <div className="facts">
+          {soon && <span className="fact soon">{soon}</span>}
           {tentative && <span className="fact tentative-tag">vorgemerkt</span>}
           <span className="fact">{formatFact(offer, session, ctx.now, numbered)}</span>
           <span className="fact">{costLabel(offer)}</span>
@@ -129,6 +136,20 @@ export function OfferCard({
           {availability && <span className={`fact avail-${offer.availability.status}`}>{availability}</span>}
           {unfit && <span className="fact warn">{ageRangeLabel(offer.age)}</span>}
         </div>
+        {followUp && (
+          <p className="card-next">
+            <span>{followUp.ends}</span>
+            <button
+              type="button"
+              className="linkbtn"
+              aria-label={`Anschluss an ${offer.title} suchen`}
+              onClick={followUp.onSearch}
+            >
+              Anschluss suchen
+              <Icon name="next" size={16} />
+            </button>
+          </p>
+        )}
       </div>
       <HeartButton offer={offer} stage={stage} onCycle={ctx.onCycle} onHold={ctx.onHold} />
     </article>

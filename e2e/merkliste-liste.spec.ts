@@ -113,14 +113,17 @@ test.describe("Filter der Merkliste (E5)", () => {
     await expect(sheet(page).getByLabel("von")).toHaveValue("2026-11-01");
     await expect(sheet(page).getByRole("button", { name: "ab Nov." })).toHaveAttribute("aria-pressed", "true");
     await page.keyboard.press("Escape");
+    // „Was ist zu tun“: erst anmelden, dann spontan; je Abschnitt nach dem Termin im Zeitraum
     await expect(titles(page)).toHaveText([
-      "Offener Krabbeltreff",
       "Musikgarten 1 (1–2 Jahre)",
-      "Krabbelreime & Fingerspiele",
       "„Kuckuck im Nest“ – Theater ab 18 Monaten",
+      "Offener Krabbeltreff",
+      "Krabbelreime & Fingerspiele",
     ]);
-    // der Treff steht an seinem Termin im Zeitraum, unter dem Tageskopf
-    await expect(page.getByRole("region", { name: /^Mittwoch, 4\. November/ })).toContainText("Offener Krabbeltreff");
+    // der Treff steht an seinem Termin im Zeitraum
+    await expect(page.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" }).locator(".when")).toHaveText(
+      /^Mi 4\.11\. · /,
+    );
   });
 });
 
@@ -128,9 +131,9 @@ test.describe("Sortierung der Merkliste (E6)", () => {
   test("nur in der Liste; „Zuletzt gemerkt“ kehrt die Merk-Reihenfolge um, flach ohne Kopf", async ({ page }) => {
     await preset(page, FIVE);
     await openList(page, 5);
-    await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Nächste Termine");
-    // nach Terminen mit Tagesköpfen wie auf der Startseite
-    await expect(page.getByRole("region", { name: /^Mittwoch, 7\. Oktober/ })).toContainText("Offener Krabbeltreff");
+    await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Was ist zu tun");
+    // Standard ungefüllt wie auf der Startseite (Plan 0057, E6)
+    await expect(sortButton(page)).not.toHaveClass(/\bon\b/);
     await sortButton(page).click();
     // rechtsbündig direkt unter dem Knopf (Browser-Review: ohne Bezug stand es weit unten über der Liste)
     const button = await sortButton(page).boundingBox();
@@ -139,10 +142,14 @@ test.describe("Sortierung der Merkliste (E6)", () => {
     expect(box.y - (button.y + button.height)).toBeLessThan(16);
     expect(Math.abs(box.x + box.width - (button.x + button.width))).toBeLessThan(4);
     await expect(menu(page).getByRole("menuitemradio")).toHaveText([
+      /^Was ist zu tun/,
       /^Nächste Termine/,
       /^Nächstgelegen/,
       /^Zuletzt gemerkt/,
     ]);
+    await expect(menu(page).getByRole("menuitemradio", { name: "Was ist zu tun" })).toHaveAccessibleDescription(
+      "Demnächst, anmelden, spontan, läuft",
+    );
     await menu(page).getByRole("menuitemradio", { name: "Zuletzt gemerkt" }).click();
     await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Zuletzt gemerkt");
     await expect(sortButton(page)).toBeFocused();
@@ -166,9 +173,14 @@ test.describe("Sortierung der Merkliste (E6)", () => {
     await views.getByRole("button", { name: "Liste", exact: true }).click();
     await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Zuletzt gemerkt");
 
-    // nur im Speicher: nach dem Neuladen wieder „Nächste Termine“, kein neuer Schlüssel im localStorage
+    // „Nächste Termine“ mit Tagesköpfen wie auf der Startseite
+    await sortButton(page).click();
+    await menu(page).getByRole("menuitemradio", { name: "Nächste Termine" }).click();
+    await expect(page.getByRole("region", { name: /^Mittwoch, 7\. Oktober/ })).toContainText("Offener Krabbeltreff");
+
+    // nur im Speicher: nach dem Neuladen wieder „Was ist zu tun“, kein neuer Schlüssel im localStorage
     await page.reload();
-    await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Nächste Termine");
+    await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Was ist zu tun");
     expect(await page.evaluate(() => Object.keys(localStorage).sort())).toEqual([
       "zwergenplan.einfuehrung",
       "zwergenplan.merkliste",
@@ -270,8 +282,72 @@ test("laufender Kurs mit „Vormittags“: Kachel am nächsten Termin mit „Ter
   const card = page.getByTestId("offer");
   await expect(card).toHaveCount(1);
   await expect(card).toContainText("Termin 3 von 8");
+  await expect(card.locator(".when")).toHaveText(/^Di 27\.10\. · 9:30 Uhr/);
+  await expect(page.locator("main h2.daylabel")).toHaveCount(1);
+  await expect(page.locator("main h2.daylabel")).toContainText("Läuft gerade");
+  // nach Terminen: Kopf „Heute“, nicht der vergangene Kursbeginn
+  await sortButton(page).click();
+  await menu(page).getByRole("menuitemradio", { name: "Nächste Termine" }).click();
   await expect(page.locator("main h2.daylabel")).toHaveCount(1);
   await expect(page.locator("main h2.daylabel")).toContainText("Heute");
+});
+
+test.describe("Was ist zu tun (E8)", () => {
+  const ALL = [...FIVE, "fnp2g3xh", "rv61suun", "kovtez0z"];
+  const heads = (page: Page) => page.locator("main section > h2.daylabel");
+
+  test("Abschnitte in fester Reihenfolge mit Zahlmarke; „Demnächst“ mit Marke „in N Tagen“", async ({ page }) => {
+    await preset(page, ALL);
+    await openList(page, 8);
+    await expect(heads(page).locator("> span:first-child")).toHaveText([
+      "Demnächst",
+      "Rechtzeitig anmelden",
+      "Spontan möglich",
+      "Später",
+    ]);
+    await expect(heads(page).locator(".section-count")).toHaveText(["2", "3", "2", "1"]);
+    const soon = page.getByRole("region", { name: "Demnächst, Termine in den nächsten 14 Tagen" });
+    await expect(soon.getByRole("heading", { level: 3 })).toHaveText([
+      "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)",
+      "Babymassage – Schnupper-Workshop",
+    ]);
+    await expect(soon.locator(".fact.soon")).toHaveText(["in 8 Tagen", "in 12 Tagen"]);
+    // Di 20.10. ist der 15. Tag: schon „Rechtzeitig anmelden“
+    const register = page.getByRole("region", { name: /^Rechtzeitig anmelden/ });
+    await expect(register.getByRole("heading", { level: 3 }).first()).toContainText("Bewegungslandschaft");
+    // Marke nur in „Demnächst“, „Anschluss suchen“ nur in „Läuft gerade“
+    await expect(page.locator(".fact.soon")).toHaveCount(2);
+    await expect(page.getByRole("button", { name: /^Anschluss an / })).toHaveCount(0);
+  });
+
+  test("„Läuft gerade“: „Endet …“ und „Anschluss suchen“ öffnet Angebote mit Kurs, Kategorie und Zeitraum", async ({
+    page,
+  }) => {
+    // Di 27.10., 8 Uhr: PEKiP läuft seit 13.10. (bis 1.12.), der Musikgarten beginnt am 5.11.
+    await page.clock.setFixedTime(new Date("2026-10-27T08:00:00+01:00"));
+    await preset(page, [PEKIP_ID, "qxdibmkc"]);
+    // ein Startseiten-Filter, der ersetzt wird
+    await page.goto("./?ansicht=merkliste&kosten=kostenlos");
+    await expect(page.getByTestId("offer")).toHaveCount(2);
+    await expect(heads(page).locator("> span:first-child")).toHaveText(["Demnächst", "Läuft gerade"]);
+    const running = page.getByRole("region", { name: "Läuft gerade, Laufende Kurse" });
+    await expect(running.locator(".card-next")).toContainText("Endet Di 1.12.");
+    const link = running.getByRole("button", {
+      name: "Anschluss an PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026) suchen",
+    });
+    await expect(link).toHaveText("Anschluss suchen");
+    const box = await link.boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+    await expectMobileUx(page);
+    await link.click();
+    await expect(page).toHaveURL(/\?/);
+    const params = new URL(page.url()).searchParams;
+    expect(Object.fromEntries(params)).toEqual({ format: "kurs", kat: "babykurse", von: "2026-12-02" });
+    // „Angebote“ mit den Kursen ab 2.12.: in den Fixtures keiner; ganz oben
+    await expect(page.getByRole("button", { name: /^Alle Filter, 3 aktiv/ })).toBeVisible();
+    await expect(page.getByTestId("offer")).toHaveCount(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
 });
 
 for (const colorScheme of ["light", "dark"] as const) {

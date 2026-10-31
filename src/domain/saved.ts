@@ -5,12 +5,14 @@
  * Pipeline-Lauf soll keine Merkliste leeren.
  */
 import { fittingSessions, sessionFit, splitByAge } from "./age.ts";
-import { type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
+import { byStartThenTitle, courseRunning, type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
 import type { SessionRule } from "./date-range.ts";
 import { activeFilterCount, applyFilters, EMPTY_FILTER, type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId, resolveProviderId } from "./ids.ts";
+import type { ListGroup, SavedSection } from "./listing.ts";
 import type { ReachFn, ReachTarget } from "./reach.ts";
 import type { Offer, Session } from "./schema.ts";
+import { addDays, berlinIsoDate } from "./time.ts";
 
 export function toggleId<T extends string>(ids: readonly T[], id: T): T[] {
   return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
@@ -263,10 +265,58 @@ export function savedUnfitIds(
 }
 
 /**
- * Sortierung der Liste der Merkliste (E6): „Nächste Termine“ (Standard in S3), „Nächstgelegen“, „Zuletzt gemerkt“. Die
- * Abschnitte „Was ist zu tun“ kommen in S4 dazu.
+ * Sortierung der Liste der Merkliste (E6): „Was ist zu tun“ (Abschnitte, Standard ab S4), „Nächste Termine“,
+ * „Nächstgelegen“, „Zuletzt gemerkt“.
  */
-export type SavedSort = "termine" | "nah" | "gemerkt";
+export type SavedSort = "zutun" | "termine" | "nah" | "gemerkt";
+
+/** „Demnächst“ reicht bis einschließlich zum 14. Berliner Kalendertag nach heute (E8) */
+export const SOON_DAYS = 14;
+
+/** Reihenfolge der Abschnitte (E8); die Regeln in `sectionOf` prüfen in anderer Reihenfolge */
+const SECTION_ORDER: readonly SavedSection[] = ["demnaechst", "anmelden", "spontan", "laeuft", "spaeter"];
+
+/**
+ * Abschnitt eines gemerkten Angebots am gezeigten Termin (E8); das erste Zutreffende gewinnt: ein begonnener Kurs läuft
+ * gerade, Regelmäßiges ohne Anmeldung geht spontan, sonst entscheidet der Termin: bis zum 14. Tag „Demnächst“, später
+ * mit Anmeldung „Rechtzeitig anmelden“, ohne „Später“.
+ */
+function sectionOf({ offer, session }: Occurrence, now: Date, soonUntil: string): SavedSection {
+  if (courseRunning(offer, now)) return "laeuft";
+  if (offer.format === "regelmaessig" && offer.registration === "ohne-anmeldung") return "spontan";
+  if (berlinIsoDate(session.start) <= soonUntil) return "demnaechst";
+  return offer.registration === "mit-anmeldung" ? "anmelden" : "spaeter";
+}
+
+/**
+ * Abschnitte der Liste „Was ist zu tun“ (E8): jedes Angebot genau einmal, je Abschnitt nach gezeigtem Termin sortiert,
+ * in der Reihenfolge Demnächst, Rechtzeitig anmelden, Spontan möglich, Läuft gerade, Später; leere entfallen.
+ */
+export function savedSections<T extends Offer>(items: readonly Occurrence<T>[], now: Date): ListGroup<Occurrence<T>>[] {
+  const soonUntil = addDays(berlinIsoDate(now), SOON_DAYS);
+  const bySection = new Map<SavedSection, Occurrence<T>[]>();
+  for (const item of items) {
+    const section = sectionOf(item, now, soonUntil);
+    bySection.set(section, [...(bySection.get(section) ?? []), item]);
+  }
+  return SECTION_ORDER.flatMap((section) => {
+    const list = bySection.get(section);
+    if (!list) return [];
+    return [
+      { kind: "abschnitt" as const, key: section, section, count: list.length, items: list.sort(byStartThenTitle) },
+    ];
+  });
+}
+
+/**
+ * „Anschluss suchen“ an einem laufenden Kurs (E8): Kurse derselben Kategorie ab dem Tag nach dem letzten Termin. Ersetzt
+ * die übrigen Filter der Startseite, statt sie zu ergänzen.
+ */
+export function followUpFilter(offer: Offer): FilterState {
+  const last = offer.sessions.at(-1);
+  const filter: FilterState = { ...EMPTY_FILTER, formats: ["kurs"], categories: [offer.category] };
+  return last ? { ...filter, range: { from: addDays(berlinIsoDate(last.start), 1) } } : filter;
+}
 
 /** „Zuletzt gemerkt“ (E6): nach der Merk-Reihenfolge rückwärts; ein Stufenwechsel ändert sie nicht (E1). */
 export function recentlySaved<T extends Offer>(

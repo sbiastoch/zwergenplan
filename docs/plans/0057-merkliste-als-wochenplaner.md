@@ -602,3 +602,19 @@ Abweichungen bei der Umsetzung von S3, im Sinn des Plans entschieden:
 - **Tests:** `mobile-ux` hat die Ansicht `merkliste-filter-sheet`; `scripts/screenshots.ts` die Ansichten `merkliste-sortieren`, `merkliste-filter`, `merkliste-filter-kalender` und `merkliste-nah`.
 - **Browser-Review:** Das Sortiermenü stand ohne Bezugselement weit unter dem Knopf über der Liste; `.saved-tools` ist jetzt `position: relative` wie `.status-row`, `merkliste-liste.spec.ts` prüft die Lage. Bei 320 px teilt sich der Umschalter die Zeile mit dem Sortier-Knopf (236 px): Die Schwelle der Einspaltigkeit sinkt auf 14rem, darunter bis 17rem rücken die Segmente enger (`e2e/saved.spec.ts`, „Kopf der Merkliste“).
 - **Messung** (`pnpm build && pnpm size`, nach S3): JS (initial) 110,78 kB (S2: 109,82, also +0,96 kB), CSS 13,51 kB (+0,04), Service Worker 9,17 kB.
+
+## Nachtrag S4 (2026-10-31)
+
+Abweichungen bei der Umsetzung von S4, im Sinn des Plans entschieden:
+
+- **Ort von `SavedSection`:** Der Typ steht in `src/domain/listing.ts` neben `ListGroupHead`, nicht in `saved.ts`. `saved.ts` baut die Gruppen und importiert dafür `ListGroup`; stünde der Typ dort, entstünde ein Zyklus `listing` ↔ `saved` (`no-circular`). `savedSections`, `SOON_DAYS` und `followUpFilter` stehen wie geplant in `saved.ts`.
+- **`courseRunning`:** „begonnen“ heißt erster Termin hat begonnen **und** der letzte ist nicht beendet. In der Liste fällt ein beendeter Kurs ohnehin heraus (kein gezeigter Termin); so ist die Funktion auch für sich richtig.
+- **„Endet …“:** reine Funktion `endsLabel(sessions)` in `src/ui/format.ts` („Endet Di 1.12.“, Tag des letzten Termins nach Berlin), mit Test neben `daysUntilLabel` und `sectionHeading`.
+- **„Anschluss suchen“:** behält die Sortierung der Startseite (sie ist kein Filter) und ersetzt alle Filter durch `followUpFilter`; danach springt die Liste nach oben wie bei „Für diesen Tag entdecken“.
+- **„Nächstgelegen“ ohne Startpunkt** zeigt bis dahin weiter die Liste nach Terminen, nicht die Abschnitte: Der Block sagt „Bis dahin nach Terminen“ (E7a ließ beides offen).
+- **Kacheln** in „Was ist zu tun“ tragen das Datum (Kopf ist kein Tag). Die Zahlmarke steht im `h2` zwischen Titel und Untertitel; der Name der Region bleibt „Titel, Untertitel“.
+- **Untertitel** wie im Plan (E8), nicht wie im Mockup („Einmaliges und Kursstarts …“, „Laufende Kurse und feste Gruppen“): Regelmäßiges mit Anmeldung steht auch in „Demnächst“, feste Gruppen nicht in „Läuft gerade“.
+- **Screenshots:** `scripts/screenshots.ts` hat die Ansichten `merkliste-zutun` und `merkliste-laeuft` (lokal am Di 27.10.).
+- **Browser-Review:** Bei 320 px und 200 % bricht „Anschluss suchen“ in zwei Zeilen um, der Pfeil steht dann am rechten Rand; bleibt so (ohne Umbruch liefe der Knopf über). Die dunkle Marke und die Zahlmarke waren im Dunkelmodus helle Inseln (`--ink`); sie nehmen jetzt `--sel`/`--on-sel` wie gewählte Zustände (gelb im Dunkeln). „Anschluss suchen“ lag unter der Klickfläche von `.card-open` und hat deshalb `z-index: 1` wie das Herz.
+- **Messung** (`pnpm build && pnpm size`, nach S4): JS (initial) 111,54 kB (S3: 110,78, also +0,76 kB), CSS 13,64 kB (+0,13), Service Worker 9,17 kB.
+- **Arch-Review** (keine Blocker): M1 „Läuft gerade“ ohne Gates im Dunkeln und bei 320 px / 200 % → `e2e/mobile-ux.spec.ts` hat die Ansicht `merkliste-laeuft` (Di 27.10.). m1 Tagesdifferenz als `daysBetween` in `time.ts` mit Test, `daysUntilLabel` macht nur den Text. m2 Zahlmarke `aria-hidden`, dafür „, 2 Angebote“ als `sr-only` im Kopf. m3 der E2E-Fall prüft nach „Anschluss suchen“ Badge („3 aktiv“), leere Liste und Scroll oben. m4 Messung steht oben. m5 `docs/architecture.md`: `courseRunning` neben `startedCourse` und `ListGroup` mit den Köpfen der Merkliste.

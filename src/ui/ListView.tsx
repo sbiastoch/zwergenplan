@@ -9,7 +9,7 @@ import type { ListGroup } from "../domain/listing.ts";
 import type { Origin } from "../domain/reach.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
-import { ageEmptyText, listingHeading, NOTHING_NEW } from "./format.ts";
+import { ageEmptyText, daysUntilLabel, endsLabel, listingHeading, NOTHING_NEW, plural } from "./format.ts";
 import { Icon } from "./icons.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 
@@ -30,6 +30,8 @@ interface ListViewProps {
   origin?: Origin | undefined;
   /** Kachel mit „Termin 3 von 8“ bei laufenden Kursen, wie bisher auf der Merkliste (Plan 0057, E6) */
   numbered?: boolean;
+  /** „Anschluss suchen“ an laufenden Kursen im Abschnitt „Läuft gerade“ (Plan 0057, E8) */
+  onFollowUp?: ((offer: SiteOffer) => void) | undefined;
 }
 
 export function ListView({
@@ -44,6 +46,7 @@ export function ListView({
   openOnDay,
   origin,
   numbered = false,
+  onFollowUp,
 }: ListViewProps) {
   if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} age={age} />;
   return (
@@ -58,19 +61,37 @@ export function ListView({
             {group.kind !== "flach" && (
               <h2 className={group.kind === "termin" && group.day === today ? "daylabel is-today" : "daylabel"}>
                 <span>{title}</span>
+                {/* Zahlmarke der Abschnitte „Was ist zu tun“ (Plan 0057, E8) */}
+                {group.kind === "abschnitt" && (
+                  <>
+                    <span className="section-count" aria-hidden="true">
+                      {group.count}
+                    </span>
+                    <span className="sr-only">, {plural(group.count, "Angebot", "Angebote")}</span>
+                  </>
+                )}
                 {sub && <small>{sub}</small>}
               </h2>
             )}
-            {group.items.map((item) => (
-              <OfferCard
-                key={item.offer.id}
-                item={item}
-                ctx={ctx}
-                dated={dated}
-                numbered={numbered}
-                calendarDay={openOnDay ? berlinIsoDate(item.session.start) : undefined}
-              />
-            ))}
+            {group.items.map((item) => {
+              const section = group.kind === "abschnitt" ? group.section : undefined;
+              return (
+                <OfferCard
+                  key={item.offer.id}
+                  item={item}
+                  ctx={ctx}
+                  dated={dated}
+                  numbered={numbered}
+                  calendarDay={openOnDay ? berlinIsoDate(item.session.start) : undefined}
+                  soon={section === "demnaechst" ? daysUntilLabel(berlinIsoDate(item.session.start), today) : undefined}
+                  followUp={
+                    section === "laeuft" && onFollowUp
+                      ? { ends: endsLabel(item.offer.sessions), onSearch: () => onFollowUp(item.offer) }
+                      : undefined
+                  }
+                />
+              );
+            })}
           </section>
         );
       })}

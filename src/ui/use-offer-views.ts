@@ -35,6 +35,7 @@ import {
   savedFilterCount,
   savedOffers,
   savedRule,
+  savedSections,
   savedUnfitIds,
 } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -192,7 +193,7 @@ export function useOfferViews({
   savedIds,
   tentative = NO_IDS,
   savedFilter = EMPTY_SAVED_FILTER,
-  savedSort = "termine",
+  savedSort = "zutun",
   savedLimitActive = false,
   now,
   reach,
@@ -299,6 +300,7 @@ export function useOfferViews({
       const items = recentlySaved(savedVisible, savedIds);
       return items.length > 0 ? [{ kind: "flach", key: "gemerkt", items }] : [];
     }
+    if (savedSort === "zutun") return savedSections(savedVisible, now);
     if (savedSort === "nah" && reach) return groupByReach(savedVisibleList, now, reachOf, savedSessionRule, savedFits);
     return groupByNextSession(savedVisibleList, now, savedSessionRule, savedFits).map(({ day, items }) => ({
       kind: "termin",

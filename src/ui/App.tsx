@@ -20,7 +20,14 @@ import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Sort, type Tab, tabSection } from "../domain/route.ts";
-import { EMPTY_SAVED_FILTER, type SavedFilter, type SavedSort, type SavedStage, savedRule } from "../domain/saved.ts";
+import {
+  EMPTY_SAVED_FILTER,
+  followUpFilter,
+  type SavedFilter,
+  type SavedSort,
+  type SavedStage,
+  savedRule,
+} from "../domain/saved.ts";
 import { searchOf } from "../domain/searches.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
@@ -118,6 +125,7 @@ const SORT_TITLES: Record<SortChoice, string> = {
 
 /** Sortierungen der Merkliste (Plan 0057, E6); Titel wie auf der Startseite */
 const SAVED_SORT_TITLES: Record<SavedSort, string> = {
+  zutun: "Was ist zu tun",
   termine: SORT_TITLES.termine,
   nah: SORT_TITLES.nah,
   gemerkt: "Zuletzt gemerkt",
@@ -156,7 +164,7 @@ export function App() {
   // Filter und Sortierung der Merkliste: getrennt von der Startseite, nie in der URL, überstehen Tab- und
   // Darstellungswechsel, nicht das Neuladen (Plan 0025, E6; Plan 0057, E5, E6)
   const [savedFilter, setSavedFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER);
-  const [savedSort, setSavedSort] = useState<SavedSort>("termine");
+  const [savedSort, setSavedSort] = useState<SavedSort>("zutun");
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. Aus der
   // Aufforderung „Wovon aus gerechnet?“ geht er stattdessen auf die Statuszeile (`originFromPrompt`, Plan 0043, E7).
   const filterButton = useRef<HTMLButtonElement>(null);
@@ -308,6 +316,12 @@ export function App() {
   // übrigen Startseiten-Filter bleiben.
   const discoverRange = ({ from, to }: { from: string; to: string }) => {
     replace({ ...route, tab: "entdecken", filter: withDateRange(route.filter, from, to) });
+    views.resetPage();
+    window.scrollTo({ top: 0 });
+  };
+  /** „Anschluss suchen“ (Plan 0057, E8): Angebote mit Kursen der Kategorie ab dem Tag nach dem letzten Termin */
+  const followUp = (offer: SiteOffer) => {
+    replace({ ...route, tab: "entdecken", filter: followUpFilter(offer) });
     views.resetPage();
     window.scrollTo({ top: 0 });
   };
@@ -529,6 +543,7 @@ export function App() {
     ),
   ];
   const savedSortOptions: readonly SortOption<SavedSort>[] = [
+    { value: "zutun", title: SAVED_SORT_TITLES.zutun, sub: "Demnächst, anmelden, spontan, läuft" },
     { value: "termine", title: SORT_TITLES.termine, sub: "was als Nächstes stattfindet" },
     { value: "nah", title: SORT_TITLES.nah, sub: nearSortSub(reachMode, origin) },
     { value: "gemerkt", title: SAVED_SORT_TITLES.gemerkt, sub: "was du zuletzt gemerkt hast" },
@@ -848,11 +863,9 @@ export function App() {
                 sheetButton={filterButton}
               />
             }
-            sortMenu={
-              <SortMenu options={savedSortOptions} current={savedSort} plain="termine" onChange={onSavedSort} />
-            }
+            sortMenu={<SortMenu options={savedSortOptions} current={savedSort} plain="zutun" onChange={onSavedSort} />}
             status={statusLine}
-            sortNote={savedSort === "termine" ? undefined : SAVED_SORT_TITLES[savedSort]}
+            sortNote={savedSort === "zutun" ? undefined : SAVED_SORT_TITLES[savedSort]}
             pending={savedListPending}
             notes={
               savedHint && (
@@ -896,6 +909,7 @@ export function App() {
                     openOnDay={ruleActive(savedRule(savedFilter, true))}
                     origin={origin}
                     numbered
+                    onFollowUp={followUp}
                   />
                 )}
               </>

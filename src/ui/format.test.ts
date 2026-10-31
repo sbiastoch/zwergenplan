@@ -20,6 +20,8 @@ import {
   clock,
   collectionToast,
   dayHeading,
+  daysUntilLabel,
+  endsLabel,
   exportLabel,
   formatFact,
   inViewStatusParts,
@@ -49,6 +51,7 @@ import {
   savedMapStatusParts,
   savedStatusParts,
   searchLabel,
+  sectionHeading,
   selectionHeading,
   seriesToast,
   shortDate,
@@ -162,6 +165,29 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
     expect(listedSince("2026-10-22T05:00:00+02:00")).toBe("Im Zwergenplan seit 22. Oktober");
     // Berliner Tag: 23:30 UTC am 21.10. ist schon der 22.
     expect(listedSince("2026-10-21T23:30:00Z")).toBe("Im Zwergenplan seit 22. Oktober");
+  });
+
+  it("benennt die Abschnitte „Was ist zu tun“ und ihre Kachel-Zusätze (Plan 0057, E8)", () => {
+    expect(sectionHeading("demnaechst")).toEqual({ title: "Demnächst", sub: "Termine in den nächsten 14 Tagen" });
+    expect(sectionHeading("anmelden")).toEqual({
+      title: "Rechtzeitig anmelden",
+      sub: "Beginnt später, Anmeldung nötig – nach Beginn sortiert",
+    });
+    expect(sectionHeading("spontan")).toEqual({ title: "Spontan möglich", sub: "Ohne Anmeldung, einfach hingehen" });
+    expect(sectionHeading("laeuft")).toEqual({ title: "Läuft gerade", sub: "Laufende Kurse" });
+    expect(sectionHeading("spaeter")).toEqual({ title: "Später", sub: "Ohne Anmeldung" });
+    expect(listingHeading({ kind: "abschnitt", section: "laeuft", count: 2 }, "2026-10-05")).toEqual(
+      sectionHeading("laeuft"),
+    );
+    expect(daysUntilLabel("2026-10-05", "2026-10-05")).toBe("heute");
+    expect(daysUntilLabel("2026-10-06", "2026-10-05")).toBe("morgen");
+    expect(daysUntilLabel("2026-10-07", "2026-10-05")).toBe("in 2 Tagen");
+    // über das Monatsende und die Zeitumstellung (25.10.)
+    expect(daysUntilLabel("2026-11-02", "2026-10-19")).toBe("in 14 Tagen");
+    // Ende des letzten Termins nach Berlin: 0:30 Uhr ist in Los Angeles noch der Vortag
+    expect(endsLabel([{ start: fromBerlinLocal("2026-12-01T00:30"), end: fromBerlinLocal("2026-12-01T01:30") }])).toBe(
+      "Endet Di 1.12.",
+    );
   });
 
   it("schreibt Kurzdaten, Wochen und den Datenstand", () => {

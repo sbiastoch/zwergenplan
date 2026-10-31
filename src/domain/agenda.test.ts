@@ -3,6 +3,7 @@ import {
   allFits,
   collapsedSessions,
   courseProgress,
+  courseRunning,
   discoverable,
   endedOnDay,
   groupByNextSession,
@@ -329,6 +330,25 @@ describe("startedCourse und discoverable (Plan 0053, E1)", () => {
     const treff = fixtureOffer("krabbeltreff");
     expect(startedCourse(treff, at("2026-10-20T12:00:00+02:00"))).toBe(false);
     expect(discoverable(treff, at("2027-06-01T12:00:00+02:00"))).toBe(false);
+  });
+});
+
+describe("courseRunning (Plan 0057, E8)", () => {
+  const pekip = fixtureOffer("pekip-herbst"); // Kurs mit Anmeldung, 13.10. bis 1.12., dienstags 9:30
+  const at = (iso: string) => new Date(iso);
+
+  it("ein Kurs läuft ab Beginn des ersten Termins, mit oder ohne Anmeldung", () => {
+    expect(courseRunning(pekip, at("2026-10-13T09:29:00+02:00"))).toBe(false);
+    expect(courseRunning(pekip, at("2026-10-13T09:30:00+02:00"))).toBe(true);
+    const open = { ...pekip, registration: "ohne-anmeldung" as const };
+    expect(courseRunning(open, at("2026-10-20T12:00:00+02:00"))).toBe(true);
+    // startedCourse bleibt bei Kursen mit Anmeldung (Plan 0053)
+    expect(startedCourse(open, at("2026-10-20T12:00:00+02:00"))).toBe(false);
+  });
+
+  it("nach dem letzten Termin und bei regelmäßigen Angeboten nicht", () => {
+    expect(courseRunning(pekip, at("2026-12-24T12:00:00+01:00"))).toBe(false);
+    expect(courseRunning(fixtureOffer("krabbeltreff"), at("2026-10-20T12:00:00+02:00"))).toBe(false);
   });
 });
 

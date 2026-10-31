@@ -10,7 +10,7 @@ import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange, Daytime } from "../domain/date-range.ts";
 import { filterFromSearch } from "../domain/filter.ts";
 import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
-import { type ListGroupHead, METER_BANDS, NEW_DAYS } from "../domain/listing.ts";
+import { type ListGroupHead, METER_BANDS, NEW_DAYS, type SavedSection } from "../domain/listing.ts";
 import {
   distanceText,
   type Origin,
@@ -21,10 +21,10 @@ import {
 } from "../domain/reach.ts";
 import { regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
-import type { ExportSelection, SavedStage } from "../domain/saved.ts";
+import { type ExportSelection, type SavedStage, SOON_DAYS } from "../domain/saved.ts";
 import type { Cost, Format, Registration, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
-import { addDays, berlinDate, berlinIsoDate, isoWeekday, parseIsoDate } from "../domain/time.ts";
+import { addDays, berlinDate, berlinIsoDate, daysBetween, isoWeekday, parseIsoDate } from "../domain/time.ts";
 import { CATEGORY_LABELS } from "../domain/topics.ts";
 import type { TransitLineNames, TransitOther, TransitSource } from "../domain/transit-types.ts";
 import type { ReachMode } from "./use-transit.ts";
@@ -133,7 +133,36 @@ export function listingHeading(group: ListGroupHead, today: string, origin?: Ori
     case "flach":
       // kein sichtbarer Kopf, nur der Name des Abschnitts (Plan 0057, E6)
       return { title: "Zuletzt gemerkt" };
+    case "abschnitt":
+      return sectionHeading(group.section);
   }
+}
+
+const SECTION_HEADINGS: Record<SavedSection, { title: string; sub: string }> = {
+  demnaechst: { title: "Demnächst", sub: `Termine in den nächsten ${SOON_DAYS} Tagen` },
+  anmelden: { title: "Rechtzeitig anmelden", sub: "Beginnt später, Anmeldung nötig – nach Beginn sortiert" },
+  spontan: { title: "Spontan möglich", sub: "Ohne Anmeldung, einfach hingehen" },
+  laeuft: { title: "Läuft gerade", sub: "Laufende Kurse" },
+  spaeter: { title: "Später", sub: "Ohne Anmeldung" },
+};
+
+/** Kopf eines Abschnitts der Liste „Was ist zu tun“ (Plan 0057, E8); die Anzahl steht als Zahlmarke daneben */
+export function sectionHeading(section: SavedSection): { title: string; sub: string } {
+  return SECTION_HEADINGS[section];
+}
+
+/** Marke in „Demnächst“ (Plan 0057, E8): „heute“, „morgen“, „in 5 Tagen“ nach Berliner Kalendertagen */
+export function daysUntilLabel(day: string, today: string): string {
+  const days = daysBetween(today, day);
+  // „Demnächst“ hat nur kommende Termine; ein vergangener Tag kommt nicht vor
+  if (days <= 0) return "heute";
+  return days === 1 ? "morgen" : `in ${days} Tagen`;
+}
+
+/** Fußzeile in „Läuft gerade“ (Plan 0057, E8): „Endet Di 1.12.“ am Tag des letzten Termins */
+export function endsLabel(sessions: readonly Session[]): string {
+  const last = sessions.at(-1);
+  return last ? `Endet ${shortDate(sessionDay(last))}` : "";
 }
 
 /** Hinweis über „Früher eingestellt“, wenn nichts Neues in der Liste steht (Plan 0043, E4) */

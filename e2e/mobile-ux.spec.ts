@@ -235,6 +235,15 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByRole("button", { name: "Alle Filter, 2 aktiv" })).toBeVisible();
     await expect(page.getByRole("status")).toContainText(/von 3 gemerkten Angeboten/);
   },
+  // Plan 0057, E8: „Was ist zu tun“ am Di 27.10. mit „Läuft gerade“ (PEKiP, Fußzeile „Endet …“ mit „Anschluss suchen“)
+  // und „Demnächst“ (Musikgarten mit Marke „in 9 Tagen“)
+  "merkliste-laeuft": async (page) => {
+    await page.clock.setFixedTime(new Date("2026-10-27T08:00:00+01:00"));
+    await page.evaluate(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["nle21y1x", "qxdibmkc"])));
+    await page.goto("./?ansicht=merkliste");
+    await expect(page.getByRole("button", { name: /^Anschluss an PEKiP/ })).toBeVisible();
+    await expect(page.locator(".fact.soon")).toHaveText("in 9 Tagen");
+  },
   // Plan 0025, E5a: Der Filter blendet alle gemerkten aus
   "merkliste-gefiltert-leer": async (page) => {
     await openSavedList(page);

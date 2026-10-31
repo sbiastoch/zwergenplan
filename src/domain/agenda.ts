@@ -64,6 +64,16 @@ export function startedCourse(offer: Offer, now: Date): boolean {
 }
 
 /**
+ * Läuft ein Kurs gerade (Plan 0057, E8, „Läuft gerade“)? Sein erster Termin hat begonnen, der letzte ist nicht beendet;
+ * anders als `startedCourse` mit oder ohne Anmeldung.
+ */
+export function courseRunning(offer: Offer, now: Date): boolean {
+  const [first] = offer.sessions;
+  const last = offer.sessions.at(-1);
+  return offer.format === "kurs" && !!first && !!last && Date.parse(first.start) <= +now && notEnded(now)(last);
+}
+
+/**
  * Steht ein Angebot in „Entdecken“ (Liste, Karte, Anbieter, Wochen-Nachricht)? Mit kommendem Termin und nicht als
  * laufender Kurs (Plan 0053, E1). Die Merkliste zeigt laufende Kurse weiter (`runningCourses` in filter.ts).
  */

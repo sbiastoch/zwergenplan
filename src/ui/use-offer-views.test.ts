@@ -658,12 +658,22 @@ describe("useOfferViews", () => {
     const input = { offers: [early, late], savedIds: [late.id, early.id], route };
     const titles = (v: OfferViews) => v.savedGroups.map((g) => [g.kind, ...ids(g.items.map((i) => i.offer))]);
 
+    it("Standard „Was ist zu tun“: Abschnitte (E8)", () => {
+      const later = offer("spaeter", "2026-11-20");
+      expect(
+        titles(render({ ...input, offers: [early, late, later], savedIds: [later.id, ...input.savedIds] })),
+      ).toEqual([
+        ["abschnitt", "frueh", "spaet"],
+        ["abschnitt", "spaeter"],
+      ]);
+    });
+
     it("„Nächste Termine“ nach Tagen; ohne Wegzeit auch bei „Nächstgelegen“", () => {
       const byDay = [
         ["termin", "frueh"],
         ["termin", "spaet"],
       ];
-      expect(titles(render(input))).toEqual(byDay);
+      expect(titles(render({ ...input, savedSort: "termine" }))).toEqual(byDay);
       expect(titles(render({ ...input, savedSort: "nah" }))).toEqual(byDay);
     });
 

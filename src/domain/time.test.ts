@@ -4,6 +4,7 @@ import {
   addMonths,
   berlinIsoDate,
   berlinKey,
+  daysBetween,
   formatGermanDate,
   fromBerlinLocal,
   isIsoDate,
@@ -51,6 +52,10 @@ describe("Kalenderrechnung", () => {
     expect(addDays("2026-10-31", 1)).toBe("2026-11-01");
     expect(addDays("2026-12-31", 1)).toBe("2027-01-01");
     expect(addDays("2026-10-25", 7)).toBe("2026-11-01");
+    // Gegenstück (Plan 0057, E8): ganze Kalendertage, über Monatsende und Zeitumstellung
+    expect(daysBetween("2026-10-19", "2026-11-02")).toBe(14);
+    expect(daysBetween("2026-10-05", "2026-10-05")).toBe(0);
+    expect(daysBetween("2026-10-06", "2026-10-05")).toBe(-1);
     expect(addDays("2026-03-01", -1)).toBe("2026-02-28");
   });
 

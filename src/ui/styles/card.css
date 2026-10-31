@@ -189,6 +189,32 @@
     background: none;
     border: 1.5px dashed var(--muted);
   }
+  /* „heute“, „morgen“, „in N Tagen“ in „Demnächst“ (Plan 0057, E8): Inversfläche (`--sel`), im dunklen Thema gelb
+     statt hell */
+  .fact.soon {
+    background: var(--sel);
+    color: var(--on-sel);
+  }
+  /* „Endet Di 1.12.“ mit „Anschluss suchen“ in „Läuft gerade“ (Plan 0057, E8); unter dem Herz, also volle Breite */
+  .card-next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 8px;
+    margin: 10px 0 -6px;
+    padding-top: 4px;
+    border-top: 2px dashed var(--muted);
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  /* über der Fläche von `.card-open`, die die ganze Kachel öffnet (wie das Herz) */
+  .card-next .linkbtn {
+    position: relative;
+    z-index: 1;
+    gap: 4px;
+    margin-right: -4px;
+  }
 
   .heart {
     position: absolute;

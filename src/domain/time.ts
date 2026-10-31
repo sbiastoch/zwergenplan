@@ -133,6 +133,13 @@ export function addDays(isoDate: string, days: number): string {
   return fromUtcDate(new Date(Date.UTC(year, month - 1, day + days)));
 }
 
+/** Ganze Kalendertage von `from` bis `to` (ISO-Daten, ohne Zeitzonenbezug); negativ, wenn `to` davor liegt. */
+export function daysBetween(from: string, to: string): number {
+  const a = parseIsoDate(from);
+  const b = parseIsoDate(to);
+  return Math.round((Date.UTC(b.year, b.month - 1, b.day) - Date.UTC(a.year, a.month - 1, a.day)) / 86_400_000);
+}
+
 /** Kalendertag + n Monate; der Tag wird aufs Monatsende gekappt (31.10. + 4 → 28.2.). */
 export function addMonths(isoDate: string, months: number): string {
   const { year, month, day } = parseIsoDate(isoDate);
