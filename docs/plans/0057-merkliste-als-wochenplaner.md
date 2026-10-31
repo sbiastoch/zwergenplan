@@ -633,3 +633,18 @@ Abweichungen bei der Umsetzung von S5, im Sinn des Plans entschieden:
 - **Kontrast der Umriss-Formen (E4, Browser-Review):** Der Strich nimmt `currentColor` des Tagesknopfs und kippt mit der Auswahl. Gemessen: hell `#13212e` auf Weiß, gewählt `#e8f1ff` auf `#13212e`; dunkel `#eef3f8` auf `#1b2733`, gewählt `#13212e` auf Gelb `#ffd93b`. Alle weit über 3:1, keine Korrektur nötig.
 - **Browser-Review:** Kalender als Start mit freien Tagen, Wochenende, vorgemerkter Form und Export-Knopf hell/dunkel, 320 px und 200 %: Die Zeilen brechen um, der Link steht dann unter dem Text, der Pfeil am rechten Rand (wie „Anschluss suchen“, S4). Keine Befunde.
 - **Messung** (`pnpm build && pnpm size`, nach S5): JS (initial) 112,25 kB (S4: 111,54, also +0,71 kB), CSS 13,68 kB (+0,04), Service Worker 9,17 kB.
+
+## Nachtrag: Karten-Tests warten auf Kameraende (2026-10-31)
+
+**Anlass:** Auf dem Branch mit S1–S4 war `e2e/anbieter-karte.spec.ts`, Test 8 („mit Stadtteil startet die Karte dort …“), auf `pixel-7` im Erstversuch und im Retry rot (CI-Lauf 41165104727): Der Kachel-Mock sah `9/271/175.pbf` „ohne Karte im DOM“. Die App ist nicht schuld, S3/S4 auch nicht.
+
+**Ursache (Beleg):** Der Trace zeigt die Reihenfolge `setViewportSize(412 × 915)` → `goto` (+10 ms) → Request `9/271/175` (+12 ms), der Mock prüft dann schon das neue, leere Dokument. Nach „Alle zeigen“ im Querformat steht die Karte bei Zoom 9,93. Das Hochformat zeigt mehr Fläche nach Süden. MapLibre zieht die Größe per ResizeObserver nach und fordert genau diese Kachel an. Lokal nachgemessen: ohne Neuladen, 1,5 s nach dem Wechsel aufs Hochformat, kam in 3 von 3 Läufen genau `/planet/test/9/271/175.pbf`. Ob der Request vor oder nach dem Neuladen ankommt, ist reines Timing. Dazu kommt die Schwäche aus f3c0777: `idle()` dieser Spec und `mapSettled()` galten schon mit `loaded()` als ruhig, auch mitten in einer Kamerafahrt.
+
+**Änderung:**
+- `e2e/fixtures.ts`:
+  - `mapIdle(page)`: wartet auf `loaded() && !isMoving()`, sonst auf das Ereignis `idle`. `mapSettled` nutzt das.
+  - `setViewportSettled(page, size)`: setzt den Viewport, wartet, bis die Zeichenfläche die Größe des Containers hat (`resize()` lief), wartet zwei Frames für das Rendern, das die Kacheln anfordert, dann `mapIdle`.
+- `e2e/anbieter-karte.spec.ts`: `idle` ist `mapIdle`; Test 8 wechselt den Viewport beide Male über `setViewportSettled`.
+- `e2e/karte.spec.ts`: Der Test zum Startpunkt im Querformat wechselt ebenso über `setViewportSettled`; `TestMap` kennt `getContainer` und `getCanvas`.
+
+**Test:** `pnpm verify` grün. `e2e/anbieter-karte.spec.ts` und `e2e/karte.spec.ts` liefen mehrfach auf `pixel-7`, `pixel-7-quer`, `desktop` und `android-klein`.

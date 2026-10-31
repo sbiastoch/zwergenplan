@@ -286,14 +286,49 @@ export const MAP_READY = { timeout: 20_000 };
  */
 export async function mapSettled(page: Page): Promise<void> {
   await expect(page.locator(".map-box")).toHaveAttribute("data-state", "bereit", MAP_READY);
+  await mapIdle(page);
+}
+
+/**
+ * Wartet, bis die Karte nichts mehr lädt oder bewegt (Plan 0057, Nachtrag „Karten-Tests warten auf Kameraende“).
+ * `loaded()` allein meint Stil und Kacheln, nicht die Kamera: Mitten in `fitBounds`/`easeTo` ist es oft schon true.
+ * Ohne `__zpMap` (Deploy-Build, Karte nicht offen) kehrt es sofort zurück.
+ */
+export async function mapIdle(page: Page): Promise<void> {
   await page.evaluate(
     () =>
       new Promise<void>((resolve) => {
         const map = window.__zpMap;
-        if (!map || map.loaded()) resolve();
+        if (!map || (map.loaded() && !map.isMoving())) resolve();
         else map.once("idle", () => resolve());
       }),
   );
+}
+
+/**
+ * Viewport ändern, während eine Karte offen ist, und warten, bis sie sich angepasst hat (Plan 0057, Nachtrag „Karten-Tests
+ * warten auf Kameraende“). MapLibre zieht die Größe per ResizeObserver nach und lädt Kacheln für den neuen Ausschnitt.
+ * Lädt der Test direkt danach neu, laufen diese Requests in die Navigation, und der Kachel-Mock sieht sie ohne Karte im
+ * DOM. Darum: warten, bis die Zeichenfläche die Größe des Containers hat (`resize()` lief), zwei Frames für das Rendern,
+ * das die Kacheln anfordert, dann bis zur Ruhe.
+ */
+export async function setViewportSettled(page: Page, size: { width: number; height: number }): Promise<void> {
+  await page.setViewportSize(size);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const map = window.__zpMap;
+        if (!map) return true;
+        const box = map.getContainer();
+        const canvas = map.getCanvas();
+        return canvas.clientWidth === box.clientWidth && canvas.clientHeight === box.clientHeight;
+      }),
+    )
+    .toBe(true);
+  await page.evaluate(
+    () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+  );
+  await mapIdle(page);
 }
 
 /**
