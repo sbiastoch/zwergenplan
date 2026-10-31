@@ -21,6 +21,17 @@ test("Leerzustand führt zurück zum Entdecken", async ({ page }) => {
   await expect(page.getByTestId("offer").first()).toBeVisible();
 });
 
+/** Tab „Merkliste“ öffnet den Kalender (Plan 0057, E9); danach auf die Liste umschalten */
+async function tabToList(page: Page) {
+  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await expect(page).toHaveURL(/ansicht=merkliste-kalender$/);
+  await page
+    .getByRole("group", { name: "Darstellung der Merkliste" })
+    .getByRole("button", { name: "Liste", exact: true })
+    .click();
+  await expect(page).toHaveURL(/ansicht=merkliste$/);
+}
+
 /** Herz ein- oder zweimal tippen: vorgemerkt bzw. fest eingeplant (Plan 0057, E2) */
 async function tapHeart(page: Page, title: string, times = 2) {
   const heart = page.getByRole("button", { name: `${title} merken` });
@@ -56,8 +67,7 @@ test("Herz: Tipp merkt vor, zweiter plant fest ein, dritter entfernt; Badge zäh
     "mixed",
   );
   await expect(page.getByRole("button", { name: `${PEKIP} merken` })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: /^Merkliste/ }).click();
-  await expect(page).toHaveURL(/ansicht=merkliste$/);
+  await tabToList(page);
   await expect(page.getByRole("heading", { level: 2, name: "Meine Merkliste" })).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(2);
   // „Was ist zu tun“ (Plan 0057, E8): PEKiP beginnt in 8 Tagen, der Treff geht spontan; Kacheln mit Datum
@@ -65,7 +75,7 @@ test("Herz: Tipp merkt vor, zweiter plant fest ein, dritter entfernt; Badge zäh
   const treff = page.getByRole("region", { name: /^Spontan möglich/ }).getByTestId("offer");
   await expect(treff).toContainText("Offener Krabbeltreff");
   await expect(treff.locator(".when")).toHaveText(/^Mi 7\.10\. · 10/);
-  await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+  await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
   expect(
     await page.evaluate(() => [
       localStorage.getItem("zwergenplan.merkliste"),
@@ -96,7 +106,7 @@ test("„Rückgängig“ im Toast stellt die vorige Stufe ohne Animation her, de
 
   // Entfernen auf der Merkliste: Die Kachel verschwindet, „Rückgängig“ holt sie zurück, der Fokus aufs neue Herz
   await tapHeart(page, PEKIP);
-  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await tabToList(page);
   await expect(page.getByTestId("offer")).toHaveCount(1);
   await page.getByRole("button", { name: `${PEKIP} merken` }).click();
   await expect(page.getByTestId("offer")).toHaveCount(0);
@@ -170,7 +180,7 @@ test("Fokus landet auf dem aktiven Tab, wenn die Kachel nach dem Ablösen im Det
 }) => {
   await tapHeart(page, "Offener Krabbeltreff");
   await tapHeart(page, PEKIP);
-  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await tabToList(page);
   await expect(page.getByTestId("offer")).toHaveCount(2);
 
   await page.getByRole("heading", { level: 3, name: "Offener Krabbeltreff" }).getByRole("button").click();
@@ -188,10 +198,14 @@ test("Fokus landet auf dem aktiven Tab, wenn die Kachel nach dem Ablösen im Det
   await expect(page.getByRole("button", { name: /^Merkliste/ })).toBeFocused();
 });
 
-test("lädt alle fest eingeplanten Termine als eine ICS-Datei", async ({ page }) => {
+test("lädt alle fest eingeplanten Termine als eine ICS-Datei, auch aus dem Kalender (Plan 0057, E9)", async ({
+  page,
+}) => {
   await tapHeart(page, "Offener Krabbeltreff");
   await tapHeart(page, PEKIP);
+  // Der Tab öffnet den Kalender: derselbe Knopf, derselbe Export
   await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await expect(page).toHaveURL(/ansicht=merkliste-kalender$/);
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click(),
@@ -284,8 +298,8 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("Kurs komplett, Treff nur bis 14.10.: 8 + 2 Termine", async ({ page }) => {
     const button = await openSaved(page, [IDS.pekip, IDS.treff], "2024-09-18");
-    // Die Statuszeile zählt die kommenden Termine, regelmäßige nur passend zum Alter wie die Datei (Plan 0028)
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 10 Terminen gemerkt");
+    // Die Statuszeile zählt nur die Angebote (Plan 0057, E9; ADR 0039)
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
     expect(download.suggestedFilename()).toBe("zwergenplan-merkliste.ics");
     expect(await vevents(download)).toBe(10);
@@ -300,7 +314,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     await expect(cards.nth(0)).toContainText("PEKiP");
     await expect(cards.nth(1)).toContainText("Offener Krabbeltreff");
     await expect(cards.nth(1).locator(".when")).toHaveText(/^Mi 21\.10\. · /);
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 11 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
     expect(await vevents(download)).toBe(11);
   });
@@ -308,9 +322,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
   test("nichts passt: kein Download, Toast", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff], "2026-08-01");
     // Die Statuszeile nennt das unpassende Angebot wie der Export-Toast (Browser-Review Plan 0028)
-    await expect(page.getByRole("status")).toHaveText(
-      "1 Angebot mit insgesamt 0 Terminen gemerkt – 1 Angebot passt nicht zum Alter",
-    );
+    await expect(page.getByRole("status")).toHaveText("1 Angebot gemerkt – 1 Angebot passt nicht zum Alter");
     let downloaded = false;
     page.on("download", () => {
       downloaded = true;
@@ -325,9 +337,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
 
   test("ein Angebot passt nicht: nur die anderen in der Datei, Toast nennt es 6 s lang", async ({ page }) => {
     const button = await openSaved(page, [IDS.treff, IDS.reime], "2026-08-01");
-    await expect(page.getByRole("status")).toHaveText(
-      "2 Angebote mit insgesamt 4 Terminen gemerkt – 1 Angebot passt nicht zum Alter",
-    );
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt – 1 Angebot passt nicht zum Alter");
     // Hält die Timer an: Die Anzeigedauer des Toasts wird gezielt vorgespult.
     await page.clock.pauseAt(new Date("2026-10-05T12:00:00+02:00"));
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
@@ -361,8 +371,8 @@ test.describe("Export nur fest eingeplant (Plan 0057, E4)", () => {
 
   test("nur das fest eingeplante in der Datei, der Toast nennt die vorgemerkten", async ({ page }) => {
     await openWith(page, ["nle21y1x", "lxizt974"], ["lxizt974"]);
-    // Statuszeile wie bisher: alle gemerkten
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    // Statuszeile: alle gemerkten, nur die Anzahl
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
     const [download] = await Promise.all([
       page.waitForEvent("download"),
       page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" }).click(),
@@ -451,11 +461,11 @@ test("Merkliste mit langen IDs (vor ADR 0022): zeigt die Angebote und ist danach
 });
 
 test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
-  test("Statuszeile zählt Angebote und kommende Termine, der runde Export-Knopf nimmt alle", async ({ page }) => {
+  test("Statuszeile zählt nur die Angebote, der runde Export-Knopf nimmt alle", async ({ page }) => {
     await preset(page, FIVE);
     await page.goto("./?ansicht=merkliste");
     await expect(page.getByTestId("offer")).toHaveCount(5);
-    await expect(page.getByRole("status")).toHaveText("5 Angebote mit insgesamt 24 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("5 Angebote gemerkt");
     // der breite Knopf und die Zeile „… · Kurse immer komplett“ sind weg
     await expect(page.getByText(/Kurse immer komplett|in einer \.ics-Datei/)).toHaveCount(0);
     const button = page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" });
@@ -575,7 +585,7 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
 test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () => {
   test.use({ tiles: "mock" });
 
-  test("Liste | Karte | Kalender setzt die Ansicht, der Fokus bleibt auf dem Segment, Export nur in der Liste", async ({
+  test("Liste | Karte | Kalender setzt die Ansicht, der Fokus bleibt auf dem Segment, Export in Liste und Kalender", async ({
     page,
   }) => {
     await preset(page, FIVE);
@@ -604,16 +614,16 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
     await expect(page.locator(".map-box")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toBeVisible();
 
-    // dritte Darstellung (Etappe 3): Kalender, Statuszeile wie in der Liste, kein Export-Knopf
+    // dritte Darstellung (Etappe 3): Kalender, Statuszeile und Export-Knopf wie in der Liste (Plan 0057, E9)
     const kalender = segment(page, "Kalender");
     await kalender.focus();
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\?ansicht=merkliste-kalender$/);
     await expect(kalender).toHaveAttribute("aria-pressed", "true");
     await expect(kalender).toBeFocused();
-    await expect(page.getByRole("status")).toHaveText("5 Angebote mit insgesamt 24 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("5 Angebote gemerkt");
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toBeVisible();
     await expect(tabButton(page, "Merkliste")).toHaveAttribute("aria-current", "page");
   });
 
@@ -691,7 +701,7 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
     await page.getByRole("button", { name: "Filter zurücksetzen" }).click();
     await expect(page.getByRole("status")).toBeFocused();
     await expect(page.getByTestId("offer")).toHaveCount(3);
-    await expect(page.getByRole("status")).toHaveText("3 Angebote mit insgesamt 19 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
     await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
   });
 

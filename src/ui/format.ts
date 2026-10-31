@@ -625,17 +625,12 @@ export const SHARE_MANUAL_HINT = "Halte den Link gedrückt, um ihn zu kopieren."
 export const OFFER_GONE = "Dieses Angebot ist nicht mehr im Zwergenplan.";
 
 /**
- * Statuszeile der Merkliste als Liste (Plan 0025, E3a): „5 Angebote mit insgesamt 28 Terminen gemerkt“. `sessions`
- * zählt die kommenden Termine, wie der Kalender sie zeigt; die Zahlen getrennt, damit sie fett stehen. `missing`
- * gemerkte Angebote ohne passenden Termin nennt sie wie der Export-Toast (Browser-Review Plan 0028).
+ * Statuszeile der Merkliste in Liste und Kalender (Plan 0025, E3a; Plan 0057, E9 nach ADR 0039, Punkt 1): nur die
+ * Anzahl, „5 Angebote gemerkt“; die Zahl getrennt, damit sie fett steht. `missing` gemerkte Angebote ohne passenden
+ * Termin nennt sie wie der Export-Toast (Browser-Review Plan 0028).
  */
-export function savedStatusParts(offers: number, sessions: number, missing = 0): [number, string, number, string] {
-  return [
-    offers,
-    offers === 1 ? " Angebot mit insgesamt " : " Angebote mit insgesamt ",
-    sessions,
-    `${sessions === 1 ? " Termin gemerkt" : " Terminen gemerkt"}${missingSuffix(missing)}`,
-  ];
+export function savedStatusParts(offers: number, missing = 0): [number, string] {
+  return [offers, `${offers === 1 ? " Angebot gemerkt" : " Angebote gemerkt"}${missingSuffix(missing)}`];
 }
 
 /** „von 5 gemerkten Angeboten“, Singular „von 1 gemerkten Angebot“ */

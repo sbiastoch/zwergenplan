@@ -45,10 +45,7 @@ const REAL_VIEWS: Record<string, (page: Page) => Promise<void>> = {
       .getByRole("navigation", { name: "Hauptnavigation" })
       .getByRole("button", { name: /^Merkliste/ })
       .click();
-    await page
-      .getByRole("group", { name: "Darstellung der Merkliste" })
-      .getByRole("button", { name: "Kalender", exact: true })
-      .click();
+    // der Tab öffnet den Kalender (Plan 0057, E9)
     await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
     await expect(page.getByRole("button", { name: "Monat zuklappen" })).toBeVisible();
   },

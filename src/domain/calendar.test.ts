@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { calendarNav, clampDay, selectionRange } from "./calendar.ts";
+import { type DayHidden, weekDays } from "./agenda.ts";
+import { calendarNav, clampDay, selectionRange, weekRows } from "./calendar.ts";
 
 // Reine Kalendertage (ISO-Datum): unabhängig von der Geräte-Zeitzone (Test läuft in America/Los_Angeles).
 
@@ -123,5 +124,105 @@ describe("selectionRange (Plan 0025, E5)", () => {
   it("zählt Kalendertage, auch über die Zeitumstellung am 25.10.2026", () => {
     expect(selectionRange({ unit: "woche", day: "2026-10-25" }, today)).toEqual(range("2026-10-19", "2026-10-25"));
     expect(selectionRange({ unit: "woche", day: "2026-10-26" }, today)).toEqual(range("2026-10-26", "2026-11-01"));
+  });
+});
+
+describe("weekRows (Plan 0057, E9)", () => {
+  // Woche Mo 5.10. – So 11.10.2026; Termine als Zeichenketten, die Funktion ist generisch
+  const WEEK = weekDays("2026-10-05");
+  const none = new Map<string, DayHidden>();
+  const group = (day: string, ...items: string[]) => ({ day, items });
+  const hidden = (entries: [string, Partial<DayHidden>][]) =>
+    new Map(entries.map(([day, h]) => [day, { filter: 0, age: 0, ...h }]));
+
+  it("Woche mit Lücken: Tage mit Terminen, dazwischen leere Tage, Wochenende zusammengefasst", () => {
+    const rows = weekRows([group("2026-10-06", "PEKiP"), group("2026-10-07", "Treff")], none, WEEK, "2026-10-05");
+    expect(rows).toEqual([
+      { kind: "frei", day: "2026-10-05", why: "leer" },
+      { kind: "termine", day: "2026-10-06", items: ["PEKiP"] },
+      { kind: "termine", day: "2026-10-07", items: ["Treff"] },
+      { kind: "frei", day: "2026-10-08", why: "leer" },
+      { kind: "frei", day: "2026-10-09", why: "leer" },
+      { kind: "wochenende", from: "2026-10-10", to: "2026-10-11" },
+    ]);
+  });
+
+  it("heute leer: eine eigene Zeile für heute; vergangene Tage fehlen", () => {
+    const rows = weekRows([group("2026-10-09", "Reime")], none, WEEK, "2026-10-08");
+    expect(rows.map((r) => (r.kind === "wochenende" ? "we" : `${r.kind}:${r.day}`))).toEqual([
+      "frei:2026-10-08",
+      "termine:2026-10-09",
+      "we",
+    ]);
+  });
+
+  it("Wochenende nur zusammen, wenn Samstag und Sonntag beide leer sind", () => {
+    const sat = weekRows([group("2026-10-10", "Markt")], none, WEEK, "2026-10-05").slice(-2);
+    expect(sat).toEqual([
+      { kind: "termine", day: "2026-10-10", items: ["Markt"] },
+      { kind: "frei", day: "2026-10-11", why: "leer" },
+    ]);
+    const sun = weekRows([group("2026-10-11", "Konzert")], none, WEEK, "2026-10-05").slice(-2);
+    expect(sun).toEqual([
+      { kind: "frei", day: "2026-10-10", why: "leer" },
+      { kind: "termine", day: "2026-10-11", items: ["Konzert"] },
+    ]);
+    // Samstag nur verdeckt: kein „Noch frei“ fürs Wochenende
+    const veiled = weekRows([], hidden([["2026-10-10", { filter: 1 }]]), WEEK, "2026-10-05").slice(-2);
+    expect(veiled).toEqual([
+      { kind: "verdeckt", day: "2026-10-10" },
+      { kind: "frei", day: "2026-10-11", why: "leer" },
+    ]);
+  });
+
+  it("Samstag: das Wochenende steht noch zusammen; Sonntag: nur der Sonntag", () => {
+    expect(weekRows([], none, WEEK, "2026-10-10")).toEqual([
+      { kind: "wochenende", from: "2026-10-10", to: "2026-10-11" },
+    ]);
+    expect(weekRows([], none, WEEK, "2026-10-11")).toEqual([{ kind: "frei", day: "2026-10-11", why: "leer" }]);
+  });
+
+  it("künftige Woche: alle sieben Tage", () => {
+    const rows = weekRows([group("2026-10-13", "PEKiP")], none, weekDays("2026-10-12"), "2026-10-05");
+    expect(rows).toHaveLength(6);
+    expect(rows[0]).toEqual({ kind: "frei", day: "2026-10-12", why: "leer" });
+    expect(rows[1]).toEqual({ kind: "termine", day: "2026-10-13", items: ["PEKiP"] });
+    expect(rows.at(-1)).toEqual({ kind: "wochenende", from: "2026-10-17", to: "2026-10-18" });
+  });
+
+  it("vom Filter verdeckter Tag ist „verdeckt“, nicht „leer“; nur vom Alter verdeckter heißt „alter“", () => {
+    const rows = weekRows(
+      [],
+      hidden([
+        ["2026-10-07", { filter: 1 }],
+        ["2026-10-08", { age: 2 }],
+        ["2026-10-09", { filter: 1, age: 1 }],
+      ]),
+      WEEK,
+      "2026-10-05",
+    );
+    expect(rows.slice(2, 5)).toEqual([
+      { kind: "verdeckt", day: "2026-10-07" },
+      { kind: "frei", day: "2026-10-08", why: "alter" },
+      { kind: "verdeckt", day: "2026-10-09" },
+    ]);
+  });
+
+  it("heute schon Vorbeiges macht nur den heutigen Tag zu „vorbei“", () => {
+    const rows = weekRows([], none, WEEK, "2026-10-07", 2);
+    expect(rows.slice(0, 2)).toEqual([
+      { kind: "frei", day: "2026-10-07", why: "vorbei" },
+      { kind: "frei", day: "2026-10-08", why: "leer" },
+    ]);
+    // Verdecktes geht vor: Es kommt noch etwas, nur der Filter blendet es aus
+    expect(weekRows([], hidden([["2026-10-07", { filter: 1 }]]), WEEK, "2026-10-07", 2)[0]).toEqual({
+      kind: "verdeckt",
+      day: "2026-10-07",
+    });
+  });
+
+  it("zählt Kalendertage über die Zeitumstellung am 25.10.", () => {
+    const rows = weekRows([], none, weekDays("2026-10-25"), "2026-10-19");
+    expect(rows.at(-1)).toEqual({ kind: "wochenende", from: "2026-10-24", to: "2026-10-25" });
   });
 });

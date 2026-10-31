@@ -77,6 +77,12 @@ async function openMap(page: Page) {
   await page.locator(".map-box[data-state=bereit]").waitFor({ timeout: 30_000 });
 }
 
+/** Tab „Merkliste“ öffnet den Kalender (Plan 0057, E9); dann auf die Liste umschalten */
+async function savedList(page: Page) {
+  await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await page.getByRole("button", { name: "Liste", exact: true }).click();
+}
+
 /** Jede Ansicht: Weg dorthin, ausgehend von der geladenen Startseite. */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   start: async () => {},
@@ -86,12 +92,11 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   "merkliste-kalender": async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
     await page.getByRole("button", { name: /^Merkliste/ }).click();
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
   },
   merkliste: async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 2)) await heart.click();
-    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await savedList(page);
   },
   // Herz mit Stufen (Plan 0057, E2, E3): erstes Herz vorgemerkt, zweites fest, Toast mit „Rückgängig“
   herz: async (page) => {
@@ -110,12 +115,11 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     }
     await page.locator(".toast").waitFor({ state: "detached", timeout: 10_000 });
     await page.getByRole("button", { name: /^Merkliste/ }).click();
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
   },
   // Filter und Sortierung der Merkliste (Plan 0057, E5, E6): Liste mit „Vormittags“ und offenem Sortiermenü
   "merkliste-sortieren": async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 4)) await heart.click();
-    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await savedList(page);
     await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
     await page.getByRole("button", { name: /^Sortierung:/ }).click();
     await page.getByRole("menu").waitFor();
@@ -123,14 +127,13 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   // Filter-Sheet der Merkliste in der Liste (mit Schnellwahlen „ab …“) und im Kalender (Hinweis statt Zeitraum)
   "merkliste-filter": async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
-    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await savedList(page);
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     await page.getByRole("dialog", { name: "Merkliste filtern" }).getByRole("button", { name: "Nachmittags" }).click();
   },
   "merkliste-filter-kalender": async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
     await page.getByRole("button", { name: /^Merkliste/ }).click();
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
     const sheet = page.getByRole("dialog", { name: "Merkliste filtern" });
     await sheet.getByRole("heading", { name: "Zeitraum" }).scrollIntoViewIfNeeded();
@@ -138,7 +141,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   // „Was ist zu tun“ (Plan 0057, E8): alle gemerkt, Abschnitte mit Zahlmarke und Marke „in N Tagen“
   "merkliste-zutun": async (page) => {
     for (const heart of await page.getByRole("button", { name: / merken$/ }).all()) await heart.click();
-    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await savedList(page);
   },
   // „Läuft gerade“ mit „Anschluss suchen“: lokal am Di 27.10., wenn PEKiP läuft. Ein laufender Kurs steht nicht mehr in
   // „Angebote“, deshalb lokal gemerkt über den Speicher (Fixture-IDs: PEKiP, Musikgarten, Krabbeltreff)
@@ -153,13 +156,13 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     } else {
       for (const heart of await page.getByRole("button", { name: / merken$/ }).all()) await heart.click();
     }
-    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await savedList(page);
     await page.getByRole("region", { name: /^Läuft gerade/ }).scrollIntoViewIfNeeded();
   },
   // „Nächstgelegen“ ohne Startpunkt: „Wovon aus gerechnet?“ über der Liste nach Terminen (Plan 0057, E7a)
   "merkliste-nah": async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
-    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await savedList(page);
     await page.getByRole("button", { name: /^Sortierung:/ }).click();
     await page.getByRole("menuitemradio", { name: "Nächstgelegen" }).click();
   },

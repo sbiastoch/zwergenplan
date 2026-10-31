@@ -92,14 +92,6 @@ export function savedOffers<T extends Offer>(
     );
 }
 
-/**
- * Kommende Termine aller Angebote zusammen, für die Statuszeile der Merkliste (Plan 0025, E3a). Mit Geburtsdatum bei
- * regelmäßigen nur die passenden, wie im Export (`fittingSessions`, Plan 0028).
- */
-export function upcomingSessionCount(offers: readonly Offer[], now: Date, birthDate: string | undefined): number {
-  return offers.reduce((sum, offer) => sum + fittingSessions(offer, now, birthDate).length, 0);
-}
-
 /** Auswahl für den ICS-Export einer Reihe bzw. der Merkliste (Plan 0018). */
 export interface ExportSelection {
   sessions: Session[];

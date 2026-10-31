@@ -2,7 +2,15 @@ import { describe, expect, it } from "vitest";
 import { DISTRICTS } from "./districts.ts";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { LIMIT_MINUTES } from "./reach.ts";
-import { isLegacyView, OFFER_PARAM, PROVIDER_PARAM, parseRoute, routeToSearch, tabSection } from "./route.ts";
+import {
+  isLegacyView,
+  isSavedTab,
+  OFFER_PARAM,
+  PROVIDER_PARAM,
+  parseRoute,
+  routeToSearch,
+  tabSection,
+} from "./route.ts";
 import { searchOf } from "./searches.ts";
 
 const offerId = "4tpu5qaq";
@@ -189,6 +197,17 @@ describe("URL-Route", () => {
         for (const name of names) expect(decodeURIComponent(search).toLowerCase()).not.toContain(name);
       }
     }
+  });
+});
+
+describe("isSavedTab (Plan 0057, E9)", () => {
+  it("erkennt die drei Darstellungen der Merkliste", () => {
+    expect(isSavedTab("merkliste")).toBe(true);
+    expect(isSavedTab("merkliste-karte")).toBe(true);
+    expect(isSavedTab("merkliste-kalender")).toBe(true);
+    expect(isSavedTab("entdecken")).toBe(false);
+    expect(isSavedTab("karte")).toBe(false);
+    expect(isSavedTab("anbieter")).toBe(false);
   });
 });
 

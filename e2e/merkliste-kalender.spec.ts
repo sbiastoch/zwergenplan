@@ -17,6 +17,8 @@ const IDS = {
 };
 const PEKIP = "PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)";
 const ALL_OVER = "Für heute ist alles vorbei";
+/** Zeile des heutigen Tages in der Woche, wenn alles Gemerkte von heute vorbei ist (Plan 0057, E9) */
+const TODAY_OVER = "Heute schon vorbei";
 
 /** Merkliste vorbelegen, optional die Uhr stellen, dann den Kalender der Merkliste öffnen. */
 async function openCalendar(
@@ -117,7 +119,15 @@ test.describe("mit Fixture-Uhr", () => {
     // Blättern zeigt immer die ganze Woche, auch wenn vorher ein Tag gewählt war
     await expect(titleButton(page, "12\\.–18\\. Okt\\.")).toHaveAttribute("aria-pressed", "true");
     await expectAgenda(page, "Woche 12.–18. Okt.", "2 Termine");
-    await expect(page.locator("h3.dayh")).toHaveText(["Di 13.10.", "Mi 14.10."]);
+    // jeder Tag der Woche, freie mit eigener Zeile, das freie Wochenende zusammen (Plan 0057, E9)
+    await expect(page.locator("h3.dayh")).toHaveText([
+      "Mo 12.10.",
+      "Di 13.10.",
+      "Mi 14.10.",
+      "Do 15.10.",
+      "Fr 16.10.",
+      "Sa 17.10. – So 18.10.",
+    ]);
     await expect(offers(page)).toHaveCount(2);
     await expect(offers(page).first()).toContainText(PEKIP);
     await expect(offers(page).last()).toContainText("Offener Krabbeltreff");
@@ -174,7 +184,7 @@ test.describe("mit Fixture-Uhr", () => {
     await expectAgenda(page, "November 2026", "5 Termine");
   });
 
-  test("leere Woche: „Für diese Woche entdecken“ führt zu „Angebote“ mit dieser Woche als Zeitraum", async ({
+  test("leere Woche: jeder Tag mit „Angebote am …“, der Link führt zu „Angebote“ mit dem Tag als Zeitraum", async ({
     page,
   }) => {
     // Dezember, zuklappen (Woche 30.11.–6.12. mit PEKiP am 1.12.), eine Woche weiter
@@ -185,13 +195,20 @@ test.describe("mit Fixture-Uhr", () => {
     await expectAgenda(page, "Woche 30. Nov. – 6. Dez.", "1 Termin");
     await page.getByRole("button", { name: "Nächste Woche" }).click();
     await expectAgenda(page, "Woche 7.–13. Dez.", "0 Termine");
-    await expect(page.getByText("Für diese Woche hast du nichts gemerkt.")).toBeVisible();
+    await expect(page.locator(".free > span")).toHaveText([
+      "Nichts eingeplant",
+      "Nichts eingeplant",
+      "Nichts eingeplant",
+      "Nichts eingeplant",
+      "Nichts eingeplant",
+      "Wochenende · Noch frei",
+    ]);
     // Der Datenstand reicht bis 10.12.: Weiter geht es nicht
     await expect(page.getByRole("button", { name: "Nächste Woche" })).toBeDisabled();
     await expectMobileUx(page);
 
-    await page.getByRole("button", { name: "Für diese Woche entdecken" }).click();
-    await expect(page).toHaveURL(/\?von=2026-12-07&bis=2026-12-13$/);
+    await page.getByRole("button", { name: "Angebote am Do", exact: true }).click();
+    await expect(page).toHaveURL(/\?von=2026-12-10&bis=2026-12-10$/);
     await expect(
       page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: /^Angebote/ }),
     ).toHaveAttribute("aria-current", "page");
@@ -273,10 +290,18 @@ test.describe("mit Fixture-Uhr", () => {
     await savedFilter(page, "Kurs");
     // Die Statuszeile zählt die passenden gemerkten Angebote, ohne Zeitraum
     await expect(page.getByRole("status")).toHaveText("1 von 2 gemerkten Angeboten passt");
-    // Woche 5.–11.: nur der Treff, und den blendet der Filter aus (Fall 1)
+    // Woche 5.–11.: nur der Treff, und den blendet der Filter aus; der Mittwoch sagt es (Plan 0057, E9)
     await expectAgenda(page, "Diese Woche", "0 Termine");
-    await expect(page.getByText("Nichts, was zu deinem Filter passt")).toBeVisible();
-    await expect(page.getByText("1 gemerkter Termin blendet der Filter aus.")).toBeVisible();
+    await expect(page.locator(".free > span")).toHaveText([
+      "Nichts eingeplant",
+      "Nichts eingeplant",
+      "Ausgeblendet durch Filter",
+      "Nichts eingeplant",
+      "Nichts eingeplant",
+      "Wochenende · Noch frei",
+    ]);
+    await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toHaveCount(1);
+    await expect(page.getByRole("button", { name: "Angebote am Mi" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Termine" })).toBeVisible();
     await expectMobileUx(page);
 
@@ -291,7 +316,7 @@ test.describe("mit Fixture-Uhr", () => {
     await reset.click();
     // Der Knopf verschwindet: Der Fokus liegt auf der Statuszeile, nicht auf <body>
     await expect(page.getByRole("status")).toBeFocused();
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
     await expectAgenda(page, "Diese Woche", "1 Termin");
     await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
   });
@@ -302,7 +327,7 @@ test.describe("mit Fixture-Uhr", () => {
     await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Nachmittags" }).click();
     // Treff (Mi 10 Uhr) und PEKiP (Di 9:30) beginnen vormittags
     await expectAgenda(page, "Diese Woche", "0 Termine");
-    await expect(page.getByText("1 gemerkter Termin blendet der Filter aus.")).toBeVisible();
+    await expect(page.getByText("Ausgeblendet durch Filter")).toHaveCount(1);
     await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
     await expectAgenda(page, "Diese Woche", "1 Termin");
   });
@@ -326,7 +351,7 @@ test.describe("mit Fixture-Uhr", () => {
     await views.getByRole("button", { name: "Kalender", exact: true }).click();
     // Im Kalender wirkt kein Filter: Badge und Statuszeile zählen wie ohne
     await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
     await expectAgenda(page, "Diese Woche", "1 Termin");
 
     await views.getByRole("button", { name: "Liste", exact: true }).click();
@@ -357,11 +382,13 @@ test("regelmäßig gemerkt, Kind wächst erst hinein: nur Tage, an denen es zum 
   await openCalendar(page, { ids: [IDS.treff], birthDate: "2026-04-20" });
   await expect(page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Termine" })).toBeVisible();
   await expect(offers(page)).toHaveCount(0);
-  // Gemerkt ist etwas, nur passt es nicht zum Alter: kein „Nichts gemerkt“ (Browser-Review 0025)
+  // Gemerkt ist etwas, nur passt es nicht zum Alter: Der Mittwoch sagt es (Browser-Review 0025; Plan 0057, E9)
+  await expect(page.locator(".free > span").nth(2)).toHaveText("Passt nicht zum Alter");
+  await expect(page.getByText("Nichts eingeplant", { exact: true })).toHaveCount(4);
+  // am Tag selbst der Leerzustand wie bisher
+  await page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Termine" }).click();
   await expect(page.getByText("Nichts passt zum Alter", { exact: true })).toBeVisible();
-  await expect(
-    page.getByText("Für diese Woche hast du nur Termine gemerkt, die nicht zum Alter passen."),
-  ).toBeVisible();
+  await expect(page.getByText("Für diesen Tag hast du nur Termine gemerkt, die nicht zum Alter passen.")).toBeVisible();
   await expect(page.getByText("Nichts gemerkt", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Nächste Woche" }).click();
   await expect(page.getByRole("button", { name: "Mittwoch, 14. Oktober, 0 Termine" })).toBeVisible();
@@ -388,9 +415,10 @@ test.describe("„Heute“ hängt an „jetzt“ (B2)", () => {
 
   test("abends fehlen beendete Termine, in der Woche wie am Tag", async ({ page }) => {
     await openCalendar(page, { ids: [IDS.treff], at: new Date("2026-10-07T20:00:00+02:00") });
-    // Woche ab heute (Mi): Der Treff ist vorbei, sonst nichts gemerkt
+    // Woche ab heute (Mi): Der Treff ist vorbei, sonst nichts gemerkt; die Zeile von heute sagt es (Plan 0057, E9)
     await expectAgenda(page, "Diese Woche", "0 Termine");
-    await expect(page.getByText(ALL_OVER)).toBeVisible();
+    await expect(page.locator(".free > span").first()).toHaveText(TODAY_OVER);
+    await expect(page.locator("h3.dayh").first()).toHaveText("Mi 7.10.");
     await page.getByRole("button", { name: "Mittwoch, 7. Oktober, 0 Termine" }).click();
     await expectAgenda(page, "Heute, 7. Oktober", "0 Termine");
     await expect(offers(page)).toHaveCount(0);
@@ -415,7 +443,7 @@ test.describe("„Heute“ hängt an „jetzt“ (B2)", () => {
     await page.clock.pauseAt(WED_11);
     await page.clock.setFixedTime(WED_1131);
     await page.clock.runFor(60_000);
-    await expect(page.getByText(ALL_OVER)).toBeVisible();
+    await expect(page.getByText(TODAY_OVER)).toBeVisible();
     await expect(offers(page)).toHaveCount(0);
     await expectAgenda(page, "Diese Woche", "0 Termine");
   });
@@ -429,7 +457,7 @@ test.describe("„Heute“ hängt an „jetzt“ (B2)", () => {
     await expect(offers(page)).toHaveCount(1);
     expect(await page.evaluate(() => document.visibilityState)).toBe("visible");
     await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
-    await expect(page.getByText(ALL_OVER)).toBeVisible();
+    await expect(page.getByText(TODAY_OVER)).toBeVisible();
     await expect(offers(page)).toHaveCount(0);
   });
 
@@ -477,4 +505,128 @@ test("vorgemerkt: Form der Woche als Umriss, Karte ohne Schatten mit Etikett „
   await expect(page.locator(".week .dots .tentative")).toHaveCount(1);
   await expect(page.locator(".week .dots > span")).toHaveCount(2);
   await expect(offers(page).filter({ hasText: "PEKiP" }).locator(".tentative-tag")).toHaveCount(0);
+
+  // „Nur fest eingeplant“ blendet den vorgemerkten Treff aus; sein Tag sagt es (Plan 0057, E9)
+  await page
+    .getByRole("group", { name: "Merkliste filtern" })
+    .getByRole("button", { name: "Nur fest eingeplant" })
+    .click();
+  await expect(offers(page)).toHaveCount(1);
+  await expect(offers(page)).toContainText("PEKiP");
+  await expect(page.locator(".week .dots .tentative")).toHaveCount(0);
+  await expect(page.locator(".free > span").nth(1)).toHaveText("Ausgeblendet durch Filter");
+});
+
+/** Tab-Leiste: Knopf „Merkliste“ (mit Badge im Namen) */
+const savedTab = (page: Page) =>
+  page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: /^Merkliste/ });
+
+// Plan 0057, E9: Der Tab öffnet die zuletzt gezeigte Darstellung, ohne sie den Kalender; nach dem Neuladen wieder ihn.
+test("Tab „Merkliste“ öffnet den Kalender, danach die zuletzt gezeigte Darstellung, nach dem Neuladen wieder ihn", async ({
+  page,
+}) => {
+  await page.addInitScript((ids) => localStorage.setItem("zwergenplan.merkliste", ids), JSON.stringify([IDS.treff]));
+  await page.goto("./");
+  await expect(offers(page).first()).toBeVisible();
+  await savedTab(page).click();
+  await expect(page).toHaveURL(/\?ansicht=merkliste-kalender$/);
+  await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+
+  const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
+  await views.getByRole("button", { name: "Liste", exact: true }).click();
+  await expect(page).toHaveURL(/\?ansicht=merkliste$/);
+  const entdecken = page
+    .getByRole("navigation", { name: "Hauptnavigation" })
+    .getByRole("button", { name: /^Angebote/ });
+  await entdecken.click();
+  await savedTab(page).click();
+  await expect(page).toHaveURL(/\?ansicht=merkliste$/);
+  // erneuter Tipp auf den offenen Tab bleibt in der Liste
+  await savedTab(page).click();
+  await expect(page).toHaveURL(/\?ansicht=merkliste$/);
+
+  await entdecken.click();
+  await page.reload();
+  await expect(offers(page).first()).toBeVisible();
+  await savedTab(page).click();
+  await expect(page).toHaveURL(/\?ansicht=merkliste-kalender$/);
+});
+
+// Plan 0057, E9, Test 17: freie Tage der Woche, das freie Wochenende, der runde Export-Knopf
+test.describe("Woche mit freien Tagen (Plan 0057, E9)", () => {
+  test.beforeEach(async ({ page }) => {
+    await openCalendar(page);
+  });
+
+  test("jeder Tag ab heute: freie mit „Angebote am …“, heute „Angebote für heute“, das Wochenende zusammen", async ({
+    page,
+  }) => {
+    // Woche Mo 5.10. (heute) – So 11.10., gemerkt nur der Treff am Mi
+    await expect(page.locator("h3.dayh")).toHaveText([
+      "Mo 5.10.",
+      "Di 6.10.",
+      "Mi 7.10.",
+      "Do 8.10.",
+      "Fr 9.10.",
+      "Sa 10.10. – So 11.10.",
+    ]);
+    await expect(page.locator(".free .linkbtn")).toHaveText([
+      "Angebote für heute",
+      "Angebote am Di",
+      "Angebote am Do",
+      "Angebote am Fr",
+      "Angebote am Wochenende",
+    ]);
+    await expect(page.getByText("Wochenende · Noch frei")).toBeVisible();
+    await expect(offers(page)).toHaveCount(1);
+    for (const link of await page.locator(".free .linkbtn").all()) {
+      const box = await link.boundingBox();
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+    }
+    // Export auch im Kalender, derselbe runde Knopf wie in der Liste
+    await expect(page.getByRole("button", { name: "Fest Eingeplantes in meinen Kalender" })).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
+    for (const colorScheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme });
+      await expectMobileUx(page);
+    }
+
+    // 320 px bei 200 %: Die Zeilen brechen um, nichts läuft über
+    await page.setViewportSize({ width: 320, height: 640 });
+    await setTextScaleRelayout(page, 2);
+    await expectTextFits(page, { scale: 2 });
+    const weekend = page.locator(".free").last();
+    const [text, link] = [weekend.locator("span"), weekend.locator(".linkbtn")];
+    const textBox = await text.boundingBox();
+    const linkBox = await link.boundingBox();
+    // der Link steht unter dem Text, nicht daneben
+    expect(linkBox?.y ?? 0).toBeGreaterThanOrEqual((textBox?.y ?? 0) + (textBox?.height ?? 0) - 1);
+  });
+
+  test("„Angebote am Do“ und „Angebote am Wochenende“ führen zu „Angebote“ mit dem Zeitraum", async ({ page }) => {
+    await page.getByRole("button", { name: "Angebote am Do", exact: true }).click();
+    await expect(page).toHaveURL(/\?von=2026-10-08&bis=2026-10-08$/);
+    await expect(
+      page.getByRole("navigation", { name: "Hauptnavigation" }).getByRole("button", { name: /^Angebote/ }),
+    ).toHaveAttribute("aria-current", "page");
+    await savedTab(page).click();
+    await expect(page).toHaveURL(/ansicht=merkliste-kalender/);
+    await page.getByRole("button", { name: "Angebote am Wochenende" }).click();
+    await expect(page).toHaveURL(/\?von=2026-10-10&bis=2026-10-11$/);
+  });
+
+  test("Tag- und Monatsauswahl behalten den Leerzustand", async ({ page }) => {
+    await page.getByRole("button", { name: "Donnerstag, 8. Oktober, 0 Termine" }).click();
+    await expect(page.locator(".free")).toHaveCount(0);
+    await expect(page.getByText("Nichts gemerkt", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Ganzen Monat zeigen" }).click();
+    await expect(page.locator(".free")).toHaveCount(0);
+  });
+});
+
+test("heute Sonntag: nur der Sonntag, kein Wochenende (Plan 0057, E9)", async ({ page }) => {
+  await openCalendar(page, { at: new Date("2026-10-11T09:00:00+02:00") });
+  await expect(page.locator("h3.dayh")).toHaveText(["So 11.10."]);
+  await expect(page.locator(".free > span")).toHaveText(["Nichts eingeplant"]);
+  await expect(page.locator(".free .linkbtn")).toHaveText(["Angebote für heute"]);
 });

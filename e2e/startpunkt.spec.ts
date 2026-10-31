@@ -263,12 +263,13 @@ test("Kein Laden ohne Anlass: ohne Stadtteil, Kind-Sheet und Karte kein Request 
     .getByRole("navigation", { name: "Hauptnavigation" })
     .getByRole("button", { name: /^Merkliste/ })
     .click();
-  await expect(offers(page)).toHaveCount(1);
+  // Der Tab öffnet den Kalender (Plan 0057, E9), danach die Liste
+  await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
   await page
     .getByRole("group", { name: "Darstellung der Merkliste" })
-    .getByRole("button", { name: "Kalender", exact: true })
+    .getByRole("button", { name: "Liste", exact: true })
     .click();
-  await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
+  await expect(offers(page)).toHaveCount(1);
   await page.waitForTimeout(500);
   expect(requests).toEqual([]);
 });
@@ -906,7 +907,7 @@ test.describe("Kein Flackern bei gespeichertem Stadtteil (M7)", () => {
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
     await expect(offers(page)).toHaveCount(1);
     await expect(page.locator(".list-pending")).toHaveCount(0);
-    await expect(page.getByRole("status")).toHaveText("1 Angebot mit insgesamt 5 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("1 Angebot gemerkt");
     release();
     await expect(offers(page)).toHaveCount(1);
     await expect(page.locator(".list-pending")).toHaveCount(0);

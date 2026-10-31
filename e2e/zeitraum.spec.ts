@@ -143,8 +143,13 @@ test("Zeitraum mit Alter: regelmäßig zählt nur ein passender Termin darin, di
   await page.keyboard.press("Escape");
   await expect(detail).toBeHidden();
 
-  // Merkliste: Der Zeitraum aus „Entdecken“ gilt dort nicht, der Treff passt ab 21.10.
+  // Merkliste: Der Zeitraum aus „Entdecken“ gilt dort nicht, der Treff passt ab 21.10. Der Tab öffnet den Kalender
+  // (Plan 0057, E9), der eigene Zeitraum wirkt nur in der Liste.
   await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await page
+    .getByRole("group", { name: "Darstellung der Merkliste" })
+    .getByRole("button", { name: "Liste", exact: true })
+    .click();
   const saved = page.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" });
   await expect(saved).toBeVisible();
   await expect(saved).not.toHaveClass(/\bunfit\b/);

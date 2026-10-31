@@ -29,6 +29,14 @@ export type Tab = (typeof TABS)[number];
 /** Eintrag der Tab-Leiste */
 export type Section = Exclude<Tab, "karte" | "merkliste-karte" | "merkliste-kalender">;
 
+/** Darstellungen der Merkliste (Plan 0025, E4): Liste, Karte, Kalender */
+export type SavedTab = Extract<Tab, "merkliste" | "merkliste-karte" | "merkliste-kalender">;
+
+/** Gehört die Ansicht zur Merkliste? (Plan 0057, E9: zuletzt gezeigte Darstellung) */
+export function isSavedTab(tab: Tab): tab is SavedTab {
+  return tabSection(tab) === "merkliste";
+}
+
 /** Welcher Eintrag der Tab-Leiste aktiv ist: Die Darstellungen gehören zu „Entdecken“ bzw. zur Merkliste. */
 export function tabSection(tab: Tab): Section {
   if (tab === "karte") return "entdecken";

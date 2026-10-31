@@ -152,14 +152,15 @@ test("Deep-Link ?sortierung=neu öffnet sortiert; der Tab-Wechsel behält die Wa
   await ready(page, "./?sortierung=neu");
   await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Neu eingestellt");
   await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Neu diese Woche/);
+  // Der Tab öffnet den Kalender (Plan 0057, E9), die Sortierung der Startseite bleibt in der URL
   await page.getByRole("button", { name: /^Merkliste/ }).click();
-  await expect(page).toHaveURL(/ansicht=merkliste&sortierung=neu$/);
+  await expect(page).toHaveURL(/ansicht=merkliste-kalender&sortierung=neu$/);
   // Die Liste der Merkliste hat ihren eigenen Knopf (Plan 0057, E6), Kalender und Karte keinen
-  await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Was ist zu tun");
-  const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
-  await views.getByRole("button", { name: "Kalender", exact: true }).click();
   await expect(sortButton(page)).toHaveCount(0);
+  const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
   await views.getByRole("button", { name: "Liste", exact: true }).click();
+  await expect(page).toHaveURL(/ansicht=merkliste&sortierung=neu$/);
+  await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Was ist zu tun");
   await page
     .getByRole("navigation", { name: "Hauptnavigation" })
     .getByRole("button", { name: /^Angebote/ })
@@ -264,6 +265,11 @@ test("Etikett im Anbieter-Sheet und auf der Merkliste: ganz im sichtbaren Bereic
   await page
     .getByRole("navigation", { name: "Hauptnavigation" })
     .getByRole("button", { name: /^Merkliste/ })
+    .click();
+  // Der Tab öffnet den Kalender (Plan 0057, E9); die Marke steht auch in der Liste
+  await page
+    .getByRole("group", { name: "Darstellung der Merkliste" })
+    .getByRole("button", { name: "Liste", exact: true })
     .click();
   const saved = page.getByTestId("offer");
   await expect(saved).toHaveCount(1);

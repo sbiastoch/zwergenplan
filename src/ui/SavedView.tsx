@@ -1,12 +1,13 @@
 /**
  * „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007).
  * Kopf nach Plan 0025, E3a: Umschalter Liste | Karte | Kalender, in der Liste mit Sortier-Knopf daneben (Plan 0057, E6),
- * Filterzeile wie auf der Startseite (Plan 0057, E5), Statuszeile mit rundem Export-Knopf (nur in der Liste). Liste,
- * Karte und Kalender rendert App über `renderList`, `renderMap` bzw. `renderCalendar`.
+ * Filterzeile wie auf der Startseite (Plan 0057, E5), Statuszeile mit rundem Export-Knopf (Liste und Kalender, Plan 0057,
+ * E9). Liste, Karte und Kalender rendert App über `renderList`, `renderMap` bzw. `renderCalendar`.
  */
 import { type ReactNode, type RefObject, useMemo } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
-import { collectionExport, type SavedState, upcomingSessionCount } from "../domain/saved.ts";
+import type { SavedTab } from "../domain/route.ts";
+import { collectionExport, type SavedState } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
@@ -27,9 +28,6 @@ import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
 import { LONG_TOAST_MS, type Say } from "./use-app-state.ts";
 import { ANNOUNCE_DELAY_MS, useSettled } from "./use-settled.ts";
-
-/** Darstellungen der Merkliste: Routenwerte (Plan 0025, E4) */
-type SavedTab = "merkliste" | "merkliste-karte" | "merkliste-kalender";
 
 const VIEW_OPTIONS: readonly ViewOption<SavedTab>[] = [
   { value: "merkliste", label: "Liste" },
@@ -189,9 +187,7 @@ export function SavedView({
                   <span className="sr-only">{inViewAnnounce}</span>
                 </span>
               ) : (
-                <StatusText
-                  parts={statusParts({ offers, shown, filtered, tab, now: ctx.now, birthDate, missing: unfitting })}
-                />
+                <StatusText parts={statusParts({ offers, shown, filtered, tab, missing: unfitting })} />
               )}
               {tab === "merkliste" && sortNote && <span className="sr-only">. Sortiert nach {sortNote}</span>}
             </p>
@@ -200,7 +196,8 @@ export function SavedView({
                 Alle zeigen
               </button>
             )}
-            {tab === "merkliste" && (
+            {/* in Liste und Kalender derselbe Knopf, derselbe Chunk (Plan 0057, E9) */}
+            {tab !== "merkliste-karte" && (
               <button
                 type="button"
                 className="iconbtn exportbtn"
@@ -252,31 +249,27 @@ export function SavedView({
 }
 
 /**
- * Texte der Statuszeile (E3a): ohne Filter „5 Angebote mit insgesamt 28 Terminen gemerkt“ bzw. auf der Karte „5 Angebote
- * an 5 Orten gemerkt“; mit Filter „2 von 5 gemerkten Angeboten passen“ bzw. „… an 2 Orten“.
+ * Texte der Statuszeile (E3a; nur die Anzahl, ADR 0039, Punkt 1): ohne Filter „5 Angebote gemerkt“, mit Filter „2 von 5
+ * gemerkten Angeboten passen“, auf der Karte „2 von 5 gemerkten Angeboten“.
  */
 function statusParts({
   offers,
   shown,
   filtered,
   tab,
-  now,
-  birthDate,
   missing,
 }: {
   offers: readonly SiteOffer[];
   shown: readonly SiteOffer[];
   filtered: boolean;
   tab: SavedTab;
-  now: Date;
-  birthDate: string | undefined;
   /** gemerkte Angebote ohne passenden Termin (`collectionExport`), wie im Export-Toast genannt */
   missing: number;
 }): StatusParts {
   const total = filtered ? offers.length : undefined;
   if (tab === "merkliste-karte") return savedMapStatusParts(shown.length, total);
   if (filtered) return savedFilterStatusParts(shown.length, offers.length);
-  return savedStatusParts(offers.length, upcomingSessionCount(offers, now, birthDate), missing);
+  return savedStatusParts(offers.length, missing);
 }
 
 type StatusParts = [number, string] | [number, string, number, string];

@@ -643,20 +643,15 @@ describe("Quellenhinweis der Wegzeit (Plan 0009, E3: CC BY-SA 3.0 DE, 4a und 4c)
 });
 
 describe("Statuszeile der Merkliste (Plan 0025, E3a)", () => {
-  it("Liste: Angebote und kommende Termine, die Zahlen getrennt", () => {
-    expect(savedStatusParts(5, 28)).toEqual([5, " Angebote mit insgesamt ", 28, " Terminen gemerkt"]);
-    expect(savedStatusParts(1, 1).join("")).toBe("1 Angebot mit insgesamt 1 Termin gemerkt");
-    expect(savedStatusParts(2, 13).join("")).toBe("2 Angebote mit insgesamt 13 Terminen gemerkt");
+  it("Liste und Kalender: nur die Anzahl, die Zahl getrennt (Plan 0057, E9; ADR 0039, Punkt 1)", () => {
+    expect(savedStatusParts(5)).toEqual([5, " Angebote gemerkt"]);
+    expect(savedStatusParts(1).join("")).toBe("1 Angebot gemerkt");
   });
 
   it("Liste: nennt Angebote ohne passenden Termin wie der Export-Toast (Browser-Review 0028)", () => {
-    expect(savedStatusParts(2, 13, 0).join("")).toBe("2 Angebote mit insgesamt 13 Terminen gemerkt");
-    expect(savedStatusParts(1, 0, 1).join("")).toBe(
-      "1 Angebot mit insgesamt 0 Terminen gemerkt – 1 Angebot passt nicht zum Alter",
-    );
-    expect(savedStatusParts(3, 4, 2).join("")).toBe(
-      "3 Angebote mit insgesamt 4 Terminen gemerkt – 2 Angebote passen nicht zum Alter",
-    );
+    expect(savedStatusParts(2, 0).join("")).toBe("2 Angebote gemerkt");
+    expect(savedStatusParts(1, 1).join("")).toBe("1 Angebot gemerkt – 1 Angebot passt nicht zum Alter");
+    expect(savedStatusParts(3, 2).join("")).toBe("3 Angebote gemerkt – 2 Angebote passen nicht zum Alter");
     // gleicher Wortlaut wie im Toast
     expect(collectionToast(4, 2).endsWith(" – 2 Angebote passen nicht zum Alter")).toBe(true);
   });

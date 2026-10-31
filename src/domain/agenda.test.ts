@@ -546,6 +546,7 @@ describe("rangeAgenda (Plan 0025, E5)", () => {
       ended: 0,
       hidden: 0,
       ageHidden: 0,
+      hiddenDays: new Map(),
       afterData: false,
     });
   });
@@ -595,6 +596,24 @@ describe("rangeAgenda (Plan 0025, E5)", () => {
     expect(rangeAgenda(fitIndex, span("2026-10-07", "2026-10-07"), evening, withAge).ageHidden).toBe(0);
   });
 
+  it("nennt Verdecktes je Tag: Filter und Alter getrennt, nur Tage mit Verdecktem (Plan 0057, E9)", () => {
+    const onlyPekip = sessionsByDay([pekip]);
+    const week = span("2026-10-12", "2026-10-18");
+    expect(rangeAgenda(onlyPekip, week, FIXTURE_NOW, context()).hiddenDays).toEqual(
+      new Map([["2026-10-14", { filter: 1, age: 0 }]]),
+    );
+    expect(rangeAgenda(index, week, FIXTURE_NOW, context()).hiddenDays).toEqual(new Map());
+    const fromOct21: SessionFit = (_offer, session) => session.start >= "2026-10-21";
+    const fitIndex = sessionsByDay([treff], fromOct21);
+    const withAge = { ...context(), allIndex: fitIndex, ageIndex: sessionsByDay([treff]) };
+    expect(rangeAgenda(fitIndex, week, FIXTURE_NOW, withAge).hiddenDays).toEqual(
+      new Map([["2026-10-14", { filter: 0, age: 1 }]]),
+    );
+    // Beendetes zählt nicht
+    const evening = at("2026-10-07T20:00:00+02:00");
+    expect(rangeAgenda(new Map(), span("2026-10-07", "2026-10-07"), evening, context()).hiddenDays.size).toBe(0);
+  });
+
   it("erkennt einen Bereich nach dem Ende des Datenstands", () => {
     expect(rangeAgenda(index, span("2026-12-11", "2026-12-11"), FIXTURE_NOW, context()).afterData).toBe(true);
     expect(rangeAgenda(index, span("2026-12-07", "2026-12-13"), FIXTURE_NOW, context()).afterData).toBe(false);
@@ -618,6 +637,7 @@ describe("rangeAgenda (Plan 0025, E5)", () => {
       ended: 5,
       hidden: 0,
       ageHidden: 0,
+      hiddenDays: new Map(),
       afterData: false,
     });
   });

@@ -19,7 +19,7 @@ import { type MapExtent, viewNarrows } from "../domain/map-view.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
-import { type Sort, type Tab, tabSection } from "../domain/route.ts";
+import { isSavedTab, type SavedTab, type Sort, type Tab, tabSection } from "../domain/route.ts";
 import {
   EMPTY_SAVED_FILTER,
   followUpFilter,
@@ -308,11 +308,20 @@ export function App() {
     // neues Alter, neuer Zusammenhang: Altersfilter wieder an (Plan 0021, E1)
     views.setAgeOnly(true);
   };
+  /*
+   * Darstellung der Merkliste (Plan 0057, E9): Der Tab-Knopf öffnet die zuletzt gezeigte, sonst den Kalender. Nur im
+   * Speicher der Sitzung: Nach dem Neuladen ohne `ansicht=` beginnt sie wieder im Kalender (U1).
+   */
+  const lastSavedTab = useRef<SavedTab | undefined>(undefined);
+  useEffect(() => {
+    if (isSavedTab(route.tab)) lastSavedTab.current = route.tab;
+  }, [route]);
   const onTab = (tab: Tab) => {
-    replace({ ...route, tab });
+    replace({ ...route, tab: tab === "merkliste" ? (lastSavedTab.current ?? "merkliste-kalender") : tab });
     window.scrollTo({ top: 0 });
   };
-  // „Für diese Woche entdecken“ (Plan 0025, E5): zu „Angebote“ mit der Kalenderauswahl als Zeitraum (von=/bis=), die
+  // „Für diese Woche entdecken“ (Plan 0025, E5), „Angebote am Do“ (Plan 0057, E9): zu „Angebote“ mit Auswahl, Tag oder
+  // Wochenende als Zeitraum (von=/bis=), die
   // übrigen Startseiten-Filter bleiben.
   const discoverRange = ({ from, to }: { from: string; to: string }) => {
     replace({ ...route, tab: "entdecken", filter: withDateRange(route.filter, from, to) });

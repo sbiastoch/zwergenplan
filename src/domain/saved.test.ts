@@ -27,7 +27,6 @@ import {
   seriesExport,
   stageOf,
   toggleId,
-  upcomingSessionCount,
   withStage,
 } from "./saved.ts";
 import type { Offer } from "./schema.ts";
@@ -388,47 +387,6 @@ describe("Stufen der Merkliste (Plan 0057, E1)", () => {
       tentative: ["lxizt974", "nle21y1x"],
     });
     expect(cleanSavedState({ ids: ["a"], tentative: [] })).toEqual({ ids: ["a"], tentative: [] });
-  });
-});
-
-describe("upcomingSessionCount (Plan 0025, E3a)", () => {
-  const today = berlinIsoDate(FIXTURE_NOW);
-  const at = (day: string, from: string, to: string) => ({
-    start: fromBerlinLocal(`${day}T${from}`),
-    end: fromBerlinLocal(`${day}T${to}`),
-  });
-
-  it("summiert die kommenden Termine über mehrere Angebote", () => {
-    const offers = [
-      { ...fixtureOffer("krabbeltreff"), sessions: weeklySessions(addDays(today, 1), 3) },
-      { ...fixtureOffer("pekip-herbst"), sessions: weeklySessions(addDays(today, 2), 4) },
-    ];
-    expect(upcomingSessionCount(offers, FIXTURE_NOW, undefined)).toBe(7);
-  });
-
-  it("zählt heute schon beendete Termine nicht, laufende und spätere von heute schon", () => {
-    // FIXTURE_NOW ist 12:00 Berliner Zeit, in Los Angeles noch Vormittag desselben Tages
-    const offer = {
-      ...fixtureOffer("krabbeltreff"),
-      sessions: [at(today, "08:30", "09:30"), at(today, "11:30", "12:30"), at(today, "15:00", "16:00")],
-    };
-    expect(upcomingSessionCount([offer], FIXTURE_NOW, undefined)).toBe(2);
-  });
-
-  it("ergibt 0 für eine leere Liste", () => {
-    expect(upcomingSessionCount([], FIXTURE_NOW, undefined)).toBe(0);
-  });
-
-  it("zählt mit Geburtsdatum dieselben Termine wie der Export, Kurse nur kommende (Plan 0028)", () => {
-    const pekip = fixtureOffer("pekip-herbst"); // Kurs, 8 kommende Termine
-    const treff = fixtureOffer("krabbeltreff"); // passt ab 21.10.: 3 von 5
-    expect(upcomingSessionCount([pekip, treff], FIXTURE_NOW, undefined)).toBe(13);
-    expect(upcomingSessionCount([pekip, treff], FIXTURE_NOW, "2026-04-20")).toBe(11);
-    expect(upcomingSessionCount([treff], FIXTURE_NOW, "2026-08-01")).toBe(0);
-    for (const birthDate of BIRTH_DATES) {
-      const exported = exportSessions(treff, FIXTURE_NOW, birthDate).sessions.length;
-      expect(upcomingSessionCount([treff], FIXTURE_NOW, birthDate), birthDate).toBe(exported);
-    }
   });
 });
 

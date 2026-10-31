@@ -2,7 +2,7 @@
  * Kalender-Navigation (Plan 0003, E14): Grenzen heute bzw. letzter Tag mit Terminen. Reine Kalendertage. Seit Plan 0025
  * (E5) der Kalender der Merkliste: Tag, Woche oder Monat sind die Auswahl, die die Liste darunter filtert.
  */
-import { weekDays } from "./agenda.ts";
+import { type DayGroup, type DayHidden, weekDays } from "./agenda.ts";
 import { addDays, addMonths, daysInMonth, isoWeekday, parseIsoDate } from "./time.ts";
 
 /** Was der Kalender der Merkliste auswählt (Plan 0025, E5). `day` ist ein Berliner Tag, nie vor heute. */
@@ -61,4 +61,61 @@ export function selectionRange(sel: CalendarSelection, today: string): { from: s
   const { year, month } = parseIsoDate(day);
   const first = firstOfMonth(day);
   return { from: clampDay(first, today), to: addDays(first, daysInMonth(year, month) - 1) };
+}
+
+/**
+ * Eine Zeile der Wochenansicht (Plan 0057, E9): ein Tag mit Terminen, ein Tag, dessen Termine nur der Filter verdeckt,
+ * ein freier Tag oder das freie Wochenende. `why` sagt, warum ein Tag frei ist: nichts gemerkt (`leer`), heute schon
+ * alles vorbei (`vorbei`) oder Gemerktes passt an dem Tag nicht zum Alter (`alter`).
+ */
+export type WeekRow<I> =
+  | { kind: "termine"; day: string; items: I[] }
+  | { kind: "verdeckt"; day: string }
+  | FreeDay
+  | { kind: "wochenende"; from: string; to: string };
+
+interface FreeDay {
+  kind: "frei";
+  day: string;
+  why: "leer" | "vorbei" | "alter";
+}
+
+/**
+ * Zeilen der Wochenansicht im Kalender der Merkliste (Plan 0057, E9): alle Tage der Woche `week` ab `today`, auch ohne
+ * Termine. `groups` sind die Tage mit Terminen (`rangeAgenda`), `hiddenDays` das je Tag Verdeckte. Sind Samstag und
+ * Sonntag beide leer und noch nicht vorbei, stehen sie in einer Zeile; ist heute Sonntag, steht nur er da.
+ * `endedToday` > 0 macht einen leeren heutigen Tag zu „vorbei“ (Muster von `RangeEmpty`: Verdecktes geht vor).
+ */
+export function weekRows<I>(
+  groups: readonly DayGroup<I>[],
+  hiddenDays: ReadonlyMap<string, DayHidden>,
+  week: readonly string[],
+  today: string,
+  endedToday = 0,
+): WeekRow<I>[] {
+  const byDay = new Map(groups.map((g) => [g.day, g.items]));
+  const rows: WeekRow<I>[] = [];
+  for (const day of week) {
+    if (day < today) continue;
+    const items = byDay.get(day);
+    const hidden = hiddenDays.get(day);
+    if (items && items.length > 0) rows.push({ kind: "termine", day, items });
+    else if (hidden && hidden.filter > 0) rows.push({ kind: "verdeckt", day });
+    else if (day === today && endedToday > 0) rows.push({ kind: "frei", day, why: "vorbei" });
+    else if (hidden && hidden.age > 0) rows.push({ kind: "frei", day, why: "alter" });
+    else rows.push({ kind: "frei", day, why: "leer" });
+  }
+  const [saturday, sunday] = rows.slice(-2);
+  if (isEmptyOn(saturday, SATURDAY) && isEmptyOn(sunday, SUNDAY)) {
+    rows.splice(-2, 2, { kind: "wochenende", from: saturday.day, to: sunday.day });
+  }
+  return rows;
+}
+
+const SATURDAY = 6;
+const SUNDAY = 7;
+
+/** Tag ohne alles Gemerkte (nicht vorbei, nicht verdeckt) am ISO-Wochentag `weekday` */
+function isEmptyOn<I>(row: WeekRow<I> | undefined, weekday: number): row is FreeDay {
+  return row?.kind === "frei" && row.why === "leer" && isoWeekday(row.day) === weekday;
 }

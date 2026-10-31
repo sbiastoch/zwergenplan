@@ -1,11 +1,20 @@
 /**
  * Kalender der Merkliste (Plan 0025, E5; bis dahin der Tab „Kalender“, Plan 0003, E14; Plan 0007, E2, E5): Wochenleiste,
  * aufklappbares Monatsraster und darunter die gemerkten Termine der Auswahl. Tag, Woche oder Monat sind der Filter der
- * Liste. Beendete Termine fallen weg (`rangeAgenda`), bei offenem Monat ist die Woche aus.
+ * Liste. Beendete Termine fallen weg (`rangeAgenda`), bei offenem Monat ist die Woche aus. In der Woche stehen auch die
+ * freien Tage ab heute (Plan 0057, E9).
  */
-import { Fragment, type MouseEvent, useLayoutEffect, useRef } from "react";
+import { Fragment, type MouseEvent, type ReactNode, useLayoutEffect, useRef } from "react";
 import { monthDays, type Occurrence, type RangeAgenda, rangeAgenda } from "../domain/agenda.ts";
-import { type CalendarNav, type CalendarSelection, calendarNav, clampDay, selectionRange } from "../domain/calendar.ts";
+import {
+  type CalendarNav,
+  type CalendarSelection,
+  calendarNav,
+  clampDay,
+  selectionRange,
+  type WeekRow,
+  weekRows,
+} from "../domain/calendar.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { parseIsoDate } from "../domain/time.ts";
 import type { Category } from "../domain/topics.ts";
@@ -30,7 +39,7 @@ interface SavedCalendarProps {
   now: Date;
   today: string;
   ctx: CardContext;
-  /** „Für diese Woche entdecken“: zu „Angebote“ mit der Auswahl als Zeitraum (E5, Fall 4) */
+  /** zu „Angebote“ mit Auswahl, Tag oder Wochenende als Zeitraum (Plan 0025, E5, Fall 4; Plan 0057, E9) */
   onDiscover: (range: { from: string; to: string }) => void;
   /** nur mit aktivem Merklisten-Filter (Etappe 4): Knopf „Filter zurücksetzen“, wenn er Termine ausblendet */
   onResetFilter?: (() => void) | undefined;
@@ -106,6 +115,11 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
   });
 
   const todayPicked = selection.unit === "tag" && selection.day === today;
+  // Nach dem Datenstand bleibt der Leerzustand „Weiter reicht der Plan noch nicht“
+  const rows =
+    selection.unit === "woche" && !agenda.afterData
+      ? weekRows(agenda.groups, agenda.hiddenDays, nav.week, today, agenda.ended)
+      : undefined;
   return (
     <>
       {!monthOpen && (
@@ -147,29 +161,122 @@ export function SavedCalendar({ calendar, now, today, ctx, onDiscover, onResetFi
         <span>{selectionHeading(selection, today)}</span>
         <small>{termine(agenda.count)}</small>
       </h2>
-      {agenda.groups.map((group) => (
-        <Fragment key={group.day}>
-          {selection.unit !== "tag" && <h3 className="dayh">{shortDate(group.day)}</h3>}
-          {group.items.map((item) => (
-            <OfferCard
-              key={`${item.offer.id}-${item.session.start}`}
-              item={item}
-              ctx={ctx}
-              numbered
-              markTentative
-              calendarDay={group.day}
-            />
+      {rows ? (
+        // Woche: alle Tage ab heute, auch leere, verdeckte und das freie Wochenende (Plan 0057, E9)
+        rows.map((row) => (
+          <WeekRowView
+            key={row.kind === "wochenende" ? row.from : row.day}
+            row={row}
+            today={today}
+            ctx={ctx}
+            onDiscover={onDiscover}
+            onResetFilter={onResetFilter}
+          />
+        ))
+      ) : (
+        <>
+          {agenda.groups.map((group) => (
+            <Fragment key={group.day}>
+              {selection.unit !== "tag" && <h3 className="dayh">{shortDate(group.day)}</h3>}
+              <DayCards items={group.items} day={group.day} ctx={ctx} />
+            </Fragment>
           ))}
-        </Fragment>
-      ))}
-      <RangeEmpty
-        agenda={agenda}
-        unit={selection.unit}
-        dataEnd={dataEnd}
-        onResetFilter={onResetFilter}
-        onDiscover={() => onDiscover(range)}
-      />
+          <RangeEmpty
+            agenda={agenda}
+            unit={selection.unit}
+            dataEnd={dataEnd}
+            onResetFilter={onResetFilter}
+            onDiscover={() => onDiscover(range)}
+          />
+        </>
+      )}
     </>
+  );
+}
+
+function DayCards({ items, day, ctx }: { items: readonly Occurrence<SiteOffer>[]; day: string; ctx: CardContext }) {
+  return items.map((item) => (
+    <OfferCard
+      key={`${item.offer.id}-${item.session.start}`}
+      item={item}
+      ctx={ctx}
+      numbered
+      markTentative
+      calendarDay={day}
+    />
+  ));
+}
+
+/** Text einer freien Zeile je Grund (`weekRows`) */
+const FREE_TEXT = { leer: "Nichts eingeplant", vorbei: "Heute schon vorbei", alter: "Passt nicht zum Alter" } as const;
+
+/**
+ * Eine Zeile der Wochenansicht (Plan 0057, E9): Tag mit Karten, sonst eine schmale gestrichelte Zeile mit dem Weg zu
+ * „Angebote“ für diesen Tag bzw. das Wochenende oder, wenn nur der Filter verdeckt, mit „Filter zurücksetzen“.
+ */
+function WeekRowView({
+  row,
+  today,
+  ctx,
+  onDiscover,
+  onResetFilter,
+}: {
+  row: WeekRow<Occurrence<SiteOffer>>;
+  today: string;
+  ctx: CardContext;
+  onDiscover: (range: { from: string; to: string }) => void;
+  onResetFilter: (() => void) | undefined;
+}) {
+  if (row.kind === "wochenende") {
+    return (
+      <>
+        <h3 className="dayh">{`${shortDate(row.from)} – ${shortDate(row.to)}`}</h3>
+        <FreeRow text="Wochenende · Noch frei">
+          <DiscoverLink onClick={() => onDiscover({ from: row.from, to: row.to })}>Angebote am Wochenende</DiscoverLink>
+        </FreeRow>
+      </>
+    );
+  }
+  const { day } = row;
+  return (
+    <>
+      <h3 className="dayh">{shortDate(day)}</h3>
+      {row.kind === "termine" && <DayCards items={row.items} day={day} ctx={ctx} />}
+      {row.kind === "verdeckt" && (
+        <FreeRow text="Ausgeblendet durch Filter">
+          {onResetFilter && (
+            <button type="button" className="linkbtn" onClick={onResetFilter}>
+              Filter zurücksetzen
+            </button>
+          )}
+        </FreeRow>
+      )}
+      {row.kind === "frei" && (
+        <FreeRow text={FREE_TEXT[row.why]}>
+          <DiscoverLink onClick={() => onDiscover({ from: day, to: day })}>
+            {day === today ? "Angebote für heute" : `Angebote am ${weekdayShort(day)}`}
+          </DiscoverLink>
+        </FreeRow>
+      )}
+    </>
+  );
+}
+
+function FreeRow({ text, children }: { text: string; children: ReactNode }) {
+  return (
+    <p className="free">
+      <span>{text}</span>
+      {children}
+    </p>
+  );
+}
+
+function DiscoverLink({ onClick, children }: { onClick: () => void; children: ReactNode }) {
+  return (
+    <button type="button" className="linkbtn" onClick={onClick}>
+      {children}
+      <Icon name="next" size={16} />
+    </button>
   );
 }
 

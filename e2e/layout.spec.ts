@@ -186,11 +186,10 @@ test("Hochformat 412×915: Tab-Leiste unverändert unten", async ({ page }) => {
 /** Engste Kombination: Seitenleiste plus große Schrift bei geringer Höhe (Pixel 7 quer, Plan 0007, E14). */
 const LANDSCAPE_200: Record<string, (page: Page) => Promise<void>> = {
   Start: async () => {},
-  // Seit Plan 0025 (E8) der Kalender der Merkliste
+  // Seit Plan 0025 (E8) der Kalender der Merkliste; seit Plan 0057 (E9) öffnet ihn der Tab
   "Merkliste Kalender": async (page) => {
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
     await page.getByRole("button", { name: /^Merkliste/ }).click();
-    await page.getByRole("button", { name: "Kalender", exact: true }).click();
     await expect(page.getByRole("button", { name: "Ganzen Monat zeigen" })).toBeVisible();
   },
   Detail: async (page) => {
@@ -430,7 +429,12 @@ test.describe("Badge im Querformat", () => {
         if (count > 1) await saveCopies(page, count);
         await ready(page);
         if (count === 1) await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
+        // Der Tab öffnet den Kalender (Plan 0057, E9); die Liste zeigt jedes gemerkte Angebot einmal
         await page.getByRole("button", { name: /^Merkliste/ }).click();
+        await page
+          .getByRole("group", { name: "Darstellung der Merkliste" })
+          .getByRole("button", { name: "Liste", exact: true })
+          .click();
         await expect(page.getByTestId("offer")).toHaveCount(count);
         await expect(page.locator(".tab .badge")).toHaveText(String(count));
         await setTextScale(page, scale);
@@ -511,7 +515,12 @@ test("Toast lässt Tipps durch, nur „Rückgängig“ fängt sie, nie über der
     await page.getByRole("button", { name }).click();
     await page.getByRole("button", { name }).click();
   }
+  // Der Tab öffnet den Kalender (Plan 0057, E9), PEKiP steht erst nächste Woche: in die Liste
   await page.getByRole("button", { name: /^Merkliste/ }).click();
+  await page
+    .getByRole("group", { name: "Darstellung der Merkliste" })
+    .getByRole("button", { name: "Liste", exact: true })
+    .click();
   await expect(page.getByTestId("offer")).toHaveCount(2);
   await setTextScale(page, 2);
   await page.clock.pauseAt(FIXTURE_NOW); // Toast bleibt stehen (Plan 0007, E15)

@@ -189,7 +189,9 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   "merkliste-kalender-woche": async (page) => {
     await openSavedCalendar(page);
     await page.getByRole("button", { name: "Nächste Woche" }).click();
-    await expect(page.locator("h3.dayh")).toHaveCount(2);
+    // fünf Werktage und das freie Wochenende, zwei davon mit Terminen, die übrigen frei (Plan 0057, E9)
+    await expect(page.locator("h3.dayh")).toHaveCount(6);
+    await expect(page.locator(".free")).toHaveCount(4);
   },
   // Monat offen, ein Tag gewählt: Raster und Liste darunter zugleich
   "merkliste-kalender-monat": async (page) => {
@@ -222,9 +224,14 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole("button", { name: "Offener Krabbeltreff merken" }).click();
     await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
     await page.getByRole("button", { name: /PEKiP-Gruppe Herbst .* merken/ }).click();
+    // Der Tab öffnet den Kalender (Plan 0057, E9), die Liste kommt über den Umschalter
     await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page
+      .getByRole("group", { name: "Darstellung der Merkliste" })
+      .getByRole("button", { name: "Liste", exact: true })
+      .click();
     await expect(page.getByTestId("offer")).toHaveCount(2);
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
   },
   // Plan 0025, E6 (Test 15); seit Plan 0057, E5 wie auf der Startseite: Liste mit drei gemerkten, „Vormittags“ aktiv
   // und „ab Nov.“ im Sheet; Filterzeile mit Badge
@@ -298,10 +305,10 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByRole("dialog")).toBeVisible();
   },
   // Plan 0018, E3: Merkliste mit Geburtsdatum. Die Zeile unter dem Export-Knopf entfiel mit Plan 0025 (E3a), die
-  // Statuszeile zählt die kommenden Termine, regelmäßige nur passend zum Alter (Plan 0028): 8 + 2.
+  // Statuszeile nennt nur die Anzahl (Plan 0057, E9; ADR 0039).
   "merkliste-mit-geburtsdatum": async (page) => {
     await loadAged(page, "./?ansicht=merkliste", "2024-09-18", [PEKIP_ID, TREFF_ID]);
-    await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 10 Terminen gemerkt");
+    await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
   },
   // Plan 0018, E4: Alterszeile mit Grenze „· passt bis 14.10.“
   "detail-mit-geburtsdatum": async (page) => {

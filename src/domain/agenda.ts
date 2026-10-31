@@ -207,8 +207,16 @@ export interface RangeAgenda<T extends Offer> {
    * Plan 0025): Der Leerzustand nennt dann das Alter statt „nichts gemerkt“
    */
   ageHidden: number;
+  /** dasselbe je Tag, nur Tage mit Verdecktem: die leeren Tage der Woche (`weekRows`, Plan 0057, E9) */
+  hiddenDays: ReadonlyMap<string, DayHidden>;
   /** `from` liegt nach dem letzten Tag des Datenstands */
   afterData: boolean;
+}
+
+/** Was an einem Tag verdeckt ist: vom Merklisten-Filter (`hidden`) bzw. nur vom Alter (`ageHidden`), je Tag */
+export interface DayHidden {
+  filter: number;
+  age: number;
 }
 
 /**
@@ -233,6 +241,7 @@ export function rangeAgenda<T extends Offer>(
   const isNotEnded = notEnded(now);
   const today = berlinIsoDate(now);
   const groups: DayGroup<Occurrence<T>>[] = [];
+  const hiddenDays = new Map<string, DayHidden>();
   let count = 0;
   let all = 0;
   let ageAll = 0;
@@ -241,10 +250,15 @@ export function rangeAgenda<T extends Offer>(
   for (let i = 0; i < MAX_RANGE_DAYS && day <= range.to; i += 1, day = addDays(day, 1)) {
     const items = (index.get(day) ?? []).filter((o) => isNotEnded(o.session));
     // Beendetes zählt nicht: „ausgeblendet“ heißt nur, was man noch besuchen könnte.
-    all += (context.allIndex.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
-    ageAll += (context.ageIndex?.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
+    const dayAll = (context.allIndex.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
+    const dayAge = (context.ageIndex?.get(day) ?? []).filter((o) => isNotEnded(o.session)).length;
+    all += dayAll;
+    ageAll += dayAge;
     count += items.length;
     if (items.length > 0) groups.push({ day, items });
+    const filter = Math.max(0, dayAll - items.length);
+    const age = context.ageIndex ? Math.max(0, dayAge - items.length) : 0;
+    if (filter > 0 || age > 0) hiddenDays.set(day, { filter, age });
   }
   return {
     groups,
@@ -252,6 +266,7 @@ export function rangeAgenda<T extends Offer>(
     ended: range.from <= today && today <= range.to ? context.endedToday : 0,
     hidden: Math.max(0, all - count),
     ageHidden: context.ageIndex ? Math.max(0, ageAll - count) : 0,
+    hiddenDays,
     afterData: context.dataEnd !== undefined && range.from > context.dataEnd,
   };
 }

@@ -239,6 +239,27 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
+  /* Freier Tag der Woche (Plan 0057, E9): schmale gestrichelte Zeile, der Link bricht bei Bedarf darunter um */
+  .free {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 8px;
+    margin: 0 0 14px;
+    padding: 0 6px 0 14px;
+    border: 2px dashed var(--muted);
+    border-radius: 18px;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  .free > span {
+    padding-block: 10px;
+  }
+  .free .linkbtn {
+    gap: 4px;
+    font-size: 0.875rem;
+  }
 
   /* Kalendertage ≥ 44 px auch bei 320 px (B3): Beide Raster dehnen sich in den Seitenrand. Media-Query in px,
      denn es geht um Pixel, nicht um Text (Plan 0007, E9). */
