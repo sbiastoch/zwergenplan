@@ -172,7 +172,7 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
       "Demnächst",
       "Anmelden",
       "Spontan",
-      "Läuft gerade",
+      "Endet bald",
       "Kurse",
       "Einmalig",
     ]);
@@ -665,6 +665,21 @@ describe("Merkliste mit Filter (Plan 0025, E3a, E5a, E7)", () => {
     expect(savedFilterStatusParts(1, 5).join("")).toBe("1 von 5 gemerkten Angeboten passt");
     expect(savedFilterStatusParts(0, 3).join("")).toBe("0 von 3 gemerkten Angeboten passen");
     expect(savedFilterStatusParts(1, 1).join("")).toBe("1 von 1 gemerkten Angebot passt");
+    // ein einzelner Schnellfilter der Liste erklärt sich selbst (Plan 0058, Nachtrag)
+    expect(savedFilterStatusParts(7, 48, "laeuft").join("")).toBe("7 von 48 gemerkten Angeboten enden bald");
+    expect(savedFilterStatusParts(1, 48, "laeuft").join("")).toBe("1 von 48 gemerkten Angeboten endet bald");
+    expect(savedFilterStatusParts(3, 48, "spontan").join("")).toBe(
+      "3 von 48 gemerkten Angeboten sind spontan ohne Anmeldung besuchbar",
+    );
+    expect(savedFilterStatusParts(2, 8, "demnaechst").join("")).toBe(
+      "2 von 8 gemerkten Angeboten finden in den nächsten 14 Tagen statt",
+    );
+    expect(savedFilterStatusParts(1, 8, "anmelden").join("")).toBe(
+      "1 von 8 gemerkten Angeboten braucht eine Anmeldung",
+    );
+    expect(savedFilterStatusParts(2, 8, "kurse").join("")).toBe("2 von 8 gemerkten Angeboten sind Kurse");
+    expect(savedFilterStatusParts(1, 8, "einmalig").join("")).toBe("1 von 8 gemerkten Angeboten ist einmalig");
+    expect(LIST_CHIP_LABELS.laeuft).toBe("Endet bald");
   });
 
   it("Karte: passende Angebote ohne Orte (Plan 0056, E2)", () => {

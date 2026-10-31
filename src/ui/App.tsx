@@ -883,6 +883,11 @@ export function App() {
             narrowed={route.tab === "merkliste-karte" && viewNarrows(mapView)}
             onShowAll={showAll}
             filtered={views.savedFiltered}
+            statusChip={
+              route.tab === "merkliste" && listChips.length === 1 && views.savedFilterCount === 0
+                ? listChips[0]
+                : undefined
+            }
             onResetFilter={resetSavedFilter}
             filters={
               <QuickFilters

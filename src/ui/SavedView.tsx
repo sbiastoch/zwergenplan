@@ -7,7 +7,7 @@
 import { type ReactNode, type RefObject, useMemo } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
 import type { SavedTab } from "../domain/route.ts";
-import { collectionExport, type SavedState } from "../domain/saved.ts";
+import { collectionExport, type SavedListChip, type SavedState } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
@@ -49,6 +49,8 @@ interface SavedViewProps {
   onShowAll: () => void;
   /** Merklisten-Filter wirkt in dieser Darstellung (`views.savedFiltered`) */
   filtered: boolean;
+  /** der einzige wirksame Filter ist dieser Schnellfilter der Liste: Die Statuszeile erklärt ihn (Plan 0058, Nachtrag) */
+  statusChip?: SavedListChip | undefined;
   /**
    * ganzen Filter zurücksetzen, auch einen im Kalender ausgeblendeten Zeitraum. Der Knopf verschwindet danach: App
    * setzt den Fokus vorher auf die Statuszeile (`status`), sie meldet die neue Zahl selbst (Muster aus Plan 0021, E3).
@@ -97,6 +99,7 @@ export function SavedView({
   narrowed,
   onShowAll,
   filtered,
+  statusChip,
   onResetFilter,
   filters,
   sortMenu,
@@ -187,7 +190,9 @@ export function SavedView({
                   <span className="sr-only">{inViewAnnounce}</span>
                 </span>
               ) : (
-                <StatusText parts={statusParts({ offers, shown, filtered, tab, missing: unfitting })} />
+                <StatusText
+                  parts={statusParts({ offers, shown, filtered, tab, missing: unfitting, chip: statusChip })}
+                />
               )}
               {tab === "merkliste" && sortNote && <span className="sr-only">. Sortiert nach {sortNote}</span>}
             </p>
@@ -258,6 +263,7 @@ function statusParts({
   filtered,
   tab,
   missing,
+  chip,
 }: {
   offers: readonly SiteOffer[];
   shown: readonly SiteOffer[];
@@ -265,10 +271,11 @@ function statusParts({
   tab: SavedTab;
   /** gemerkte Angebote ohne passenden Termin (`collectionExport`), wie im Export-Toast genannt */
   missing: number;
+  chip: SavedListChip | undefined;
 }): StatusParts {
   const total = filtered ? offers.length : undefined;
   if (tab === "merkliste-karte") return savedMapStatusParts(shown.length, total);
-  if (filtered) return savedFilterStatusParts(shown.length, offers.length);
+  if (filtered) return savedFilterStatusParts(shown.length, offers.length, chip);
   return savedStatusParts(offers.length, missing);
 }
 

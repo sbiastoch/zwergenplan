@@ -144,7 +144,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await savedList(page);
     await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Demnächst" }).click();
   },
-  // „Läuft gerade“ mit „Anschluss suchen“: lokal am Di 27.10., wenn PEKiP läuft. Ein laufender Kurs steht nicht mehr in
+  // „Endet bald“ (laufende Kurse) mit „Anschluss suchen“: lokal am Di 27.10., wenn PEKiP läuft. Ein laufender Kurs steht nicht mehr in
   // „Angebote“, deshalb lokal gemerkt über den Speicher (Fixture-IDs: PEKiP, Musikgarten, Krabbeltreff)
   "merkliste-laeuft": async (page) => {
     if (isLocal) {
@@ -158,7 +158,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       for (const heart of await page.getByRole("button", { name: / merken$/ }).all()) await heart.click();
     }
     await savedList(page);
-    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Läuft gerade" }).click();
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Endet bald" }).click();
   },
   // „Nächstgelegen“ ohne Startpunkt: „Wovon aus gerechnet?“ über der Liste nach Terminen (Plan 0057, E7a)
   "merkliste-nah": async (page) => {

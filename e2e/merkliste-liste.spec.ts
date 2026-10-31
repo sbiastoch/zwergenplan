@@ -294,7 +294,7 @@ test.describe("Schnellfilter der Liste (Plan 0058)", () => {
   // dazu der Schnupper-Workshop (einmalig, Sa 17.10.), die Bewegungslandschaft (regelmäßig mit Anmeldung, ab Di 20.10.)
   // und das Babykonzert (einmalig ohne Anmeldung, 6.12.)
   const ALL = [...FIVE, "fnp2g3xh", "rv61suun", "kovtez0z"];
-  const LIST_CHIPS = ["Demnächst", "Anmelden", "Spontan", "Läuft gerade", "Kurse", "Einmalig", "Nur fest eingeplant"];
+  const LIST_CHIPS = ["Demnächst", "Anmelden", "Spontan", "Endet bald", "Kurse", "Einmalig", "Nur fest eingeplant"];
   const chipNames = (page: Page) => filters(page).getByRole("button").filter({ hasNotText: "Filter" });
   const status = (page: Page) => page.getByRole("status");
 
@@ -315,13 +315,15 @@ test.describe("Schnellfilter der Liste (Plan 0058)", () => {
       "Babymassage – Schnupper-Workshop",
     ]);
     // der Krabbeltreff (regelmäßig ohne Anmeldung) hat zwar einen Termin in 14 Tagen, ist aber nicht „Demnächst“
-    await expect(status(page)).toHaveText("2 von 8 gemerkten Angeboten passen");
+    // ein einzelner Schnellfilter erklärt sich in der Statuszeile (Plan 0058, Nachtrag)
+    await expect(status(page)).toHaveText("2 von 8 gemerkten Angeboten finden in den nächsten 14 Tagen statt");
     // Chips stehen nicht im Sheet: das Badge bleibt leer
     await expect(filterButton(page)).toHaveAccessibleName("Alle Filter, 0 aktiv");
 
     // Zeit UND Format: nur PEKiP
     await chip(page, "Kurse").click();
     await expect(titles(page)).toHaveText(["PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026)"]);
+    // mehrere Filter: neutral
     await expect(status(page)).toHaveText("1 von 8 gemerkten Angeboten passt");
     // Format ODER Format: beide wieder
     await chip(page, "Einmalig").click();
@@ -347,7 +349,7 @@ test.describe("Schnellfilter der Liste (Plan 0058)", () => {
     await preset(page, ALL);
     await openList(page, 8);
     // am 5.10. läuft kein Kurs
-    await chip(page, "Läuft gerade").click();
+    await chip(page, "Endet bald").click();
     await expect(page.getByText("Nichts, was zu deinem Filter passt")).toBeVisible();
     await page.getByRole("button", { name: "Filter zurücksetzen" }).click();
     await expect(status(page)).toBeFocused();
@@ -355,7 +357,7 @@ test.describe("Schnellfilter der Liste (Plan 0058)", () => {
     for (const name of LIST_CHIPS) await expect(chip(page, name)).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("„Läuft gerade“: „Endet …“ und „Anschluss suchen“ öffnet Angebote mit Kurs, Kategorie und Zeitraum", async ({
+  test("„Endet bald“: „Endet …“ und „Anschluss suchen“ öffnet Angebote mit Kurs, Kategorie und Zeitraum", async ({
     page,
   }) => {
     // Di 27.10., 8 Uhr: PEKiP läuft seit 13.10. (bis 1.12.), der Musikgarten beginnt am 5.11.
@@ -366,9 +368,10 @@ test.describe("Schnellfilter der Liste (Plan 0058)", () => {
     await expect(page.getByTestId("offer")).toHaveCount(2);
     // ohne Chip: der laufende Kurs trägt keine Marke, der Musikgarten „in 9 Tagen“
     await expect(page.locator(".fact.soon")).toHaveText(["in 9 Tagen"]);
-    await chip(page, "Läuft gerade").click();
+    await chip(page, "Endet bald").click();
     const card = page.getByTestId("offer");
     await expect(card).toHaveCount(1);
+    await expect(page.getByRole("status")).toHaveText("1 von 2 gemerkten Angeboten endet bald");
     await expect(card.locator(".card-next")).toContainText("Endet Di 1.12.");
     const link = card.getByRole("button", {
       name: "Anschluss an PEKiP-Gruppe Herbst (Babys geb. Juni–Aug. 2026) suchen",
