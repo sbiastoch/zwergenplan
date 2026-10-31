@@ -464,3 +464,9 @@ Ansichten `meine-anbieter`, `push`, `start`, `filter` und `kind`, je 320, 360, i
 - Das Kind-Sheet zeigt nur noch Anbieter-Abos, bei 320 px bricht „Entfernen“ sauber um.
 - Prüfzeile m9: Bei gedrücktem Chip zählt die Schaltfläche im Filter-Sheet die Auswahl mit, ohne den Chip zu zeigen. Das ist gewollt wie in Plan 0058; ein Schalter im Sheet steht in `docs/ideas.md`.
 
+### Live Nachtrag A (2026-10-31)
+
+Live seit 9777bda: CI auf `main` grün (volle Suite), Deploy durch, `meta.json` zeigt `9777bda`. Kurzcheck `/browser-review live` mit `start` und `kind` (iPhone, hell und dunkel): keine Such-Glocke mehr, ohne Abo kein Chip, das Kind-Sheet bricht nicht. `meine-anbieter` und `push` nutzen Fixture-IDs und laufen live nicht.
+
+Offen vor dem Archivieren bleibt der iPhone-Spike aus E5.
+
