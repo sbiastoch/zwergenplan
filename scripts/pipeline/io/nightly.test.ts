@@ -1056,17 +1056,33 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     expect([...(rawUnit(dirsOf)?.held?.lost ?? [])].sort()).toEqual(
       [ids["Offener Krabbeltreff 1"], ids["Offener Krabbeltreff 2"]].sort(),
     );
-    // der Mensch nimmt hin; zugleich ändert sich die Seite, und die neue Extraktion formuliert auch Treff 3 um
+    // der Mensch nimmt hin, mit einem Datum ab dem ersten Halten (wie `acceptanceFor`: Halten bis zu diesem Tag)
+    const firstSince = rawUnit(dirsOf)?.held?.since ?? "";
+    const accepted = (_: string, since: string) => (since <= firstSince ? { grund: "1 und 2 geprüft" } : undefined);
+    // zugleich ändert sich die Seite, und die neue Extraktion formuliert auch Treff 3 um
     const j = fakeJudge(all("unklar"));
     const { r } = await gateNight(dirsOf, {
       judge: j.judge,
       text: (url) => `Programm ${url} neu`,
-      extra: { accepted: () => ({ grund: "1 und 2 geprüft" }) },
+      extra: { accepted, now: () => "2026-10-07T03:00:00+02:00" },
     });
     // Treff 3 hat niemand hingenommen: Er geht vor den Richter, und der sagt unklar
     expect(j.seen).toHaveLength(1);
     expect(idsByTitle(dirsOf)["Offener Krabbeltreff 3"]).toBe(ids["Offener Krabbeltreff 3"]);
     expect(r.idGate?.[0]).toMatchObject({ outcome: "gehalten", held: "unklar" });
+    // der neue Verlust setzt den Beginn des Haltens neu (Arch-Review 2, B1): Der alte Eintrag deckt ihn nicht
+    expect(rawUnit(dirsOf)?.held?.since).not.toBe(firstSince);
+    // dritte Nacht, Seite unverändert: kein stilles Hinnehmen von Treff 3, sondern wieder der Richter
+    const j3 = fakeJudge(all("unklar"));
+    const n3 = await gateNight(dirsOf, {
+      judge: j3.judge,
+      text: (url) => `Programm ${url} neu`,
+      extra: { accepted, now: () => "2026-10-08T03:00:00+02:00" },
+    });
+    expect(n3.r.idGate).toBeUndefined();
+    expect(j3.seen).toEqual([]);
+    expect(rawUnit(dirsOf)?.held?.lost).toContain(ids["Offener Krabbeltreff 3"]);
+    expect(idsByTitle(dirsOf)["Offener Krabbeltreff 3"]).toBe(ids["Offener Krabbeltreff 3"]);
   });
 
   it("Halten einer Einheit kostet keine ID, die in (a) eine andere gated Einheit hielt (Nachprüfung nach dem Urteil)", async () => {

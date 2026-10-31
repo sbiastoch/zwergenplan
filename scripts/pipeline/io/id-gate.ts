@@ -63,10 +63,44 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
   try {
     return await gate(o, calls);
   } catch (e) {
+    const why = `ID-Gate: ${e instanceof Error ? e.message : String(e)}`;
     const out: IdGateResult = { raws: {}, entries: [], calls, held: {} };
-    holdAll(o, out, gatedUnits(o.prev, o.next), `ID-Gate: ${e instanceof Error ? e.message : String(e)}`);
-    return out;
+    try {
+      holdAll(o, out, gatedUnits(o.prev, o.next), why);
+      return out;
+    } catch {
+      // auch das Halten scheitert (Arch-Review 2, m2): die gated Einheiten auf den Vorstand zurück, ohne `held`. Die
+      // nächste Nacht sieht dieselbe neue Fassung und richtet erneut; keine ID geht verloren
+      return revertAll(o, calls, why);
+    }
   }
+}
+
+/** Letzter Ausweg: alle gated Einheiten im Stand des Vorstands (Stand (b)), ohne Halten und ohne Urteil. */
+function revertAll(o: IdGateOptions, calls: CallRecord[], why: string): IdGateResult {
+  const out: IdGateResult = { raws: {}, entries: [], calls, held: {} };
+  const gated = new Map<string, Set<string>>();
+  for (const [id, n] of Object.entries(o.next)) {
+    const p = o.prev[id];
+    if (!p || !isV2(p) || !isV2(n)) continue;
+    // ohne `gatedUnits` (das selbst geworfen haben kann): jede Einheit mit neuem Ergebnis, eine Obermenge der gated
+    const units = new Set(
+      Object.keys(n.units).filter((u) => {
+        const before = p.units[u];
+        return before?.inputHash !== undefined && n.units[u]?.inputHash !== before.inputHash;
+      }),
+    );
+    if (units.size > 0) gated.set(id, units);
+  }
+  for (const [id, raw] of Object.entries(heldBack(o.prev, o.next, gated))) {
+    const units = gated.get(id);
+    if (!units || !isV2(raw)) continue;
+    out.raws[id] = raw;
+    out.held[id] = [...units].sort();
+    for (const unit of out.held[id] ?? [])
+      out.entries.push({ provider: id, unit, outcome: "gehalten", held: "grenze", ids: [], note: why });
+  }
+  return out;
 }
 
 /** Alle noch nicht gehaltenen gated Einheiten mit `grenze` halten (Ergebnis wie Stand (b)). */

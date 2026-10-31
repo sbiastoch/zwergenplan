@@ -15,7 +15,7 @@ Status: **angenommen** (2026-10-31, mit Plan 0049, Nachtrag 2, Schritt B), Nutze
 ## Entscheidung
 
 1. **Fassung je Einheit.** `UnitState.partsHash` ist der Hash über die `KeyParts` und `INPUT_EPOCH` der Eingabe, aus der `events` stammen. Er ist nicht Teil des Cache-Schlüssels, löst also selbst keine Neuextraktion aus. `INPUT_EPOCH` (`lib/normalize.ts`) steigt, wenn sich der Code ändert, der den Eingabetext erzeugt; ein Pin-Test erzwingt das. Nicht pinbar ist die Abrufart (`--abruf alt|neu`); beim Umschalten steigt die Epoche von Hand. Das Fallback-Modell gehört bewusst nicht zur Fassung: Der zweite Versuch läuft nur nach einer Schlüsseländerung und mit demselben Schlüssel.
-2. **Gated** ist eine Einheit, die einen Vorstand hat und ein Ergebnis einer anderen Fassung übernimmt. Ein fehlendes `partsHash` zählt als andere Fassung. Gleichgültig ist, ob sich die Seite zugleich geändert hat. Sonst ginge der Verlust mit der nächsten kleinen Änderung der Seite doch durch.
+2. **Gated** ist eine Einheit, die einen Vorstand hat und ein Ergebnis einer anderen Fassung übernimmt. Ein fehlendes `partsHash` zählt als andere Fassung. Gleichgültig ist, ob sich die Seite zugleich geändert hat. Sonst ginge der Verlust mit der nächsten kleinen Änderung der Seite doch durch. **Nicht gated** ist eine Einheit ohne Vorstand: eine neue Seite, auch die neue URL einer Seite, die ein Mensch (oder später die Pflege) im Katalog ersetzt hat. Die verwaiste alte Einheit entfällt dann wie bisher (Plan 0048, E1). Das ist eine Änderung des Katalogs, keine neue Fassung der Pipeline; ihre Verluste regelt die Zuordnung nach ADR 0022. Ebenso ohne Gate bleibt die Umstellung eines Anbieters vom alten Format V1 (2026-10-31: alle Dateien V2).
 3. **Verlust** ist eine ID mit künftigem Termin im Vorstand, die im Build mit allen neuen Ergebnissen fehlt, im Build mit dem alten Stand der gated Einheiten aber vorkommt. Da sich die beiden Builds nur in den gated Einheiten unterscheiden, kommt jeder solche Verlust von einer neuen Fassung. Stammt das Angebot im zweiten Build aus einer Einheit ohne neue Fassung (über `mergeParts` vereinigt), kann der Richter dort nicht urteilen; die erste gated Einheit des Anbieters wird gehalten (`crossUnit`). Verluste aus Einheiten mit geänderter Seite, aber gleicher Fassung, bleiben erlaubt (ADR 0022).
 4. **Richter.** Für jede gated Einheit mit Verlusten urteilt ein Opus-Modell (`LLM_MODEL_JUDGE`) je verlorener ID:
    - `gleich`: Das neue Event erbt die ID (`RawEvent.keepIds`, je Beginn).
@@ -36,6 +36,11 @@ Status: **angenommen** (2026-10-31, mit Plan 0049, Nachtrag 2, Schritt B), Nutze
 - **Nur die Zuordnung verbessern** (lockerere Stufen): erhöht das Risiko, dass eine ID still auf ein anderes Angebot zeigt; ADR 0022 sagt „lieber neu als vertauscht“.
 - **Verluste nur melden:** bricht die harte Regel.
 - **Richter mit Haiku:** billiger, aber das Urteil über „dasselbe Angebot“ ist genau die Schwäche, die das Gate abfängt. Qualität vor Kosten (Nutzervorgabe).
+
+## Grenzen
+
+- Nicht Teil der Fassung sind die Nachricht an den Extraktor (`extractMessage`) und die Teilungsschwelle (`PART_MAX_CHARS`). Eine Änderung dort extrahiert nicht neu; spätere Verluste bei einer Änderung der Seite zählen dann als gleiche Fassung. Wer sie ändert, erhöht `INPUT_EPOCH`.
+- `JUDGE_BRAKES` wird vor jeder Einheit geprüft, nicht vor jedem Teil: Eine große Einheit kann die Grenze um ihre Teile (je bis zu zwei Aufrufe) überschreiten. Die Frist hält trotzdem, weil das Signal abbricht.
 
 ## Konsequenzen
 

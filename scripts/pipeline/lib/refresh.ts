@@ -531,7 +531,9 @@ export function holdUnit(
       ...(candidate.dated ? { dated: candidate.dated } : {}),
       model: candidate.model,
       events: candidate.events,
-      since: prev.held?.since ?? o.since,
+      // Beginn des Haltens bleibt nur, solange keine neue verlorene ID dazukommt: Ein Hinnehmen-Eintrag ab diesem
+      // Beginn deckt sonst einen Verlust, den kein Mensch gesehen hat (Arch-Review 2, B1)
+      since: prev.held && o.lost.every((id) => prev.held?.lost.includes(id)) ? prev.held.since : o.since,
       reason: o.reason,
       lost: [...o.lost],
     },
