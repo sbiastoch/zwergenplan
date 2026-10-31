@@ -57,9 +57,9 @@ interface OfferCardProps {
    * („place“) fehlen Ort und Entfernung in der Meta-Zeile, im Anbieter-Sheet („provider“) der Anbietername.
    */
   context?: "place" | "provider";
-  /** Marke „heute“, „morgen“, „in 5 Tagen“ im Abschnitt „Demnächst“ (Plan 0057, E8) */
+  /** Marke „heute“, „morgen“, „in 5 Tagen“ für „Demnächst“ auf der Merkliste (Plan 0057, E8; Plan 0058, E4) */
   soon?: string | undefined;
-  /** Fußzeile „Endet Di 1.12.“ mit „Anschluss suchen“ im Abschnitt „Läuft gerade“ (Plan 0057, E8) */
+  /** Fußzeile „Endet Di 1.12.“ mit „Anschluss suchen“ an laufenden Kursen der Merkliste (Plan 0057, E8; Plan 0058, E4) */
   followUp?: { ends: string; onSearch: () => void } | undefined;
 }
 

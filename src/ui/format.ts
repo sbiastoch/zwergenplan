@@ -10,7 +10,7 @@ import type { CalendarSelection } from "../domain/calendar.ts";
 import type { DateRange, Daytime } from "../domain/date-range.ts";
 import { filterFromSearch } from "../domain/filter.ts";
 import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
-import { type ListGroupHead, METER_BANDS, NEW_DAYS, type SavedSection } from "../domain/listing.ts";
+import { type ListGroupHead, METER_BANDS, NEW_DAYS } from "../domain/listing.ts";
 import {
   distanceText,
   type Origin,
@@ -21,7 +21,7 @@ import {
 } from "../domain/reach.ts";
 import { regionList } from "../domain/regions.ts";
 import { registrationPhase } from "../domain/registration.ts";
-import { type ExportSelection, type SavedStage, SOON_DAYS } from "../domain/saved.ts";
+import { type ExportSelection, type SavedListChip, type SavedStage, SOON_DAYS } from "../domain/saved.ts";
 import type { Cost, Format, Registration, Session } from "../domain/schema.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, berlinDate, berlinIsoDate, daysBetween, isoWeekday, parseIsoDate } from "../domain/time.ts";
@@ -133,25 +133,21 @@ export function listingHeading(group: ListGroupHead, today: string, origin?: Ori
     case "flach":
       // kein sichtbarer Kopf, nur der Name des Abschnitts (Plan 0057, E6)
       return { title: "Zuletzt gemerkt" };
-    case "abschnitt":
-      return sectionHeading(group.section);
   }
 }
 
-const SECTION_HEADINGS: Record<SavedSection, { title: string; sub: string }> = {
-  demnaechst: { title: "Demnächst", sub: `Termine in den nächsten ${SOON_DAYS} Tagen` },
-  anmelden: { title: "Rechtzeitig anmelden", sub: "Beginnt später, Anmeldung nötig – nach Beginn sortiert" },
-  spontan: { title: "Spontan möglich", sub: "Ohne Anmeldung, einfach hingehen" },
-  laeuft: { title: "Läuft gerade", sub: "Laufende Kurse" },
-  spaeter: { title: "Später", sub: "Ohne Anmeldung" },
+/** Beschriftung der Schnellfilter in der Liste der Merkliste (Plan 0058, E1) */
+export const LIST_CHIP_LABELS: Record<SavedListChip, string> = {
+  demnaechst: "Demnächst",
+  anmelden: "Anmelden",
+  spontan: "Spontan",
+  // laufende Kurse: Es geht vor allem um den Anschluss (Plan 0058, Nachtrag)
+  laeuft: "Endet bald",
+  kurse: "Kurse",
+  einmalig: "Einmalig",
 };
 
-/** Kopf eines Abschnitts der Liste „Was ist zu tun“ (Plan 0057, E8); die Anzahl steht als Zahlmarke daneben */
-export function sectionHeading(section: SavedSection): { title: string; sub: string } {
-  return SECTION_HEADINGS[section];
-}
-
-/** Marke in „Demnächst“ (Plan 0057, E8): „heute“, „morgen“, „in 5 Tagen“ nach Berliner Kalendertagen */
+/** Marke „Demnächst“ an der Kachel (Plan 0057, E8; Plan 0058, E4): „heute“, „morgen“, „in 5 Tagen“ nach Berliner Kalendertagen */
 export function daysUntilLabel(day: string, today: string): string {
   const days = daysBetween(today, day);
   // „Demnächst“ hat nur kommende Termine; ein vergangener Tag kommt nicht vor
@@ -159,7 +155,7 @@ export function daysUntilLabel(day: string, today: string): string {
   return days === 1 ? "morgen" : `in ${days} Tagen`;
 }
 
-/** Fußzeile in „Läuft gerade“ (Plan 0057, E8): „Endet Di 1.12.“ am Tag des letzten Termins */
+/** Fußzeile an laufenden Kursen (Plan 0057, E8; Schnellfilter „Endet bald“, Plan 0058): „Endet Di 1.12.“ am Tag des letzten Termins */
 export function endsLabel(sessions: readonly Session[]): string {
   const last = sessions.at(-1);
   return last ? `Endet ${shortDate(sessionDay(last))}` : "";
@@ -645,9 +641,23 @@ export function savedMapStatusParts(offers: number, total?: number): [number, st
   return [offers, ofSaved(total)];
 }
 
-/** Statuszeile von Liste und Kalender mit aktivem Merklisten-Filter: „2 von 5 gemerkten Angeboten passen“ (E3a) */
-export function savedFilterStatusParts(shown: number, total: number): [number, string] {
-  return [shown, `${ofSaved(total)} ${shown === 1 ? "passt" : "passen"}`];
+/** Was ein einzelner Schnellfilter der Liste bedeutet, als Prädikat der Statuszeile: [Singular, Plural] (Plan 0058) */
+const LIST_CHIP_STATUS: Record<SavedListChip, [string, string]> = {
+  demnaechst: [`findet in den nächsten ${SOON_DAYS} Tagen statt`, `finden in den nächsten ${SOON_DAYS} Tagen statt`],
+  anmelden: ["braucht eine Anmeldung", "brauchen eine Anmeldung"],
+  spontan: ["ist spontan ohne Anmeldung besuchbar", "sind spontan ohne Anmeldung besuchbar"],
+  laeuft: ["endet bald", "enden bald"],
+  kurse: ["ist ein Kurs", "sind Kurse"],
+  einmalig: ["ist einmalig", "sind einmalig"],
+};
+
+/**
+ * Statuszeile von Liste und Kalender mit aktivem Merklisten-Filter: „2 von 5 gemerkten Angeboten passen“ (E3a). Wirkt
+ * nur ein Schnellfilter der Liste, erklärt er sich: „7 von 48 gemerkten Angeboten enden bald“ (Plan 0058, Nachtrag).
+ */
+export function savedFilterStatusParts(shown: number, total: number, chip?: SavedListChip): [number, string] {
+  const [one, many] = chip ? LIST_CHIP_STATUS[chip] : ["passt", "passen"];
+  return [shown, `${ofSaved(total)} ${shown === 1 ? one : many}`];
 }
 
 /** Leerzustand, wenn der Merklisten-Filter alle gemerkten ausblendet (E5a) */

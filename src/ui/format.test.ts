@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Origin, Reach } from "../domain/reach.ts";
-import type { ExportSelection } from "../domain/saved.ts";
+import { type ExportSelection, SAVED_LIST_CHIPS } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { addDays, fromBerlinLocal } from "../domain/time.ts";
 // nur im Test: Konstanten der Rechnung gegen den Text (src/ui importiert transit.ts sonst nur per import())
@@ -25,6 +25,7 @@ import {
   exportLabel,
   formatFact,
   inViewStatusParts,
+  LIST_CHIP_LABELS,
   limitHint,
   limitReason,
   listedSince,
@@ -51,7 +52,6 @@ import {
   savedMapStatusParts,
   savedStatusParts,
   searchLabel,
-  sectionHeading,
   selectionHeading,
   seriesToast,
   shortDate,
@@ -167,18 +167,15 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
     expect(listedSince("2026-10-21T23:30:00Z")).toBe("Im Zwergenplan seit 22. Oktober");
   });
 
-  it("benennt die Abschnitte „Was ist zu tun“ und ihre Kachel-Zusätze (Plan 0057, E8)", () => {
-    expect(sectionHeading("demnaechst")).toEqual({ title: "Demnächst", sub: "Termine in den nächsten 14 Tagen" });
-    expect(sectionHeading("anmelden")).toEqual({
-      title: "Rechtzeitig anmelden",
-      sub: "Beginnt später, Anmeldung nötig – nach Beginn sortiert",
-    });
-    expect(sectionHeading("spontan")).toEqual({ title: "Spontan möglich", sub: "Ohne Anmeldung, einfach hingehen" });
-    expect(sectionHeading("laeuft")).toEqual({ title: "Läuft gerade", sub: "Laufende Kurse" });
-    expect(sectionHeading("spaeter")).toEqual({ title: "Später", sub: "Ohne Anmeldung" });
-    expect(listingHeading({ kind: "abschnitt", section: "laeuft", count: 2 }, "2026-10-05")).toEqual(
-      sectionHeading("laeuft"),
-    );
+  it("benennt die Schnellfilter der Liste und die Kachel-Zusätze (Plan 0058, E1, E4)", () => {
+    expect(SAVED_LIST_CHIPS.map((chip) => LIST_CHIP_LABELS[chip])).toEqual([
+      "Demnächst",
+      "Anmelden",
+      "Spontan",
+      "Endet bald",
+      "Kurse",
+      "Einmalig",
+    ]);
     expect(daysUntilLabel("2026-10-05", "2026-10-05")).toBe("heute");
     expect(daysUntilLabel("2026-10-06", "2026-10-05")).toBe("morgen");
     expect(daysUntilLabel("2026-10-07", "2026-10-05")).toBe("in 2 Tagen");
@@ -668,6 +665,21 @@ describe("Merkliste mit Filter (Plan 0025, E3a, E5a, E7)", () => {
     expect(savedFilterStatusParts(1, 5).join("")).toBe("1 von 5 gemerkten Angeboten passt");
     expect(savedFilterStatusParts(0, 3).join("")).toBe("0 von 3 gemerkten Angeboten passen");
     expect(savedFilterStatusParts(1, 1).join("")).toBe("1 von 1 gemerkten Angebot passt");
+    // ein einzelner Schnellfilter der Liste erklärt sich selbst (Plan 0058, Nachtrag)
+    expect(savedFilterStatusParts(7, 48, "laeuft").join("")).toBe("7 von 48 gemerkten Angeboten enden bald");
+    expect(savedFilterStatusParts(1, 48, "laeuft").join("")).toBe("1 von 48 gemerkten Angeboten endet bald");
+    expect(savedFilterStatusParts(3, 48, "spontan").join("")).toBe(
+      "3 von 48 gemerkten Angeboten sind spontan ohne Anmeldung besuchbar",
+    );
+    expect(savedFilterStatusParts(2, 8, "demnaechst").join("")).toBe(
+      "2 von 8 gemerkten Angeboten finden in den nächsten 14 Tagen statt",
+    );
+    expect(savedFilterStatusParts(1, 8, "anmelden").join("")).toBe(
+      "1 von 8 gemerkten Angeboten braucht eine Anmeldung",
+    );
+    expect(savedFilterStatusParts(2, 8, "kurse").join("")).toBe("2 von 8 gemerkten Angeboten sind Kurse");
+    expect(savedFilterStatusParts(1, 8, "einmalig").join("")).toBe("1 von 8 gemerkten Angeboten ist einmalig");
+    expect(LIST_CHIP_LABELS.laeuft).toBe("Endet bald");
   });
 
   it("Karte: passende Angebote ohne Orte (Plan 0056, E2)", () => {

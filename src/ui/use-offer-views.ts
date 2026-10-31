@@ -27,15 +27,16 @@ import type { Route } from "../domain/route.ts";
 import {
   applySavedFilter,
   EMPTY_SAVED_FILTER,
+  matchesListChips,
   matchesSavedFilter,
   recentlySaved,
   type SavedFilter,
+  type SavedListChip,
   type SavedSort,
   type SavedState,
   savedFilterCount,
   savedOffers,
   savedRule,
-  savedSections,
   savedUnfitIds,
 } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
@@ -55,6 +56,8 @@ export interface OfferViewsInput {
   savedFilter?: SavedFilter;
   /** Sortierung der Liste der Merkliste (Plan 0057, E6), lebt in `App`; ohne Angabe „Nächste Termine“ */
   savedSort?: SavedSort;
+  /** Schnellfilter der Liste der Merkliste (Plan 0058, E1), lebt in `App`; wirkt nur auf dem Tab „merkliste“ */
+  listChips?: readonly SavedListChip[];
   /**
    * Wegzeit-Grenze der Merkliste zählt (Badge, „gefiltert“): in der Liste wie auf der Startseite schon beim Laden
    * (`limitActive` aus use-transit.ts), in Kalender und Karte erst mit Wegzeit, denn sie warten nicht (Plan 0057, E7a)
@@ -117,7 +120,12 @@ export interface OfferViews {
   savedVisible: Occurrence<SiteOffer>[];
   /** dieselben im Kartenausschnitt der Merklisten-Karte (Plan 0056, E5); sonst `savedVisible` */
   savedInView: Occurrence<SiteOffer>[];
-  /** Merklisten-Filter wirkt in dieser Darstellung (im Kalender zählt der Zeitraum nicht) */
+  /** dieselben nach den Schnellfiltern der Liste (Plan 0058, E3); außerhalb der Liste `savedVisible` */
+  savedListVisible: Occurrence<SiteOffer>[];
+  /**
+   * Merklisten-Filter wirkt in dieser Darstellung (im Kalender zählt der Zeitraum nicht); in der Liste auch mit einem
+   * Schnellfilter (Plan 0058, E3)
+   */
   savedFiltered: boolean;
   /** Zahl im Badge des Filter-Knopfs der Merkliste (E5): Werte wie auf der Startseite plus „Nur fest eingeplant“ */
   savedFilterCount: number;
@@ -170,6 +178,7 @@ export interface SavedCalendarData {
 
 const NO_REACH = (): undefined => undefined;
 const NO_IDS: readonly string[] = [];
+const NO_CHIPS: readonly SavedListChip[] = [];
 
 /** Entfernung je Koordinate zwischengespeichert: Viele Angebote teilen sich einen Ort. */
 function reachCache(reachFn: ReachFn | undefined): (offer: SiteOffer) => Reach | undefined {
@@ -193,7 +202,8 @@ export function useOfferViews({
   savedIds,
   tentative = NO_IDS,
   savedFilter = EMPTY_SAVED_FILTER,
-  savedSort = "zutun",
+  savedSort = "termine",
+  listChips = NO_CHIPS,
   savedLimitActive = false,
   now,
   reach,
@@ -260,15 +270,16 @@ export function useOfferViews({
   const useRange = !onCalendar;
   const savedState = useMemo((): SavedState => ({ ids: savedIds, tentative }), [savedIds, tentative]);
   const savedCount = savedFilterCount(savedFilter, { useRange, limitActive: savedLimitActive });
-  const savedFiltered = savedCount > 0;
+  // Sheet-Filter: entscheidet, ob `savedVisible` neu gerechnet wird (Plan 0058, Review 2 m3)
+  const sheetFiltered = savedCount > 0;
   const savedSessionRule = useMemo(() => savedRule(savedFilter, useRange), [savedFilter, useRange]);
   const savedVisible = useMemo(() => {
-    if (!savedFiltered) return saved;
+    if (!sheetFiltered) return saved;
     const shown = applySavedFilter(savedList, savedFilter, savedState, now, { useRange, reach });
     // Mit Zeitraum oder Tageszeit steht ein Angebot am Termin darin und wird danach sortiert (E3a; Plan 0057, E7)
     return savedOffers(shown, savedIds, now, birthDate, savedSessionRule);
   }, [
-    savedFiltered,
+    sheetFiltered,
     saved,
     savedList,
     savedFilter,
@@ -281,6 +292,15 @@ export function useOfferViews({
     savedSessionRule,
   ]);
   const savedVisibleList = useMemo(() => savedVisible.map((o) => o.offer), [savedVisible]);
+  const savedListTab = route.tab === "merkliste";
+  // Schnellfilter der Liste (Plan 0058, E1, E3): nur auf dem Tab „merkliste“, am gezeigten Termin
+  const listChipsActive = savedListTab && listChips.length > 0;
+  const savedListVisible = useMemo(
+    () => (listChipsActive ? savedVisible.filter((item) => matchesListChips(item, listChips, now)) : savedVisible),
+    [listChipsActive, savedVisible, listChips, now],
+  );
+  const savedListVisibleList = useMemo(() => savedListVisible.map((o) => o.offer), [savedListVisible]);
+  const savedFiltered = sheetFiltered || listChipsActive;
   const savedInView = useMemo(
     () =>
       route.tab === "merkliste-karte" && extent
@@ -293,16 +313,15 @@ export function useOfferViews({
   const savedFits = useMemo(() => sessionFit(birthDate), [birthDate]);
   // Liste nach der Sortierung (E6). „Nächstgelegen“ ohne Wegzeit zeigt bis dahin die Termine (wie Plan 0043, E7). Die
   // Gruppierungen wählen denselben Termin wie `savedOffers` (gleiche Regel, gleiche Altersregel).
-  const savedListTab = route.tab === "merkliste";
   const savedGroups = useMemo((): ListGroup<Occurrence<SiteOffer>>[] => {
     if (!savedListTab) return [];
     if (savedSort === "gemerkt") {
-      const items = recentlySaved(savedVisible, savedIds);
+      const items = recentlySaved(savedListVisible, savedIds);
       return items.length > 0 ? [{ kind: "flach", key: "gemerkt", items }] : [];
     }
-    if (savedSort === "zutun") return savedSections(savedVisible, now);
-    if (savedSort === "nah" && reach) return groupByReach(savedVisibleList, now, reachOf, savedSessionRule, savedFits);
-    return groupByNextSession(savedVisibleList, now, savedSessionRule, savedFits).map(({ day, items }) => ({
+    if (savedSort === "nah" && reach)
+      return groupByReach(savedListVisibleList, now, reachOf, savedSessionRule, savedFits);
+    return groupByNextSession(savedListVisibleList, now, savedSessionRule, savedFits).map(({ day, items }) => ({
       kind: "termin",
       key: day,
       day,
@@ -311,10 +330,10 @@ export function useOfferViews({
   }, [
     savedListTab,
     savedSort,
-    savedVisible,
+    savedListVisible,
     savedIds,
     reach,
-    savedVisibleList,
+    savedListVisibleList,
     now,
     reachOf,
     savedSessionRule,
@@ -332,8 +351,8 @@ export function useOfferViews({
     [onCalendar, savedList, savedFits],
   );
   const savedIndex = useMemo(
-    () => (onCalendar && savedFiltered ? sessionsByDay(savedVisibleList, calendarFits) : allIndex),
-    [onCalendar, savedFiltered, savedVisibleList, calendarFits, allIndex],
+    () => (onCalendar && sheetFiltered ? sessionsByDay(savedVisibleList, calendarFits) : allIndex),
+    [onCalendar, sheetFiltered, savedVisibleList, calendarFits, allIndex],
   );
   // ohne Altersprüfung, aber mit Tageszeit: Die Differenz zu `index` ist genau, was das Alter verdeckt
   const ageIndex = useMemo(
@@ -394,6 +413,7 @@ export function useOfferViews({
       },
     saved,
     savedVisible,
+    savedListVisible,
     savedInView,
     savedFiltered,
     savedFilterCount: savedCount,

@@ -160,7 +160,7 @@ test("Deep-Link ?sortierung=neu öffnet sortiert; der Tab-Wechsel behält die Wa
   const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
   await views.getByRole("button", { name: "Liste", exact: true }).click();
   await expect(page).toHaveURL(/ansicht=merkliste&sortierung=neu$/);
-  await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Was ist zu tun");
+  await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Nächste Termine");
   await page
     .getByRole("navigation", { name: "Hauptnavigation" })
     .getByRole("button", { name: /^Angebote/ })

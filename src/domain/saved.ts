@@ -5,11 +5,10 @@
  * Pipeline-Lauf soll keine Merkliste leeren.
  */
 import { fittingSessions, sessionFit, splitByAge } from "./age.ts";
-import { byStartThenTitle, courseRunning, type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
+import { courseRunning, type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
 import type { SessionRule } from "./date-range.ts";
 import { activeFilterCount, applyFilters, EMPTY_FILTER, type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId, resolveProviderId } from "./ids.ts";
-import type { ListGroup, SavedSection } from "./listing.ts";
 import type { ReachFn, ReachTarget } from "./reach.ts";
 import type { Offer, Session } from "./schema.ts";
 import { addDays, berlinIsoDate } from "./time.ts";
@@ -257,46 +256,69 @@ export function savedUnfitIds(
 }
 
 /**
- * Sortierung der Liste der Merkliste (E6): „Was ist zu tun“ (Abschnitte, Standard ab S4), „Nächste Termine“,
- * „Nächstgelegen“, „Zuletzt gemerkt“.
+ * Sortierung der Liste der Merkliste (Plan 0057, E6; Plan 0058, E3): „Nächste Termine“ (Standard), „Nächstgelegen“,
+ * „Zuletzt gemerkt“. „Was ist zu tun“ mit Abschnitten ist mit Plan 0058 entfallen, die Abschnitte sind Chips.
  */
-export type SavedSort = "zutun" | "termine" | "nah" | "gemerkt";
+export type SavedSort = "termine" | "nah" | "gemerkt";
 
-/** „Demnächst“ reicht bis einschließlich zum 14. Berliner Kalendertag nach heute (E8) */
+/** „Demnächst“ reicht bis einschließlich zum 14. Berliner Kalendertag nach heute (Plan 0057, E8) */
 export const SOON_DAYS = 14;
 
-/** Reihenfolge der Abschnitte (E8); die Regeln in `sectionOf` prüfen in anderer Reihenfolge */
-const SECTION_ORDER: readonly SavedSection[] = ["demnaechst", "anmelden", "spontan", "laeuft", "spaeter"];
+/** Schnellfilter der Liste der Merkliste (Plan 0058, E1); nie in der URL, ohne Wirkung in Karte und Kalender */
+export type SavedListChip = "demnaechst" | "anmelden" | "spontan" | "laeuft" | "kurse" | "einmalig";
+
+/** Reihenfolge der Chipzeile (Plan 0058, E1) */
+export const SAVED_LIST_CHIPS: readonly SavedListChip[] = [
+  "demnaechst",
+  "anmelden",
+  "spontan",
+  "laeuft",
+  "kurse",
+  "einmalig",
+];
 
 /**
- * Abschnitt eines gemerkten Angebots am gezeigten Termin (E8); das erste Zutreffende gewinnt: ein begonnener Kurs läuft
- * gerade, Regelmäßiges ohne Anmeldung geht spontan, sonst entscheidet der Termin: bis zum 14. Tag „Demnächst“, später
- * mit Anmeldung „Rechtzeitig anmelden“, ohne „Später“.
+ * „Demnächst“ (Plan 0058, E1; Regel aus Plan 0057, E8): gezeigter Termin bis einschließlich zum 14. Berliner Kalendertag,
+ * ohne laufende Kurse (schon gebucht) und ohne Regelmäßiges ohne Anmeldung (hätte sonst immer einen Termin darin).
+ * Dieselbe Regel gilt für Chip und Kachel-Marke.
  */
-function sectionOf({ offer, session }: Occurrence, now: Date, soonUntil: string): SavedSection {
-  if (courseRunning(offer, now)) return "laeuft";
-  if (offer.format === "regelmaessig" && offer.registration === "ohne-anmeldung") return "spontan";
-  if (berlinIsoDate(session.start) <= soonUntil) return "demnaechst";
-  return offer.registration === "mit-anmeldung" ? "anmelden" : "spaeter";
+export function isSoon({ offer, session }: Occurrence, now: Date): boolean {
+  if (courseRunning(offer, now)) return false;
+  if (offer.format === "regelmaessig" && offer.registration === "ohne-anmeldung") return false;
+  return berlinIsoDate(session.start) <= addDays(berlinIsoDate(now), SOON_DAYS);
 }
 
-/**
- * Abschnitte der Liste „Was ist zu tun“ (E8): jedes Angebot genau einmal, je Abschnitt nach gezeigtem Termin sortiert,
- * in der Reihenfolge Demnächst, Rechtzeitig anmelden, Spontan möglich, Läuft gerade, Später; leere entfallen.
- */
-export function savedSections<T extends Offer>(items: readonly Occurrence<T>[], now: Date): ListGroup<Occurrence<T>>[] {
-  const soonUntil = addDays(berlinIsoDate(now), SOON_DAYS);
-  const bySection = new Map<SavedSection, Occurrence<T>[]>();
-  for (const item of items) {
-    const section = sectionOf(item, now, soonUntil);
-    bySection.set(section, [...(bySection.get(section) ?? []), item]);
+/** Gruppen der Chips (E1): innerhalb einer Gruppe ODER, zwischen Gruppen UND, wie im Filter-Sheet */
+const CHIP_GROUPS: readonly (readonly SavedListChip[])[] = [
+  ["demnaechst", "laeuft"],
+  ["anmelden", "spontan"],
+  ["kurse", "einmalig"],
+];
+
+function chipMatches(chip: SavedListChip, item: Occurrence, now: Date): boolean {
+  const { offer } = item;
+  switch (chip) {
+    case "demnaechst":
+      return isSoon(item, now);
+    case "anmelden":
+      return offer.registration === "mit-anmeldung" && !courseRunning(offer, now);
+    case "spontan":
+      // auch ein laufender Kurs ohne Anmeldung: Dort kann man einfach hingehen (Review m1)
+      return offer.registration === "ohne-anmeldung";
+    case "laeuft":
+      return courseRunning(offer, now);
+    case "kurse":
+      return offer.format === "kurs";
+    case "einmalig":
+      return offer.format === "einmalig";
   }
-  return SECTION_ORDER.flatMap((section) => {
-    const list = bySection.get(section);
-    if (!list) return [];
-    return [
-      { kind: "abschnitt" as const, key: section, section, count: list.length, items: list.sort(byStartThenTitle) },
-    ];
+}
+
+/** Passt ein gemerktes Angebot am gezeigten Termin zu den gewählten Chips (Plan 0058, E1)? Ohne Chip passt alles. */
+export function matchesListChips(item: Occurrence, chips: readonly SavedListChip[], now: Date): boolean {
+  return CHIP_GROUPS.every((group) => {
+    const chosen = group.filter((chip) => chips.includes(chip));
+    return chosen.length === 0 || chosen.some((chip) => chipMatches(chip, item, now));
   });
 }
 
