@@ -212,7 +212,8 @@ describe("runPflege, Trockenlauf (Plan 0049, S1)", () => {
     // Kennung im Beweis gleich der URL im Anhang (ohne utm_* und Fragment)
     expect(seen.map((s) => s.unit)).toEqual([`seite:${URL_C}`]);
     // Auszug nennt alle Seiten des Anbieters samt Kandidat (M1)
-    expect((seen[0]?.excerpt as Anbieter | undefined)?.programme.map((g) => g.url)).toEqual([URL_A, URL_C]);
+    const excerpt = seen[0]?.excerpt;
+    expect(excerpt?.role === "anbieter" ? excerpt.programme.map((g) => g.url) : undefined).toEqual([URL_A, URL_C]);
     // der Beweis ruft nichts ab: Kandidat aus der Erkundung, keine anderen Seiten
     expect(crawled.filter((u) => u.startsWith(URL_C))).toHaveLength(1);
     expect(new Set(crawled).size).toBe(crawled.length);
@@ -295,6 +296,34 @@ describe("runPflege, Trockenlauf (Plan 0049, S1)", () => {
     expect(run.rows[0]?.kandidaten[0]?.hinweise).toEqual([
       "Hinweise der Terminseiten gelten hier nicht: „nur Kurse mit Baby“",
     ]);
+  });
+
+  it("Sitzungsparameter: Katalogseite mit ?PHPSESSID ist kein Kandidat, zwei sid-Varianten ergeben einen Beweis (M1)", async () => {
+    const { run, seen } = await pflege({
+      pages: {
+        [HOME]: html(
+          `<a href="${URL_A}?PHPSESSID=abc">Programm</a> <a href="${URL_C}?sid=1">Babymassage</a> <a href="${URL_C}?sid=2">Babymassage</a>`,
+        ),
+        [`${URL_A}?PHPSESSID=abc`]: MASSAGE,
+        [URL_A]: KRABBEL,
+        [`${URL_C}?sid=1`]: MASSAGE,
+        [`${URL_C}?sid=2`]: MASSAGE,
+      },
+    });
+    expect(seen.map((s) => s.unit)).toEqual([`seite:${URL_C}`]);
+    expect(run.rows[0]?.kandidaten.map((k) => k.url)).toEqual([URL_C]);
+  });
+
+  it("Ausnahme im Beweis: Ergebnis fehler, der Lauf geht weiter und schreibt Bericht und Zustand (M2)", async () => {
+    const { run } = await pflege({
+      pages: PAGES,
+      catalog: withProgramme([{ url: `${HOME}/plaetze`, kind: "html", use: "verfuegbarkeit" }]),
+      fetchTask: () => {
+        throw new Error("Netz weg");
+      },
+    });
+    expect(run.rows[0]?.kandidaten).toMatchObject([{ ergebnis: "fehler", grund: expect.stringMatching(/Netz weg/) }]);
+    expect(run.states.nuernberg?.gepflegt).toEqual([{ anbieter: P, datum: TODAY }]);
   });
 
   it("Zeitbudget: Lauf endet geordnet, der angefangene Anbieter gilt nicht als gepflegt", async () => {

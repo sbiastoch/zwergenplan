@@ -50,11 +50,15 @@ const durableLong = (u: Pick<UnitState, "klasse" | "klasseSince">, today: string
   u.klasseSince !== undefined &&
   berlinIsoDate(u.klasseSince) <= addDays(today, -DURABLE_MIN_DAYS);
 
-/** Kennungen der Einheiten, die seit mindestens zwei Kalendertagen dauerhaft scheitern, sortiert */
-export function durableUnitIds(raw: ProviderRaw | undefined, today: string): string[] {
+/**
+ * Kennungen der Einheiten des Katalogeintrags, die seit mindestens zwei Kalendertagen dauerhaft scheitern, sortiert.
+ * Einheiten, die der wirksame Katalog nicht nennt (`--katalog`, entfernte Seite), zählen nicht (Arch-Review S1, m4).
+ */
+export function durableUnitIds(provider: Anbieter, raw: ProviderRaw | undefined, today: string): string[] {
   if (!raw || !isV2(raw)) return [];
+  const known = new Set(unitsOf(provider, { candidates: true, hadKandidaten: true }).map((u) => u.id));
   return Object.entries(raw.units)
-    .filter(([, u]) => durableLong(u, today))
+    .filter(([id, u]) => known.has(id) && durableLong(u, today))
     .map(([id]) => id)
     .sort();
 }
@@ -96,7 +100,7 @@ export function standOf(provider: Anbieter, raw: ProviderRaw | undefined, today:
   const units = unitsOf(provider, { candidates: false, hadKandidaten: false })
     .map((u) => u.id)
     .sort();
-  const payload = JSON.stringify({ units, dauerhaft: durableUnitIds(raw, today) });
+  const payload = JSON.stringify({ units, dauerhaft: durableUnitIds(provider, raw, today) });
   return createHash("sha256").update(payload).digest("hex").slice(0, 16);
 }
 

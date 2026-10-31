@@ -7,8 +7,9 @@
  */
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { RegionId } from "../../../src/domain/regions.ts";
+import { REGION_IDS, type RegionId } from "../../../src/domain/regions.ts";
 import type { Anbieter, Offer, OffersFile, Provider } from "../../../src/domain/schema.ts";
+import { berlinIsoDate } from "../../../src/domain/time.ts";
 import { type BrakeKind, type Brakes, brakeHit, costJsonl, summarizeCosts } from "../lib/cost.ts";
 import type { DiscoverState, PflegeErgebnis, Seite } from "../lib/discover-state.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
@@ -44,6 +45,8 @@ import {
   candidatesOf,
   crawlScope,
   exploreSite,
+  kindOf,
+  pageSignals,
   umbrellaHosts,
 } from "../lib/site-crawl.ts";
 import { PART_MAX_CHARS, splitInput } from "../lib/split.ts";
@@ -138,7 +141,12 @@ export async function runPflege(o: PflegeOptions): Promise<PflegeRun> {
   const rejected = rejectedUrls(Object.values(o.states).filter((s) => s !== undefined));
   const umbrellas = umbrellaHosts(o.catalog);
   const byId = new Map(o.catalog.map((p) => [p.id, p] as const));
-  const durable = new Map(o.participants.map((id) => [id, durableUnitIds(o.raws[id], o.today)] as const));
+  const durable = new Map(
+    o.participants.flatMap((id) => {
+      const p = byId.get(id);
+      return p?.role === "anbieter" ? [[id, durableUnitIds(p, o.raws[id], o.today)] as const] : [];
+    }),
+  );
   const gepflegt = Object.values(o.states).flatMap((s) => s?.gepflegt ?? []);
   const order = careOrder(
     o.participants.map((id) => ({ id, durable: (durable.get(id)?.length ?? 0) > 0 })),
@@ -179,7 +187,7 @@ export async function runPflege(o: PflegeOptions): Promise<PflegeRun> {
     try {
       crawl = await exploreSite(scope, o.deps.crawlFetch(scope));
     } catch (e) {
-      rows.push({ id, fetches: 0, gesperrt: [], kandidaten: [], fehler: (e as Error).message });
+      rows.push({ id, fetches: 0, gesperrt: [], kandidaten: [], fehler: e instanceof Error ? e.message : String(e) });
       continue;
     }
     const candidates = candidatesOf(crawl, scope, o.today, skip);
@@ -191,22 +199,34 @@ export async function runPflege(o: PflegeOptions): Promise<PflegeRun> {
       ...(isDurable ? { ersatzFuer: (durable.get(id) ?? []).map((u) => u.replace(/^seite:/, "")) } : {}),
       ...(ortsHint(provider) ? { nurBericht: "Orts-hint an einer Terminseite: Ort von Hand prüfen" } : {}),
     };
-    const kandidaten: ReportCandidate[] = [...resting].map((url) => ({
-      url,
-      kind: "html",
-      browser: false,
-      future: 0,
-      ergebnis: "ruhe",
-      grund: `geprüft am ${prior.get(seiteKey(url))?.geprueft}: ${prior.get(seiteKey(url))?.ergebnis}`,
-      neu: [],
-      hinweise: [],
-    }));
+    const kandidaten: ReportCandidate[] = [...resting].map((url) => {
+      const r = crawl.pages.find((p) => p.result.ok && p.result.finalUrl === url)?.result;
+      return {
+        url,
+        kind: (r?.ok && kindOf(r.contentType)) || "html",
+        browser: r?.ok === true && r.browser,
+        future: r?.ok ? pageSignals(r.page, o.today).future : 0,
+        ergebnis: "ruhe" as const,
+        grund: `geprüft am ${prior.get(seiteKey(url))?.geprueft}: ${prior.get(seiteKey(url))?.ergebnis}`,
+        neu: [],
+        hinweise: [],
+      };
+    });
     const beilagen = beilagenOf(o, provider);
     let n = 0;
     for (const cand of candidates) {
       abort ??= stopNow();
       if (abort) break;
-      const proof = await prove(o, { provider, cand, crawl, comparison, beilagen, n: n++ });
+      const proof = await prove(o, { provider, cand, crawl, comparison, beilagen, n: n++ }).catch(
+        (e: unknown): Proof => ({
+          page: { url: canonicalUrl(cand.url) ?? cand.url, kind: cand.kind, use: "termine" },
+          ergebnis: "fehler",
+          grund: `Ausnahme im Beweis: ${e instanceof Error ? e.message : String(e)}`,
+          neu: [],
+          hinweise: [],
+          calls: [],
+        }),
+      );
       calls.push(...proof.calls);
       if (proof.abort) {
         abort = proof.abort;
@@ -230,7 +250,7 @@ export async function runPflege(o: PflegeOptions): Promise<PflegeRun> {
         ...(proof.grund ? { grund: proof.grund } : {}),
         neu: proof.neu.map((x) => ({
           title: x.title,
-          first: x.sessions.find((s) => s.start >= o.today)?.start ?? x.sessions[0]?.start ?? "",
+          first: x.sessions.find((s) => berlinIsoDate(s.start) >= o.today)?.start ?? x.sessions[0]?.start ?? "",
         })),
         hinweise: proof.hinweise,
       });
@@ -248,7 +268,8 @@ export async function runPflege(o: PflegeOptions): Promise<PflegeRun> {
   }
 
   const states: Partial<Record<RegionId, DiscoverState>> = {};
-  for (const [regionId, s] of Object.entries(o.states) as Array<[RegionId, DiscoverState | undefined]>) {
+  for (const regionId of REGION_IDS) {
+    const s = o.states[regionId];
     if (!s) continue;
     const inRegion = (pid: string) => byId.get(pid)?.region === regionId;
     states[regionId] = nextState(s, {
@@ -344,8 +365,10 @@ async function prove(
       : cand.kind === "ical"
         ? programmeText("ical", fetched.page.text, fetched.finalUrl)
         : fetched.page.text;
-  const entry = withCandidate(provider, page);
   const unitId = unitIdOf(page);
+  // dieselbe Einheit zweimal hieße: der Katalog nennt die Seite schon (Arch-Review S1, M1)
+  if (provider.programme.some((g) => unitIdOf(g) === unitId)) return done("fehler", "Seite steht schon im Katalog");
+  const entry = withCandidate(provider, page);
   const outcome: PageOutcome = {
     url,
     art: cand.browser ? "browser" : cand.kind,
@@ -359,7 +382,9 @@ async function prove(
   const input = proofInput(entry, unitId, outcomes);
   const unit = input.units[0];
   if (input.status === "fehler")
-    return done("abgeschnitten", `${input.reason ?? "Eingabe zu groß"}; partChars prüfen`, { hinweise });
+    return /Eingabe zu groß/.test(input.reason ?? "")
+      ? done("abgeschnitten", `${input.reason}; partChars prüfen`, { hinweise })
+      : done("fehler", input.reason ?? "Eingabe fehlt", { hinweise });
   if (
     unit &&
     splitInput(unit.text, PART_MAX_CHARS, { pageUrls: unit.pages.map((p) => p.url), candidates: 0 }).parts.length > 1

@@ -102,7 +102,7 @@ import {
   type ExtractInput,
   type ExtractOutcome,
   type ExtractResult,
-  effortOf,
+  extractModelOf,
   modelKey,
 } from "./io/extract.ts";
 import { fetchInputs, fetchOutcome, fetchPdfText } from "./io/fetch-inputs.ts";
@@ -351,8 +351,7 @@ async function nightly() {
   for (const id of umstellen ?? [])
     if (!readCatalog().some((p) => p.id === id)) fail(`--umstellen: unbekannter Anbieter ${id}`);
   // Modell und Effort gehören in den Cache-Schlüssel (N3): ein Wechsel extrahiert einmal alles neu
-  const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
-  const effort = effortOf(process.env);
+  const { model, effort } = extractModelOf(process.env);
   const acceptance = readIdAcceptanceOrWarn(join(ROOT, "data"), (m) =>
     print(`::warning::Hinnehmen-Datei unlesbar, nichts hingenommen: ${m}`),
   );
@@ -513,8 +512,7 @@ async function discoverCmd() {
       fail(`G1 schon vor dem Lauf rot, nichts entdeckt: ${(e as Error).message}`);
     }
   // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf: Der Zustand des Ertragsbeweises gilt dort weiter (E1)
-  const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
-  const effort = effortOf(process.env);
+  const { model, effort } = extractModelOf(process.env);
   const step = (m: string | undefined, e: string | undefined) => `${m}/${e || "Standard"}`;
   const modelle =
     `Suche/Bewerten ${step(process.env["LLM_MODEL_DISCOVER"] ?? "haiku", process.env["LLM_EFFORT_DISCOVER"])}, ` +
@@ -769,6 +767,12 @@ async function pflegeCmd() {
   const catalog = values.katalog ? readCatalog(resolve(values.katalog)) : readCatalog();
   const only = values.only?.split(",").filter(Boolean);
   for (const id of only ?? []) if (!catalog.some((p) => p.id === id)) fail(`--only: unbekannter Anbieter ${id}`);
+  for (const id of only ?? []) {
+    const p = catalog.find((x) => x.id === id);
+    if (p?.role !== "anbieter" || p.coveredBy || p.skipCrawl)
+      fail(`--only: ${id} nimmt nicht teil (kein Anbieter, coveredBy oder skipCrawl)`);
+    if (!regions.includes(p.region)) fail(`--only: ${id} liegt nicht in ${regions.join(", ")}`);
+  }
   const participants = catalog
     .filter((p) => p.role === "anbieter" && !p.coveredBy && !p.skipCrawl && regions.includes(p.region))
     .filter((p) => !only || only.includes(p.id))
@@ -778,11 +782,16 @@ async function pflegeCmd() {
   const budgetMin = Number(process.env["PFLEGE_BUDGET_MIN"] || PFLEGE_BUDGET_MIN);
   if (!(budgetMin > 0)) fail(`PFLEGE_BUDGET_MIN ungültig: ${process.env["PFLEGE_BUDGET_MIN"]}`);
   // dasselbe Modell und derselbe Schlüssel wie der Nachtlauf (M2): Ziel 2 misst, was live entstünde
-  const model = process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
-  const effort = effortOf(process.env);
-  const runDir = values["run-dir"] ? resolve(values["run-dir"]) : join(ROOT, "runs", date, "pflege");
+  const { model, effort } = extractModelOf(process.env);
+  // eigenes Verzeichnis je Lauf (-2, -3 …): ein zweiter Lauf am Tag ließe sonst alte Beweise liegen (Arch-Review S1, m5)
+  const runDir = values["run-dir"]
+    ? resolve(values["run-dir"])
+    : freshRunDir(join(ROOT, "runs", date, "pflege"), existsSync);
   actionsOutput("run_dir", runDir);
   const { freeDaysSpan } = nightlyWindow(date);
+  const controller = new AbortController();
+  process.once("SIGINT", () => controller.abort());
+  process.once("SIGTERM", () => controller.abort());
   const queue = hostQueue();
   const browser = browserSession();
   try {
@@ -800,7 +809,7 @@ async function pflegeCmd() {
       ignoreRest: values.katalog !== undefined,
       brakes: brakes.brakes,
       budgetMin,
-      signal: new AbortController().signal,
+      signal: controller.signal,
       log: print,
       modell: `${model}/${effort || "Standard"}`,
       deps: {

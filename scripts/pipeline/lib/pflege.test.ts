@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { shortId } from "../../../src/domain/ids.ts";
 import type { Anbieter, Offer, Provider, Session } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import type { Seite } from "./discover-state.ts";
@@ -46,6 +47,19 @@ const anbieter = (id: string, list: readonly Provider[] = catalog): Anbieter => 
   return p;
 };
 const familientreff = anbieter(P);
+const homeVenue = familientreff.venues[0];
+if (!homeVenue) throw new Error("Fixture-Ort fehlt");
+type Programm = Anbieter["programme"][number];
+const page = (url: string, over: Partial<Programm> = {}): Programm => ({ url, kind: "html", use: "termine", ...over });
+const withPages = (programme: Programm[]): Anbieter => ({ ...familientreff, programme });
+/** Nachbar in 30 m mit eigenem Ort (wie hebanne-schulz bei der FamilienBox) */
+const near: Anbieter = {
+  ...anbieter("musikschule-beispiel"),
+  id: "hebamme-beispiel",
+  publicId: shortId("hebamme-beispiel"),
+  programme: [page("https://example.org/hebamme/kurse")],
+  venues: [{ ...homeVenue, id: "hebamme-beispiel-raum", geo: { lat: 49.4524, lon: 11.0768 } }],
+};
 
 const event = (over: Partial<RawEvent> = {}): RawEvent =>
   RawEvent.parse({
@@ -188,7 +202,7 @@ describe("judgeProof: Ergebnis (E2)", () => {
   const fresh = offer("n1", { title: "Babymassage", sessions: weekly(["2026-10-09"], "15:00") });
 
   it("neues Angebot mit Kleinkindbezug → anhaengen, mit den neuen Angeboten", () => {
-    const v = judgeProof({ candidate: [fresh, own[0] as Offer], own, neighbors: [], relevant: true, today: TODAY });
+    const v = judgeProof({ candidate: [fresh, ...own], own, neighbors: [], relevant: true, today: TODAY });
     expect(v.ergebnis).toBe("anhaengen");
     expect(v.neu.map((o) => o.id)).toEqual(["n1"]);
   });
@@ -247,7 +261,7 @@ describe("simulateNight: Beweis bei bestehenden Einheiten (B1, M6)", () => {
     const raws = {
       [P]: raw({ [A]: unit([event()]), [B]: failing([babymassage(URL_B)], "2026-10-04T03:00:00+02:00") }),
     };
-    expect(durableUnitIds(raws[P], TODAY)).toEqual([B]);
+    expect(durableUnitIds(familientreff, raws[P], TODAY)).toEqual([B]);
     const r = proveC(raws, [babymassage()]);
     expect(judgeProof({ ...r, neighbors: [], relevant: true, today: TODAY }).ergebnis).toBe("anhaengen");
   });
@@ -255,7 +269,7 @@ describe("simulateNight: Beweis bei bestehenden Einheiten (B1, M6)", () => {
   it("zweite Fassung einer vorübergehend oder erst seit gestern ausgefallenen Seite → deckungsgleich", () => {
     for (const since of ["2026-10-05T03:00:00+02:00"]) {
       const raws = { [P]: raw({ [A]: unit([event()]), [B]: failing([babymassage(URL_B)], since) }) };
-      expect(durableUnitIds(raws[P], TODAY)).toEqual([]);
+      expect(durableUnitIds(familientreff, raws[P], TODAY)).toEqual([]);
       const r = proveC(raws, [babymassage()]);
       expect(judgeProof({ ...r, neighbors: [], relevant: true, today: TODAY }).ergebnis).toBe("deckungsgleich");
     }
@@ -265,9 +279,9 @@ describe("simulateNight: Beweis bei bestehenden Einheiten (B1, M6)", () => {
   });
 
   it("mit --katalog ohne die entfernte Seite → anhaengen (Einheiten außerhalb des wirksamen Katalogs zählen nicht)", () => {
-    const copy = catalog.map((p) => (p.id === P && p.role === "anbieter" ? { ...p, programme: [p.programme[0]] } : p));
+    const copy = catalog.map((p) => (p.id === P ? withPages([page(URL_A)]) : p));
     const raws = { [P]: raw({ [A]: unit([event()]), [B]: unit([babymassage(URL_B)]) }) };
-    const r = proveC(raws, [babymassage()], copy as Provider[]);
+    const r = proveC(raws, [babymassage()], copy);
     expect(judgeProof({ ...r, neighbors: [], relevant: true, today: TODAY }).ergebnis).toBe("anhaengen");
   });
 });
@@ -285,21 +299,42 @@ describe("Stand, Nachbarn, Orts-hint", () => {
   });
 
   it("neighborIds: andere Anbieter mit einem Ort in höchstens 100 m", () => {
-    const near: Provider = {
-      ...anbieter("musikschule-beispiel"),
-      id: "hebamme-beispiel",
-      venues: [{ ...familientreff.venues[0], id: "hebamme-beispiel-raum", geo: { lat: 49.4525, lon: 11.0768 } }],
-    } as Provider;
     expect([...neighborIds(familientreff, [...catalog, near])]).toEqual(["hebamme-beispiel"]);
+  });
+
+  it("simulateNight mit Nachbar: dasselbe Angebot beim Nachbarn → fremder-anbieter (Ende zu Ende)", () => {
+    const list = [...catalog, near];
+    const theirs = {
+      ...babymassage("https://example.org/hebamme/kurse"),
+      providerId: near.id,
+      venueId: "hebamme-beispiel-raum",
+    };
+    const raws = {
+      [P]: raw({ [A]: unit([event()]) }),
+      [near.id]: raw({ "seite:https://example.org/hebamme/kurse": unit([theirs]) }),
+    };
+    const entry = withCandidate(anbieter(P, list), page(URL_C));
+    const r = simulateNight({
+      comparison: comparisonRaws(raws, list, TODAY),
+      catalog: list,
+      entry,
+      unitId: C,
+      unit: unit([babymassage()]),
+      previous: undefined,
+      today: TODAY,
+      freeDays: {},
+      now: NOW,
+      neighbors: neighborIds(entry, list),
+    });
+    expect(r.errors).toEqual([]);
+    expect(r.neighbors.map((o) => o.providerId)).toEqual([near.id]);
+    expect(judgeProof({ ...r, relevant: true, today: TODAY }).ergebnis).toBe("fremder-anbieter");
   });
 
   it("ortsHint: Hinweis „weglassen“ oder „Nur Termine an“ an einer termine-Seite", () => {
     expect(ortsHint(familientreff)).toBe(false);
-    const hinted = {
-      ...familientreff,
-      programme: [{ ...familientreff.programme[0], hint: "Nur Termine an der Beispielstraße" }],
-    } as Anbieter;
-    expect(ortsHint(hinted)).toBe(true);
+    expect(ortsHint(withPages([page(URL_A, { hint: "Nur Termine an der Beispielstraße" })]))).toBe(true);
+    expect(ortsHint(withPages([page(URL_A, { use: "verfuegbarkeit", hint: "weglassen" })]))).toBe(false);
   });
 
   it("listPages: Folgelink „weiter“ oder ?page=2 → Liste blättert", () => {
@@ -310,14 +345,11 @@ describe("Stand, Nachbarn, Orts-hint", () => {
   });
 
   it("termineHints: Hinweise der Terminseiten, ohne Dubletten und ohne Beilagen", () => {
-    const hinted = {
-      ...familientreff,
-      programme: [
-        { ...familientreff.programme[0], hint: "nur Kurse mit Baby" },
-        { url: URL_B, kind: "html", use: "termine", hint: "nur Kurse mit Baby" },
-        { url: URL_C, kind: "html", use: "verfuegbarkeit", hint: "Plätze" },
-      ],
-    } as Anbieter;
+    const hinted = withPages([
+      page(URL_A, { hint: "nur Kurse mit Baby" }),
+      page(URL_B, { hint: "nur Kurse mit Baby" }),
+      page(URL_C, { use: "verfuegbarkeit", hint: "Plätze" }),
+    ]);
     expect(termineHints(hinted)).toEqual(["nur Kurse mit Baby"]);
     expect(termineHints(familientreff)).toEqual([]);
   });
@@ -344,7 +376,7 @@ describe("Reihenfolge und Ruhezeit (E4, E5)", () => {
 
   it("drei Läufe mit Budget für je zwei von sechs Anbietern: jeder ist einmal dran", () => {
     const ids = ["a", "b", "c", "d", "e", "f"];
-    let state = { seiten: [] as Seite[], gepflegt: [] as Array<{ anbieter: string; datum: string }> };
+    let state: { seiten: Seite[]; gepflegt: Array<{ anbieter: string; datum: string }> } = { seiten: [], gepflegt: [] };
     const seen: string[] = [];
     ["2026-10-07", "2026-10-14", "2026-10-21"].forEach((day) => {
       const done = careOrder(

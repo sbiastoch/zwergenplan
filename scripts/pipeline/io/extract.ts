@@ -69,9 +69,18 @@ export function effortOf(
 /** Modellteil des Cache-Schlüssels: Ohne Effort bleibt er, wie er war; ein Wechsel extrahiert einmal alles neu. */
 export const modelKey = (model: string, effort: Effort | undefined): string => (effort ? `${model}/${effort}` : model);
 
+/**
+ * Modell und Effort der Extraktion aus der Umgebung, gemeinsam für Nachtlauf, Ertragsbeweis des Entdeckens und Pflege
+ * (Plan 0049, M2): Der Beweis misst nur, was live entstünde, wenn er dasselbe Modell nutzt.
+ */
+export function extractModelOf(env: NodeJS.ProcessEnv): { model: string; effort: Effort | undefined } {
+  return { model: env["LLM_MODEL_EXTRACT"] ?? "haiku", effort: effortOf(env) };
+}
+
 export function createExtractor(opts: ExtractorOptions = {}): Extractor {
-  const model = opts.model ?? process.env["LLM_MODEL_EXTRACT"] ?? "haiku";
-  const effort = opts.effort ?? effortOf(process.env);
+  const fromEnv = extractModelOf(process.env);
+  const model = opts.model ?? fromEnv.model;
+  const effort = opts.effort ?? fromEnv.effort;
   const fallbackModel = opts.fallbackModel ?? fallbackModelOf(process.env);
   const partMaxChars = opts.partMaxChars ?? PART_MAX_CHARS;
   const loadDays = opts.freeDays ?? loadFreeDays;
