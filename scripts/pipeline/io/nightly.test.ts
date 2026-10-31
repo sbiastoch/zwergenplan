@@ -1023,6 +1023,27 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     expect(rawUnit(dirsOf)?.held).toBeUndefined();
   });
 
+  it("Hinnehmen deckt nur die hingenommenen Verluste: kostet die neue Extraktion einer geänderten Seite mehr, wird gerichtet", async () => {
+    const { dirsOf, ids } = await baseline();
+    // neue Fassung: Treff 3 bleibt, 1 und 2 werden umformuliert → unklar, gehalten mit lost = [1, 2]
+    const partly = [renamed[0], renamed[1], treffs[2]].flatMap((e) => (e ? [e] : []));
+    await gateNight(dirsOf, { judge: fakeJudge(all("unklar")).judge, events: () => partly });
+    expect([...(rawUnit(dirsOf)?.held?.lost ?? [])].sort()).toEqual(
+      [ids["Offener Krabbeltreff 1"], ids["Offener Krabbeltreff 2"]].sort(),
+    );
+    // der Mensch nimmt hin; zugleich ändert sich die Seite, und die neue Extraktion formuliert auch Treff 3 um
+    const j = fakeJudge(all("unklar"));
+    const { r } = await gateNight(dirsOf, {
+      judge: j.judge,
+      text: (url) => `Programm ${url} neu`,
+      extra: { accepted: () => ({ grund: "1 und 2 geprüft" }) },
+    });
+    // Treff 3 hat niemand hingenommen: Er geht vor den Richter, und der sagt unklar
+    expect(j.seen).toHaveLength(1);
+    expect(idsByTitle(dirsOf)["Offener Krabbeltreff 3"]).toBe(ids["Offener Krabbeltreff 3"]);
+    expect(r.idGate?.[0]).toMatchObject({ outcome: "gehalten", held: "unklar" });
+  });
+
   it("Einzeltermine: je Termin ein Angebot, je Termin ein Urteil gleich@Beginn, jede ID bleibt", async () => {
     const dirsOf = tempData();
     const concert = (title: string, at: string) =>

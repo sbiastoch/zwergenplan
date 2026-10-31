@@ -118,7 +118,13 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
       );
       continue;
     }
-    const acceptance = prevUnit.held ? o.accepted(loss.providerId, prevUnit.held.since) : undefined;
+    // Hinnehmen deckt nur die Verluste, die beim Halten feststanden: Kostet eine neue Extraktion (geänderte Seite)
+    // weitere IDs, hat die niemand hingenommen, und der Richter urteilt
+    const covered = new Set(prevUnit.held?.lost ?? []);
+    const acceptance =
+      prevUnit.held && loss.lost.every((x) => covered.has(x.id))
+        ? o.accepted(loss.providerId, prevUnit.held.since)
+        : undefined;
     if (acceptance) {
       out.raws[loss.providerId] = raw;
       out.entries.push({
