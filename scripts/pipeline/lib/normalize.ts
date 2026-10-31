@@ -169,6 +169,23 @@ export const ICAL_HEADING = "## ICAL\n";
 export interface ExtractKey {
   hash: string;
   dated: Record<string, string>;
+  /** Fassung der Pipeline (`partsHashOf`), kein Teil des Schlüssels; gespeichert als `partsHash` (Plan 0049, Nachtrag 2) */
+  parts: string;
+}
+
+/**
+ * Fassung des Codes, der den Eingabetext erzeugt (`extractPage`, `programmeText`, `normalizeText`, PDF, iCal,
+ * `ORDER_FREE_KEY`, Abrufart; Plan 0049, Nachtrag 2, B1). Ändert sich dieser Code, ändert sich jeder Schlüssel, ohne dass
+ * sich Katalog, Prompt, Schema oder Modell ändern; ohne neue Epoche liefe die Neuextraktion am ID-Gate vorbei. Erhöhen,
+ * wenn der Pin-Test in `normalize.test.ts` rot wird. Geht nur in `partsHashOf` ein, nicht in den Schlüssel: Sonst
+ * extrahierte jede neue Epoche alles neu, auch wo der Text gleich bleibt.
+ */
+export const INPUT_EPOCH = 1;
+
+/** Hash der Fassung: Bestandteile des Schlüssels außer der Eingabe, dazu `INPUT_EPOCH`. */
+function partsHashOf(parts: KeyParts): string {
+  const sorted = Object.entries({ ...parts, epoch: String(INPUT_EPOCH) }).sort(([a], [b]) => a.localeCompare(b));
+  return createHash("sha256").update(JSON.stringify(sorted)).digest("hex");
 }
 
 /** Ändert sich einer der Bestandteile, wird der Anbieter neu extrahiert. Gespeichert in `data/raw` (`inputHash`, `dated`). */
@@ -204,7 +221,7 @@ export function extractKey(
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([day, texts]) => [day, createHash("sha256").update(JSON.stringify(texts.sort())).digest("hex")]),
   );
-  return { hash, dated };
+  return { hash, dated, parts: partsHashOf(parts) };
 }
 
 /** Gleiche Eingabe für die Extraktion: gleicher Grundschlüssel und gleiche datierte Bestandteile ab `today`. */

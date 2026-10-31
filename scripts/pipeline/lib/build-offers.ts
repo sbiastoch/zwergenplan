@@ -73,9 +73,16 @@ export function batchesFromRaw(
   raws: Readonly<Record<string, ProviderRaw>>,
   providers: readonly Provider[],
   window: MatchWindow,
-): { batches: BuildInput["batches"]; extracted: Set<string>; notes: string[] } {
+): {
+  batches: BuildInput["batches"];
+  extracted: Set<string>;
+  notes: string[];
+  /** Einheit je Batch `<id>#<nn>` (Ursprung für das ID-Gate, Plan 0049, Nachtrag 2) */
+  unitOf: Record<string, string>;
+} {
   const notes: string[] = [];
   const extracted = new Set<string>();
+  const unitOf: Record<string, string> = {};
   const byId = new Map(providers.map((p) => [p.id, p] as const));
   const batches: Array<BuildInput["batches"][number]> = [];
   for (const [id, raw] of Object.entries(raws).sort(([a], [b]) => a.localeCompare(b))) {
@@ -127,14 +134,16 @@ export function batchesFromRaw(
       const state = raw.units[u.id];
       if (!state) return;
       const events = merged.events.filter((_, i) => merged.from[i] === k);
+      const name = `${id}#${String(indexOf(u.id)).padStart(2, "0")}`;
+      unitOf[name] = u.id;
       batches.push({
-        name: `${id}#${String(indexOf(u.id)).padStart(2, "0")}`,
+        name,
         checkedAt: state.checkedAt,
         batch: { providers: { [id]: check }, events },
       });
     });
   }
-  return { batches, extracted, notes };
+  return { batches, extracted, notes, unitOf };
 }
 
 export interface BuildReport {
@@ -145,6 +154,8 @@ export interface BuildReport {
   drift: Array<{ id: string; drift: string }>;
   /** Abbruchgründe – dann wird nichts geschrieben */
   errors: string[];
+  /** Batch je vergebener ID, aus der Zuordnung dieses Laufs (nicht aus dem Altbestand; ID-Gate, Plan 0049, Nachtrag 2) */
+  origins: Record<string, string>;
   /** Hinweise: geschätzte Enden, weggefallene Events, Zusammenführungen, Übernahmen */
   notes: string[];
   /** Angebote, deren `category` aus den Themen abgeleitet ist (Übergang Plan 0037, E5; entfällt in Stufe C) */
@@ -161,8 +172,40 @@ export interface Candidate {
   rank: number;
   order: number;
   label: string;
+  /** Name des Batches, aus dem der Kandidat stammt */
+  batch: string;
   /** `category` fehlte im Rohevent und kommt aus den Themen (Plan 0037, E5) */
   derivedCategory: boolean;
+  /** ID-Erbe aus `RawEvent.keepIds` (Plan 0049, Nachtrag 2, B3); `null`: zwei verschiedene trafen zusammen, keins gilt */
+  keepId?: string | null;
+}
+
+/**
+ * Erbe beim Zusammenlegen zweier Kandidaten: Das erste gilt; zwei verschiedene heben sich auf (`null`), damit keine
+ * ID still auf ein anderes Angebot wandert (ADR 0022: lieber neu als vertauscht).
+ */
+function mergeKeep(a: Candidate, b: Candidate, notes: string[]): Candidate["keepId"] {
+  if (a.keepId === null || b.keepId === null) return null;
+  if (a.keepId !== undefined && b.keepId !== undefined && a.keepId !== b.keepId) {
+    notes.push(`${a.label}: ID-Erbe ${a.keepId} und ${b.keepId} treffen zusammen – keins gilt`);
+    return null;
+  }
+  return a.keepId ?? b.keepId;
+}
+const withKeep = (c: Candidate, keepId: Candidate["keepId"]): Candidate => {
+  const { keepId: _k, ...rest } = c;
+  return keepId === undefined ? rest : { ...rest, keepId };
+};
+
+/** Erbe eines Entwurfs: die ID zum ersten seiner Termine, den `keepIds` nennt (Vergleich als Zeitpunkt). */
+function keepOf(e: RawEvent, offer: Draft): string | undefined {
+  if (!e.keepIds) return undefined;
+  const byTime = new Map(Object.entries(e.keepIds).map(([start, id]) => [Date.parse(start), id] as const));
+  for (const s of offer.sessions) {
+    const id = byTime.get(Date.parse(s.start));
+    if (id !== undefined) return id;
+  }
+  return undefined;
 }
 
 function addMinutesLocal(local: string, minutes: number): string {
@@ -330,7 +373,10 @@ export function dropSameSourceDuplicates(
       survivors.push({ c: { ...low }, index });
       continue;
     }
-    high.c = { ...high.c, offer: { ...high.c.offer, topics: unionTopics(high.c.offer.topics, low.offer.topics) } };
+    high.c = withKeep(
+      { ...high.c, offer: { ...high.c.offer, topics: unionTopics(high.c.offer.topics, low.offer.topics) } },
+      mergeKeep(high.c, low, notes),
+    );
     notes.push(`${low.label}: Dublette von ${high.c.label} (gleiche Quelle, gleiche Termine) – entfällt`);
   }
   return { kept: survivors.sort((a, b) => a.index - b.index).map(({ c }) => c), notes };
@@ -400,6 +446,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     errors: [],
     notes: [],
     derivedCategories: 0,
+    origins: {},
   };
   const { notes } = report;
   /** Angebote mit abgeleiteter Kategorie je Anbieter (Plan 0037, E5) */
@@ -421,12 +468,15 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     batch.events.forEach((e, i) => {
       const label = `${name}#${i} „${e.title}“`;
       for (const offer of fromRaw(e, checkedAt, input, label, notes)) {
+        const keepId = keepOf(e, offer);
         candidates.push({
           offer,
           rank: RANK[e.via ?? "anbieter"],
           order: order++,
           label,
+          batch: name,
           derivedCategory: e.category === undefined,
+          ...(keepId === undefined ? {} : { keepId }),
         });
       }
     });
@@ -446,7 +496,9 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     const sorted = [...group].sort((a, b) => a.rank - b.rank || a.order - b.order);
     const [best, ...rest] = sorted as [Candidate, ...Candidate[]];
     let offer = best.offer;
+    let keep = best;
     for (const other of rest) {
+      keep = withKeep(keep, mergeKeep(keep, other, notes));
       // `category` bleibt die von `best`: ranghöhere Quelle, bei gleichem Rang das frühere Event (Plan 0037, E6)
       offer = { ...offer, topics: unionTopics(offer.topics, other.offer.topics) };
       if (other.rank !== best.rank) {
@@ -467,7 +519,7 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
         );
       }
     }
-    merged.push({ ...best, offer });
+    merged.push({ ...withKeep(best, keep.keepId), offer });
   }
 
   // 4. Dubletten über Titel hinweg: gleicher Anbieter/Ort/Beginn, ähnlicher Titel, rangniedere Quelle entfällt
@@ -484,6 +536,8 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     if (!high) return true;
     // `category` bleibt die von `high` (Plan 0037, E6), nur die Themen werden vereinigt
     high.offer = { ...high.offer, topics: unionTopics(high.offer.topics, low.offer.topics) };
+    const keepId = mergeKeep(high, low, notes);
+    if (keepId !== undefined) high.keepId = keepId;
     notes.push(`${low.label}: Dublette von ${high.label} (ranghöhere Quelle) – entfällt`);
     return false;
   });
@@ -494,9 +548,14 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
   // 5. IDs: Zuordnung gegen den Vorstand samt Kursfortschreibung (ADR 0022)
   const assigned = assignIds({
     drafts: deduped.kept.map((c) => c.offer),
+    keepIds: deduped.kept.map((c) => c.keepId ?? undefined),
     previous: input.previous,
     providers: input.providers,
     horizon: input.horizon,
+  });
+  assigned.offers.forEach((o, i) => {
+    const c = deduped.kept[assigned.sources[i] ?? -1];
+    if (c) report.origins[o.id] = c.batch;
   });
   const previousById = new Map(previous.map((o) => [o.id, o] as const));
   const offers = assigned.offers.map((o) => courseCohortAge(withListedAt(o, previousById.get(o.id), input)));

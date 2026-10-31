@@ -237,7 +237,7 @@ Dazu:
 | `scripts/pipeline/lib/raw.ts`, `lib/refresh.ts`, `lib/normalize.ts`, `lib/extract.ts`, `lib/build-offers.ts`, `lib/stable-ids.ts`, `lib/watch.ts`, `lib/cost.ts`, `io/refresh.ts`, `io/nightly.ts`, `cli.ts`, `.github/workflows/nightly.yml` | `partsHash`, `INPUT_EPOCH`, `held`, `keepIds`, `mergeUnitStates`, zwei Builds, Grenzen des Richters, Wächter `ids` | Nachtrag 2, B |
 | `data/id-hinnehmen.yaml` (neu), `scripts/validate-data.ts`, `CLAUDE.md` | Hinnehmen von Hand | Nachtrag 2, B |
 | `scripts/pipeline/id-continuity.test.ts`, `scripts/pipeline/freeze-id-continuity.ts`, `scripts/pipeline/fixtures/` (neu) | ID-Kontinuität des Build-Codes, Pin-Test `INPUT_EPOCH` | Nachtrag 2, B |
-| ADR 0040 „ID-Gate“ (neu, `docs/adr/`), `docs/architecture.md` | ADR und Invariante | Nachtrag 2, B |
+| ADR 0041 „ID-Gate“ (neu, `docs/adr/`), `docs/architecture.md` | ADR und Invariante | Nachtrag 2, B |
 | `scripts/pipeline/lib/eval-score.ts`, `evals/cases/` | Falle `fremder-ort`, `excluded` | Nachtrag 2, C |
 
 ## Tests (test-first)
@@ -511,7 +511,7 @@ Der Code von Nachtrag 1 wurde nie committet. Nachtrag 2 ersetzt ihn.
   - ein Mensch nimmt den Verlust ausdrücklich hin (B5).
 - **Fassung** sind die `KeyParts` von `extractKey` (`lib/normalize.ts`: Katalogauszug, Prompt, Schema, Modell) plus eine Konstante `INPUT_EPOCH` (B1).
 
-0. **ADR** (Review N2, M5; Review N2-2, M7). Neues ADR 0040 „ID-Gate bei neuer Pipeline-Fassung“. Es ergänzt:
+0. **ADR** (Review N2, M5; Review N2-2, M7). Neues ADR 0041 „ID-Gate bei neuer Pipeline-Fassung“. Es ergänzt:
    - **ADR 0022, Punkt 3:** `keepIds` als vorgeschaltete, vom Richter belegte Zuordnung; Statuszeile mit Verweis.
    - **ADR 0026, Zeile 44:** Ein Wechsel extrahiert weiter alles neu, übernimmt aber nur nach dem Gate.
    - **ADR 0033, Konsequenzen:** Den hingenommenen ID-Bruch beim Modellwechsel gibt es nicht mehr.
@@ -692,7 +692,7 @@ Der Code von Nachtrag 1 wurde nie committet. Nachtrag 2 ersetzt ihn.
   - M2 entfällt mit B1;
   - M3 Ort im Ablauf (Overlay, zwei Builds über alles, nur Nachtlauf);
   - M4 Richter sieht den Katalog, Erbe über `keepId` statt nur Halten, Hinnehmen über die Workflow-Eingabe;
-  - M5 ADR 0040;
+  - M5 ADR 0041;
   - M6 `excluded` mit Beginn;
   - M7 Build-Code über die Fixture `id-continuity`.
 - **Minor:**
@@ -713,7 +713,7 @@ Der Code von Nachtrag 1 wurde nie committet. Nachtrag 2 ersetzt ihn.
   - M4 `mergeUnitStates` im Speicher, Schichtung im Trockenlauf;
   - M5 `INPUT_EPOCH` mit Pin-Test;
   - M6 `JUDGE_BUDGET_MIN`, `step: "judge"`, `brakeHit` ohne Richter;
-  - M7 ADR 0040 ergänzt ADR 0022, Punkt 3; Ort darf sich bei `keepIds` ändern (D);
+  - M7 ADR 0041 ergänzt ADR 0022, Punkt 3; Ort darf sich bei `keepIds` ändern (D);
   - M8 Fixture mit freien Tagen unter `scripts/pipeline/fixtures/`.
 - **Minor:**
   - m1 `entfallen`;

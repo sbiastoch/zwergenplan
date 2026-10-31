@@ -19,6 +19,8 @@ export type Draft = Omit<Offer, "id">;
 
 export interface IdAssignment {
   offers: Offer[];
+  /** je Angebot der Index seines Entwurfs in `drafts` (Ursprung für das ID-Gate, Plan 0049, Nachtrag 2) */
+  sources: number[];
   notes: string[];
 }
 
@@ -171,6 +173,11 @@ function byClock(candidates: number[], shares: (i: number) => boolean): number[]
 export function assignIds(input: {
   /** nach den Dubletten-Schritten von buildOffers */
   drafts: readonly Draft[];
+  /**
+   * ID-Erbe je Entwurf, gleiche Reihenfolge wie `drafts` (Plan 0049, Nachtrag 2, B3; ADR 0041): vom Richter des
+   * ID-Gates belegte Zuordnung, geht allen Stufen vor.
+   */
+  keepIds?: ReadonlyArray<string | undefined>;
   /** data/offers.json vor dem Lauf (fehlt beim ersten Lauf) */
   previous: OffersFile | undefined;
   /** Katalog, für vorhandene Orte */
@@ -187,15 +194,22 @@ export function assignIds(input: {
   // Feste Reihenfolge: Ergebnis unabhängig von der Eingabereihenfolge
   const olds = [...(input.previous?.offers ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   const drafts = input.drafts
-    .map((d) => ({ d, key: keyOf(d) }))
+    .map((d, i) => ({ d, key: keyOf(d), keep: input.keepIds?.[i], index: i }))
     .sort((a, b) => a.key.localeCompare(b.key) || JSON.stringify(a.d).localeCompare(JSON.stringify(b.d)));
   const P = olds.map((p) => ({ ...side(p, from, to), id: p.id, window: windowKey(p, from) }));
-  const D = drafts.map(({ d, key }) => ({ ...side(d, from, to), key, window: windowKey(d, from) }));
+  const D = drafts.map(({ d, key, keep, index }) => ({
+    ...side(d, from, to),
+    key,
+    window: windowKey(d, from),
+    keep,
+    index,
+  }));
 
   const partnerOfDraft = new Map<number, number>(); // Entwurf → Vorstand
   const partnerOfOld = new Map<number, number>();
-  const stageOf = new Map<number, 0 | 1 | 2>();
-  const match = (pi: number, di: number, stage: 0 | 1 | 2) => {
+  /** 0–2: Stufen nach ADR 0022; 3: Erbe des Richters (ADR 0041) */
+  const stageOf = new Map<number, 0 | 1 | 2 | 3>();
+  const match = (pi: number, di: number, stage: 0 | 1 | 2 | 3) => {
     partnerOfDraft.set(di, pi);
     partnerOfOld.set(pi, di);
     stageOf.set(di, stage);
@@ -217,6 +231,28 @@ export function assignIds(input: {
   const conflictNote = (stage: 1 | 2, pi: number, di: number) =>
     `IDs: mehrdeutig in Stufe ${stage} – Zwilling ${P[pi]?.id} „${P[pi]?.offer.title}“ passt zu „${D[di]?.offer.title}“, sein Zwilling zu einem anderen Entwurf`;
 
+  // Erbe (ADR 0041): vor allen Stufen, damit eine Stufe die geerbte ID nicht einem anderen Entwurf gibt. Nur beim
+  // selben Anbieter und nur, wenn genau ein Entwurf die ID beansprucht; der Ort darf wechseln (Fehlverortung behoben).
+  const pinIndex = new Map(P.map((p, i) => [p.id, i] as const));
+  const claims = groupBy(
+    D.flatMap((d, i) => (d.keep === undefined ? [] : [i])),
+    (i) => D[i]?.keep ?? "",
+  );
+  for (const [id, ds] of claims) {
+    const pi = pinIndex.get(id);
+    const di = at(ds, 0);
+    const why =
+      pi === undefined
+        ? "nicht im Vorstand"
+        : ds.length > 1
+          ? "mehrfach beansprucht"
+          : at(P, pi).offer.providerId !== at(D, di).offer.providerId
+            ? "anderer Anbieter"
+            : undefined;
+    if (pi === undefined || why !== undefined) notes.push(`IDs: Erbe ${id} ignoriert (${why})`);
+    else match(pi, di, 3);
+  }
+
   // Stufe 0: gleicher Fensterschlüssel, nur bei genau einem Paar. Fensterschlüssel statt `offerKey`: Ein laufender
   // Kurs, dessen Quelle die vergangenen Termine nicht mehr nennt, hat einen anderen ersten Termin (wie Dubletten, m3).
   const oldsByKey = groupBy(
@@ -229,7 +265,10 @@ export function assignIds(input: {
   );
   for (const [key, ds] of draftsByKey) {
     const ps = oldsByKey.get(key) ?? [];
-    if (ds.length === 1 && ps.length === 1) match(at(ps, 0), at(ds, 0), 0);
+    if (ds.length !== 1 || ps.length !== 1) continue;
+    const [pi, di] = [at(ps, 0), at(ds, 0)];
+    // ein Erbe hat Vorrang
+    if (!partnerOfOld.has(pi) && !partnerOfDraft.has(di)) match(pi, di, 0);
   }
 
   const sameProvider = (pi: number, di: number) => P[pi]?.offer.providerId === D[di]?.offer.providerId;
@@ -344,7 +383,8 @@ export function assignIds(input: {
   // Vergabe: Treffer übernehmen die ID (samt Kursfortschreibung), alle anderen bekommen eine neue
   const occupied = new Set(olds.map((p) => p.id));
   const offers: Offer[] = [];
-  const counts = [0, 0, 0];
+  const sources: number[] = [];
+  const counts = [0, 0, 0, 0];
   const fresh: number[] = [];
   D.forEach(({ offer: d }, di) => {
     const pi = partnerOfDraft.get(di);
@@ -365,8 +405,10 @@ export function assignIds(input: {
         notes.push(`${p.id}: Kurs fortgeschrieben (${merged.length - d.sessions.length} vergangene Termine)`);
       }
     }
-    if (stage > 0) notes.push(`IDs: Stufe ${stage} ${p.id} „${p.offer.title}“ → „${d.title}“`);
+    if (stage === 3) notes.push(`IDs: geerbt ${p.id} „${p.offer.title}“ → „${d.title}“ (Richter)`);
+    else if (stage > 0) notes.push(`IDs: Stufe ${stage} ${p.id} „${p.offer.title}“ → „${d.title}“`);
     offers.push({ id: p.id, ...d, sessions });
+    sources.push(at(D, di).index);
   });
   for (const di of fresh) {
     const { offer: d, key } = at(D, di);
@@ -375,6 +417,7 @@ export function assignIds(input: {
     const id = shortId(key, seed);
     occupied.add(id);
     offers.push({ id, ...d });
+    sources.push(at(D, di).index);
   }
 
   // Teilung: ein Vorstand mit Partner passt auch zu einem Entwurf, der neu ist
@@ -404,9 +447,9 @@ export function assignIds(input: {
     notes.push(`IDs: ${id} – ${n} neu, ${g} weggefallen`);
   }
   notes.unshift(
-    `IDs: ${counts[0]} gleicher Schlüssel, ${counts[1]} gleiche Termine, ${counts[2]} ähnlicher Titel, ${fresh.length} neu, ${free(P, partnerOfOld).length} weggefallen`,
+    `IDs: ${counts[0]} gleicher Schlüssel, ${counts[1]} gleiche Termine, ${counts[2]} ähnlicher Titel, ${counts[3] ? `${counts[3]} geerbt, ` : ""}${fresh.length} neu, ${free(P, partnerOfOld).length} weggefallen`,
   );
-  return { offers, notes };
+  return { offers, sources, notes };
 }
 
 /** Eine ID, die vorher und nachher besteht, behält ihren Anbieter – das Netz gegen Fehler in der Zuordnung. */

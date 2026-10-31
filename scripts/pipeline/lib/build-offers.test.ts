@@ -777,7 +777,14 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
   });
   const cand = (order: number, over: Partial<Draft> = {}, rank = 0): Candidate => {
     const offer = draft(over);
-    return { offer, rank, order, label: `turnverein-beispiel#${order} „${offer.title}“`, derivedCategory: false };
+    return {
+      offer,
+      rank,
+      order,
+      label: `turnverein-beispiel#${order} „${offer.title}“`,
+      batch: "turnverein-beispiel",
+      derivedCategory: false,
+    };
   };
   const none = new Set<string>();
 
@@ -1226,5 +1233,74 @@ describe("batchesFromRaw je Einheit (Plan 0048, E6)", () => {
     const { file, notes } = build(v2({ [`seite:${url(0)}`]: unit([kurs]), [`seite:${url(1)}`]: unit([regel]) }), 2);
     expect(file?.offers.filter((o) => o.providerId === ID)).toHaveLength(1);
     expect(notes.join("\n")).toContain("entfällt, gleich");
+  });
+});
+
+describe("ID-Erbe aus keepIds (Plan 0049, Nachtrag 2, B3)", () => {
+  const status = { "familientreff-beispiel": ok };
+  const first = buildOffers(base({ batches: [batch("b", [ev()], status)] })).file;
+  const oldId = first?.offers[0]?.id ?? "";
+  const renamed = { title: "Krabbelgruppe am Mittwochvormittag", schedule: { ...ev().schedule, start: "10:15" } };
+
+  it("ein umbenanntes Event erbt die alte ID über den Beginn eines seiner Termine", () => {
+    const without = buildOffers(base({ previous: first, batches: [batch("b", [ev(renamed)], status)] }));
+    expect(without.file?.offers[0]?.id).not.toBe(oldId);
+    const heir = ev({ ...renamed, keepIds: { "2026-10-14T10:15:00+02:00": oldId } });
+    const r = buildOffers(base({ previous: first, batches: [batch("b", [heir], status)] }));
+    expect(r.file?.offers.map((o) => o.id)).toEqual([oldId]);
+    expect(r.file?.offers[0]).not.toHaveProperty("keepId");
+  });
+
+  it("Einzeltermine: nur der Termin mit Eintrag erbt", () => {
+    const once = (keepIds?: Record<string, string>) =>
+      ev({
+        format: "einmalig",
+        title: "Babymassage-Schnupperstunde",
+        schedule: { kind: "dates", dates: [{ start: "2026-10-08T10:00" }, { start: "2026-10-15T10:00" }] },
+        ...(keepIds ? { keepIds } : {}),
+      });
+    const before = buildOffers(base({ batches: [batch("b", [once()], status)] })).file;
+    const second = before?.offers.find((o) => o.sessions[0]?.start.startsWith("2026-10-15"))?.id ?? "";
+    const r = buildOffers(
+      base({
+        previous: before,
+        batches: [
+          batch("b", [ev({ ...once({ "2026-10-15T10:00:00+02:00": second }), title: "Babymassage neu" })], status),
+        ],
+      }),
+    );
+    const byDay = (day: string) => r.file?.offers.find((o) => o.sessions[0]?.start.startsWith(day))?.id;
+    expect(byDay("2026-10-15")).toBe(second);
+    expect(byDay("2026-10-08")).not.toBe(second);
+  });
+
+  it("zwei verschiedene Erben beim Zusammenlegen: keins gilt, mit Notiz", () => {
+    const a = ev({ keepIds: { "2026-10-07T10:00:00+02:00": "aaaaaaaa" } });
+    const b = ev({ keepIds: { "2026-10-07T10:00:00+02:00": "bbbbbbbb" } });
+    const r = buildOffers(base({ batches: [batch("b", [a, b], status)] }));
+    expect(r.report.notes.some((n) => n.includes("ID-Erbe aaaaaaaa und bbbbbbbb treffen zusammen"))).toBe(true);
+  });
+});
+
+describe("Ursprung je ID (Plan 0049, Nachtrag 2, B2)", () => {
+  it("origins nennt den Batch jeder vergebenen ID, nicht den Altbestand", () => {
+    const status = { "familientreff-beispiel": ok };
+    const r = buildOffers(
+      base({
+        batches: [
+          batch("familientreff-beispiel#00", [ev()], status),
+          batch(
+            "familientreff-beispiel#01",
+            [ev({ title: "Babycafé", schedule: { ...ev().schedule, weekdays: ["FR"] } })],
+            status,
+          ),
+        ],
+      }),
+    );
+    const byTitle = Object.fromEntries((r.file?.offers ?? []).map((o) => [o.title, r.report.origins[o.id]]));
+    expect(byTitle).toEqual({
+      "Offener Krabbeltreff": "familientreff-beispiel#00",
+      Babycafé: "familientreff-beispiel#01",
+    });
   });
 });

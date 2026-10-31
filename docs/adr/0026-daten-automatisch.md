@@ -1,6 +1,6 @@
 # ADR 0026 – Daten automatisch: Nachtlauf und Entdecken in GitHub Actions über `claude -p`
 
-Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006, ändert den Vergabeweg der IDs aus ADR 0022 und weicht ab von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032.
+Status: angenommen (2026-10-11), mit Plan 0032, Stufe 5; Nachtlauf live seit 7bd84f2. Ersetzt ADR 0016. Weicht ab von ADR 0002, 0003, 0004 und 0006, ändert den Vergabeweg der IDs aus ADR 0022 und weicht ab von `docs/architecture.md` („Ein Datenvertrag“, Schichten); ADR 0011 Nr. 4 bleibt unverändert (Abschnitt „Abweichungen“). Baut auf ADR 0022 (stabile IDs) und ADR 0025 (ausführbarer, regionsfähiger Katalog) auf. Details, Messungen und Begründungen in Plan 0032. Präzisiert durch ADR 0041 (ID-Gate: Neuextraktion nach Wechsel von Prompt, Schema oder Modell übernimmt erst nach dem Gate, 2026-10-31).
 
 ## Kontext
 

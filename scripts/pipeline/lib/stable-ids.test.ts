@@ -692,3 +692,46 @@ describe("assignIds – Formatwechsel kurs ↔ regelmaessig (Plan 0048, E11)", (
     expect(idOf(run([draft(two)], prev([old("aaaaaaaa", one)])), two.title)).not.toBe("aaaaaaaa");
   });
 });
+
+describe("assignIds – Erbe des Richters (Plan 0049, Nachtrag 2, B3; ADR 0041)", () => {
+  const withKeep = (drafts: Draft[], keepIds: Array<string | undefined>, previous: OffersFile) =>
+    assignIds({ drafts, keepIds, previous, providers, horizon: HORIZON });
+
+  it("ein umbenanntes Angebot ohne Treffer in den Stufen erbt die alte ID", () => {
+    const previous = prev([old("aaaaaaaa", { title: "PEKiP (Di 9:30)" })]);
+    const renamed = draft({ title: "Prager Eltern-Kind-Programm", sessions: at(weekly("2026-10-06", 10), "11:00") });
+    expect(run([renamed], previous).offers[0]?.id).not.toBe("aaaaaaaa");
+    const r = withKeep([renamed], ["aaaaaaaa"], previous);
+    expect(r.offers[0]?.id).toBe("aaaaaaaa");
+    expect(r.notes.some((n) => n.startsWith("IDs: geerbt aaaaaaaa"))).toBe(true);
+    expect(r.notes[0]).toContain("1 geerbt");
+  });
+
+  it("geht Stufe 0 vor: Der Entwurf mit dem Erbe bekommt die ID, der Schlüssel-Zwilling eine neue", () => {
+    const previous = prev([old("aaaaaaaa")]);
+    const same = draft();
+    const heir = draft({ title: "PEKiP neu", sessions: at(weekly("2026-10-08", 10)) });
+    const r = withKeep([same, heir], [undefined, "aaaaaaaa"], previous);
+    expect(idOf(r, "PEKiP neu")).toBe("aaaaaaaa");
+    expect(idOf(r, "PEKiP (Di 9:30)")).not.toBe("aaaaaaaa");
+  });
+
+  it("ignoriert: unbekannte ID, fremder Anbieter, zwei Ansprüche – mit Notiz", () => {
+    const previous = prev([old("aaaaaaaa"), old("bbbbbbbb", { providerId: "musikschule-beispiel", title: "Musik" })]);
+    const a = draft({ title: "Neu A", sessions: at(weekly("2026-10-07", 10)) });
+    const b = draft({ title: "Neu B", sessions: at(weekly("2026-10-09", 10)) });
+    const unknown = withKeep([a], ["zzzzzzzz"], previous);
+    expect(unknown.notes).toContain("IDs: Erbe zzzzzzzz ignoriert (nicht im Vorstand)");
+    const foreign = withKeep([a], ["bbbbbbbb"], previous);
+    expect(idOf(foreign, "Neu A")).not.toBe("bbbbbbbb");
+    expect(foreign.notes).toContain("IDs: Erbe bbbbbbbb ignoriert (anderer Anbieter)");
+    const twice = withKeep([a, b], ["aaaaaaaa", "aaaaaaaa"], previous);
+    expect(twice.notes).toContain("IDs: Erbe aaaaaaaa ignoriert (mehrfach beansprucht)");
+  });
+
+  it("der Ort darf sich ändern (Fehlverortung behoben)", () => {
+    const previous = prev([old("aaaaaaaa")]);
+    const moved = draft({ venueId: "turnverein-beispiel-anderswo", title: "PEKiP woanders" });
+    expect(withKeep([moved], ["aaaaaaaa"], previous).offers[0]?.id).toBe("aaaaaaaa");
+  });
+});

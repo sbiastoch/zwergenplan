@@ -13,6 +13,9 @@ import {
   type FetchedProvider,
   type FetchedUnit,
   hasFuture,
+  holdUnit,
+  isGated,
+  mergeUnitStates,
   migrate,
   missingFromPrevious,
   NO_INPUT_MODEL,
@@ -793,3 +796,117 @@ function addDaysIso(start: string, days: number): string {
   const [date = "", time = ""] = start.split("T");
   return `${addDays(date, days)}T${time}`;
 }
+
+describe("ID-Gate: Fassung und Halten (Plan 0049, Nachtrag 2, B1/B4)", () => {
+  const fullKey = (f: FetchedUnit, parts = KEY_PARTS) =>
+    extractKey(
+      { pages: f.pages, candidates: f.candidates },
+      { ...parts, catalog: catalogExcerpt(provider) },
+      { today: TODAY },
+    );
+  const NEW_PROMPT = { ...KEY_PARTS, prompt: "Prompt v2" };
+  const renamed = events(4, "Treffen");
+  const current = () => raw({ partsHash: fullKey(fetched()).parts });
+  const heldAs = (reason: "unklar" | "grenze") => {
+    const prev = current();
+    const candidate = nextOf(run(ctx({ prev, keyParts: NEW_PROMPT }), ok(renamed)));
+    return { prev, held: UnitState.parse(holdUnit(prev, candidate, { since: NOW, reason, lost: ["abc12345"] })) };
+  };
+
+  it("unverändert trägt partsHash nach; Übernahme setzt die Fassung", () => {
+    expect(nextOf(run(ctx())).partsHash).toBe(fullKey(fetched()).parts);
+    expect(nextOf(run(ctx({ fetched: changed }), ok(events(4)))).partsHash).toBe(fullKey(changed).parts);
+  });
+
+  it("die Fassung hängt nicht am Seitentext, aber am Prompt", () => {
+    expect(fullKey(changed).parts).toBe(fullKey(fetched()).parts);
+    expect(fullKey(fetched(), NEW_PROMPT).parts).not.toBe(fullKey(fetched()).parts);
+  });
+
+  it("gated: neue Fassung mit Vorstand, auch bei geänderter Seite; fehlendes partsHash zählt als neu", () => {
+    const prev = current();
+    expect(isGated(prev, nextOf(run(ctx({ prev, fetched: changed }), ok(renamed))))).toBe(false);
+    expect(isGated(prev, nextOf(run(ctx({ prev, keyParts: NEW_PROMPT }), ok(renamed))))).toBe(true);
+    expect(isGated(prev, nextOf(run(ctx({ prev, keyParts: NEW_PROMPT, fetched: changed }), ok(renamed))))).toBe(true);
+    const legacy = raw();
+    expect(isGated(legacy, nextOf(run(ctx({ prev: legacy, fetched: changed }), ok(renamed))))).toBe(true);
+  });
+
+  it("nicht gated: neue Einheit, unverändert, zurückgehaltener Einbruch", () => {
+    const prev = current();
+    expect(isGated(undefined, nextOf(run(ctx({ prev: undefined }), ok(renamed))))).toBe(false);
+    expect(isGated(prev, nextOf(run(ctx({ prev }))))).toBe(false);
+    const collapse = nextOf(run(ctx({ prev, keyParts: NEW_PROMPT }), ok([])));
+    expect(collapse.pending).toBeDefined();
+    expect(isGated(prev, collapse)).toBe(false);
+  });
+
+  it("pending mit neuer Fassung geht durchs Gate (Review N2, M1)", () => {
+    const collapse = nextOf(run(ctx({ prev: current(), keyParts: NEW_PROMPT }), ok([])));
+    const adopted = run(ctx({ prev: collapse, keyParts: NEW_PROMPT }));
+    expect(adopted.kind === "keep" && adopted.result).toBe("pending-uebernommen");
+    expect(isGated(collapse, nextOf(adopted))).toBe(true);
+  });
+
+  it("gehalten: alter Stand bleibt, gleicher Schlüssel ohne Aufruf, `held` trägt das Ergebnis", () => {
+    const { prev, held } = heldAs("unklar");
+    expect(held.events).toEqual(prev.events);
+    expect(held.partsHash).toBe(prev.partsHash);
+    expect(held.held?.events).toEqual(renamed);
+    const again = run(ctx({ prev: held, keyParts: NEW_PROMPT }));
+    expect(again.called).toBe(false);
+    expect(again.kind === "keep" && again.result).toBe("gehalten");
+    expect(nextOf(again).events).toEqual(prev.events);
+  });
+
+  it("gehalten, am nächsten Tag ändert sich eine Zeile: neu extrahiert und wieder gated (Review N2, B1)", () => {
+    const { held } = heldAs("unklar");
+    expect(isGated(held, nextOf(run(ctx({ prev: held, keyParts: NEW_PROMPT, fetched: changed }), ok(renamed))))).toBe(
+      true,
+    );
+  });
+
+  it("Grenze oder Hinnehmen: gehaltenes Ergebnis ohne Extraktion erneut vorgelegt", () => {
+    const limit = heldAs("grenze").held;
+    const again = run(ctx({ prev: limit, keyParts: NEW_PROMPT }));
+    expect(again.called).toBe(false);
+    expect(again.kind === "keep" && again.result).toBe("gehalten-uebernommen");
+    const next = nextOf(again);
+    expect(next.events).toEqual(renamed);
+    expect(next.held).toBeUndefined();
+    expect(isGated(limit, next)).toBe(true);
+    const accepted = run(ctx({ prev: heldAs("unklar").held, keyParts: NEW_PROMPT, acceptHeld: true }));
+    expect(accepted.kind === "keep" && accepted.result).toBe("gehalten-uebernommen");
+  });
+
+  it("die Fassung kehrt zurück: unverändert, `held` entfällt", () => {
+    const back = run(ctx({ prev: heldAs("unklar").held }));
+    expect(back.kind === "keep" && back.result).toBe("unveraendert");
+    expect(nextOf(back).held).toBeUndefined();
+  });
+
+  it("mergeUnitStates: gehaltene Einheiten aus dem Vorstand, die übrigen neu", () => {
+    const a = raw({ partsHash: "alt" });
+    const b = raw({ events: renamed, partsHash: "neu" });
+    const merged = mergeUnitStates(
+      { version: 2, units: { [PAGE_UNIT]: a } },
+      { version: 2, units: { [PAGE_UNIT]: b, [KANDIDATEN]: b } },
+      new Set([PAGE_UNIT, KANDIDATEN]),
+    );
+    expect(merged.units[PAGE_UNIT]).toBe(a);
+    expect(merged.units[KANDIDATEN]).toBe(b);
+  });
+
+  it("summarize: gehalten zählt, ist kein Fehler", () => {
+    expect(summarize(["unveraendert", "gehalten"])).toBe("gehalten");
+    expect(summarize(["gehalten", "gehalten-uebernommen"])).toBe("gehalten-uebernommen");
+  });
+});
+
+describe("keepIds setzt nur der Code (Plan 0049, Nachtrag 2, Review N2-2, B1)", () => {
+  it("ein keepIds in der Antwort des Modells wird verworfen", () => {
+    const sneaky = { ...ev("Treff 1"), keepIds: { "2026-10-14T10:00:00+02:00": "aaaaaaaa" } };
+    const next = nextOf(run(ctx({ fetched: changed }), ok([sneaky])));
+    expect(next.events[0]).not.toHaveProperty("keepIds");
+  });
+});

@@ -158,7 +158,10 @@ describe("extractKey (Plan 0032, E4)", () => {
   });
 
   it("ohne datierte Bestandteile ist der Grundschlüssel der frühere inputHash (keine Neu-Extraktion nach dem Umbau)", () => {
-    expect(extractKey(input, parts, today)).toEqual({ hash: inputHash({ ...input, extra: { ...parts } }), dated: {} });
+    expect(extractKey(input, parts, today)).toMatchObject({
+      hash: inputHash({ ...input, extra: { ...parts } }),
+      dated: {},
+    });
   });
 
   it("catalogExcerpt: ohne notes (ADR 0025, Punkt 5), sonst der ganze Eintrag", () => {
@@ -266,7 +269,7 @@ describe("extractKey: vergangene Termine zählen nicht (Plan 0032, Kostenhebel)"
     const odd = feed({ SUMMARY: "TZ", DTSTART: "2026-10-14" });
     for (const page of [broken, odd]) {
       const k = key([page], [], "2026-10-12");
-      expect(k).toEqual({ hash: inputHash({ pages: [page], candidates: [], extra: { ...parts } }), dated: {} });
+      expect(k).toMatchObject({ hash: inputHash({ pages: [page], candidates: [], extra: { ...parts } }), dated: {} });
     }
   });
 

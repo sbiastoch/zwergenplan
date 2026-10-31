@@ -13,6 +13,8 @@ import type { ProviderResult } from "./refresh.ts";
 const REFRESH_RESULTS = [
   "unveraendert",
   "pending-uebernommen",
+  "gehalten",
+  "gehalten-uebernommen",
   "ausgefallen",
   "entfernt",
   "extrahiert",
@@ -113,7 +115,11 @@ export type NightlyReport = z.infer<typeof NightlyReport>;
 /** Ergebnisse, die zählen, wenn mehr als 20 % der Anbieter scheitern (E6). Ein zurückgehaltener Einbruch nicht. */
 const FAILED: ReadonlySet<ProviderState> = new Set<ProviderState>(["fehler", "ausgefallen"]);
 /** Anbieter mit neuem Stand (Spalte `geaenderte_anbieter`) */
-const CHANGED: ReadonlySet<ProviderState> = new Set<ProviderState>(["extrahiert", "pending-uebernommen"]);
+const CHANGED: ReadonlySet<ProviderState> = new Set<ProviderState>([
+  "extrahiert",
+  "pending-uebernommen",
+  "gehalten-uebernommen",
+]);
 const UNDONE: ReadonlySet<ProviderState> = new Set<ProviderState>(["offen", "abgebrochen", "abort"]);
 const MAX_FAILED_SHARE = 0.2;
 /**

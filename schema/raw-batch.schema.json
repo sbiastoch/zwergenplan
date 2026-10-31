@@ -426,6 +426,16 @@
               "frankenkids",
               "evtermine"
             ]
+          },
+          "keepIds": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "required": [

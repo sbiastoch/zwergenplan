@@ -40,6 +40,12 @@ export const RawEvent = OfferFields.pick({
   schedule: Schedule,
   /** Herkunft, wenn das Event aus einem Sammelkalender stammt (setzt der Code, nie das Modell; Plan 0032, E4) */
   via: z.enum(SOURCES).optional(),
+  /**
+   * ID-Erbe (Plan 0049, Nachtrag 2, B3): je Beginn (ISO mit Offset, wie `Session.start`) die alte ID, die das Angebot
+   * dieses Termins behält, weil der Richter es als dasselbe erkannt hat. Setzt der Code, nie das Modell: Das
+   * Antwortschema lässt das Feld weg (`ExtractResponse`), sonst könnte das Modell IDs vergeben.
+   */
+  keepIds: z.record(z.string(), z.string().min(1)).optional(),
 });
 export type RawEvent = z.infer<typeof RawEvent>;
 
@@ -69,6 +75,18 @@ const Pending = z.strictObject({
   dated: DatedKey.optional(),
   model: z.string().min(1),
   events: z.array(RawEvent),
+});
+
+/**
+ * Vom ID-Gate gehaltenes Ergebnis (Plan 0049, Nachtrag 2, B4): eine neue Fassung hätte IDs gekostet. `unklar`: Der
+ * Richter konnte nicht zuordnen, die Einheit bleibt beim alten Stand, bis sich der Schlüssel wieder ändert oder ein
+ * Mensch hinnimmt. `grenze`: Richter nicht gelaufen (Bremse, Zeit, Fehler); die nächste Nacht richtet erneut.
+ */
+const Held = Pending.extend({
+  since: Instant,
+  reason: z.enum(["unklar", "grenze"]),
+  /** IDs, die verloren gingen */
+  lost: z.array(z.string().min(1)),
 });
 
 /** Felder, die Anbieter (V1) und Einheit (V2) gemeinsam haben, mit denselben Regeln (Plan 0032, E5). */
@@ -181,10 +199,19 @@ export const UnitState = z
     removedAt: Instant.optional(),
     /** Sammelkalender, die Kandidaten beigetragen haben; nur bei der Einheit `kandidaten` */
     sources: z.array(z.enum(SOURCES)).optional(),
+    /**
+     * Fassung der Pipeline, aus der `events` stammen (`ExtractKey.parts`: Katalogauszug, Prompt, Schema, Modell,
+     * `INPUT_EPOCH`; Plan 0049, Nachtrag 2, B1). Fehlt bei Ständen vor dem ID-Gate; dann zählt jede Übernahme als
+     * neue Fassung.
+     */
+    partsHash: z.string().min(1).optional(),
+    held: Held.optional(),
   })
   .superRefine((r, ctx) => {
     stateRules(r, ctx);
     klasseRules(r, ctx);
+    if ((r.partsHash !== undefined || r.held !== undefined) && r.inputHash === undefined)
+      ctx.addIssue({ code: "custom", message: "partsHash und held nur mit inputHash", path: ["partsHash"] });
     if (r.removedAt !== undefined && (r.status !== "fehler" || r.inputHash !== undefined || r.events.length > 0))
       ctx.addIssue({
         code: "custom",

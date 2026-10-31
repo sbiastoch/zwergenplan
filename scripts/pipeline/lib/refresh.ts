@@ -13,7 +13,7 @@ import { addDays, berlinIsoDate } from "../../../src/domain/time.ts";
 import type { Candidate, Source } from "./candidate.ts";
 import type { CallRecord, ExtractKeyParts, ExtractOutcome } from "./extract.ts";
 import { catalogExcerpt, datedFrom, type ExtractKey, extractKey, sameKey } from "./normalize.ts";
-import { expansionWindow, type FailureClass, type RawEvent, type UnitState } from "./raw.ts";
+import { expansionWindow, type FailureClass, type ProviderRawV2, type RawEvent, type UnitState } from "./raw.ts";
 import { type ExpandWindow, expandSchedule } from "./schedule.ts";
 import { similarTitle } from "./similar.ts";
 import { KANDIDATEN } from "./units.ts";
@@ -83,12 +83,18 @@ export interface RefreshContext {
   now: string;
   /** freie Tage für `hasFuture` */
   freeDays: ExpandWindow["freeDays"];
+  /** ID-Gate (Plan 0049, Nachtrag 2, B5): ein gehaltenes Ergebnis übernehmen, `data/id-hinnehmen.yaml` */
+  acceptHeld?: boolean;
 }
 
 /** Was mit der Einheit geschah, für Bericht und Statistik. */
 export type RefreshResult =
   | "unveraendert"
   | "pending-uebernommen"
+  /** ID-Gate (Plan 0049, Nachtrag 2): alter Stand bleibt, Ergebnis der neuen Fassung liegt in `held` */
+  | "gehalten"
+  /** ID-Gate: gehaltenes Ergebnis erneut vorgelegt (Grenze in der Vornacht) oder vom Menschen hingenommen */
+  | "gehalten-uebernommen"
   | "ausgefallen"
   | "entfernt"
   | "extrahiert"
@@ -242,7 +248,7 @@ function adapterFailure(ctx: RefreshContext): string | undefined {
 export function assignVia(events: readonly RawEvent[], candidates: readonly Candidate[]): RawEvent[] {
   const byUrl = new Map<string, Source>();
   for (const c of candidates) if (!byUrl.has(c.detailUrl)) byUrl.set(c.detailUrl, c.source);
-  return events.map(({ via: _model, ...e }) => {
+  return events.map(({ via: _model, keepIds: _keep, ...e }) => {
     const via = byUrl.get(e.sourceUrl);
     return via ? { ...e, via } : e;
   });
@@ -282,7 +288,7 @@ function removed(ctx: RefreshContext, next: UnitState): UnitState | undefined {
   if (next.klasse !== "dauerhaft" || next.klasseSince === undefined) return undefined;
   const since = berlinIsoDate(next.klasseSince);
   if (since > addDays(ctx.today, -REMOVED_AFTER_DAYS)) return undefined;
-  const { inputHash: _h, dated: _d, model: _m, changedAt: _c, pending: _p, ...rest } = next;
+  const { inputHash: _h, dated: _d, model: _m, changedAt: _c, pending: _p, partsHash: _ph, held: _hd, ...rest } = next;
   return {
     ...rest,
     events: [],
@@ -304,6 +310,7 @@ function adopted(ctx: RefreshContext, key: ExtractKey, model: string, events: Ra
     changedAt: same && prev?.changedAt ? prev.changedAt : now,
     ...(prev?.emptySince ? { emptySince: prev.emptySince } : {}),
     ...withSources(ctx),
+    partsHash: key.parts,
   };
 }
 
@@ -343,10 +350,24 @@ export function planRefresh(ctx: RefreshContext): RefreshPlan {
       klasse: _k,
       klasseSince: _s,
       inputHash,
+      held: _h,
       ...rest
     } = prev;
-    const next = { ...rest, ...stored({ inputHash, dated: prev.dated }, ctx.today), status: statusOf(prev.events) };
+    // gleicher Schlüssel heißt gleiche Fassung: `partsHash` wird nachgetragen; ein `held` ist hinfällig (Fassung zurück)
+    const next = {
+      ...rest,
+      ...stored({ inputHash, dated: prev.dated }, ctx.today),
+      status: statusOf(prev.events),
+      partsHash: key.parts,
+    };
     return keep(ctx, { ...next, checkedAt: now }, "unveraendert");
+  }
+  const held = prev?.held;
+  if (prev && held && sameKey(held, key, ctx.today)) {
+    // dieselbe Eingabe wie beim Halten: nach `unklar` kein neuer Aufruf; nach `grenze` oder beim Hinnehmen wieder vorlegen
+    if (held.reason === "grenze" || ctx.acceptHeld)
+      return keep(ctx, adopted(ctx, key, held.model, held.events), "gehalten-uebernommen");
+    return keep(ctx, prev, "gehalten");
   }
   if (prev?.pending && sameKey(prev.pending, key, ctx.today)) {
     const { model, events } = prev.pending;
@@ -447,7 +468,15 @@ export function summarize(results: readonly (RefreshResult | "offen")[]): Provid
   const failing = results.filter((r) => FAILING.has(r));
   if (failing.length === results.length) return failing.every((r) => r === "ausgefallen") ? "ausgefallen" : "fehler";
   if (failing.length > 0) return "teilausfall";
-  for (const r of ["einbruch", "extrahiert", "pending-uebernommen", "leer"] as const) if (results.includes(r)) return r;
+  for (const r of [
+    "einbruch",
+    "extrahiert",
+    "pending-uebernommen",
+    "gehalten-uebernommen",
+    "gehalten",
+    "leer",
+  ] as const)
+    if (results.includes(r)) return r;
   return "unveraendert";
 }
 
@@ -469,4 +498,57 @@ export function migrate(input: {
   const fresh = input.units.reduce((n, u) => n + eventUnits(u.events, input.today), 0);
   if (old >= COLLAPSE_MIN_OLD && fresh < old / 2) return { ok: false, reason: `Einbruch (${old} → ${fresh} Angebote)` };
   return { ok: true };
+}
+
+/**
+ * ID-Gate (Plan 0049, Nachtrag 2, B1): Übernimmt die Einheit ein Ergebnis einer anderen Fassung der Pipeline, als aus der
+ * ihr Vorstand stammt? Nur dann kann eine Verbesserung der Pipeline IDs kosten. Ohne Vorstand (neue Einheit) oder ohne
+ * neue Übernahme (unverändert, Ausfall, zurückgehaltener Einbruch) nicht; ein fehlendes `partsHash` im Vorstand zählt
+ * als andere Fassung. Eine geänderte Seite hebt das Gate nicht auf: Sonst ginge der Verlust in der nächsten Nacht mit
+ * einer Zeile Platzstand doch durch (Review N2, B1).
+ */
+export function isGated(prev: UnitState | undefined, next: UnitState): boolean {
+  if (prev?.inputHash === undefined || next.inputHash === undefined) return false;
+  if (next.inputHash === prev.inputHash && JSON.stringify(next.dated) === JSON.stringify(prev.dated)) return false;
+  return next.partsHash !== prev.partsHash;
+}
+
+/**
+ * Halten (B4): Die Einheit behält den alten Stand samt `partsHash`; das Ergebnis der neuen Fassung liegt in `held`,
+ * damit es die nächste Nacht ohne Aufruf erneut vorlegen (`grenze`) oder ein Mensch übernehmen kann.
+ */
+export function holdUnit(
+  prev: UnitState,
+  candidate: UnitState,
+  o: { since: string; reason: "unklar" | "grenze"; lost: readonly string[] },
+): UnitState {
+  if (candidate.inputHash === undefined || candidate.model === undefined)
+    throw new Error("holdUnit: Kandidat ohne inputHash/model");
+  return {
+    ...prev,
+    held: {
+      inputHash: candidate.inputHash,
+      ...(candidate.dated ? { dated: candidate.dated } : {}),
+      model: candidate.model,
+      events: candidate.events,
+      since: prev.held?.since ?? o.since,
+      reason: o.reason,
+      lost: [...o.lost],
+    },
+  };
+}
+
+/**
+ * Stand (b) des Gates (B2): der neue Zustand des Anbieters, aber die Einheiten aus `keep` im Stand des Vorstands.
+ * Fehlt eine davon im Vorstand, bleibt sie neu.
+ */
+export function mergeUnitStates(
+  prev: ProviderRawV2 | undefined,
+  next: ProviderRawV2,
+  keep: ReadonlySet<string>,
+): ProviderRawV2 {
+  const units = Object.fromEntries(
+    Object.entries(next.units).map(([id, u]) => [id, keep.has(id) ? (prev?.units[id] ?? u) : u] as const),
+  );
+  return { ...next, units };
 }

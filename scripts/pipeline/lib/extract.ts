@@ -85,7 +85,7 @@ export interface ExtractKeyParts {
  * Pflicht (Plan 0037, E3): Das Schema ist Teil des Cache-Schlüssels und ändert sich nur in Stufe A.
  */
 const ExtractResponse = z.strictObject({
-  events: z.array(RawEvent.omit({ providerId: true, via: true }).extend({ category: CategoryField })),
+  events: z.array(RawEvent.omit({ providerId: true, via: true, keepIds: true }).extend({ category: CategoryField })),
 });
 
 /**
