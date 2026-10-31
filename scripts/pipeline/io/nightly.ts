@@ -8,8 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
-import { addMonths } from "../../../src/domain/time.ts";
-import { type BuildInput, batchesFromRaw, buildOffers, HORIZON_MONTHS } from "../lib/build-offers.ts";
+import { type BuildInput, buildFromState, nightlyWindow } from "../lib/build-offers.ts";
 import { isSource } from "../lib/candidate.ts";
 import {
   appendCsvRow,
@@ -109,9 +108,9 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const units: NonNullable<NightlyReport["units"]> = {};
   const migrations: Record<string, string> = {};
   const gaps: NonNullable<NightlyReport["gaps"]> = {};
-  const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
+  const span = nightlyWindow(o.today).freeDaysSpan;
   // vor den Einheiten geladen: `hasFuture` (E5) braucht sie, der Build danach dieselben
-  const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
+  const freeDays = await (o.freeDays ?? loadFreeDays)(span.from, span.to);
   const force = new Set(o.forceMigrate ?? []);
   const work = plan.providers.flatMap((p) => {
     const provider = byId.get(p.id);
@@ -269,24 +268,15 @@ async function buildFromRaw(o: {
     }
 
   const raws = { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(o.dryRun.overlayDir) : {}) };
-  const horizon = { from: o.today, to: addMonths(o.today, HORIZON_MONTHS) };
-  // vor `batchesFromRaw`: Abgleich und Vereinigung der Einheiten brauchen die freien Tage (Plan 0048, E6)
-  const freeDays = await (o.freeDays ?? loadFreeDays)(addMonths(horizon.from, -12), addMonths(horizon.to, 24));
-  const { batches, extracted, notes } = batchesFromRaw(raws, o.catalog, {
-    previous: o.previous?.offers,
-    horizon,
-    freeDays,
-  });
-  const { file, report } = buildOffers({
-    batches,
-    providers: o.catalog,
+  const span = nightlyWindow(o.today).freeDaysSpan;
+  const { file, report, notes } = buildFromState({
+    raws,
+    catalog: o.catalog,
     previous: o.previous,
-    freeDays,
-    horizon,
+    today: o.today,
+    freeDays: await (o.freeDays ?? loadFreeDays)(span.from, span.to),
     generatedAt: o.now(),
     sources: o.sources,
-    perProviderStatus: true,
-    extracted,
   });
   let written: string | undefined;
   if (file) {

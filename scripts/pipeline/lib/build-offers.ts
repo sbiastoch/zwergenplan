@@ -4,7 +4,7 @@
  */
 import { validateDataset } from "../../../src/domain/dataset.ts";
 import type { Offer, OffersFile, Provider, Session } from "../../../src/domain/schema.ts";
-import { addDays, berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
+import { addDays, addMonths, berlinDate, fromBerlinLocal } from "../../../src/domain/time.ts";
 import { fallbackCategory } from "../../../src/domain/topics.ts";
 import type { Source } from "./candidate.ts";
 import { birthCohort, cohortAge } from "./cohort.ts";
@@ -135,6 +135,54 @@ export function batchesFromRaw(
     });
   }
   return { batches, extracted, notes };
+}
+
+/**
+ * Horizont des Nachtlaufs ab `today` (YYYY-MM-DD, Europe/Berlin) und die Spanne der freien Tage, die er dafür lädt:
+ * ein Jahr zurück (Abgleich mit dem Vorstand) bis zwei Jahre über den Horizont (Ausdehnung der Regeltermine).
+ */
+export function nightlyWindow(today: string): {
+  horizon: { from: string; to: string };
+  freeDaysSpan: { from: string; to: string };
+} {
+  const horizon = { from: today, to: addMonths(today, HORIZON_MONTHS) };
+  return { horizon, freeDaysSpan: { from: addMonths(horizon.from, -12), to: addMonths(horizon.to, 24) } };
+}
+
+/**
+ * Der Build des Nachtlaufs aus dem Zustand je Anbieter (`data/raw`), rein: `batchesFromRaw`, dann `buildOffers` mit
+ * Zustand je Anbieter. Gemeinsam für `pipeline nightly`, `--build-only` und den Test der ID-Kontinuität
+ * (`id-continuity.test.ts`, Plan 0049, Nachtrag 2, B7), damit der Test genau den Code des Nachtlaufs prüft.
+ */
+export function buildFromState(o: {
+  raws: Readonly<Record<string, ProviderRaw>>;
+  catalog: readonly Provider[];
+  previous: OffersFile | undefined;
+  today: string;
+  /** über `nightlyWindow(today).freeDaysSpan` geladen */
+  freeDays: Readonly<Record<string, string>>;
+  generatedAt: string;
+  sources: BuildInput["sources"];
+}): { file?: OffersFile; report: BuildReport; notes: string[] } {
+  const { horizon } = nightlyWindow(o.today);
+  // vor `buildOffers`: Abgleich und Vereinigung der Einheiten brauchen die freien Tage (Plan 0048, E6)
+  const { batches, extracted, notes } = batchesFromRaw(o.raws, o.catalog, {
+    previous: o.previous?.offers,
+    horizon,
+    freeDays: o.freeDays,
+  });
+  const built = buildOffers({
+    batches,
+    providers: o.catalog,
+    previous: o.previous,
+    freeDays: o.freeDays,
+    horizon,
+    generatedAt: o.generatedAt,
+    sources: o.sources,
+    perProviderStatus: true,
+    extracted,
+  });
+  return { ...built, notes };
 }
 
 export interface BuildReport {
