@@ -38,7 +38,7 @@
    "inputHash": "32c1eb026c1c9d03d69539d35b2c5144ffa62bc746d4f6e703326e7e1408b644",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://www.treffpunkt-nbg.de/familienstuetzpunkt/": {
@@ -46,7 +46,7 @@
    "inputHash": "aea85f8f023de420c52a27611d836f5ee1db631dd283a03cd545daaa5f271459",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

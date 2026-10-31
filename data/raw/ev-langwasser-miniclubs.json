@@ -115,7 +115,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "emptySince": "2026-10-30T08:39:48+01:00"
   },
@@ -295,7 +295,6 @@
    ],
    "inputHash": "65acb1193277cc55ced981affa2dcf8c05d2a94de948b400998a3d4465db67d3",
    "dated": {
-    "2026-10-30": "808d58eb439beefe2603f4ea53827b4dddfcc24e09cf1838034152b8fe4e3925",
     "2026-11-01": "33d8f9e1db8917c1abc8744e7b51b5b9c3812418e9a3abb9bcde315b27b8de94",
     "2026-11-02": "ce2381b9cc38808d2627a84355e44160239e1988af680f828319edcd07bed2fe",
     "2026-11-03": "0ef20b7f9cab50506f81caaadf3143fd9cbed53342ebccf49f6a421290b644a2",
@@ -604,7 +603,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html": {
@@ -643,7 +642,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:http://www.evangelisch-in-langwasser.de/bonhoeffer-gruppen.html": {
@@ -683,7 +682,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "kandidaten": {
@@ -989,7 +988,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "evtermine"

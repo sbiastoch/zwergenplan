@@ -36,7 +36,7 @@
    "inputHash": "344175190079a346ec893fc7b703157c22f921545793a5d1208c7a6096a5fd65",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://www.bindungsorientierte-familienbegleitung.de/babymassage": {
@@ -44,7 +44,7 @@
    "inputHash": "110ab8c3dabaf0021e5b003ec49b83d33f86690647ba3c65379ef1fb017bead4",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.bindungsorientierte-familienbegleitung.de/krabbelgruppe-gruene-zukunft": {
@@ -84,7 +84,7 @@
    "inputHash": "fa8ddf6a0de289ef1ea6c9779c9fabaeb59dd89670aac6d92616c6cce15c93a8",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://www.bindungsorientierte-familienbegleitung.de/yoga-mama-baby": {
@@ -305,7 +305,7 @@
    "inputHash": "53b66e394b673fc6142ef1d1c8e3a450d0df62fe483b7a1884b888f8d0392f22",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   }
  }

@@ -212,7 +212,7 @@
    "inputHash": "83b362f729d1c36e89328ea318737e03c1e4cf72a2bf9f3c3e7ef154acf13a2a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf": {
@@ -372,7 +372,7 @@
    "inputHash": "dc23f2a4074f3c940958732fe84df0eba74b7ee3b06835742d93358e39fac294",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   }
  }

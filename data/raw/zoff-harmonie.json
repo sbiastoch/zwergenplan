@@ -6,20 +6,20 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP Babys geb. April–Juni 2026, Di 9:30",
-     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern, dienstags 9:30–11:00. Die Gruppe läuft noch bis 15.12.; Plätze bitte über die Detailseite prüfen.",
+     "title": "PEKiP (Babys geb. April–Juni 2026)",
+     "summary": "Entwicklungsbegleitung für Babys mit Bewegungs- und Spielanregungen sowie Austausch für Eltern. Dienstags 9:30 Uhr bis Mitte Dezember; die freien Plätze stehen auf der Detailseite.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
+     "url": "https://zoff-harmonie.de/aktuelles/kurse-und-veranstaltungen",
      "sourceUrl": "https://zoff-harmonie.de/aktuelles/kurse-und-veranstaltungen",
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Platzstand in der Liste nicht angegeben; Anmeldung und Plätze über die Detailseite"
+      "note": "Freie Plätze auf der Detailseite prüfen; Anmeldung über das Online-Formular"
      },
      "schedule": {
       "kind": "weekly",
@@ -27,29 +27,28 @@
        "TU"
       ],
       "start": "09:30",
-      "end": "11:00",
-      "from": "2026-11-03",
+      "from": "2026-09-22",
       "until": "2026-12-15",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP Babys geb. Dez. 2025–Feb. 2026, Di 11:30",
-     "summary": "PEKiP-Entwicklungsbegleitung für ältere Babys, dienstags 11:30–13:00. Laut Liste ausgebucht; der Kurs läuft bis 15.12.",
+     "title": "PEKiP (Babys geb. Dez. 2025–Feb. 2026)",
+     "summary": "Entwicklungsbegleitung für Babys mit Bewegungs- und Spielanregungen sowie Austausch für Eltern. Dienstags 11:30 Uhr bis Mitte Dezember; der Kurs ist ausgebucht.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
+     "url": "https://zoff-harmonie.de/aktuelles/kurse-und-veranstaltungen",
      "sourceUrl": "https://zoff-harmonie.de/aktuelles/kurse-und-veranstaltungen",
      "category": "babykurse",
      "availability": {
       "status": "ausgebucht",
-      "note": "In der Liste als ausgebucht markiert"
+      "note": "Ausgebucht laut Kursliste"
      },
      "schedule": {
       "kind": "weekly",
@@ -57,51 +56,17 @@
        "TU"
       ],
       "start": "11:30",
-      "end": "13:00",
-      "from": "2026-11-03",
+      "from": "2026-09-22",
       "until": "2026-12-15",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "zoff-harmonie",
-     "venueId": "zoff-harmonie",
-     "title": "Waldspielgruppe Die Eulenbande (2–4 Jahre)",
-     "summary": "Waldgruppe für Eltern mit Kindern von 2–4 Jahren: Tiere beobachten, Waldschätze sammeln, die Jahreszeiten erleben. Laut Liste läuft die Reihe Freitags 15:00–16:30 bis 30.10.; ein späterer Einstieg ist nicht angegeben.",
-     "topics": [
-      "waldgruppe",
-      "eltern-kind-gruppe"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://zoff-harmonie.de/aktuelles/kurse-und-veranstaltungen",
-     "sourceUrl": "https://zoff-harmonie.de/aktuelles/kurse-und-veranstaltungen",
-     "category": "natur",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 48
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Platzstand in der Liste nicht angegeben; Anmeldung über die Detailseite"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-30T15:00",
-        "end": "2026-10-30T16:30"
-       }
-      ]
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "01096dcd09436cc28dad53af513f5eb62acfb8c9e9ac99888bd9f1a7a839f14e",
+   "inputHash": "6f6e8ea5ce483efec0fd5ccbe2b7e2af90ba1dec10790aec1863ef17383776ac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip": {
    "events": [
@@ -243,7 +208,7 @@
    "inputHash": "2e9e3032d3784bb82a21fd4f37f356233b84bb07e3badbc3c97b2f91635e7803",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/fenkid": {
@@ -251,7 +216,7 @@
    "inputHash": "7dec4a0dda160e9dd229b8a2361e586180d08acd994edf0c3ea5e8c3f8fe8c17",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/eltern-kind-gruppen": {
@@ -360,7 +325,7 @@
    "inputHash": "1191e7196a3b6d4af8ab9a0f9d6cdfc15119b6f201655c5dd6d12031522867be",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/musikalische-angebote": {
@@ -438,7 +403,7 @@
    "inputHash": "e8f2b51135bc88c3162a9c7c607e9b8d8048f3f63ab5c72eebf820c0e2835097",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/papa---ich-angebote": {
@@ -480,15 +445,15 @@
    "inputHash": "b0f0cd537b118e472fefb53a675945ba581145c8531f1282738d875754fa2e11",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/angebote-in-der-natur": {
    "events": [],
-   "inputHash": "b38f766c1101d418263da3a70cffbe91e48ac681301ea5fc664f461527b7e5ff",
+   "inputHash": "ca8d576aca4cf2f5ddc5c73d50f7fb631fb5f68b5e689b786fa8f1242654ee51",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00"
   },
@@ -497,7 +462,7 @@
    "inputHash": "352bcaa7d1bf11f0bebbd21b99006b92499187da1d2f418e0fcfdda8daf2a5af",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "kandidaten": {
@@ -508,7 +473,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "stadt-vk"

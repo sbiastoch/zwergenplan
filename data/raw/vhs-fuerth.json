@@ -7,7 +7,7 @@
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
      "title": "Eltern-Kind-Turnen (1½–2½ Jahre), Mittwoch 17:00",
-     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen, Eltern sind aktiv dabei und helfen beim Auf- und Abbau. Der Kurs läuft seit 23.09.; ein Enddatum nennt die Seite nicht.",
+     "summary": "Wöchentlicher Parcours zum freien Turnen, Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kurs läuft seit 23.09.2026; Termine im Horizont laut Kursliste mittwochs.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe nicht auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16301)"
+      "note": "Kursnummer 16301; Anmeldung über die Kursdetails auf der vhs-Seite"
      },
      "schedule": {
       "kind": "weekly",
@@ -41,7 +41,7 @@
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
      "title": "Eltern-Kind-Turnen (2–3 Jahre), Donnerstag 17:00",
-     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen, Eltern sind aktiv dabei und helfen beim Auf- und Abbau. Der Kurs läuft seit 24.09.; ein Enddatum nennt die Seite nicht.",
+     "summary": "Wöchentlicher Parcours zum freien Turnen, Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kurs läuft seit 24.09.2026; Termine im Horizont laut Kursliste donnerstags.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -59,7 +59,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe nicht auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16303)"
+      "note": "Kursnummer 16303; Anmeldung über die Kursdetails auf der vhs-Seite"
      },
      "schedule": {
       "kind": "weekly",
@@ -72,11 +72,11 @@
      }
     }
    ],
-   "inputHash": "29fef01535c043463883df4c977453794dfa9f1e9d8716e012650608e78def0c",
+   "inputHash": "a38baeff2dddc8684059b39e4dbffbd77134c9d880b13360bf12cc17bbe088a9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00"
   }
  }
 }

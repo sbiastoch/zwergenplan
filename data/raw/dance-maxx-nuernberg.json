@@ -95,7 +95,7 @@
    "inputHash": "ae2677173e6c52bcb60546aae3455f325586703156d1568b58ddb3744f530c5e",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00"
   },
   "seite:https://www.dance-maxx.de/kursplan/fit-dank-baby-mini/": {
@@ -103,7 +103,7 @@
    "inputHash": "539e7f2bc44a9c17913e1d8caf05a9e7c799734b8954bafaa5daa998e1cba53a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://www.dance-maxx.de/kursplan/eltern-kind-tanz/": {
@@ -111,7 +111,7 @@
    "inputHash": "9fae59c1a05ea68c473875cee9ec245aeb3f63c113fae3631ae9299feb7e8568",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://dance-maxx.de/kursplan/fit-dank-baby-maxi/": {
@@ -119,14 +119,14 @@
    "inputHash": "4bb87ccab6d518c6d392c855f61c67343e83a2b12a949b234a1b77bd9608503f",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  },
  "beilagen": {
   "seite:https://calendly.com/dance-maxx-info/kostenlose-probestunde-fitdankbaby-in-nurnberg": {
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T08:26:00+01:00"
   }
  }
 }

@@ -6,8 +6,8 @@
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 Jahre (freitags)",
-     "summary": "Freies Spielen und Toben in der Turnhalle des CVJM für Kinder bis 3 Jahre, Eltern oder Bezugsperson sind dabei. Hallenschuhe oder ABS-Socken mitbringen. Keine Anmeldung nötig, einfach kommen.",
+     "title": "Wuselwelt: Bewegung und Freispiel für 0–3-Jährige (freitags)",
+     "summary": "Offene Freispielzeit in der Turnhalle des CVJM für Kinder von 0 bis 3 Jahren mit Eltern oder Bezugsperson. Hallenschuhe oder ABS-Socken mitbringen. Keine Anmeldung nötig, Einstieg jederzeit. In den Ferien findet nichts statt.",
      "topics": [
       "bewegung",
       "spielplatz-indoor"
@@ -34,16 +34,16 @@
       ],
       "start": "09:30",
       "end": "10:15",
-      "from": "2026-10-30",
+      "from": "2026-11-13",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "fe1da65bf2132b73a13222eec134b9ae1b4c1916dd8bd818485a45cb9882a6ad",
+   "inputHash": "381791ef31df43a5178a9a7f991899c2d36c494af3bca50d036d4cae377cbdc1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
    "events": [
@@ -101,23 +101,28 @@
    "model": "haiku",
    "status": "ok",
    "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "changedAt": "2026-10-28T08:14:30+01:00",
+   "pending": {
+    "inputHash": "a9949d26eb6f088ab240ac25c36d181bd7fedfa0599f71af8bede2a62f168110",
+    "model": "haiku",
+    "events": []
+   }
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
    "events": [],
-   "inputHash": "ca8d157cfc286381ff84c2ff60d5c9ea2ace7fa9d72079fa97817eaa3c9b5873",
+   "inputHash": "838582b1370f1ad427b6757d85bf5b3a4d0f5d0a51e3b0deb154d49d1b506ec7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;": {
    "events": [],
-   "inputHash": "2cdc1260174f686e2d6711d6a08ddba2c873e1ecffa7816710d25a5874e4140a",
+   "inputHash": "9c086ebf9bf21d8f713a845f846a3dc1d7a5029d207ef9f981a9765581bf4076",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00"
   },
@@ -162,13 +167,12 @@
    ],
    "inputHash": "9014d4bb27ab7dbb3157a73c8dd388cfde0e579cdb5bcae0a8ad63e084098ab1",
    "dated": {
-    "2026-10-30": "8165702f9a17fd28f85b43434d7e2f9c1f28d63e5798d18c562013fcb254ea2b",
     "2026-11-13": "dd4a1cffc709f0ed109ee5d1af65142761dcac9fe3c7ce56f661020ee3b2eecc",
     "2026-11-27": "4fc8440bb3b3ae5eb339264134dbd7d17ef41c1723a56f8e9fe0c1e8a8ee5893"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "frankenkids"

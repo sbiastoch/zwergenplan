@@ -75,14 +75,13 @@
    "inputHash": "b4f8666250751c3ce6a4bb064f50dd67ad6959794b8fbe30cc38f3520b00393a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://www.evangelische-termine.de/ical?vid=590": {
    "events": [],
    "inputHash": "0f93a49928c2a4cdfdc9ab4e4d3f64090f762076d5f4ffbedef552f213aa2657",
    "dated": {
-    "2026-10-30": "d73b1b112e2c4a5eeabcf327d37392dfe9f9089ec439c60c2dc2607ae742270e",
     "2026-11-01": "967735f6f76b535bf368a311990fef4d2b9093fb9a65fddac0b0f2b281d397f5",
     "2026-11-02": "042b5a28ab22f4a98264a10db2d991a5fb85d768019c7fab004cb55276dadef9",
     "2026-11-04": "24d00b1afa261ab9d78c55b007fbd1b2aebe6daf3c79dad46f58c4d2822d9a23",
@@ -213,7 +212,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

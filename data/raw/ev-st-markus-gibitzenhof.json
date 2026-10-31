@@ -6,9 +6,10 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Offene Tür für Groß und Klein (montags)",
-     "summary": "Offener Spiel- und Begegnungstreff im FreiRaum der Markuskirche für Familien mit Kindern. Einfach vorbeikommen, keine Anmeldung. Der Termin am 30.11. entfällt.",
+     "title": "Offene Tür für Groß und Klein – Montagstreff im FreiRaum",
+     "summary": "Offener Treff für Familien mit Kindern in den Räumen des FreiRaums an der Markuskirche, montags 9–11 Uhr. Keine Anmeldung nötig, einfach vorbeikommen. Einzelne Termine können ausfallen.",
      "topics": [
+      "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
@@ -19,59 +20,86 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offener Treff, einfach vorbeikommen"
+      "note": "offener Treff, keine Plätze"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "MO"
-      ],
-      "start": "09:00",
-      "end": "11:00",
-      "from": "2026-11-09",
-      "skipHolidays": true,
-      "except": [
-       "2026-11-30"
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-09T09:00",
+        "end": "2026-11-09T11:00"
+       },
+       {
+        "start": "2026-11-16T09:00",
+        "end": "2026-11-16T11:00"
+       },
+       {
+        "start": "2026-11-23T09:00",
+        "end": "2026-11-23T11:00"
+       },
+       {
+        "start": "2026-12-07T09:00",
+        "end": "2026-12-07T11:00"
+       },
+       {
+        "start": "2026-12-14T09:00",
+        "end": "2026-12-14T11:00"
+       },
+       {
+        "start": "2026-12-21T09:00",
+        "end": "2026-12-21T11:00"
+       }
       ]
      }
     },
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Café für Alle (dienstags, Helmut-Herold-Platz)",
-     "summary": "Offener Café-Treff auf dem Helmut-Herold-Platz vor der Markuskirche, Kinder sind willkommen (z. B. Brettspiele, Bilderbuchkino). Einfach vorbeikommen. Der Termin am 03.11. entfällt.",
+     "title": "Offene Tür für Groß und Klein (Jan. 2027)",
+     "summary": "Offener Treff im FreiRaum der Markuskirche für Groß und Klein, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung nötig. In dieser Quelle sind nur die Termine im Januar 2027 genannt.",
      "topics": [
-      "elterncafe"
+      "elterntreff",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8053909.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8286333.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
      "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 72
+     },
      "availability": {
       "status": "ohne-anmeldung",
       "note": "Offener Treff, einfach vorbeikommen"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "15:00",
-      "end": "17:00",
-      "from": "2026-11-10",
-      "skipHolidays": true
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-11T09:00",
+        "end": "2027-01-11T11:00"
+       },
+       {
+        "start": "2027-01-18T09:00",
+        "end": "2027-01-18T11:00"
+       },
+       {
+        "start": "2027-01-25T09:00",
+        "end": "2027-01-25T11:00"
+       }
+      ]
      }
     }
    ],
    "inputHash": "e1098639d45764dc73b636f609f698e2ca7a27eb3205654c45294b033eb0cccd",
    "dated": {
-    "2026-10-30": "0e7e9537af057a6caa8fa375266b64f81a0f55d07e114b38dd5ad072327cf655",
     "2026-11-01": "91f3b2ce0ebbb72c770e0c0f31fd073d16a3ded89c1353aeb7ee7cfcc9055a57",
     "2026-11-03": "af202a1c96968d2014adc862b725153aaed85d987ff0fc4eaef6ffefe4d26338",
     "2026-11-04": "e5b6936a4c39ec5d7b746d68aac46de0de02257b14e284ef62a7f4e4ff606f67",
-    "2026-11-05": "48d8235835ef6a638282e0f082427f7261753cfff95637882962db592460ec92",
+    "2026-11-05": "ac96201c21dd314a2d2f2d57f92c358cd1062e3e1988680e44fc550c54e1b668",
     "2026-11-06": "223c4b8970d3ca8c7766bf132a1f53ff5240dd65ce509dba90a127b07695f74a",
     "2026-11-08": "699b9efc55d1b1ca9e1a141822e19e5ea9472d5adc9f13f304717c0016b34606",
     "2026-11-09": "91607e96d9108606a836dd727f6f9b1354390845115749d83bf041bc7572ab91",
@@ -79,7 +107,7 @@
     "2026-11-11": "29e70bfec6c82c51bf20a606b43388e8b26efceba5b2cf7396419f82c189b46b",
     "2026-11-12": "18ccd31afbecdceea659d29cb51a01a456fba9d3444b946ac1132c9d2b44468b",
     "2026-11-13": "7ca6adcfd1714be5b05b547012d5de5d2090ad1f02d7586bfe3cd40e5ef4c802",
-    "2026-11-14": "51728af1253d5701b8464b75e90557f4013984032a658b88e1deda719b888239",
+    "2026-11-14": "c643fad3fd218edf122b537b10d268fc129cc79ee2d4c6ef6527e860778b3f6d",
     "2026-11-15": "61ce131e97fcc328b0176a53a193104ba699f7e81d4842dd3eecde1962f26f77",
     "2026-11-16": "a9bcf170cff476cc08de4313b6d19e0769df220ee242974dd736722eef190358",
     "2026-11-17": "90b0dd6eff7a0d09c31111810677c13380b5dff1ff5b720f3d6ac741ef4d4396",
@@ -107,7 +135,7 @@
     "2026-12-11": "708d629776dc63b6a724b78c0f104bc2c36e24f97de431cdc0b3868c94530880",
     "2026-12-13": "39f51308eb7e7094d3fb84e0c6f7653a55ce9e573f024e0d2d6147136de78075",
     "2026-12-14": "71e85c456bb369c19aa542f392afd45e687e0526b1b1bb42d5029526312a0c94",
-    "2026-12-15": "247a2530bb5a127db9f760ac10b6d100130d71a38c44e728f65fe1fbc8ce5057",
+    "2026-12-15": "129bbbc60c046ee1b9ab7ae801192397dfdd25738516473cfc214def2cb9050e",
     "2026-12-16": "4c34c0446d6a9bc9b6c0eb7c5307fdf8679afa87b3a82298a4f324a6f0f3bc9b",
     "2026-12-17": "735f9bc8670520c5bb86919a676ebe84628e55f10d2f2fd4372000c307b07894",
     "2026-12-18": "380430b0dd5db1c4d9337d96715a04629c47832e418c9e21cedf5f0aeb2c07bb",
@@ -122,92 +150,133 @@
     "2027-01-03": "f3eb14082e78d2bc9d67162a7d2310a7afebaab65cb89b950f98cdc3fb451989",
     "2027-01-08": "6b617abe175e82812556012fa5477543704a65ab139d18094401602166bf9492",
     "2027-01-10": "7b2226068b8b5d9b6afb90917bc12c5fb83344b7c2d7565152f765c943b0fd71",
+    "2027-01-11": "09b343c420de88b6187c18e2085ffb7918d372a5fb44cc45f195388539121516",
+    "2027-01-12": "b2be72896939205c00dd4ec3a74f2d5926f971e80e131c07a10cb807ee5ef95a",
     "2027-01-13": "bf0d99645508e51a50683d528efb1ee44a892e8a16034a9e78dfd71febb1774f",
     "2027-01-14": "8aa3b4e9e15844ec33b9792543950fe6af1c6b2f029ede10095d3b135962d8fc",
     "2027-01-15": "68e0f64d6933bd5c83f8c27784fb6248297d8385762ca3111a50b17077769021",
     "2027-01-17": "963f2c5ce5ea5ab74f250cbe49b6878d9e57af064a0a215eec15077019f3a3ba",
+    "2027-01-18": "309b4597e18c59b1cc91819e3dcef0c9f6bda3a827a793916319b9178d8b0986",
+    "2027-01-19": "9d358b8feaeba41cbfce45d47d014e301875e44dd32e60168fe5a5bbbeda5724",
     "2027-01-20": "7e61729fb9df5cf520cdea320bfe65db270ef0a73373d5bda553a823773416c3",
     "2027-01-21": "4d8df6f9fd7b9e4dbad6743203c1b4425f35e6e18b7741479f4e54690adf3440",
     "2027-01-22": "6d0c9377eb24664998b8fb07847742b2cbea58a2211cf2fc34e6ed949af39acb",
     "2027-01-24": "9cdd65ec892c9e7ee69a57f650136a77167ba87fded560fb6e5bcad6fbda40b6",
+    "2027-01-25": "94e0632c7c82449621f61841c002851ffb5c120af73d8fa9aae49d71de529a97",
+    "2027-01-26": "0a40f44f8303865c26ea489ce7c63e4bbad171ccfc29c57d6489d67d8377561b",
     "2027-01-28": "cf3fbbb0869dafa9a527e62e73f990a6ca83ead5970cfb989408c38bed65286e",
     "2027-01-29": "34f86c45084f8ce1f6eb86d85e5398f57c76dfab99050314186747352c93c785",
+    "2027-01-30": "f5fe5a4de08df07d54f875b60ec04734ccf069975f7ddbfa656218a015034a28",
     "2027-01-31": "e0f5843dc4f5a5bb49bc58bcaca20405141f6761e770e5b2693d2c0ca5d5379b",
+    "2027-02-02": "9636914bfe27a6f48f02bfc7b85729434dd959bad0dacc0be10052ff96acd4c6",
     "2027-02-03": "923c102cca4ae66e17608fc42b0ca5f59264ac72ce010fada70b7180345ec5d0",
     "2027-02-04": "40e5748f162c38e3485502cb232f848692b43abf9795121f2ae0fd367d86ef0d",
     "2027-02-05": "5d1e7bf8d7f258478346a9ecf7e15b4e33db4a6d9fddeadecbb532347456be22",
     "2027-02-07": "8017b2f1d638cc495ec44e6d65a6796ef0e0ddc322e5ba32b2bce73eae2575d2",
     "2027-02-12": "09a3f2c0cd41a3d0347f57f1201cbaf74eec1c64b2bb033edcb0ed6ed20db130",
     "2027-02-14": "0efee5508d712b386dcc02c8042e7366ac8fefcc925228f0cf45ca192b2c398f",
+    "2027-02-16": "c5bf84b1a537e5d0f9c88461fe3934216483a30e6d7929f2cdab931bbec8bc7a",
     "2027-02-17": "50213c7a1e87c0e45a34c2d68ca8e1d688e5ce7aac2d469016a8e308fecef5a6",
     "2027-02-18": "0e79e1eea1572a79b0b0b84006438c49a9527c61547e71ac95adfb4842680afa",
     "2027-02-19": "4993b8f85356cc4522046cfb718824bc3f77fda8ce284b5ca879aed88780ce75",
     "2027-02-21": "13e23e871574334928d473ac6edf8996cc1b7c13da116e9231711443fdf7ad0b",
+    "2027-02-23": "34190220e7b8f77960630bba136e47f724ffe131c9a93743a68e0610fbe009d2",
     "2027-02-25": "d1b080246885dd79e664cf34687d92a0787251dbb643be18da8a4db82060c7b0",
     "2027-02-26": "36acb33aca093ead20e2ecab4e32b9ca417bd4eea63ec585db3845820c87c9f8",
     "2027-02-28": "1905b00196698b6740af0cbceef85c8f47908f6d03c91554cba3272cf98787fc",
+    "2027-03-02": "e699895a1b83d885ea5c3cb3e4c40fdf7495d700583c3ff2bb0fa8a3a5c34cff",
     "2027-03-03": "18b1512544089fd2b27fc156edd60e7032b971d593ae2f0a06ae19fb311dd023",
     "2027-03-04": "2da2e52e75650cb311ae102dd5aea27b4528f509c9cbdc826d1bfa7703bfd5e3",
+    "2027-03-09": "1f2bf28cd4fdd47486287bca4b84a9b3d70bea4b210dab2b4fc88b802a9d51cc",
     "2027-03-11": "f7f55b5ea24264ca547333a9d07ecf6d6c57e2ccb7dd41d2533e0ed0d0898112",
+    "2027-03-16": "6e0f3b628485d8e8fba1833efabb369d9f4985f437fb215c37de97576460acdd",
     "2027-03-17": "d913bde1f50c04613d8f377b002a5581b0ff2829ea83e4e8278a412acc9db8a3",
     "2027-03-18": "fcbd6ed1558ab014bd601980420f01c475415eaf8b27424016644ab258b16b29",
+    "2027-04-06": "e02b478de3b58940b1db361334369be8ba5f470866f24ff4f835344c5d9721ba",
     "2027-04-08": "13830a46bcd01be68e4e92edbe9932c56b9fb0b20f71e48902eefd57dd82e7e7",
-    "2027-04-13": "7178fb472f20fb09525884f4d7e9b910906e83b07c8ea60f9ad1b2811adac57c",
+    "2027-04-13": "b57d5c44a17b6e53f74624ddfe8e1cf478a68a27e0f354c9504eb6d40e863b89",
     "2027-04-14": "d9ea2f700b09b7c1f244e916ea5a1f2bfc0490ca1d2121edab5f6817c9e3e8f2",
     "2027-04-15": "876bf713515320d87f0f89863bbb4bb333fac8ad1d38fae7675efba40fcd63aa",
+    "2027-04-20": "56a1c72fe347d737a5ac1667e3e737f3047f9dc88c6dfcaa41511a40c37c348a",
     "2027-04-22": "13b30bd2c7b8a5bc27001c571be2f1c1002b336c5cd8ffcb3cfa5cf3fffb465d",
+    "2027-04-27": "39031e5b15c960297b897c3880eaf139fb1f8886fe87461cca3fb65fb51a598e",
     "2027-04-28": "ce99d52d08d72530d377c3506075b94e8a28dbef7cb8407ad72ab8b4035b7898",
     "2027-04-29": "f628f56230777276a62521da60b1411e50240724db2785813888102b50875811",
+    "2027-05-04": "ee0936aa8482ed7780b29283437d3ee216f78c99aace183bff09a134bfa5ea01",
     "2027-05-06": "790761cb37fc809d96f7e4192776497a9d216d0df75c870f1b190369c0f87436",
+    "2027-05-11": "fa03c2013207a8256833262311f53a8d4c6f14089c198d8a6483e33fc0629f72",
     "2027-05-12": "fa454d089ec01dca68a884cca8cb437ae851420484b4d5a10c23d79b18728409",
     "2027-05-13": "a39022e6cd6e653868919564f28a5e54714832209005ee6b9a4eff0c9936de39",
+    "2027-06-01": "3c154af02499d11e0d9b795c90632710c9d69ec5ea45e6182e3e5b7d6aaf8390",
     "2027-06-03": "b1c5a83882d7fce2f89154970e7c35ab6b76a3f85e564d9fd0f8dabfba7dbf98",
+    "2027-06-08": "f93949bc8855e71e3d79e1a39f1499682432954eb5383de37f3d87935dacf736",
     "2027-06-09": "b69f377d5e1d6c75425a6ad3cfc1f2a77ae97a2d6c019bea4140ac69119a569e",
     "2027-06-10": "a1fd62da4795ed980739767b8b935786c634cd80a3ccbb6513d63223049bacd1",
+    "2027-06-15": "77debf82223ea140672e0d1019134eb80439c78121590a89b813b04a7df3e590",
     "2027-06-17": "60a6ba323df2ee7c56a733b9f33e063a4534314681d697028218c50c85ced3cc",
+    "2027-06-22": "7c0d320cb63fe7dc1fbd79ba4f149b65662ae84132d6e132b76ad2ab4918cad2",
     "2027-06-23": "b68efe2f67350205366487f0840dc023699ed9df0a3c25972d910b42621482eb",
     "2027-06-24": "a9143763b20c3a58375d70d3f277d2c76a7f7b2b7eaf223fdf649bd46e97520b",
+    "2027-06-29": "357ece4688a8bb4e5591f14364dd35ed499537cbd7a9cf79848c1ab9dc55a5d2",
     "2027-07-01": "6a828eb336ae6614ed9313263b6e975700c0227a2b12b96991d10e3f96827780",
+    "2027-07-06": "db1eba72aa840fcbad76280d588f0408c0305ec827f97de1a3236043300895a8",
     "2027-07-07": "2220b402860411f7f570a4e6ff2b10ca3117d7e2f76d51d9e7f2b73841aba83e",
     "2027-07-08": "f4f5860b091cace2a62ebcbf2b696bb2a0fa10f5943d9c8000015fb6e1f0e044",
+    "2027-07-13": "bcbeb25641d8f36924f5bb6b6820c65ab6e4a5945589c63de21e8a00d7d8d0d8",
     "2027-07-15": "4241057c9128d01bdcab9e29ef6db1deead79b5ee92b3e18fb9ebabe667bd397",
+    "2027-07-20": "ba473265d66fcc356638993abdbd32b2b72a06cd878ec4a1f0761ab87c59ea51",
     "2027-07-21": "ad71e973f05e2a05a4e88c5f10aa311b77455fe98673c40e14675c73d890d83f",
     "2027-07-22": "967d2f2abb214f708de377ec173a69ee3ac02f8639a5e9d65e29a6c72a58ca21",
+    "2027-07-27": "51db780baf04680bf99eb6db4149d9c677e280cf25521ce3d49773db5ff5c15d",
     "2027-07-29": "e4c5cabb8392f7476acdbc8d9db6e63bcede0cc0be94ac6dacbc949942537760",
+    "2027-09-14": "5a03a4da347ba64fb22398943f170e0fb810d713ccefc34854171b0fce920b5e",
     "2027-09-15": "f734327775f2b12b92f5204ed00bbfe8be109b6b7db7c3e8140c0bf8966ab729",
     "2027-09-16": "544fb9841ce45dd62d8db11639172ba0a723dbc58e237f8ee8f269effdc0dbfa",
+    "2027-09-21": "362dbe38ecd5d1762c41b689e2daa555fc049800d3bcda91597cedbc482e3544",
     "2027-09-23": "6e3b519b3e5239fbd6b935f56bb7bcdac945b5d6b39a4040c2d0a2aed626a844",
+    "2027-09-28": "906f50bc8a572de944b2d3b1f102437421016f89603a317fcf55c1f8ab960999",
     "2027-09-29": "b72c077e40683d8fa1556d66735b95ebd23c7c5a2231d6c895161884f076facd",
     "2027-09-30": "cf36e32c08e8a63d45cdc92ee5cd4e6904dc93fc19317358cd95d9fbce3857bc",
+    "2027-10-05": "37a5392a25b02090ecab748c991186b206e7c15db6c661bbb72aab3a51f5c1ca",
     "2027-10-07": "fb34ba92be945aa986a7de3348ab7c3d73af8d94d8733d027daa87b0c00f3171",
+    "2027-10-12": "9b9ad37847d3a58d441f95cdfad6c5460b9cd618c9e8d2018eace5cbea243529",
     "2027-10-13": "34c45ee4bee9ad9915303a7c8460c6aaffeb931568c7fbc41844267d95d847bc",
     "2027-10-14": "88c360d277c662b8a45bb6aa0a2317bcc95305700c60f7992c6794958cfa6596",
+    "2027-10-19": "f9a61580ce9dd415f9fb866aa1ffb80a4af172412ba11e64c179a1a854039f54",
     "2027-10-21": "0855de22ae0b6c197fa814e87c6ab2a3a5f5ac73013309c2627d9c99fc106968",
+    "2027-10-26": "eb9d1d010c8180877b712501f1be388e04e7760436367e7249165dfbe63398d3",
     "2027-10-27": "cb64dcf4ac9aafb2ef37e91a707faac3647e39d826318486d01ae010b2ae0193",
     "2027-10-28": "f713346a6e9a4d879921cc3764c5e7e961c04cfb5936ccf33ec12ddf511ff3c7",
+    "2027-11-09": "616b069b5aa93e22ecd828b48f779dd96571c27f4cb7aea0fe378abc5a059a33",
     "2027-11-10": "c4178c759bfd660c7468336127e71c87475701c38dd5761e919c1dbcab59b556",
     "2027-11-11": "a4615dc33fbf62b312a69b8f47bd800f22afc352bd3596a328ad02a86ade545b",
+    "2027-11-16": "6762a12e6eb9e615bbd287fe7e5f5f80e3e98cfda465d150ef04ebcf554a4fa8",
     "2027-11-18": "a15696b40af7bd14fbeaa1834df5d47da2617126869c2369d9e8c47f8ade7890",
+    "2027-11-23": "35c99550aab8f5f52fb058b508a0d2a4bb8df7c1481f5809a7ddcd89f69020cf",
     "2027-11-24": "2588e3b0fed291ecc4a5d05dd955f41a61d44a48125f09f04604627ceb554471",
     "2027-11-25": "539044fdd174a7c2386242e1fdb0932ab4afe8e6e24581d408fda1ddcfbf57e4",
+    "2027-11-30": "38b1c9c93820c03826e8e107b8278e67f0bbf8a9fa0223da62f4d9f587c446ec",
     "2027-12-02": "ff704f3ea3dc6a2c13a0597a380dcb469ff80498d1b5b72ef713f205ca0723ff",
+    "2027-12-07": "610bd9d30a68d5c0fbeb635ba99f55982f4c918768462143a35d9d74cb569a0c",
     "2027-12-08": "2bc1400150cead26035a8d27396fba00a2a9834156efb87e2f1a61461e560bc3",
     "2027-12-09": "5ec20099aa4e615d889e3422e5b79f589fd395eb38478226a7b100a23716e57f",
+    "2027-12-14": "219cc193e50d4ee2670436c937a672ef3e98ff8a98a1d21cb94d555061430091",
     "2027-12-16": "c23302ff0b004846b19a96278923e370f421095d83ce3de9dcc959c8361e1f81",
+    "2027-12-21": "a5145b380ad37930071db67801ebc1ce4c42af32332953073ad25fb7d3a81794",
     "2027-12-22": "ea0c554ef8a40917d974f050a0bc5e94f3a77aba0037026bd1cd6bb2a975911f"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00"
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familiencafe/": {
    "events": [
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Café für Alle – Dienstagscafé für Familien im FreiRaum",
-     "summary": "Offener Treff jeden Dienstag mit Kaffee und Kuchen gegen Spende, Kinder sind ausdrücklich willkommen. Die Uhrzeit ist auf der Seite widersprüchlich (15–18 bzw. 14–17 Uhr), vorher nachfragen.",
+     "title": "Café für Alle – offenes Familiencafé (dienstags)",
+     "summary": "Offenes Café für Familien, Kinderlärm ist willkommen; Kaffee und Kuchen gegen Spende, manchmal Bastel- und Bilderbuchangebote für Kinder. Die Uhrzeit widerspricht sich auf der Seite (14–17 oder 15–18 Uhr), bitte vorher nachfragen.",
      "topics": [
       "elterncafe",
       "elterntreff"
@@ -215,13 +284,13 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "Kaffee und Kuchen gegen Spende",
+     "price": "Spende (Kaffee und Kuchen)",
      "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
      "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offener Treff, einfach vorbeikommen. Fragen an Lisa Betz (platzfueralle@n-gibitzenhof.de)"
+      "note": "Offener Treff, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -234,18 +303,18 @@
      }
     }
    ],
-   "inputHash": "ac4653c89fb0607f1bcb7ae239147e7790502cf34be5433aa9887bbeed00c5b8",
+   "inputHash": "00f912ee7e72dfe2880156cbb37791e2ac00a89548398049e4049d841f682db7",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00"
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familien-kinder/": {
    "events": [],
-   "inputHash": "7ab2e07bcab3d39c0606d369205a44f17962aeaa8f0204e308897149cb353044",
+   "inputHash": "948a18162e389a0246eb8d7f3bdc194a4e4189fb7930da6fd928b7b8356c46ca",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "kandidaten": {
@@ -253,9 +322,10 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Offene Tür für Groß und Klein (montags 9–11 Uhr)",
-     "summary": "Offener Vormittagstreff in der Markuskirche/FreiRaum: Spielzeit mit dem Kleinkind, dazu Kaffee und Gesellschaft. Ohne Anmeldung, Einstieg jederzeit möglich.",
+     "title": "Offene Tür für Groß und Klein (Montagvormittag)",
+     "summary": "Offener Vormittagstreff in der Markuskirche mit Spielzeit für Kleinkinder, Kaffee und Gesellschaft für Eltern. Einfach vorbeikommen, keine Anmeldung nötig.",
      "topics": [
+      "elterncafe",
       "elterntreff"
      ],
      "format": "regelmaessig",
@@ -266,7 +336,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung nötig, offener Treff"
+      "note": "Offener Treff, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "dates",
@@ -298,6 +368,18 @@
        {
         "start": "2026-12-21T09:00",
         "end": "2026-12-21T11:00"
+       },
+       {
+        "start": "2027-01-11T09:00",
+        "end": "2027-01-11T11:00"
+       },
+       {
+        "start": "2027-01-18T09:00",
+        "end": "2027-01-18T11:00"
+       },
+       {
+        "start": "2027-01-25T09:00",
+        "end": "2027-01-25T11:00"
        }
       ]
      },
@@ -312,12 +394,15 @@
     "2026-11-30": "05c6a9d331e1f98aa3e65ae7da5ca23dc2f41e77673d2806162456d09244d778",
     "2026-12-07": "0fbd5bb6af464e4a718c1782d94262d99f2620b40b3b0437c125b872e8e6325f",
     "2026-12-14": "17d6214972cd0f7cfa81856fd3f76902ae6aefa5fc5a66896804df317760bcec",
-    "2026-12-21": "e3d9f19590e18aef5961c86688b4f9075c1ea613a089a4e34b90625d04370ae5"
+    "2026-12-21": "e3d9f19590e18aef5961c86688b4f9075c1ea613a089a4e34b90625d04370ae5",
+    "2027-01-11": "c57790ed513e62d8dd9121940c3b7230363836ded5dbe0b8a75228fac9e605d2",
+    "2027-01-18": "96175aff2d7adc0c95e9261e8570afa40179d56ff1d0865e0a2ad00e95362dd2",
+    "2027-01-25": "ae88cede4e53905bd5609608a41c53f67e40cd76b5ae4cbb085e4ed84e17e6c5"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
    "sources": [
     "evtermine"
    ]

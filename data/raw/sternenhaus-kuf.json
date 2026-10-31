@@ -88,7 +88,7 @@
    "inputHash": "46e1a94f3b12f7d8a89170e71a979c71a2a78c8f1cb76bd889d761798fb19023",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "kandidaten": {
@@ -143,7 +143,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

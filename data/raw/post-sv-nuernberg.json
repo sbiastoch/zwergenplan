@@ -73,7 +73,7 @@
    "inputHash": "652251b6c2631d2e715f9500257c479dba5c8767fada0f2c5eb5c41b51ee3217",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://post-sv.de/sport/schwimmen/kursangebot/kleinkindschwimmen/": {
@@ -115,7 +115,7 @@
    "inputHash": "93c135fa4a41f2655268eb16cfbdfd98b1811a3cca0df51da5bd8fab8caf2e68",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://post-sv.de/sport/schwimmen/kursangebot/baby-kleinkindschwimmen/": {
@@ -123,7 +123,7 @@
    "inputHash": "374e87af1ebeab2d75a9876d4971d1ba20fd7f12d823fd12fcc1f2eeabf03156",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://post-sv.de/sport/postis-kinderwelt/postis-kindersport/": {
@@ -412,7 +412,7 @@
    "inputHash": "6e2a92fc82ba25fc2be0a947b989ef647e0b376835cfdeeba5cb3fdeb8edea10",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://post-sv.de/abteilungen/tanz/baby-dance/": {
@@ -420,7 +420,7 @@
    "inputHash": "107832c74d46ac62e412ef801480b8f1d04e91e1a4d4f58124b136a2c8edf212",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   }
  }

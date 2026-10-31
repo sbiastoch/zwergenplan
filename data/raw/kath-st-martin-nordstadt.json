@@ -39,7 +39,7 @@
    "inputHash": "7bbe49055391106f61ef39bab34929a32e88ad5d2a16343c8ed635f0f2279dec",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://st-martin-nuernberg.de/aktuelles/termine": {
@@ -47,8 +47,8 @@
     {
      "providerId": "kath-st-martin-nordstadt",
      "venueId": "kath-st-martin-nordstadt",
-     "title": "Kleinkindergottesdienst (0–8 Jahre)",
-     "summary": "Gottesdienst für Kleinkinder von 0 bis 8 Jahren im Pfarrzentrum St. Martin. Am 13.12.2026 von 10:30 bis 11:00 Uhr; eine Anmeldung ist nicht genannt.",
+     "title": "Kleinkindergottesdienst für Kinder von 0 bis 8 Jahren",
+     "summary": "Kurzer Gottesdienst für die Kleinsten im Pfarrzentrum St. Martin, Kinder begleitet von Eltern oder Bezugspersonen. Auf der Seite ist keine Anmeldung genannt.",
      "topics": [
       "krabbelgottesdienst"
      ],
@@ -64,7 +64,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung nicht genannt, bei Fragen ans Pfarrbüro St. Martin."
+      "note": "Keine Anmeldung auf der Seite genannt; Fragen an das Pfarrbüro St. Martin, Tel. 0911 9909 8871"
      },
      "schedule": {
       "kind": "dates",
@@ -77,11 +77,11 @@
      }
     }
    ],
-   "inputHash": "14c1698612bc4c53a2cb0ebecb4d9a94656b9b3ba7276c94b1387c543eec69bc",
+   "inputHash": "f4b168e58a374392d150121212e6b051fbd1d6f5baa8d9ea0d897a66cc8f3a79",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00"
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00"
   }
  }
 }

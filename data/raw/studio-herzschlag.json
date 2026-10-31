@@ -112,484 +112,41 @@
    "inputHash": "41bf2d307cbb5fe4121d5b794ae09b5c4db48577cd5ffe4455709d36ded9c91a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00"
   },
   "seite:https://mamalea-familienbegleitung.de/musikzauber/": {
-   "events": [
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Musikzauber „Herbstzauber“ 6–15 Monate (Mi 10:00)",
-     "summary": "Musikkurs von Mamalea zum Thema Herbst. Eltern und Babys singen, bewegen sich, machen Fingerspiele und probieren Instrumente aus. Die Reihe mit 8 Einheiten läuft schon seit 16.09.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "130 € (8 Einheiten à 45 Min.)",
-     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "category": "musik",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 15
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über „Jetzt anmelden“ auf der Mamalea-Website"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-09-16T10:00",
-        "end": "2026-09-16T10:45"
-       },
-       {
-        "start": "2026-09-23T10:00",
-        "end": "2026-09-23T10:45"
-       },
-       {
-        "start": "2026-09-30T10:00",
-        "end": "2026-09-30T10:45"
-       },
-       {
-        "start": "2026-10-21T10:00",
-        "end": "2026-10-21T10:45"
-       },
-       {
-        "start": "2026-10-28T10:00",
-        "end": "2026-10-28T10:45"
-       },
-       {
-        "start": "2026-11-04T10:00",
-        "end": "2026-11-04T10:45"
-       },
-       {
-        "start": "2026-11-11T10:00",
-        "end": "2026-11-11T10:45"
-       },
-       {
-        "start": "2026-11-18T10:00",
-        "end": "2026-11-18T10:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Musikzauber „Herbstzauber“ 1–2 Jahre (Mi 9:00)",
-     "summary": "Musikkurs von Mamalea zum Thema Herbst. Eltern und Kleinkinder singen, tanzen, musizieren und machen Fingerspiele. Die Reihe mit 8 Einheiten läuft schon seit 16.09.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "130 € (8 Einheiten à 45 Min.)",
-     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 24
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über „Jetzt anmelden“ auf der Mamalea-Website"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-09-16T09:00",
-        "end": "2026-09-16T09:45"
-       },
-       {
-        "start": "2026-09-23T09:00",
-        "end": "2026-09-23T09:45"
-       },
-       {
-        "start": "2026-09-30T09:00",
-        "end": "2026-09-30T09:45"
-       },
-       {
-        "start": "2026-10-21T09:00",
-        "end": "2026-10-21T09:45"
-       },
-       {
-        "start": "2026-10-28T09:00",
-        "end": "2026-10-28T09:45"
-       },
-       {
-        "start": "2026-11-04T09:00",
-        "end": "2026-11-04T09:45"
-       },
-       {
-        "start": "2026-11-11T09:00",
-        "end": "2026-11-11T09:45"
-       },
-       {
-        "start": "2026-11-18T09:00",
-        "end": "2026-11-18T09:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Musikzauber „Winterzauber“ 6–15 Monate (Mi 10:00)",
-     "summary": "Musikkurs von Mamalea zur Winterzeit. Mit Liedern, Bewegung, Instrumenten und kreativen Materialien geht es um Schnee und Sterne. 8 Einheiten à 45 Minuten ab 02.12.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "130 € (8 Einheiten à 45 Min.)",
-     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "category": "musik",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 15
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über „Jetzt anmelden“ auf der Mamalea-Website"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-02T10:00",
-        "end": "2026-12-02T10:45"
-       },
-       {
-        "start": "2026-12-09T10:00",
-        "end": "2026-12-09T10:45"
-       },
-       {
-        "start": "2026-12-16T10:00",
-        "end": "2026-12-16T10:45"
-       },
-       {
-        "start": "2027-01-13T10:00",
-        "end": "2027-01-13T10:45"
-       },
-       {
-        "start": "2027-01-20T10:00",
-        "end": "2027-01-20T10:45"
-       },
-       {
-        "start": "2027-01-27T10:00",
-        "end": "2027-01-27T10:45"
-       },
-       {
-        "start": "2027-02-03T10:00",
-        "end": "2027-02-03T10:45"
-       },
-       {
-        "start": "2027-02-10T10:00",
-        "end": "2027-02-10T10:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Musikzauber „Winterzauber“ 1–2 Jahre (Mi 9:00)",
-     "summary": "Musikkurs von Mamalea zur Winterzeit. Eltern und Kleinkinder singen, bewegen sich und musizieren zu Schnee und Sternen. 8 Einheiten à 45 Minuten ab 02.12., Gruppe am Vormittag.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "130 € (8 Einheiten à 45 Min.)",
-     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 24
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über „Jetzt anmelden“ auf der Mamalea-Website"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-02T09:00",
-        "end": "2026-12-02T09:45"
-       },
-       {
-        "start": "2026-12-09T09:00",
-        "end": "2026-12-09T09:45"
-       },
-       {
-        "start": "2026-12-16T09:00",
-        "end": "2026-12-16T09:45"
-       },
-       {
-        "start": "2027-01-13T09:00",
-        "end": "2027-01-13T09:45"
-       },
-       {
-        "start": "2027-01-20T09:00",
-        "end": "2027-01-20T09:45"
-       },
-       {
-        "start": "2027-01-27T09:00",
-        "end": "2027-01-27T09:45"
-       },
-       {
-        "start": "2027-02-03T09:00",
-        "end": "2027-02-03T09:45"
-       },
-       {
-        "start": "2027-02-10T09:00",
-        "end": "2027-02-10T09:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Musikzauber „Winterzauber“ 1–2 Jahre (Mi 15:00)",
-     "summary": "Musikkurs von Mamalea zur Winterzeit. Eltern und Kleinkinder singen, bewegen sich und musizieren zu Schnee und Sternen. 8 Einheiten à 45 Minuten ab 02.12., Gruppe am Nachmittag.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "130 € (8 Einheiten à 45 Min.)",
-     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 24
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über „Jetzt anmelden“ auf der Mamalea-Website"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-02T15:00",
-        "end": "2026-12-02T15:45"
-       },
-       {
-        "start": "2026-12-09T15:00",
-        "end": "2026-12-09T15:45"
-       },
-       {
-        "start": "2026-12-16T15:00",
-        "end": "2026-12-16T15:45"
-       },
-       {
-        "start": "2027-01-13T15:00",
-        "end": "2027-01-13T15:45"
-       },
-       {
-        "start": "2027-01-20T15:00",
-        "end": "2027-01-20T15:45"
-       },
-       {
-        "start": "2027-01-27T15:00",
-        "end": "2027-01-27T15:45"
-       },
-       {
-        "start": "2027-02-03T15:00",
-        "end": "2027-02-03T15:45"
-       },
-       {
-        "start": "2027-02-10T15:00",
-        "end": "2027-02-10T15:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Musikzauber „Winterzauber“ 2–3 Jahre (Mi 16:00)",
-     "summary": "Musikkurs von Mamalea zur Winterzeit für Zwei- bis Dreijährige mit Eltern. Gemeinsam wird gesungen, getanzt und mit Instrumenten gespielt. 8 Einheiten à 45 Minuten ab 02.12.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "130 € (8 Einheiten à 45 Min.)",
-     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
-     "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über „Jetzt anmelden“ auf der Mamalea-Website"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-02T16:00",
-        "end": "2026-12-02T16:45"
-       },
-       {
-        "start": "2026-12-09T16:00",
-        "end": "2026-12-09T16:45"
-       },
-       {
-        "start": "2026-12-16T16:00",
-        "end": "2026-12-16T16:45"
-       },
-       {
-        "start": "2027-01-13T16:00",
-        "end": "2027-01-13T16:45"
-       },
-       {
-        "start": "2027-01-20T16:00",
-        "end": "2027-01-20T16:45"
-       },
-       {
-        "start": "2027-01-27T16:00",
-        "end": "2027-01-27T16:45"
-       },
-       {
-        "start": "2027-02-03T16:00",
-        "end": "2027-02-03T16:45"
-       },
-       {
-        "start": "2027-02-10T16:00",
-        "end": "2027-02-10T16:45"
-       }
-      ]
-     }
-    }
-   ],
-   "inputHash": "bd7fe3f77a820fc8b5dc10ed105604e6b069a07369e5c4042482bffb47a87b56",
-   "model": "opus",
-   "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
-   "pending": {
-    "inputHash": "a1fa71eb9260662f33f29ebf0cafcc3b6b7854d4eae13a47ca2fa3b3e63c040b",
-    "model": "haiku",
-    "events": []
-   }
+   "events": [],
+   "inputHash": "a1fa71eb9260662f33f29ebf0cafcc3b6b7854d4eae13a47ca2fa3b3e63c040b",
+   "model": "haiku",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "emptySince": "2026-10-31T08:26:00+01:00"
   },
   "seite:https://mamalea-familienbegleitung.de/sinneszauber/": {
    "events": [],
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://mamalea-familienbegleitung.de/babyzeichensprache-nuernberg/": {
-   "events": [
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Babyzeichensprache Winterkurs (ab 6 Monate, montags)",
-     "summary": "Eltern-Kind-Kurs nach dem Konzept „Zauberhafte Babyhände“: Mit Liedern, Fingerspielen und Bewegung lernt ihr Gebärden, mit denen sich Babys schon vor dem Sprechen mitteilen können. 8 Treffen; ein Elternseminar am 22.11. kann man dazubuchen.",
-     "topics": [
-      "babysignal"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "140 € (8 × 60 Min.), 160 € inkl. 2-stündigem Elternseminar",
-     "url": "https://mamalea-familienbegleitung.de/babyzeichensprache-nuernberg/",
-     "sourceUrl": "https://mamalea-familienbegleitung.de/babyzeichensprache-nuernberg/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über „Jetzt anmelden“ auf der Website von Mamalea"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-30T09:00",
-        "end": "2026-11-30T10:00"
-       },
-       {
-        "start": "2026-12-07T09:00",
-        "end": "2026-12-07T10:00"
-       },
-       {
-        "start": "2026-12-14T09:00",
-        "end": "2026-12-14T10:00"
-       },
-       {
-        "start": "2027-01-11T09:00",
-        "end": "2027-01-11T10:00"
-       },
-       {
-        "start": "2027-01-18T09:00",
-        "end": "2027-01-18T10:00"
-       },
-       {
-        "start": "2027-01-25T09:00",
-        "end": "2027-01-25T10:00"
-       },
-       {
-        "start": "2027-02-01T09:00",
-        "end": "2027-02-01T10:00"
-       },
-       {
-        "start": "2027-02-08T09:00",
-        "end": "2027-02-08T10:00"
-       }
-      ]
-     }
-    }
-   ],
-   "inputHash": "863584d484ade4ec7b5a87fc950ff7088cb807abc6bc2af88687d78e751c6ed9",
-   "model": "opus",
-   "status": "ok",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
-   "pending": {
-    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
-    "model": "haiku",
-    "events": []
-   }
+   "events": [],
+   "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
+   "model": "haiku",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-31T08:26:00+01:00",
+   "emptySince": "2026-10-31T08:26:00+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/kursart-offener-treff/": {
    "events": [],
    "inputHash": "900df567d71314e1bacff9a6a5c555c59cce1159e7a25bf4db63c5676e0063a2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://studioherzschlag.de/kurse-ab-september/": {
@@ -1614,7 +1171,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/babymassage/": {
@@ -1695,7 +1252,7 @@
    "inputHash": "f590c622383648adf1a826aa3fd7ce2bbd2a42b31d6bc865dede7851c08f68ef",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsnest/": {
@@ -1890,7 +1447,7 @@
    "inputHash": "8a304dc74387c52391db6fb24b95881145968883cf75d8789008f271a9122a29",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/herzzeit/": {
@@ -1898,7 +1455,7 @@
    "inputHash": "ddc2ff0c9e1b06f4820937152dca1a5122118ad5614ec2c5d79b8adfdd2b27b2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/yoga-mit-baby/": {
@@ -1906,7 +1463,7 @@
    "inputHash": "f11960d934dbc9141e6371897c7dd9e5cf6594a83b7ce0f351f22058ad41630c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/pilates-fitness-mit-baby/": {
@@ -1914,7 +1471,7 @@
    "inputHash": "80b39740a310825f35df2a7fe77091811cd2a98f0c9aa32e45bdd7ea767bfdb7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/": {
@@ -1983,27 +1540,23 @@
    "inputHash": "7bcf82b9d01a8b7d3ef4c7337b1162fe6ee3ccfde74094c32c83744434accab2",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/": {
    "events": [],
-   "inputHash": "39a3bfb93d3bde038da5831567694cf91ecf96c39fa4ee25adf51f3065c7c673",
-   "model": "opus",
-   "status": "fehler",
-   "reason": "https://studioherzschlag.de/angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
-   "checkedAt": "2026-10-27T09:00:54+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
-   "failingSince": "2026-10-30T08:39:48+01:00",
-   "klasse": "voruebergehend",
-   "klasseSince": "2026-10-30T08:39:48+01:00"
+   "inputHash": "e999bd760da1da0c8e72c75a7b4adc065ff5aa9954cbc9dd5fbb293c613446c2",
+   "model": "haiku",
+   "status": "keine-termine",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
+   "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "seite:https://studioherzschlag.de/angebot/eltern-kind-turnen/": {
    "events": [],
    "inputHash": "cbaa9cd43ca446c411dfae3a96fc07ce634c7160347d0094047fc9d5e5f6b62d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00"
   },
   "kandidaten": {
@@ -2049,7 +1602,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-10-31T08:26:00+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"
