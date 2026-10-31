@@ -89,10 +89,16 @@ export function unitLosses(o: {
   return [...groups.values()].sort((x, y) => x.providerId.localeCompare(y.providerId) || x.unit.localeCompare(y.unit));
 }
 
-/** Beginne eines Events ab `from` bis `to` als ISO mit Offset, wie `Session.start` im Build. */
+/**
+ * Beginne eines Events ab `from` bis `to` als ISO mit Offset, wie `Session.start` im Build. Der Tag des Beginns muss im
+ * Fenster liegen, auch bei Einzelterminen (`expandSchedule` filtert `dates` nicht): Ein vergangener Termin entsteht im
+ * Build nicht, ein `gleich` darauf ginge ins Leere und die ID verloren.
+ */
 function eventStarts(e: RawEvent, w: { from: string; to: string; freeDays: ExpandWindow["freeDays"] }): string[] {
   return expandSchedule(e.schedule, { to: expansionWindow(e, w.to), freeDays: w.freeDays, from: w.from }).flatMap(
     (occ) => {
+      const day = occ.start.slice(0, 10);
+      if (day < w.from || day > w.to) return [];
       try {
         return [fromBerlinLocal(occ.start)];
       } catch {

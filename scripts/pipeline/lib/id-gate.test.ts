@@ -277,6 +277,21 @@ describe("judgeInputOf: Eingabe des Richters", () => {
     expect(r.fresh[0]?.starts.at(-1)).toBe("2026-11-25T10:00:00+01:00");
   });
 
+  it("Einzeltermine: je Termin ein Beginn, vergangene nicht", () => {
+    const r = judgeInputOf({
+      excerpt: familientreff,
+      unit: A,
+      text: "",
+      layout: { pageUrls: [], candidates: 0 },
+      lost: [],
+      events: [concert("Babykonzert")],
+      a: file([]),
+      previous: file([]),
+      window: { ...WINDOW, from: "2026-10-11" },
+    });
+    expect(r.fresh[0]?.starts).toEqual(["2026-10-17T10:00:00+02:00"]);
+  });
+
   it("taken: ein Event, das in (a) eine nicht verlorene alte ID trägt, ist kein Ziel", () => {
     const fresh = event({ title: "Offener Krabbeltreff" });
     const keeper = offer("kept0001", { title: "Offener Krabbeltreff" });
