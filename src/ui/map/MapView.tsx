@@ -63,20 +63,30 @@ const ATTRIBUTION_INSET = 66;
  */
 const ATTRIBUTION_COLLAPSE_MS = 5000;
 const collapseDelay = () => (__E2E__ ? (globalThis.__zpAttributionMs ?? 3_600_000) : ATTRIBUTION_COLLAPSE_MS);
+/**
+ * Freiraum links für den Knopf „Karte groß zeigen“ oben links (Plan 0059, E3; CI-Befund: Marker lagen auf kleinen
+ * Geräten darunter): 44 px Knopf + 10 px Abstand. Wie `ZOOM_CONTROL_INSET` für jeden Startausschnitt gleich.
+ */
+const GROW_CONTROL_INSET = 54;
 /** Rand um die Marker; reicht für Cluster (18 + 2 px) und Zahl-Badge (bis ≈ 28 px vom Mittelpunkt) */
 const MARKER_INSET = 32;
 const START_PADDING = {
   top: MARKER_INSET,
   right: MARKER_INSET + ZOOM_CONTROL_INSET,
   bottom: MARKER_INSET + ATTRIBUTION_INSET,
-  left: MARKER_INSET,
+  left: MARKER_INSET + GROW_CONTROL_INSET,
 };
 /**
  * Anbieterkarte (Plan 0055, N7): niedriger (höchstens 250 px), daher ein festes, knapperes Padding; rechts weiter
  * Platz für die Zoom-Knöpfe, unten für die ausgeschriebene Attribution (sonst lag quer ein Marker darunter,
  * Browser-Review 0055). Hängt wie `START_PADDING` an nichts Privatem (ADR 0008).
  */
-const PROVIDER_PADDING = { top: 24, right: 24 + ZOOM_CONTROL_INSET, bottom: 24 + ATTRIBUTION_INSET, left: 24 };
+const PROVIDER_PADDING = {
+  top: 24,
+  right: 24 + ZOOM_CONTROL_INSET,
+  bottom: 24 + ATTRIBUTION_INSET,
+  left: 24 + GROW_CONTROL_INSET,
+};
 const START_MAX_ZOOM = 14;
 
 type Kind = MapLayer["kind"];

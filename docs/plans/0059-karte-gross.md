@@ -264,3 +264,11 @@ Screenshots `karte`, `karte-gross`, `karte-gross-detail` und `anbieter-gross` (n
   - **Dunkel:** Es gibt keine hellen Inseln. Ring und Rand bleiben erkennbar, der Schleier ist leicht.
   - **Micro-Interactions:** „Groß“ und „Verkleinern“ haben einen Pressed-Zustand. Das Sheet fährt von unten herein, bei reduzierter Bewegung ohne Animation (`motion.css`).
   - **Design-System:** Pillen, Ränder und Schatten sind dieselben wie bei Chips und Sheets.
+
+## Branch-CI (2026-10-31): Knopf verdeckte Marker
+
+Der erste Branch-Lauf war rot. `karte.spec.ts` „Tipp auf Marker öffnet das Orts-Sheet“ und „Stilwechsel …“ schlugen auf iphone-15 und android-klein fehl, weil der Marker unter dem Pillen-Knopf „Groß“ oben links lag. Das ist ein echter Befund: Der Knopf verdeckte Marker.
+
+- **Behoben:** Der Knopf ist jetzt rund und 44 px groß, nur mit Symbol, wie „Karte verkleinern“. `aria-label` bleibt „Karte groß zeigen“.
+- **Startausschnitt:** Er hält links 54 px frei (`GROW_CONTROL_INSET` in `MapView.tsx`), wie rechts für die Zoom-Knöpfe. Padding Angebotskarte 32 / 90 / 98 / 86 px, Anbieterkarte 24 / 82 / 90 / 78 px; `docs/architecture.md` ist angepasst.
+- **Abweichung vom Mockup:** Dort stand eine Pille „Groß“ mit Text.

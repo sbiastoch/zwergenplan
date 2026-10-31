@@ -318,25 +318,26 @@
   .map-box.big > .map-note {
     padding-top: calc(76px + env(safe-area-inset-top));
   }
-  /* „Groß“ oben links im kleinen Rahmen (E3); rechts stehen die Zoom-Knöpfe */
+  /*
+   * „Karte groß zeigen“ oben links im kleinen Rahmen (E3), rund wie „Karte verkleinern“; rechts stehen die Zoom-Knöpfe.
+   * Der Startausschnitt hält links 54 px frei (`GROW_CONTROL_INSET`, MapView.tsx), damit kein Marker darunter liegt.
+   */
   .map-grow {
     position: absolute;
     top: 10px;
     left: 10px;
     z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
     box-sizing: border-box;
-    padding: 0 14px 0 11px;
     border: 2px solid var(--line);
-    border-radius: 22px;
+    border-radius: 50%;
     background: var(--surface);
     color: var(--ink);
     box-shadow: 3px 3px 0 var(--shadow);
-    font-weight: 800;
-    white-space: nowrap;
   }
   .map-grow:active,
   .bigmap-close:active {
