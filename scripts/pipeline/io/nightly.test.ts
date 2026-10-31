@@ -1146,6 +1146,117 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     expect(dayToId(after)).toEqual(dayToId(before));
   });
 
+  /**
+   * Verlust über eine Einheit ohne neue Fassung: Nacht 0 mit Babymassage auf A und Treffs auf B; danach gilt B als
+   * andere Fassung (Vorstand ohne partsHash), A bleibt in seiner. Beide Seiten ändern sich: A formuliert die Massage um
+   * (gleiche Termine), B nennt zusätzlich ein Angebot mit denselben Terminen. In (b) erbt As Massage die ID über
+   * Stufe 1 (gleiche Termine); in (a) passen zwei Entwürfe gleich gut, keiner bekommt sie. Ursprung in (b) ist A.
+   */
+  async function crossNight(treffsB: readonly RawEvent[]) {
+    const dirsOf = tempData();
+    addPageB(dirsOf);
+    await runNightly({
+      ...options(dirsOf, unitExtractor((u) => (u === UNIT_A ? [massage] : treffs)).extractor),
+      only,
+      forceMigrate: only,
+    });
+    const ids = idsByTitle(dirsOf);
+    expect(ids["Babymassage"]).toBeDefined();
+    const rawFile = join(dirsOf.dataDir, "raw", `${PROVIDER}.json`);
+    const stored = JSON.parse(readFileSync(rawFile, "utf8"));
+    delete stored.units[UNIT_B].partsHash;
+    writeFileSync(rawFile, JSON.stringify(stored));
+    const massageA = RawEvent.parse({ ...massage, title: "Sanfte Berührung für Babys" });
+    const rundeB = RawEvent.parse({ ...massage, title: "Kinderwagen-Runde" });
+    const j = fakeJudge(sameByNumber);
+    const { r } = await gateNight(dirsOf, {
+      judge: j.judge,
+      keyParts: KEY_PARTS,
+      text: (url) => `Programm ${url} geändert`,
+      events: (u) => (u === UNIT_A ? [massageA] : [...treffsB, rundeB]),
+    });
+    return { dirsOf, ids, r, j };
+  }
+
+  it("Verlust mit Ursprung in einer nicht gated Einheit: die gated Einheit wird ohne Richter gehalten (crossUnit), ID bleibt", async () => {
+    const { dirsOf, ids, r, j } = await crossNight(treffs);
+    expect(j.seen).toEqual([]);
+    expect(rawUnit(dirsOf, UNIT_B)?.held).toMatchObject({ reason: "unklar", lost: [ids["Babymassage"]] });
+    expect(rawUnit(dirsOf, UNIT_A)?.held).toBeUndefined();
+    expect(rawUnit(dirsOf, UNIT_A)?.events.map((e) => e.title)).toEqual(["Sanfte Berührung für Babys"]);
+    expect(r.idGate).toEqual([
+      expect.objectContaining({
+        unit: UNIT_B,
+        outcome: "gehalten",
+        held: "unklar",
+        note: expect.stringMatching(/^Verlust über eine Einheit ohne neue Fassung/),
+      }),
+    ]);
+    const now = idsByTitle(dirsOf);
+    expect(now["Sanfte Berührung für Babys"]).toBe(ids["Babymassage"]);
+    for (const t of treffs) expect(now[t.title]).toBe(ids[t.title]);
+    expect(now["Kinderwagen-Runde"]).toBeUndefined();
+  });
+
+  it("Stand (b) scheitert an einem Datenfehler eines nicht gated Anbieters: gated Einheiten gehalten (grenze), offers.json bleibt", async () => {
+    const { dirsOf, ids } = await baseline();
+    // Musikschule (nicht in diesem Lauf, also nicht gated): zwei regelmäßige Events gleichen Titels und Orts mit
+    // anderen Merkmalen; der Build meldet das als Fehler
+    const ms = "musikschule-beispiel";
+    const garden = (cost: "kostenlos" | "kostenpflichtig") =>
+      RawEvent.parse({
+        ...treff,
+        providerId: ms,
+        venueId: "musikschule-beispiel-sued",
+        title: "Musikgarten",
+        cost,
+        sourceUrl: "https://example.org/musikschule/kurse",
+      });
+    const unitState = {
+      events: [garden("kostenlos"), garden("kostenpflichtig")],
+      inputHash: "h-ms",
+      model: "haiku",
+      status: "ok",
+      checkedAt: NOW(),
+      changedAt: NOW(),
+    };
+    writeFileSync(
+      join(dirsOf.dataDir, "raw", `${ms}.json`),
+      JSON.stringify({ version: 2, units: { "seite:https://example.org/musikschule/kurse": unitState } }),
+    );
+    const offersBefore = readFileSync(join(dirsOf.dataDir, "offers.json"), "utf8");
+    const j = fakeJudge(sameByNumber);
+    const { r } = await gateNight(dirsOf, { judge: j.judge });
+    expect(r.build.errors.join("\n")).toMatch(/Musikgarten/);
+    expect(r.build.written).toBeUndefined();
+    expect(readFileSync(join(dirsOf.dataDir, "offers.json"), "utf8")).toBe(offersBefore);
+    expect(j.seen).toEqual([]);
+    expect(rawUnit(dirsOf)?.held?.reason).toBe("grenze");
+    expect(rawUnit(dirsOf)?.events.map((e) => e.title)).toEqual(treffs.map((e) => e.title));
+    expect(r.idGate).toEqual([
+      expect.objectContaining({
+        unit: UNIT_A,
+        outcome: "gehalten",
+        held: "grenze",
+        note: expect.stringMatching(/^Vergleichsstand \(b\) gescheitert/),
+      }),
+    ]);
+    // nach der Korrektur des Datenfehlers: das gehaltene Ergebnis wird ohne Extraktion gerichtet, IDs wandern mit
+    writeFileSync(
+      join(dirsOf.dataDir, "raw", `${ms}.json`),
+      JSON.stringify({
+        version: 2,
+        units: { "seite:https://example.org/musikschule/kurse": { ...unitState, events: [garden("kostenlos")] } },
+      }),
+    );
+    const j2 = fakeJudge(sameByNumber);
+    const n2 = await gateNight(dirsOf, { judge: j2.judge });
+    expect(n2.seen).toEqual([]);
+    expect(j2.seen).toHaveLength(1);
+    expect(n2.r.build.errors).toEqual([]);
+    expectInherited(dirsOf, ids);
+  });
+
   it("ein Richter ohne Urteil zu einer verlorenen ID übernimmt nicht (fehlendes Urteil = unklar)", async () => {
     const { dirsOf, ids } = await baseline();
     const { r } = await gateNight(dirsOf, { judge: fakeJudge(() => ({ kind: "ok", verdicts: [] })).judge });
