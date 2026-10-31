@@ -145,6 +145,29 @@ describe("pageSignals und futureDates", () => {
     expect(futureDates("29.10.", today)).toBe(0);
   });
 
+  it("Daten mit Monatsnamen zählen wie TT.MM. (wie BRK: „07. Oktober – 16. Dezember 2026“)", () => {
+    expect(futureDates("Mittwoch, 07. Oktober - 16. Dezember 2026; Montag, 18. Januar - 15. März 2027", today)).toBe(3);
+    expect(futureDates("Freitag, 15. Januar - 19.März 2027 (nicht am 12. Feb.)", today)).toBe(3);
+    // „am 3. Advent“ oder „1. Mai“ im Vorjahr: nur echte Monatsnamen, ein vergangenes Datum mit Jahr zählt nicht
+    expect(futureDates("am 3. Advent und am 1. Mai 2026", today)).toBe(0);
+  });
+
+  it("Wochentag und Uhrzeit in getrennten Zeilen (wie Musikgarten: „Dienstag / Zeit: 09:15 Uhr“)", () => {
+    expect(pageSignals(page("Babys\nDienstag\nZeit: 09:15 Uhr\nMittwoch\nZeit: 14:30 Uhr"), today).candidate).toBe(
+      true,
+    );
+    // eine Ziffer dazwischen trennt (kein Datum als Uhrzeit)
+    expect(pageSignals(page("Babys am Dienstag 06.10.2026, Mittwoch 07.10.2026"), today).candidate).toBe(false);
+  });
+
+  it("Kleinkindbezug auch aus JSON-LD (wie Ohana: Kursname nur im JSON-LD)", () => {
+    const jsonLd = [{ name: "Babys ab 3 Monate", start: "2026-11-05T10:00" }];
+    expect(pageSignals({ ...page("Kursdetails, Anmeldung"), jsonLd }, today)).toMatchObject({ candidate: true });
+    expect(
+      pageSignals({ ...page("Kursdetails"), jsonLd: [{ name: "Kraulkurs", start: "2026-11-05T10:00" }] }, today),
+    ).toMatchObject({ candidate: false });
+  });
+
   it("Wochentag plus Uhrzeit, iCal, JSON-LD; ohne isRelevant kein Kandidat", () => {
     expect(pageSignals(page("Krabbelgruppe Di 9:30 Uhr und Do 10 Uhr"), today).candidate).toBe(true);
     expect(pageSignals({ ...page("Eltern-Kind-Kurse"), feeds: ["https://x.de/kurse.ics"] }, today).reason).toBe("iCal");
@@ -266,6 +289,16 @@ describe("exploreSite (Breitensuche)", () => {
     });
     await exploreSite(crawlScope(p, [p]), s.fetchOne);
     expect(s.log.sort()).toEqual(["https://kikudoo.com/w/s", "https://s.de/", "https://www.eversports.de/s/s"]);
+  });
+
+  it("die eigene url ist Kandidat (keine Programmseite), die url eines anderen Anbieters nicht", async () => {
+    const p = anbieter("hj", "https://hj.de/kurse", [{ url: "https://hj.de/alt" }]);
+    const other = anbieter("x", "https://hj.de/fremd", [{ url: "https://x.de/" }]);
+    const kurse = html("<p>Babymassage am 04.11., 11.11. und 18.11.</p>");
+    const s = site({ "https://hj.de/kurse": html(`${kurse}<a href="/fremd">Fremd</a>`), "https://hj.de/fremd": kurse });
+    const scope = crawlScope(p, [p, other]);
+    const crawl = await exploreSite(scope, s.fetchOne);
+    expect(candidatesOf(crawl, scope, today).map((c) => c.url)).toEqual(["https://hj.de/kurse"]);
   });
 
   it("Relaunch wie FamilienBox: alte Seite 404, neue Stundenplan-Seite über die Startseite gefunden", async () => {

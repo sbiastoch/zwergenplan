@@ -113,7 +113,13 @@ export function crawlScope(provider: Provider, catalog: Catalog, umbrellas = umb
     url,
     shared: isShared(url, umbrellas),
   }));
-  const known = new Set(catalog.flatMap((p) => urlsOf(p).flatMap((u) => normalizeUrl(u) ?? [])));
+  // die eigene `url` ist keine Programmseite: Nach einem Relaunch steht dort oft das Programm (S1, Messung Ziel 1);
+  // `url` anderer Anbieter bleibt bekannt, deren Angebote gehören dorthin
+  const known = new Set(
+    catalog.flatMap((p) =>
+      (p.id === provider.id ? p.programme.map((g) => g.url) : urlsOf(p)).flatMap((u) => normalizeUrl(u) ?? []),
+    ),
+  );
   const aggregatorPrefixes = catalog
     .filter((p) => p.role === "aggregator")
     .flatMap((p) => p.programme.flatMap((g) => normalizeUrl(g.url) ?? []));
@@ -226,7 +232,8 @@ export function iframeLinks(html: string, base: string): string[] {
 
 const WEEKDAYS = "(Mo|Di|Mi|Do|Fr|Sa|So|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)";
 const WEEKDAY_TIME = new RegExp(
-  `\\b${WEEKDAYS}s?\\b\\.?,?\\s*(ab\\s*)?\\d{1,2}([:.]\\d{2})?\\s*(-|–|bis)?\\s*\\d{0,2}[:.]?\\d{0,2}\\s*Uhr`,
+  // bis zu 25 Zeichen ohne Ziffer zwischen Wochentag und Uhrzeit, auch über eine Zeile („Dienstag / Zeit: 09:15 Uhr“)
+  `\\b${WEEKDAYS}s?\\b\\.?[^\\d]{0,25}?(ab\\s*)?\\d{1,2}([:.]\\d{2})?\\s*(-|–|bis)?\\s*\\d{0,2}[:.]?\\d{0,2}\\s*Uhr`,
   "g",
 );
 const DATE = /\b(\d{1,2})\.(\d{1,2})\.(\d{4}|\d{2})?(?!\d)/g;
@@ -235,21 +242,61 @@ const FUTURE_MONTHS = 10;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/** Monatsnamen und gängige Kürzel → Monat (S1, Messung Ziel 1: „07. Oktober – 16. Dezember 2026“) */
+const MONTHS: ReadonlyArray<[string, number]> = [
+  ["januar", 1],
+  ["jan", 1],
+  ["februar", 2],
+  ["feb", 2],
+  ["märz", 3],
+  ["maerz", 3],
+  ["mär", 3],
+  ["april", 4],
+  ["apr", 4],
+  ["mai", 5],
+  ["juni", 6],
+  ["jun", 6],
+  ["juli", 7],
+  ["jul", 7],
+  ["august", 8],
+  ["aug", 8],
+  ["september", 9],
+  ["sept", 9],
+  ["sep", 9],
+  ["oktober", 10],
+  ["okt", 10],
+  ["november", 11],
+  ["nov", 11],
+  ["dezember", 12],
+  ["dez", 12],
+];
+const MONTH_OF = new Map(MONTHS);
+const DATE_NAMED = new RegExp(
+  `\\b(\\d{1,2})\\.\\s*(${MONTHS.map(([m]) => m).join("|")})(?![a-zäöü])\\.?(?:\\s*(\\d{4}))?`,
+  "gi",
+);
+
 /**
- * Künftige Datumsangaben `TT.MM.` oder `TT.MM.JJJJ` ab `today` (Europe/Berlin). Ohne Jahr: das nächste Vorkommen;
- * mehr als 10 Monate voraus: vergangen.
+ * Künftige Datumsangaben `TT.MM.`, `TT.MM.JJJJ` oder mit Monatsnamen (`7. Oktober`, `19.März 2027`) ab `today`
+ * (Europe/Berlin). Ohne Jahr: das nächste Vorkommen; mehr als 10 Monate voraus: vergangen.
  */
 export function futureDates(text: string, today: string): number {
   const ty = Number(today.slice(0, 4));
   const tm = Number(today.slice(5, 7));
   const limit = addDays(today, FUTURE_MONTHS * 31);
   const seen = new Set<string>();
-  for (const m of text.matchAll(DATE)) {
-    const day = Number(m[1]);
-    const month = Number(m[2]);
+  const found = [
+    ...[...text.matchAll(DATE)].map((m) => ({ day: Number(m[1]), month: Number(m[2]), y: m[3] })),
+    ...[...text.matchAll(DATE_NAMED)].map((m) => ({
+      day: Number(m[1]),
+      month: MONTH_OF.get((m[2] ?? "").toLowerCase()) ?? 0,
+      y: m[3],
+    })),
+  ];
+  for (const { day, month, y } of found) {
     if (day < 1 || day > 31 || month < 1 || month > 12) continue;
     let year: number;
-    if (m[3]) year = m[3].length === 2 ? 2000 + Number(m[3]) : Number(m[3]);
+    if (y) year = y.length === 2 ? 2000 + Number(y) : Number(y);
     else year = month < tm || (month === tm && `${ty}-${pad(month)}-${pad(day)}` < today) ? ty + 1 : ty;
     const iso = `${year}-${pad(month)}-${pad(day)}`;
     if (iso >= today && iso <= limit) seen.add(iso);
@@ -292,7 +339,9 @@ export function pageSignals(page: PageExtract, today: string): PageSignals {
           ? `${weekly}× Wochentag mit Uhrzeit`
           : undefined;
   if (!signal) return { candidate: false, future, reason: "kein Terminsignal" };
-  if (!isRelevant(page.text)) return { candidate: false, future, reason: `${signal}, ohne Kleinkindbezug` };
+  // Kleinkindbezug auch aus JSON-LD (Kursname wie „Babys ab 3 Monate“ steht oft nur dort; S1, Messung Ziel 1)
+  if (!isRelevant(page.text, ...page.jsonLd.map((e) => JSON.stringify(e))))
+    return { candidate: false, future, reason: `${signal}, ohne Kleinkindbezug` };
   return { candidate: true, future: Math.max(future, jsonLdFuture), reason: signal };
 }
 
