@@ -65,6 +65,10 @@ env:
   LLM_MODEL_EXTRACT: haiku
   LLM_MODEL_FALLBACK: haiku
   LLM_EFFORT_EXTRACT: high
+  # Richter des ID-Gates (ADR 0041, Punkt 4): Opus, nur bei neuer Fassung und nur für Einheiten mit ID-Verlust;
+  # Grenzen in JUDGE_BRAKES und JUDGE_BUDGET_MIN (lib/cost.ts). Nicht Teil des Cache-Schlüssels.
+  LLM_MODEL_JUDGE: opus
+  LLM_EFFORT_JUDGE: high
 
 jobs:
   modus:

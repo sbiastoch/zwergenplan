@@ -4,13 +4,14 @@
  *   --against-deployed   zusätzlich Plausibilität gegen den LIVE deployten Stand (ADR 0002)
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { parse } from "yaml";
 import { SITE_URL } from "../site.config.ts";
 import { checkPlausibility, type DatasetSummary } from "../src/domain/dataset.ts";
 import { dataSource, loadDataset, loadTimetable, ROOT, TIMETABLE_REQUIRED, timetableIssues } from "./lib/load-data.ts";
 import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
 import { DiscoverState, reservedConflicts } from "./pipeline/lib/discover-state.ts";
 import { hasResultFor, promptHash } from "./pipeline/lib/eval-score.ts";
-import { providerRawIssues } from "./pipeline/lib/raw.ts";
+import { idAcceptanceIssues, providerRawIssues } from "./pipeline/lib/raw.ts";
 import { duplicateUnitIds } from "./pipeline/lib/units.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
 
@@ -83,6 +84,24 @@ function discoverIssues(): string[] {
 }
 
 /**
+ * Hinnehmen-Datei `data/id-hinnehmen.yaml` (ADR 0041, Punkt 7): von Hand gepflegt, deshalb hier geprüft (Schema
+ * `IdAcceptance`, Anbieter im Katalog). Fehlt sie, ist nichts hingenommen.
+ */
+function acceptanceIssues(): string[] {
+  const file = new URL(source === "fixture" ? "tests/fixtures/id-hinnehmen.yaml" : "data/id-hinnehmen.yaml", ROOT);
+  if (!existsSync(file)) return [];
+  const label = "data/id-hinnehmen.yaml";
+  let input: unknown;
+  try {
+    input = parse(readFileSync(file, "utf8")) ?? [];
+  } catch (e) {
+    return [`${label}: Lesefehler: ${(e as Error).message}`];
+  }
+  const anbieter = new Set(result.ok ? result.providers.filter((p) => p.role === "anbieter").map((p) => p.id) : []);
+  return idAcceptanceIssues(label, input, anbieter);
+}
+
+/**
  * Eval zum aktuellen Prompt (Plan 0032, E9): kein Gate, nur ein Hinweis, wenn `evals/results.md` für Prompt und
  * Antwortschema (`EXTRACT_KEY_PARTS`) keine Zeile hat. Nach einem Prompt- oder Schemawechsel `pnpm eval` laufen lassen.
  */
@@ -104,7 +123,14 @@ const timetableCheck = timetableIssues(timetable, { required: TIMETABLE_REQUIRED
 const unitIssues = result.providers.flatMap((p) =>
   p.role === "anbieter" ? duplicateUnitIds(p).map((id) => `data/providers.yaml ${p.id}: Seite doppelt (${id})`) : [],
 );
-const errors = [...plausibility.errors, ...timetableCheck.errors, ...rawIssues(), ...discoverIssues(), ...unitIssues];
+const errors = [
+  ...plausibility.errors,
+  ...timetableCheck.errors,
+  ...rawIssues(),
+  ...discoverIssues(),
+  ...unitIssues,
+  ...acceptanceIssues(),
+];
 const warnings = [
   ...plausibility.warnings,
   ...timetableCheck.warnings,

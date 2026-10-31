@@ -10,7 +10,7 @@ import {
   type Provider,
   ProvidersFile,
 } from "../../../src/domain/schema.ts";
-import { ProviderRaw } from "../lib/raw.ts";
+import { IdAcceptance, ProviderRaw } from "../lib/raw.ts";
 
 export const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const CATALOG = join(ROOT, "data/providers.yaml");
@@ -33,6 +33,20 @@ export function writeJson(file: string, value: unknown): void {
 
 export function readCatalog(file: string = CATALOG): Provider[] {
   return ProvidersFile.parse(parse(readFileSync(file, "utf8")));
+}
+
+/**
+ * Hinnehmen-Datei `<dataDir>/id-hinnehmen.yaml` (ADR 0041, Punkt 7), von Hand gepflegt. Fehlt sie, gilt die leere
+ * Liste; ist sie kaputt oder ungültig, wirft es mit dem Pfad.
+ */
+export function readIdAcceptance(dataDir: string): IdAcceptance {
+  const file = join(dataDir, "id-hinnehmen.yaml");
+  if (!existsSync(file)) return [];
+  try {
+    return IdAcceptance.parse(parse(readFileSync(file, "utf8")) ?? []);
+  } catch (e) {
+    throw new Error(`${file}: ${(e as Error).message}`, { cause: e });
+  }
 }
 
 export function readPreviousOffers(file: string = OFFERS): OffersFile | undefined {

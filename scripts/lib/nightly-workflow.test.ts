@@ -85,6 +85,10 @@ describe("nightly.yml (Plan 0048, E7)", () => {
     });
   });
 
+  it("Richter des ID-Gates: Opus high (ADR 0041, Punkt 4)", () => {
+    expect(workflow.env).toMatchObject({ LLM_MODEL_JUDGE: "opus", LLM_EFFORT_JUDGE: "high" });
+  });
+
   it("der Job mit dem Modell hat kein Schreibrecht", () => {
     expect(workflow.permissions).toEqual({ contents: "read" });
     expect(nachtlauf?.permissions).toBeUndefined();

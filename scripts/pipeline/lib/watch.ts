@@ -10,7 +10,16 @@ import type { DiscoverState } from "./discover-state.ts";
 import { isV2, type ProviderRaw, type ProviderRawV2, type UnitState } from "./raw.ts";
 import { hostOf, normalizeUrl } from "./url.ts";
 
-type WatchKind = "seite" | "entfernt" | "gesperrt" | "einbruch" | "leer" | "anbieter" | "umstellung" | "klaerfall";
+type WatchKind =
+  | "seite"
+  | "entfernt"
+  | "gesperrt"
+  | "einbruch"
+  | "ids"
+  | "leer"
+  | "anbieter"
+  | "umstellung"
+  | "klaerfall";
 
 export interface WatchFinding {
   /** Katalog-ID, beim Klärfall dessen Name (Plan 0050, S2b) */
@@ -45,7 +54,18 @@ function unitFindings(providerId: string, page: string, u: UnitState, today: str
       page,
       reason: `zurückgehalten: ${u.pending.events.length} statt ${u.events.length} Events`,
     });
+  if (u.held) out.push({ subject: providerId, kind: "ids", page, reason: heldReason(u.held), since: u.held.since });
   return out;
+}
+
+/** Grund eines vom ID-Gate gehaltenen Ergebnisses (ADR 0041, Punkt 6): Zahl und IDs der Verluste, Art des Haltens */
+function heldReason(held: NonNullable<UnitState["held"]>): string {
+  const n = held.lost.length;
+  const why =
+    held.reason === "unklar"
+      ? "Urteil unklar, Einheit gehalten"
+      : "Richter nicht gelaufen (Grenze), nächste Nacht erneut";
+  return `${n} ${n === 1 ? "ID" : "IDs"}: ${why} (${held.lost.join(", ")})`;
 }
 
 function beilageFindings(providerId: string, raw: ProviderRawV2, today: string): WatchFinding[] {
@@ -181,6 +201,10 @@ function line(f: WatchFinding): string {
   return `${head}${page} · \`${clean(f.reason, room)}\`${tail}`;
 }
 
+/** Was bei `ids` zu tun ist (ADR 0041, Punkt 7; Skill babyevents-nuernberg, „Wächter: IDs gehalten“) */
+const IDS_HINT =
+  "Zu `ids` (ID-Gate, ADR 0041): hinnehmen: Eintrag in data/id-hinnehmen.yaml (Anbieter, Grund, Datum); oder Zuordnung verbessern. Bis dahin zeigt die Einheit ihren alten Stand.";
+
 /**
  * Text des Wächter-Issues (E10) als Liste; leer ohne Befunde. Letzte Zeile ein Marker mit den Paaren `schlüssel:art`,
  * an dem der Job neue Befunde erkennt. Gesamt unter 60 000 Zeichen: Der Marker trägt alle Paare, die Liste wird bei
@@ -198,6 +222,7 @@ export function watchIssue(findings: readonly WatchFinding[], today: string): st
   const head = [
     `Befunde des Wächters vom ${formatGermanDate(today)} (Plan 0048, E10). Den Text schreibt der Nachtlauf; das Issue schließt sich, wenn nichts mehr offen ist.`,
     "",
+    ...(findings.some((f) => f.kind === "ids") ? [IDS_HINT, ""] : []),
   ];
   // Platz für die Zeile „… und N weitere“, die Leerzeile und den Marker
   const budget = MAX_TOTAL - 1 - marker.length - head.join("\n").length - 2 * MAX_LINE;

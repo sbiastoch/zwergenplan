@@ -114,6 +114,31 @@ describe("watchFindings (Plan 0048, E10)", () => {
     ]);
   });
 
+  it("ids: vom ID-Gate gehaltene Einheit mit Zahl und IDs, Grund nach held.reason (ADR 0041, Punkt 6)", () => {
+    const held = (reason: "unklar" | "grenze", lost: string[]) =>
+      ok({
+        held: { inputHash: "neu", model: "haiku", events: [ev], since: "2026-10-26T03:00:00+01:00", reason, lost },
+      });
+    expect(
+      find({ a: v2({ [A]: held("unklar", ["ab12cd34", "ef56gh78"]), [B]: held("grenze", ["xy12ab34"]) }) }),
+    ).toEqual([
+      {
+        subject: "a",
+        kind: "ids",
+        page: B,
+        reason: "1 ID: Richter nicht gelaufen (Grenze), nächste Nacht erneut (xy12ab34)",
+        since: "2026-10-26T03:00:00+01:00",
+      },
+      {
+        subject: "a",
+        kind: "ids",
+        page: A,
+        reason: "2 IDs: Urteil unklar, Einheit gehalten (ab12cd34, ef56gh78)",
+        since: "2026-10-26T03:00:00+01:00",
+      },
+    ]);
+  });
+
   it("leer nur, wenn keine Einheit künftige Events hat, und 14 Tage lang", () => {
     const empty = (since: string) => ok({ emptySince: since });
     // eine Einheit hat noch künftige Events
@@ -314,6 +339,17 @@ describe("watchIssue (Plan 0048, E10)", () => {
     expect(lines).toContain("- `b` · umstellung · `V1`");
     expect(lines.at(-1)).toBe(`<!-- waechter: a#${hash8(B)}:seite,b:umstellung -->`);
     expect(lines.at(-1)).toMatch(WATCH_MARKER);
+  });
+
+  it("Hinweis zum Hinnehmen nur, wenn ein Befund ids dabei ist", () => {
+    const hint = /hinnehmen: Eintrag in data\/id-hinnehmen\.yaml \(Anbieter, Grund, Datum\); oder Zuordnung verbessern/;
+    expect(watchIssue([f()], today)).not.toMatch(hint);
+    const text = watchIssue(
+      [f(), f({ kind: "ids", reason: "1 ID: Urteil unklar, Einheit gehalten (ab12cd34)" })],
+      today,
+    );
+    expect(text).toMatch(hint);
+    expect(text.split("\n").at(-1)).toBe(`<!-- waechter: a#${hash8(B)}:seite,a#${hash8(B)}:ids -->`);
   });
 
   it("fremder Text nur in Code-Spans, ohne Backticks, Zeilenumbrüche und @", () => {
