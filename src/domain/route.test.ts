@@ -175,6 +175,7 @@ describe("URL-Route", () => {
         formats: ["kurs"],
         registration: ["ohne-anmeldung"],
         cost: ["kostenlos"],
+        daytimes: ["vormittags"],
         reachLimit: { kind: "minuten", value },
       },
     ]);

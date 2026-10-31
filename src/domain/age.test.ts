@@ -74,10 +74,12 @@ describe("offerFitsAge", () => {
 
   it("mit Zeitraum: regelmäßig nur über Termine darin, Kurse weiter am ersten Termin (Plan 0053, E2)", () => {
     const treff = fixtureOffer("krabbeltreff"); // 6–24 Monate; geb. 1.5.2026 erst ab 1.11. passend
-    expect(offerFitsAgeIn(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-10-05", to: "2026-10-11" })).toBe(false);
-    expect(offerFitsAgeIn(treff, "2026-05-01", FIXTURE_NOW, { from: "2026-11-01" })).toBe(true);
+    expect(offerFitsAgeIn(treff, "2026-05-01", FIXTURE_NOW, { range: { from: "2026-10-05", to: "2026-10-11" } })).toBe(
+      false,
+    );
+    expect(offerFitsAgeIn(treff, "2026-05-01", FIXTURE_NOW, { range: { from: "2026-11-01" } })).toBe(true);
     const pekip = fixtureOffer("pekip-herbst");
-    expect(offerFitsAgeIn(pekip, "2026-09-10", FIXTURE_NOW, { from: "2026-12-01" })).toBe(true);
+    expect(offerFitsAgeIn(pekip, "2026-09-10", FIXTURE_NOW, { range: { from: "2026-12-01" } })).toBe(true);
   });
 
   it("wertet bei regelmäßigen Angeboten nur kommende Termine", () => {
@@ -196,6 +198,43 @@ describe("ageVisibility", () => {
     const none = ageVisibility(filtered, upcoming, birth, FIXTURE_NOW, { ageOnly: true });
     expect(none.listUnfitIds).toBe(none.unfitIds);
     expect(none.visible.map(fixtureKey)).toContain("krabbeltreff");
+  });
+});
+
+describe("offerFitsAgeIn und ageVisibility mit Tageszeit (Plan 0057, E7)", () => {
+  // Treff 6–24 Monate; Kind geb. 1.5.2026: am 7.10. 5 Monate, ab 1.11. passend. Die echten Termine sind vormittags;
+  // hier passt nur ein Vormittagstermin, die Nachmittagstermine liegen vorher.
+  const treff = fixtureOffer("krabbeltreff");
+  const mixed = {
+    ...treff,
+    sessions: [
+      { start: "2026-10-14T16:00:00+02:00", end: "2026-10-14T17:00:00+02:00" },
+      { start: "2026-10-21T16:00:00+02:00", end: "2026-10-21T17:00:00+02:00" },
+      { start: "2026-11-04T10:00:00+01:00", end: "2026-11-04T11:00:00+01:00" },
+    ],
+  };
+  const birth = "2026-05-01";
+
+  it("passender Termin nur vormittags, Filter nachmittags: passt nicht", () => {
+    expect(offerFitsAgeIn(mixed, birth, FIXTURE_NOW)).toBe(true);
+    expect(offerFitsAgeIn(mixed, birth, FIXTURE_NOW, { daytimes: ["vormittags"] })).toBe(true);
+    expect(offerFitsAgeIn(mixed, birth, FIXTURE_NOW, { daytimes: ["nachmittags"] })).toBe(false);
+    expect(offerFitsAgeIn(mixed, birth, FIXTURE_NOW, { daytimes: [] })).toBe(true);
+    expect(offerFitsAgeIn(mixed, birth, FIXTURE_NOW, { range: { from: "2026-11-01" }, daytimes: ["vormittags"] })).toBe(
+      true,
+    );
+    expect(offerFitsAgeIn(mixed, birth, FIXTURE_NOW, { range: { to: "2026-10-31" }, daytimes: ["vormittags"] })).toBe(
+      false,
+    );
+  });
+
+  it("ageVisibility markiert mit der Tageszeit, unfitIds bleibt ohne", () => {
+    const v = ageVisibility([mixed], [mixed], birth, FIXTURE_NOW, { ageOnly: true, daytimes: ["nachmittags"] });
+    expect(v.visible).toEqual([]);
+    expect(v.listUnfitIds.has(mixed.id)).toBe(true);
+    expect(v.unfitIds.has(mixed.id)).toBe(false);
+    const none = ageVisibility([mixed], [mixed], birth, FIXTURE_NOW, { ageOnly: true, daytimes: [] });
+    expect(none.listUnfitIds).toBe(none.unfitIds);
   });
 });
 

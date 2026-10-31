@@ -1,5 +1,5 @@
 import { nextSession, referenceSession, type SessionFit, upcomingSessions } from "./agenda.ts";
-import { type DateRange, inRangeDay } from "./date-range.ts";
+import { candidateSessions, ruleActive, type SessionRule } from "./date-range.ts";
 import type { AgeRange, Offer, Session } from "./schema.ts";
 import { addMonths, berlinDate, daysInMonth, fromBerlinLocal, parseIsoDate } from "./time.ts";
 
@@ -58,13 +58,14 @@ export function offerFitsAge(offer: Offer, birthDate: string, now: Date): boolea
 }
 
 /**
- * `offerFitsAge` mit Zeitraum (Plan 0053, E2): Regelmäßige passen nur über einen passenden Termin darin, sonst stünde
- * der Termin dieser Woche als passend in der Liste, obwohl erst ein späterer passt. Eigene Funktion, damit der Service
- * Worker (`startFitsAge`) sie nicht mitlädt (Budget 9 kB).
+ * `offerFitsAge` mit Zeitraum und Tageszeit (Plan 0053, E2; Plan 0057, E7): Regelmäßige passen nur über einen
+ * passenden Kandidaten-Termin, sonst stünde der Termin dieser Woche (bzw. der Nachmittagstermin) als passend in der
+ * Liste, obwohl erst ein späterer (bzw. nur einer am Vormittag) passt. Eigene Funktion, damit der Service Worker
+ * (`startFitsAge`) sie nicht mitlädt (Budget 12 kB).
  */
-export function offerFitsAgeIn(offer: Offer, birthDate: string, now: Date, range?: DateRange): boolean {
-  if (!range || offer.format !== "regelmaessig") return offerFitsAge(offer, birthDate, now);
-  return fittingSessions(offer, now, birthDate).some((s) => inRangeDay(range, s));
+export function offerFitsAgeIn(offer: Offer, birthDate: string, now: Date, rule: SessionRule = {}): boolean {
+  if (!ruleActive(rule) || offer.format !== "regelmaessig") return offerFitsAge(offer, birthDate, now);
+  return candidateSessions(offer, now, rule.range, rule.daytimes).some((s) => fitsAgeAt(offer.age, birthDate, s.start));
 }
 
 /**
@@ -78,16 +79,16 @@ export function startFitsAge(offer: Offer, birthDate: string, now: Date): boolea
   return next !== undefined && fitsAgeAt(offer.age, birthDate, next.start);
 }
 
-/** Teilt nach `offerFitsAgeIn` (mit Zeitraum, falls gegeben); die Reihenfolge bleibt erhalten. */
+/** Teilt nach `offerFitsAgeIn` (mit Zeitraum und Tageszeit, falls gegeben); die Reihenfolge bleibt erhalten. */
 export function splitByAge<T extends Offer>(
   offers: readonly T[],
   birthDate: string,
   now: Date,
-  range?: DateRange,
+  rule?: SessionRule,
 ): { fitting: T[]; unfit: T[] } {
   const fitting: T[] = [];
   const unfit: T[] = [];
-  for (const offer of offers) (offerFitsAgeIn(offer, birthDate, now, range) ? fitting : unfit).push(offer);
+  for (const offer of offers) (offerFitsAgeIn(offer, birthDate, now, rule) ? fitting : unfit).push(offer);
   return { fitting, unfit };
 }
 
@@ -146,29 +147,35 @@ export interface AgeVisibility<T> {
   unfitCount: number;
   /** IDs aller kommenden Angebote, die nicht zum Kind passen, ohne Zeitraum (Markierung auf Merkliste und in Sheets) */
   unfitIds: ReadonlySet<string>;
-  /** dasselbe mit dem Zeitraum des Filters (Liste und Karte in „Entdecken“, Plan 0053, E2); ohne Zeitraum `unfitIds` */
+  /**
+   * dasselbe mit Zeitraum und Tageszeit des Filters (Liste und Karte in „Entdecken“, Plan 0053, E2; Plan 0057, E7);
+   * ohne beide `unfitIds`
+   */
   listUnfitIds: ReadonlySet<string>;
 }
 
 /**
  * Alters-Sichtbarkeit der Liste: `unfitIds` gilt für alle kommenden Angebote (`upcoming`),
  * ausgeblendet wird nur mit Altersfilter (`ageOnly`, Plan 0021) und Geburtsdatum. Mit Zeitraum zählt bei regelmäßigen
- * Angeboten nur ein passender Termin darin (`listUnfitIds`, Plan 0053, E2); `unfitIds` bleibt ohne Zeitraum, weil der
- * Filter in „Entdecken“ beim Tabwechsel stehen bleibt und Merkliste und Sheets nicht betrifft.
+ * Angeboten nur ein passender Termin darin (`listUnfitIds`, Plan 0053, E2), ebenso mit Tageszeit (Plan 0057, E7);
+ * `unfitIds` bleibt ohne beide, weil der Filter in „Entdecken“ beim Tabwechsel stehen bleibt und Merkliste und Sheets
+ * nicht betrifft.
  */
 export function ageVisibility<T extends Offer>(
   filtered: readonly T[],
   upcoming: readonly T[],
   birthDate: string | undefined,
   now: Date,
-  { ageOnly, range }: { ageOnly: boolean; range?: DateRange | undefined },
+  { ageOnly, ...rule }: { ageOnly: boolean } & SessionRule,
 ): AgeVisibility<T> {
   if (birthDate === undefined) {
     const none = new Set<string>();
     return { visible: filtered, unfitCount: 0, unfitIds: none, listUnfitIds: none };
   }
   const unfitIds = new Set(splitByAge(upcoming, birthDate, now).unfit.map((o) => o.id));
-  const listUnfitIds = range ? new Set(splitByAge(upcoming, birthDate, now, range).unfit.map((o) => o.id)) : unfitIds;
+  const listUnfitIds = ruleActive(rule)
+    ? new Set(splitByAge(upcoming, birthDate, now, rule).unfit.map((o) => o.id))
+    : unfitIds;
   const fitting = filtered.filter((o) => !listUnfitIds.has(o.id));
   return {
     visible: ageOnly ? fitting : filtered,

@@ -1,16 +1,26 @@
 /**
- * Filter-Sheet (Plan 0003, E16; Plan 0004, E7; Plan 0009, E11; Plan 0021, E2: Altersschalter oben; Plan 0023: Zeitraum). Inhalt des Dialogs, die Hülle ist Dialog.tsx.
+ * Filter-Sheet (Plan 0003, E16; Plan 0004, E7; Plan 0009, E11; Plan 0021, E2: Altersschalter oben; Plan 0023: Zeitraum;
+ * Plan 0057, E7: Tageszeit). Inhalt des Dialogs, die Hülle ist Dialog.tsx.
  * Kind-Sheet: KidSheet.tsx.
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
-import { type BoundCheck, type BoundLimits, checkBound, fieldLimits } from "../domain/date-range.ts";
+import { type BoundCheck, type BoundLimits, checkBound, DAYTIMES, fieldLimits } from "../domain/date-range.ts";
 import { type FilterState, FORMATS, toggleIn, withDateRange, withReachLimit } from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { markAutofocus } from "./Dialog.tsx";
-import { ageOnlyNote, FORMAT_LABELS, limitReason, plural, reachLimitLabel, SHARE_MANUAL_HINT } from "./format.ts";
+import {
+  ageOnlyNote,
+  DAYTIME_HINT,
+  DAYTIME_LABELS,
+  FORMAT_LABELS,
+  limitReason,
+  plural,
+  reachLimitLabel,
+  SHARE_MANUAL_HINT,
+} from "./format.ts";
 import { Shape } from "./icons.tsx";
 import type { ReachMode } from "./use-transit.ts";
 
@@ -186,6 +196,8 @@ export function FilterSheet({
   const limits = fieldLimits(filter.range, today);
   const ageLabelId = useId();
   const ageNoteId = useId();
+  const daytimeHeadingId = useId();
+  const daytimeNoteId = useId();
   const reason = limitReason(mode);
   /** Einfachwahl auf einer Listen-Dimension: „Egal“ = leere Liste */
   const single = <T extends string>(selected: readonly T[], value: T | undefined) =>
@@ -219,6 +231,19 @@ export function FilterSheet({
             </div>
           </>
         )}
+        <h3 id={daytimeHeadingId}>Tageszeit</h3>
+        <fieldset className="plain" aria-labelledby={daytimeHeadingId} aria-describedby={daytimeNoteId}>
+          <div className="wrap">
+            {DAYTIMES.map((d) => (
+              <Chip key={d} on={filter.daytimes.includes(d)} onClick={() => onChange(toggleIn(filter, "daytimes", d))}>
+                {DAYTIME_LABELS[d]}
+              </Chip>
+            ))}
+          </div>
+        </fieldset>
+        <p id={daytimeNoteId} className="small">
+          {DAYTIME_HINT}
+        </p>
         <h3>Art</h3>
         <div className="wrap">
           {CATEGORIES.map((c) => (

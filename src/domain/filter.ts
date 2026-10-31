@@ -1,5 +1,5 @@
 import { discoverable, nextSession } from "./agenda.ts";
-import { type DateRange, dateRange, inDateRange } from "./date-range.ts";
+import { candidateSessions, DAYTIMES, type DateRange, type Daytime, dateRange, ruleActive } from "./date-range.ts";
 import { LIMIT_MINUTES, type ReachFn, type ReachLimit, type ReachTarget, withinLimit } from "./reach.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
 import { CATEGORIES, type Category } from "./topics.ts";
@@ -13,13 +13,16 @@ const COSTS = ["kostenlos", "kostenpflichtig"] as const satisfies readonly Cost[
  * Eine leere Liste heißt „egal“. Das Geburtsdatum ist bewusst NICHT Teil der URL
  * (Links werden geteilt – das Geburtsdatum des Kindes gehört nicht hinein).
  * Die Wegzeit-Grenze darf in die URL, weil sie ohne Startpunkt nichts verrät; der Startpunkt selbst nie
- * (Plan 0004, E7; Plan 0009, E8). Der Zeitraum steht als `von`/`bis` darin (Plan 0023, E4).
+ * (Plan 0004, E7; Plan 0009, E8). Der Zeitraum steht als `von`/`bis` darin (Plan 0023, E4), die Tageszeit als
+ * `tageszeit` (Plan 0057, E7).
  */
 export interface FilterState {
   categories: Category[];
   formats: Format[];
   registration: Registration[];
   cost: Cost[];
+  /** Tageszeit je Termin (Plan 0057, E7); wirkt wie der Zeitraum in `applyFilters`, nicht in `matchesFilter` */
+  daytimes: Daytime[];
   /** wirkt nur mit Wegzeit (`FilterContext.reach`, Art „oepnv“) */
   reachLimit?: ReachLimit;
   /** Zeitraum „von / bis“ (Plan 0023); wirkt in `applyFilters`, nicht in `matchesFilter` (E11) */
@@ -27,20 +30,21 @@ export interface FilterState {
 }
 
 /** die Mehrfachwahl-Dimensionen; die Wegzeit ist eine Einfachwahl */
-const LIST_DIMENSIONS = ["categories", "formats", "registration", "cost"] as const;
+const LIST_DIMENSIONS = ["categories", "formats", "registration", "cost", "daytimes"] as const;
 type Dimension = (typeof LIST_DIMENSIONS)[number];
 /** `umkreis=` (km, Plan 0004) wird nicht mehr gelesen (Plan 0009, E8). */
 const REACH_KEY = "wegzeit";
 const FROM_KEY = "von";
 const TO_KEY = "bis";
 
-export const EMPTY_FILTER: FilterState = { categories: [], formats: [], registration: [], cost: [] };
+export const EMPTY_FILTER: FilterState = { categories: [], formats: [], registration: [], cost: [], daytimes: [] };
 
 const PARAMS = {
   categories: { key: "kat", values: CATEGORIES },
   formats: { key: "format", values: FORMATS },
   registration: { key: "anmeldung", values: REGISTRATIONS },
   cost: { key: "kosten", values: COSTS },
+  daytimes: { key: "tageszeit", values: DAYTIMES },
 } as const;
 
 function parseList<T extends string>(raw: string | null, allowed: readonly T[]): T[] {
@@ -65,6 +69,7 @@ export function filterFromSearch(search: string): FilterState {
     formats: parseList(p.get(PARAMS.formats.key), PARAMS.formats.values),
     registration: parseList(p.get(PARAMS.registration.key), PARAMS.registration.values),
     cost: parseList(p.get(PARAMS.cost.key), PARAMS.cost.values),
+    daytimes: parseList(p.get(PARAMS.daytimes.key), PARAMS.daytimes.values),
     ...(reachLimit ? { reachLimit } : {}),
     ...(range ? { range } : {}),
   };
@@ -100,16 +105,17 @@ export interface FilterContext {
 
 /**
  * Anzahl gewählter Werte über alle Dimensionen (Badge am Filter-Knopf). Die Wegzeit zählt nur, wenn sie
- * wirkt (`limitActive`, Plan 0009, E8). Ein Zeitraum zählt als einer, auch mit beiden Grenzen (Plan 0023, E5).
+ * wirkt (`limitActive`, Plan 0009, E8). Ein Zeitraum zählt als einer, auch mit beiden Grenzen (Plan 0023, E5); jede
+ * gewählte Tageszeit zählt wie ein Wert einer Liste (Plan 0057, E7).
  */
 export function activeFilterCount(state: FilterState, { limitActive }: { limitActive: boolean }): number {
-  const lists = state.categories.length + state.formats.length + state.registration.length + state.cost.length;
+  const lists = LIST_DIMENSIONS.reduce((sum, dim) => sum + state[dim].length, 0);
   return lists + (limitActive && state.reachLimit ? 1 : 0) + (state.range ? 1 : 0);
 }
 
 /**
- * Filter im Tab „Anbieter“ (Plan 0055, E3): nur die Kategorien. Kosten, Anmeldung, Format, Wegzeit-Grenze und Zeitraum
- * beschreiben einzelne Termine, nicht Anbieter; sie bleiben in der URL und wirken weiter in „Entdecken“.
+ * Filter im Tab „Anbieter“ (Plan 0055, E3): nur die Kategorien. Kosten, Anmeldung, Format, Wegzeit-Grenze, Zeitraum und
+ * Tageszeit beschreiben einzelne Termine, nicht Anbieter; sie bleiben in der URL und wirken weiter in „Entdecken“.
  */
 export function providerFilter(state: FilterState): FilterState {
   return { ...EMPTY_FILTER, categories: state.categories };
@@ -161,19 +167,21 @@ export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: Filt
  * Angebote, deren letzter Termin vorbei ist, fallen immer heraus, laufende Kurse mit Anmeldung außer mit
  * `runningCourses` auch (`discoverable`, Plan 0053, E1).
  * Das Alter filtert hier bewusst nicht: Die Oberfläche zeigt unpassende Angebote auf Wunsch
- * markiert an (`splitByAge` in age.ts). Die Wegzeit-Grenze wirkt nur mit Wegzeit. Der Zeitraum braucht „jetzt“
- * (`inDateRange`, Plan 0023, E2) und wirkt deshalb hier.
+ * markiert an (`splitByAge` in age.ts). Die Wegzeit-Grenze wirkt nur mit Wegzeit. Zeitraum und Tageszeit brauchen
+ * „jetzt“ und wirken deshalb hier, am selben Termin: Das Angebot braucht einen Kandidaten (`candidateSessions`,
+ * Plan 0023, E2; Plan 0057, E7). Liste, Statuszeile und Karte gehen alle hierüber und zeigen dieselbe Zahl.
  */
 export function applyFilters<T extends Offer & { venue: ReachTarget }>(
   offers: readonly T[],
   state: FilterState,
   ctx: FilterContext,
 ): T[] {
-  const { range } = state;
+  const { range, daytimes } = state;
+  const byTerm = ruleActive(state);
   return offers.filter(
     (o) =>
       (ctx.runningCourses ? nextSession(o, ctx.now) !== undefined : discoverable(o, ctx.now)) &&
       matchesFilter(o, state, ctx.reach) &&
-      (!range || inDateRange(o, range, ctx.now)),
+      (!byTerm || candidateSessions(o, ctx.now, range, daytimes).length > 0),
   );
 }

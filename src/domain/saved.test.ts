@@ -584,7 +584,7 @@ describe("toggleSavedFilter (Plan 0025, E6, E7)", () => {
 describe("savedOffers mit Zeitraum (Plan 0025, E3a)", () => {
   it("stellt ein Angebot an seinen Termin im Zeitraum und sortiert danach", () => {
     const ids = [id("krabbeltreff"), id("musikgarten-1")];
-    const items = savedOffers(file.offers, ids, FIXTURE_NOW, undefined, { from: "2026-11-01" });
+    const items = savedOffers(file.offers, ids, FIXTURE_NOW, undefined, { range: { from: "2026-11-01" } });
     // Treff am 4.11., Musikgarten am 5.11.; ohne Zeitraum stünde der Treff am 7.10.
     expect(items.map((i) => [fixtureKey(i.offer), berlinIsoDate(i.session.start)])).toEqual([
       ["krabbeltreff", "2026-11-04"],

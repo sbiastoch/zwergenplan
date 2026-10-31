@@ -143,6 +143,56 @@ test("Filter-Sheet wirkt sofort, Einfachwahl bei Anmeldung, Zurücksetzen leert"
   await expect(page).toHaveURL((url) => url.pathname === "/" && url.search === "");
 });
 
+test("Tageszeit im Filter-Sheet (Plan 0057, E7): URL, gleiche Zahl in Liste, Statuszeile und Karte, keine Glocke", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: /^Alle Filter/ }).click();
+  const sheet = page.getByRole("dialog", { name: "Filter" });
+  const daytime = sheet.getByRole("group", { name: "Tageszeit" });
+  await expect(daytime).toHaveAccessibleDescription("Beginn vor 12 Uhr, 12–15 Uhr, ab 15 Uhr");
+  // zwischen Alter und Art: vor „Art“ (ohne Geburtsdatum gibt es keinen Abschnitt „Alter“)
+  const headings = await sheet.getByRole("heading", { level: 3 }).allTextContents();
+  expect(headings.slice(0, 2)).toEqual(["Tageszeit", "Art"]);
+  await daytime.getByRole("button", { name: "Vormittags" }).click();
+  await expect(daytime.getByRole("button", { name: "Vormittags" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/\?tageszeit=vormittags$/);
+  // nachmittags sind nur Musikgarten (16 Uhr) und Bewegungslandschaft (15 Uhr): 6 von 8 bleiben
+  await expect(sheet.getByRole("button", { name: "6 Angebote zeigen" })).toBeVisible();
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await expectMobileUx(page);
+  }
+  await page.emulateMedia({ colorScheme: "light" });
+  await sheet.getByRole("button", { name: "6 Angebote zeigen" }).click();
+  await expect(sheet).toBeHidden();
+
+  await expect(page.getByRole("status")).toHaveText("6 Angebote");
+  await expect(offers(page)).toHaveCount(6);
+  await expect(offers(page).filter({ hasText: "Musikgarten" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Alle Filter, 1 aktiv" })).toBeVisible();
+  // keine Tageszeit-Chips in der Chipzeile, und ohne anderen Filter keine Glocke (searchOf streicht die Tageszeit)
+  await expect(
+    page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: "Vormittags" }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Suche „.*“ abonnieren$/ })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Karte", exact: true }).click();
+  await expect(page).toHaveURL(/\?tageszeit=vormittags&ansicht=karte$/);
+  await mapSettled(page);
+  await expect(page.getByRole("status")).toHaveText("6 Angebote");
+  await expect(offers(page)).toHaveCount(6);
+  await page.getByRole("button", { name: "Liste", exact: true }).click();
+
+  // mit einem anderen Filter erscheint die Glocke; das Abo nimmt die Tageszeit nicht mit und sagt es
+  await page.getByRole("button", { name: "Kurse", exact: true }).click();
+  await expect(page).toHaveURL(/\?format=kurs&tageszeit=vormittags$/);
+  await expect(offers(page)).toHaveCount(1);
+  const bell = page.getByRole("button", { name: "Suche „Kurs“ abonnieren" });
+  await bell.click();
+  await expect(page.getByText(/^Suche abonniert, ohne Tageszeit/)).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem("zwergenplan.such-abos"))).toBe('["format=kurs"]');
+});
+
 test("Geburtsdatum filtert nach Alter, ohne Zusatzzeile, bleibt lokal und steht nie in der URL", async ({ page }) => {
   // iOS-Zifferntastatur: ohne Punkte
   await setBirthDate(page, "01092026");

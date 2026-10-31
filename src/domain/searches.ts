@@ -1,6 +1,6 @@
 /**
  * Such-Abos (Plan 0017, E6): Sucheinstellungen der Liste, die die Wochen-Nachricht zuschneiden. Ein Abo ist der
- * kanonische Filter-Querystring ohne Zeitraum (`searchOf`), kein eigenes Format. Rein; gespeichert wird die Liste roh in
+ * kanonische Filter-Querystring ohne Zeitraum und Tageszeit (`searchOf`), kein eigenes Format. Rein; gespeichert wird die Liste roh in
  * `src/data/searches-store.ts`, nur auf dem Gerät. Seit Plan 0054 (E6, ADR 0037) im Start: die Glocke über der Liste.
  */
 import { type FilterState, filterFromSearch, filterToSearch } from "./filter.ts";
@@ -10,12 +10,13 @@ export const MAX_SEARCHES = 5;
 export type SearchOutcome = "neu" | "schon-da" | "leer" | "voll";
 
 /**
- * Kanonische Form eines Abos: der Filter ohne Zeitraum (Plan 0023, E12). Die Wochen-Nachricht schaut immer auf die
- * kommende Woche; ein fester Zeitraum veraltete im Abo und träfe ohne Label alles.
+ * Kanonische Form eines Abos: der Filter ohne Zeitraum (Plan 0023, E12) und ohne Tageszeit (Plan 0057, E7). Die
+ * Wochen-Nachricht schaut immer auf die kommende Woche; ein fester Zeitraum veraltete im Abo und träfe ohne Label alles.
+ * Die Tageszeit wirkt je Termin, die Nachricht kennt sie nicht (`docs/ideas.md`, „Tageszeit in Such-Abos und Push“).
  */
 export function searchOf(filter: FilterState): string {
   const { range: _range, ...rest } = filter;
-  return filterToSearch(rest);
+  return filterToSearch({ ...rest, daytimes: [] });
 }
 
 /** Hängt die Suche an, wenn sie nicht leer, noch nicht da und noch Platz ist. Die Eingabe bleibt unverändert. */

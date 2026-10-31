@@ -182,10 +182,12 @@ export function useOfferViews({
     () => applyFilters(offers, route.filter, { now, reach }),
     [offers, route.filter, now, reach],
   );
-  const range = route.filter.range;
+  // Zeitraum und Tageszeit bestimmen, welcher Termin zählt (Plan 0057, E7): Markierung und gezeigter Termin
+  const { range, daytimes } = route.filter;
+  const rule = useMemo(() => ({ range, daytimes }), [range, daytimes]);
   const { visible, unfitCount, unfitIds, listUnfitIds } = useMemo(
-    () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, range }),
-    [filtered, upcoming, birthDate, now, ageOnly, range],
+    () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, ...rule }),
+    [filtered, upcoming, birthDate, now, ageOnly, rule],
   );
   const providerTab = route.tab === "anbieter";
   const providerView = useMemo(() => {
@@ -207,15 +209,15 @@ export function useOfferViews({
     [route.tab, extent, visible],
   );
   const groups = useMemo((): ListGroup<Occurrence<SiteOffer>>[] => {
-    if (sort === "neu") return groupByListing(inView, now, range, fits);
-    if (sort === "nah") return groupByReach(inView, now, reachOf, range, fits);
-    return groupByNextSession(inView, now, range, fits).map(({ day, items }) => ({
+    if (sort === "neu") return groupByListing(inView, now, rule, fits);
+    if (sort === "nah") return groupByReach(inView, now, reachOf, rule, fits);
+    return groupByNextSession(inView, now, rule, fits).map(({ day, items }) => ({
       kind: "termin",
       key: day,
       day,
       items,
     }));
-  }, [sort, inView, now, range, fits, reachOf]);
+  }, [sort, inView, now, rule, fits, reachOf]);
   const dataEnd = useMemo(() => lastSessionDay(upcoming), [upcoming]);
   const today = berlinIsoDate(now);
   const savedQuick = useMemo(() => quickRanges(today, dataEnd), [today, dataEnd]);
@@ -232,7 +234,7 @@ export function useOfferViews({
     if (!savedFiltered) return saved;
     const shown = applySavedFilter(savedList, savedFilter, now, { useRange });
     // Mit Schnellwahl steht ein Angebot am Termin im Zeitraum und wird danach sortiert (E3a)
-    return savedOffers(shown, savedIds, now, birthDate, useRange ? savedFilter.range : undefined);
+    return savedOffers(shown, savedIds, now, birthDate, { range: useRange ? savedFilter.range : undefined });
   }, [savedFiltered, saved, savedList, savedFilter, now, useRange, savedIds, birthDate]);
   const savedVisibleList = useMemo(() => savedVisible.map((o) => o.offer), [savedVisible]);
   const savedInView = useMemo(

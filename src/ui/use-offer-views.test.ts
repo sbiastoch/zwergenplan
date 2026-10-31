@@ -142,6 +142,7 @@ describe("useOfferViews", () => {
         formats: ["kurs"],
         registration: ["ohne-anmeldung"],
         cost: ["kostenpflichtig"],
+        daytimes: ["nachmittags"],
         reachLimit: { kind: "minuten", value: 20 },
         range: { from: "2026-10-11", to: "2026-10-13" },
       },
@@ -149,7 +150,7 @@ describe("useOfferViews", () => {
     const fern = { ...GROSS, venue: { ...GROSS.venue, geo: { lat: 49.6, lon: 11.3 } } };
     const slow: ReachFn = ({ geo }) => ({ kind: "oepnv", minutes: geo.lat > 49.5 ? 90 : 10, byFoot: false });
 
-    it("ignoriert Kosten, Anmeldung, Format, Wegzeit-Grenze und Zeitraum", () => {
+    it("ignoriert Kosten, Anmeldung, Format, Wegzeit-Grenze, Zeitraum und Tageszeit", () => {
       const v = render({ offers: [BABY, fern, VORBEI], route: ANBIETER, reach: slow });
       expect(ids(v.visible)).toEqual([]);
       expect(ids(v.providerVisible)).toEqual(["baby", "gross"]);

@@ -8,6 +8,7 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Abo-Feeds (webcal)** für vordefinierte Filter-Sets.
 - **Wochen-Nachricht nur bei Treffern (Stufe 3)**: Filterung beim Absender. Dazu bekäme der Push-Worker Such-Abos, Startpunkt-Stadtteil und Geburtsmonat; eigenes ADR, ändert die Privatsphäre-Invarianten (Plan 0017, „Stufe 3“).
 - **Such-Abos als Schnellwahl in der Liste** (Plan 0017, Nicht-Ziel): heute schneiden die Abos nur die Wochen-Nachricht zu.
+- **Tageszeit in Such-Abos und Push** (Plan 0057, Nicht-Ziel): `searchOf` streicht `tageszeit=` wie den Zeitraum, die Wochen-Nachricht kennt keine Termine je Tageszeit. Dafür bräuchte `news.ts` die Kandidaten-Regel (`candidateSessions`) im Service Worker.
 - **Toast nicht über ein frisch geöffnetes Sheet tragen** (Browser-Review Plan 0054, F2): Ein langer Hinweis nach dem Glocken-Tipp (6 s) liegt noch über dem Kind-Sheet, wenn man es gleich öffnet. Beim Öffnen eines Dialogs den App-Toast schließen oder kürzen.
 - **Bestandsnutzer auf die Glocke hinweisen** (Plan 0054, U1): Gemerkte Anbieter sind seit Plan 0054 Abos und schneiden die Wochen-Nachricht zu. Ein einmaliger Hinweis in der App (oder eine Nachricht an Familie und Freunde) erklärt das.
 - **Sheet „Neu seit der letzten Wochen-Nachricht“** (≈ 0,1 kB Start-JS: Flag `neu`, Lazy-Einstieg in `App`): erst mit freiem Start-Budget, etwa nach „Merkliste als Lazy-Chunk“ (Plan 0017, Nutzerentscheidung 4).

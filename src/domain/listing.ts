@@ -5,7 +5,7 @@
  * nach Wegzeit (`groupByReach`, E7). Rein: darf in den Start; der Service Worker nutzt nur `listingWeek`.
  */
 import { byStartThenTitle, type Occurrence, type SessionFit, shownSession } from "./agenda.ts";
-import type { DateRange } from "./date-range.ts";
+import type { SessionRule } from "./date-range.ts";
 import { type Reach, roundedDistance, roundedMinutes } from "./reach.ts";
 import type { Offer } from "./schema.ts";
 import { addDays, berlinIsoDate } from "./time.ts";
@@ -80,13 +80,13 @@ export type ListGroup<I> = ListGroupHead & { key: string; items: I[] };
 export function groupByListing<T extends Offer>(
   offers: readonly T[],
   now: Date,
-  range?: DateRange,
+  rule?: SessionRule,
   fits?: SessionFit,
 ): ListGroup<Occurrence<T>>[] {
   const bounds = weeks(berlinIsoDate(now));
   const byWeek: Record<ListingWeek, Occurrence<T>[]> = { "diese-woche": [], "vorige-woche": [], frueher: [] };
   for (const offer of offers) {
-    const session = shownSession(offer, now, range, fits);
+    const session = shownSession(offer, now, rule, fits);
     if (session) byWeek[listingWeek(offer, now)].push({ offer, session });
   }
   const groups: ListGroup<Occurrence<T>>[] = [];
@@ -129,13 +129,13 @@ export function groupByReach<T extends Offer>(
   offers: readonly T[],
   now: Date,
   reachOf: (offer: T) => Reach | undefined,
-  range?: DateRange,
+  rule?: SessionRule,
   fits?: SessionFit,
 ): ListGroup<Occurrence<T>>[] {
   const bands = new Map<string, { band: ReachBand; items: { item: Occurrence<T>; value: number }[] }>();
   const without: Occurrence<T>[] = [];
   for (const offer of offers) {
-    const session = shownSession(offer, now, range, fits);
+    const session = shownSession(offer, now, rule, fits);
     if (!session) continue;
     const reach = reachOf(offer);
     if (!reach) {

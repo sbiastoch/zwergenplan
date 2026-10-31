@@ -2,7 +2,7 @@
  * Kalender- und Listenlogik der Oberfläche: Welcher Termin eines Angebots zählt, wie Tage
  * gruppiert und Raster gebaut werden. Alle Kalendertage sind Berliner Tage (time.ts).
  */
-import { type DateRange, inRangeDay, notEnded, rangeSession } from "./date-range.ts";
+import { isCandidate, notEnded, type SessionRule } from "./date-range.ts";
 import type { Offer, Session } from "./schema.ts";
 import { addDays, berlinIsoDate, berlinKey, daysInMonth, isoWeekday, parseIsoDate } from "./time.ts";
 
@@ -79,15 +79,21 @@ export function sessionOnDay(offer: Offer, day: string): Session | undefined {
 }
 
 /**
- * Der Termin, an dem ein Angebot in Liste und Merkliste steht: der nächste nicht beendete bzw. mit Zeitraum der aus
- * `rangeSession`. Mit `fits` der erste passende davon oder danach (im Zeitraum), sonst wie ohne `fits` (Plan 0028):
- * Ein regelmäßiges Angebot, in das das Kind erst hineinwächst, steht am ersten Termin, an dem es passt.
+ * Der Termin, an dem ein Angebot in Liste und Merkliste steht. Der Filter entscheidet über die Kandidaten nur, **ob**
+ * ein Angebot passt (`candidateSessions`); hier steht, **welcher** Termin gezeigt wird (Plan 0057, E7, Review 3 B1):
+ * - Kurs mit Zeitraum: der Kursbeginn (Plan 0023, E2);
+ * - Kurs ohne Zeitraum, auch mit Tageszeit: der nächste nicht beendete Termin, ein laufender Kurs also nicht an seinem
+ *   vergangenen Beginn (die Tageszeit prüft der Filter am Kursbeginn);
+ * - sonst der erste Kandidat (nicht beendet, im Zeitraum, in der Tageszeit).
+ * Mit `fits` der erste passende davon, sonst wie ohne `fits` (Plan 0028): Ein regelmäßiges Angebot, in das das Kind
+ * erst hineinwächst, steht am ersten Termin, an dem es passt.
  */
-export function shownSession(offer: Offer, now: Date, range?: DateRange, fits?: SessionFit): Session | undefined {
-  const base = range ? rangeSession(offer, range, now) : nextSession(offer, now);
+export function shownSession(offer: Offer, now: Date, rule?: SessionRule, fits?: SessionFit): Session | undefined {
+  const { range, daytimes } = rule ?? {};
+  const shown = offer.format === "kurs" && !range ? notEnded(now) : isCandidate(offer, now, range, daytimes);
+  const base = offer.sessions.find(shown);
   if (!base || !fits || fits(offer, base)) return base;
-  const isNotEnded = notEnded(now);
-  return offer.sessions.find((s) => isNotEnded(s) && (!range || inRangeDay(range, s)) && fits(offer, s)) ?? base;
+  return offer.sessions.find((s, i) => shown(s, i) && fits(offer, s)) ?? base;
 }
 
 export function byStartThenTitle(a: Occurrence, b: Occurrence): number {
@@ -106,19 +112,19 @@ function groupByDay<T extends Offer>(occurrences: Occurrence<T>[]): DayGroup<Occ
 }
 
 /**
- * Liste „Entdecken“: jedes Angebot genau einmal, am nächsten nicht beendeten Termin. Mit Zeitraum am Termin, für
- * den es im Zeitraum steht (`rangeSession`: Kurse am Beginn, sonst der erste Termin darin; Plan 0023, E6). Mit
- * `fits` am ersten passenden Termin (`shownSession`, Plan 0028).
+ * Liste „Entdecken“: jedes Angebot genau einmal, am nächsten nicht beendeten Termin. Mit Zeitraum bzw. Tageszeit am
+ * Termin, den `shownSession` zeigt (Kurse mit Zeitraum am Beginn, sonst der erste Termin darin; Plan 0023, E6;
+ * Plan 0057, E7). Mit `fits` am ersten passenden Termin (Plan 0028).
  */
 export function groupByNextSession<T extends Offer>(
   offers: readonly T[],
   now: Date,
-  range?: DateRange,
+  rule?: SessionRule,
   fits?: SessionFit,
 ): DayGroup<Occurrence<T>>[] {
   const occurrences: Occurrence<T>[] = [];
   for (const offer of offers) {
-    const session = shownSession(offer, now, range, fits);
+    const session = shownSession(offer, now, rule, fits);
     if (session) occurrences.push({ offer, session });
   }
   return groupByDay(occurrences.sort(byStartThenTitle));

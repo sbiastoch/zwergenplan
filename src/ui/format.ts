@@ -7,7 +7,7 @@ import type { LoadFailure } from "../data/site.ts";
 import { type AgeCheck, fittingSessions } from "../domain/age.ts";
 import { courseProgress, rhythm, sessionIndex, uniformTimes, upcomingSessions, weekDays } from "../domain/agenda.ts";
 import type { CalendarSelection } from "../domain/calendar.ts";
-import type { DateRange } from "../domain/date-range.ts";
+import type { DateRange, Daytime } from "../domain/date-range.ts";
 import { filterFromSearch } from "../domain/filter.ts";
 import { MONTHS, monthShort, plural, timeRange, WD_SHORT, weekdayName } from "../domain/labels.ts";
 import { type ListGroupHead, METER_BANDS, NEW_DAYS } from "../domain/listing.ts";
@@ -691,6 +691,13 @@ export function loadErrorText(reason: LoadFailure): string {
 }
 
 export const FORMAT_LABELS: Record<Format, string> = { kurs: "Kurs", regelmaessig: "Regelmäßig", einmalig: "Einmalig" };
+/** Tageszeit im Filter-Sheet (Plan 0057, E7); die Grenzen stehen in `daytimeOf` (date-range.ts) */
+export const DAYTIME_LABELS: Record<Daytime, string> = {
+  vormittags: "Vormittags",
+  mittags: "Mittags",
+  nachmittags: "Nachmittags",
+};
+export const DAYTIME_HINT = "Beginn vor 12 Uhr, 12–15 Uhr, ab 15 Uhr";
 const REGISTRATION_LABELS: Record<Registration, string> = {
   "ohne-anmeldung": "Ohne Anmeldung",
   "mit-anmeldung": "Mit Anmeldung",
@@ -733,16 +740,22 @@ export interface AboToast {
  * Rückmeldung nach einem Glocken-Tipp (Plan 0054, E5). `push` ist das Ergebnis von `bellPush`, `undefined`, wenn der
  * Chunk nicht lud. `noOrigin`: Such-Abo mit Wegzeit, aber ohne gespeicherten Startpunkt. `iosTab`: iPhone im
  * Browser-Tab; dort gibt es kein Push, und die installierte App hat einen eigenen Speicher, das Abo zieht nicht mit.
+ * `daytime`: Such-Abo bei gewählter Tageszeit; das Abo nimmt sie nicht mit (`searchOf`, Plan 0057, E7), der Toast sagt
+ * es und steht dafür lang.
  */
 export function aboToast(
   kind: "anbieter" | "suche",
   subscribed: boolean,
   push: BellPush | undefined,
-  noOrigin = false,
-  iosTab = false,
+  {
+    noOrigin = false,
+    iosTab = false,
+    daytime = false,
+  }: { noOrigin?: boolean; iosTab?: boolean; daytime?: boolean } = {},
 ): AboToast {
   if (!subscribed) return { text: "Abo beendet" };
-  const what = kind === "anbieter" ? "Anbieter abonniert" : "Suche abonniert";
+  const what =
+    kind === "anbieter" ? "Anbieter abonniert" : daytime ? "Suche abonniert, ohne Tageszeit" : "Suche abonniert";
   const long = 6000;
   if (push === "verweigert") {
     return {
@@ -767,6 +780,10 @@ export function aboToast(
   }
   if (noOrigin) return { text: `${what}. Die Wegzeit wirkt in der Push-Nachricht ab einem Startpunkt.`, ms: long };
   if (push === "eingeschaltet") return { text: `${what} – die wöchentliche Push-Nachricht ist jetzt an`, ms: long };
-  if (push === "an") return { text: `${what} – Neues kommt in die wöchentliche Push-Nachricht` };
-  return { text: kind === "anbieter" ? `${what} – steht jetzt oben im Tab „Anbieter“` : what };
+  if (push === "an") {
+    const text = `${what} – Neues kommt in die wöchentliche Push-Nachricht`;
+    return daytime ? { text, ms: long } : { text };
+  }
+  if (kind === "anbieter") return { text: `${what} – steht jetzt oben im Tab „Anbieter“` };
+  return daytime ? { text: what, ms: long } : { text: what };
 }

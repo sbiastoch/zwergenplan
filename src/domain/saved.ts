@@ -6,7 +6,7 @@
  */
 import { fittingSessions, sessionFit } from "./age.ts";
 import { type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
-import type { DateRange } from "./date-range.ts";
+import type { DateRange, SessionRule } from "./date-range.ts";
 import { applyFilters, EMPTY_FILTER, type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId, resolveProviderId } from "./ids.ts";
 import type { ReachTarget } from "./reach.ts";
@@ -74,14 +74,14 @@ export function savedOffers<T extends Offer>(
   ids: readonly string[],
   now: Date,
   birthDate: string | undefined,
-  /** Schnellwahl „ab …“ des Merklisten-Filters: Termin im Zeitraum (`rangeSession`, Plan 0025, E3a) */
-  range?: DateRange,
+  /** Schnellwahl „ab …“ des Merklisten-Filters: Termin im Zeitraum (Plan 0025, E3a); Tageszeit ab Plan 0057, S3 */
+  rule?: SessionRule,
 ): Occurrence<T>[] {
   const wanted = new Set(ids);
   const fits = sessionFit(birthDate);
   return offers
     .flatMap((offer) => {
-      const session = wanted.has(offer.id) ? shownSession(offer, now, range, fits) : undefined;
+      const session = wanted.has(offer.id) ? shownSession(offer, now, rule, fits) : undefined;
       return session ? [{ offer, session }] : [];
     })
     .sort(

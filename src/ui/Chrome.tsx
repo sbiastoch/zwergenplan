@@ -80,7 +80,7 @@ export function QuickFilters({
   onOpenSheet: () => void;
   /** der Knopf „Alle Filter“, Fokus-Rückweg für das Kind-Sheet */
   sheetButton?: Ref<HTMLButtonElement>;
-  /** Glocke der Suche (Plan 0054, E6): nur im Tab „Angebote“ und nur mit einem Filter außer dem Zeitraum */
+  /** Glocke der Suche (Plan 0054, E6): nur im Tab „Angebote“ und nur mit einem Filter außer Zeitraum und Tageszeit */
   bell?: { label: string; subscribed: boolean; busy: boolean; onToggle: () => void } | undefined;
 }) {
   const count = activeFilterCount(filter, { limitActive });

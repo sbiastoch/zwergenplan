@@ -968,20 +968,35 @@ describe("aboToast (Plan 0054, E5)", () => {
   });
 
   it("iPhone im Browser-Tab ohne Push: Hinweis auf die installierte App, dort neu abonnieren", () => {
-    expect(aboToast("anbieter", true, "nein", false, true)).toEqual({
+    expect(aboToast("anbieter", true, "nein", { iosTab: true })).toEqual({
       text: "Anbieter abonniert. Push-Nachrichten gibt es auf dem iPhone in der installierten App – dort bitte noch einmal abonnieren.",
       ms: 6000,
       tone: "hint",
     });
-    expect(aboToast("suche", true, "nein", true, true).text).toContain("installierten App");
+    expect(aboToast("suche", true, "nein", { noOrigin: true, iosTab: true }).text).toContain("installierten App");
     // Chunk nicht geladen: kein Urteil über Push, neutral wie bisher
-    expect(aboToast("suche", true, undefined, false, true).text).toBe("Suche abonniert");
-    expect(aboToast("anbieter", false, "nein", false, true)).toEqual({ text: "Abo beendet" });
+    expect(aboToast("suche", true, undefined, { iosTab: true }).text).toBe("Suche abonniert");
+    expect(aboToast("anbieter", false, "nein", { iosTab: true })).toEqual({ text: "Abo beendet" });
   });
 
   it("Such-Abo mit Wegzeit ohne Startpunkt nennt das, solange Push nicht scheiterte", () => {
-    expect(aboToast("suche", true, "an", true).text).toContain("ab einem Startpunkt");
-    expect(aboToast("suche", true, "verweigert", true).text).toContain("blockiert");
+    expect(aboToast("suche", true, "an", { noOrigin: true }).text).toContain("ab einem Startpunkt");
+    expect(aboToast("suche", true, "verweigert", { noOrigin: true }).text).toContain("blockiert");
+  });
+
+  it("Such-Abo mit Tageszeit sagt, dass sie nicht mitkommt (Plan 0057, E7)", () => {
+    expect(aboToast("suche", true, "nein", { daytime: true })).toEqual({
+      text: "Suche abonniert, ohne Tageszeit",
+      ms: 6000,
+    });
+    expect(aboToast("suche", true, "an", { daytime: true })).toEqual({
+      text: "Suche abonniert, ohne Tageszeit – Neues kommt in die wöchentliche Push-Nachricht",
+      ms: 6000,
+    });
+    expect(aboToast("suche", true, "verweigert", { daytime: true }).text).toMatch(
+      /^Suche abonniert, ohne Tageszeit\. /,
+    );
+    expect(aboToast("suche", false, "an", { daytime: true })).toEqual({ text: "Abo beendet" });
   });
 });
 

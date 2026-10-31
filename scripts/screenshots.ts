@@ -2,7 +2,7 @@
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,merkliste-kalender,…] [--text=200]   Standard: lokale Preview mit
  * Fixtures
- * Ansichten: start, merkliste, detail, filter, kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
+ * Ansichten: start, merkliste, detail, filter, filter-tageszeit (Plan 0057, E7), kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
  * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
  * (Plan 0017, 0054: Abos im Kind-Sheet mit langem Such-Abo), onboarding (Plan 0033, E15: alle Schritte der Einführung
@@ -117,6 +117,11 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   },
   filter: async (page) => {
     await page.getByRole("button", { name: /^Alle Filter/ }).click();
+  },
+  // Tageszeit (Plan 0057, E7): „Vormittags“ gewählt; danach die Liste mit ?tageszeit=vormittags (Ansicht start)
+  "filter-tageszeit": async (page) => {
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await page.getByRole("dialog", { name: "Filter" }).getByRole("button", { name: "Vormittags" }).click();
   },
   // Sortierung (Plan 0043, E4): Menü offen, und die Liste „Neu eingestellt“ mit Etiketten
   sortierung: async (page) => {

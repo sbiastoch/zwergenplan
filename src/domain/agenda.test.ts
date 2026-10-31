@@ -38,13 +38,15 @@ describe("groupByNextSession", () => {
   it("stellt bei Zeitraum regelmäßige an den ersten Termin darin, Kurse an den Beginn (Plan 0023, E6)", () => {
     const treff = fixtureOffer("krabbeltreff");
     const musikgarten = fixtureOffer("musikgarten-1"); // Beginn 5.11.
-    const groups = groupByNextSession([treff, musikgarten], FIXTURE_NOW, { from: "2026-10-27" });
+    const groups = groupByNextSession([treff, musikgarten], FIXTURE_NOW, { range: { from: "2026-10-27" } });
     expect(groups.map((g) => [g.day, g.items.map((i) => fixtureKey(i.offer))])).toEqual([
       ["2026-10-28", ["krabbeltreff"]],
       ["2026-11-05", ["musikgarten-1"]],
     ]);
     // Ein Kurs, der vor dem Zeitraum begonnen hat, fehlt.
-    expect(groupByNextSession([fixtureOffer("pekip-herbst")], FIXTURE_NOW, { from: "2026-10-20" })).toEqual([]);
+    expect(groupByNextSession([fixtureOffer("pekip-herbst")], FIXTURE_NOW, { range: { from: "2026-10-20" } })).toEqual(
+      [],
+    );
   });
 
   it("zeigt jedes Angebot einmal am nächsten Termin, nach Berliner Tag gruppiert", () => {
@@ -120,18 +122,23 @@ describe("shownSession und SessionFit (Plan 0028)", () => {
 
   it("nimmt ohne Prädikat den nächsten Termin bzw. den Termin im Zeitraum", () => {
     expect(shownSession(treff, FIXTURE_NOW)).toEqual(nextSession(treff, FIXTURE_NOW));
-    expect(shownSession(treff, FIXTURE_NOW, { from: "2026-10-13" })?.start).toBe("2026-10-14T10:00:00+02:00");
+    expect(shownSession(treff, FIXTURE_NOW, {})).toEqual(nextSession(treff, FIXTURE_NOW));
+    expect(shownSession(treff, FIXTURE_NOW, { range: { from: "2026-10-13" } })?.start).toBe(
+      "2026-10-14T10:00:00+02:00",
+    );
   });
 
   it("nimmt mit Prädikat den ersten passenden kommenden Termin, auch im Zeitraum", () => {
     expect(shownSession(treff, FIXTURE_NOW, undefined, fromOct21)?.start).toBe("2026-10-21T10:00:00+02:00");
-    expect(shownSession(treff, FIXTURE_NOW, { to: "2026-10-28" }, fromOct21)?.start).toBe("2026-10-21T10:00:00+02:00");
+    expect(shownSession(treff, FIXTURE_NOW, { range: { to: "2026-10-28" } }, fromOct21)?.start).toBe(
+      "2026-10-21T10:00:00+02:00",
+    );
   });
 
   it("fällt ohne passenden Termin auf den nächsten bzw. den im Zeitraum zurück", () => {
     expect(shownSession(treff, FIXTURE_NOW, undefined, never)).toEqual(treff.sessions[0]);
-    expect(shownSession(treff, FIXTURE_NOW, { to: "2026-10-14" }, fromOct21)).toEqual(treff.sessions[0]);
-    expect(shownSession(treff, FIXTURE_NOW, { from: "2026-12-01" }, fromOct21)).toBeUndefined();
+    expect(shownSession(treff, FIXTURE_NOW, { range: { to: "2026-10-14" } }, fromOct21)).toEqual(treff.sessions[0]);
+    expect(shownSession(treff, FIXTURE_NOW, { range: { from: "2026-12-01" } }, fromOct21)).toBeUndefined();
   });
 
   it("stellt Angebote in der Liste an den passenden Termin", () => {
@@ -146,6 +153,52 @@ describe("shownSession und SessionFit (Plan 0028)", () => {
   it("lässt im Kalender-Index nur passende Termine", () => {
     const index = sessionsByDay([treff], fromOct21);
     expect([...index.keys()]).toEqual(["2026-10-21", "2026-10-28", "2026-11-04"]);
+  });
+});
+
+describe("shownSession mit Tageszeit (Plan 0057, E7)", () => {
+  // Mo vormittags, Di nachmittags, Mi vormittags, Do nachmittags
+  const mixed = withSessions("Gemischt", [
+    s("2026-10-12T09:00:00+02:00", "2026-10-12T10:00:00+02:00"),
+    s("2026-10-13T16:00:00+02:00", "2026-10-13T17:00:00+02:00"),
+    s("2026-10-14T09:00:00+02:00", "2026-10-14T10:00:00+02:00"),
+    s("2026-10-15T16:00:00+02:00", "2026-10-15T17:00:00+02:00"),
+  ]);
+  const afternoon = { daytimes: ["nachmittags" as const] };
+  const fromWednesday: SessionFit = (_offer, session) => session.start >= "2026-10-14";
+
+  it("regelmäßig: erster Termin in der Tageszeit", () => {
+    expect(shownSession(mixed, FIXTURE_NOW, afternoon)?.start).toBe("2026-10-13T16:00:00+02:00");
+    expect(shownSession(mixed, FIXTURE_NOW, { daytimes: [] })?.start).toBe("2026-10-12T09:00:00+02:00");
+  });
+
+  it("Alter passt nicht, Tageszeit passt: erster Termin in der Tageszeit; beides: erster gemeinsamer", () => {
+    expect(shownSession(mixed, FIXTURE_NOW, afternoon, () => false)?.start).toBe("2026-10-13T16:00:00+02:00");
+    expect(shownSession(mixed, FIXTURE_NOW, afternoon, fromWednesday)?.start).toBe("2026-10-15T16:00:00+02:00");
+    expect(shownSession(mixed, FIXTURE_NOW, { daytimes: ["vormittags"] }, fromWednesday)?.start).toBe(
+      "2026-10-14T09:00:00+02:00",
+    );
+    expect(shownSession(mixed, FIXTURE_NOW, { daytimes: ["mittags"] })).toBeUndefined();
+  });
+
+  it("laufender Kurs, Tageszeit ohne Zeitraum: gezeigt wird der nächste Termin, nicht der Kursbeginn (Review 3 B1)", () => {
+    const pekip = fixtureOffer("pekip-herbst"); // Beginn 13.10., 9:30, wöchentlich
+    const later = new Date("2026-10-21T12:00:00+02:00");
+    const next = nextSession(pekip, later);
+    expect(next?.start).toBe("2026-10-27T09:30:00+01:00");
+    expect(shownSession(pekip, later, { daytimes: ["vormittags"] })).toEqual(next);
+    // mit Zeitraum bleibt es beim Kursbeginn (Plan 0023, E2)
+    expect(shownSession(pekip, later, { range: { from: "2026-10-13" }, daytimes: ["vormittags"] })).toEqual(
+      pekip.sessions[0],
+    );
+  });
+
+  it("groupByNextSession mit Tageszeit: kein Tageskopf in der Vergangenheit", () => {
+    const pekip = fixtureOffer("pekip-herbst");
+    const later = new Date("2026-10-21T12:00:00+02:00");
+    const days = groupByNextSession([pekip, mixed], later, { daytimes: ["vormittags"] }).map((g) => g.day);
+    expect(days.every((day) => day >= "2026-10-21")).toBe(true);
+    expect(days).toEqual(["2026-10-27"]);
   });
 });
 

@@ -567,4 +567,18 @@ Abweichungen bei der Umsetzung von S1, im Sinn des Plans entschieden:
 - **Export-Texte:** Mit Filter heißt der Knopf „Alle N fest eingeplanten in meinen Kalender, auch ausgeblendete“. Der Toast nennt die vorgemerkten ohne Schlusspunkt wie die übrigen Export-Toasts: „… geladen · 3 vorgemerkte sind nicht in der Datei“ (Einzahl „1 vorgemerktes ist …“); mit vorgemerkten steht er 6 s. Passt keins der fest eingeplanten zum Alter: „Keins der fest eingeplanten Angebote passt zum Alter.“
 - **Statuszeile:** zählt Angebote ohne passenden Termin weiter über alle gemerkten, gleich welche Stufe (`collectionExport` ohne Stufen); nur die Datei nimmt allein fest Eingeplantes.
 - **Monatsraster:** Die Form eines vorgemerkten Termins steht auch dort als Umriss, wie in der Wochenleiste.
+- **Toast mit Aktion:** Er hat links 8 statt 16 px Rand (E3), damit neben dem Knopf mehr Platz für den Text bleibt. Ist der Toast schmal, fällt das Häkchen vor dem Text weg (Container-Query auf den Toast).
 - **Tests:** Die Kalender-Darstellung von „vorgemerkt“ (E4) kam schon in S1; ihr E2E-Fall steht deshalb jetzt in `e2e/merkliste-kalender.spec.ts`, nicht erst in S5. `e2e/sortierung.spec.ts` blieb unverändert: Ein Tipp merkt vor, das Angebot steht danach wie erwartet auf der Merkliste.
+
+## Nachtrag S2 (2026-10-31)
+
+Abweichungen bei der Umsetzung von S2, im Sinn des Plans entschieden:
+
+- **Ort der Tageszeit:** `Daytime`, `DAYTIMES` und `daytimeOf` stehen in `src/domain/date-range.ts`, nicht in `filter.ts`. `filter.ts` importiert `date-range.ts`, und `candidateSessions` braucht die Tageszeit; so entsteht kein Zyklus. `FilterState.daytimes` und `PARAMS` (`tageszeit=`) stehen wie geplant in `filter.ts`. Die Stunde kommt aus `berlinKey` (`time.ts`).
+- **Gemeinsamer Parametertyp `SessionRule`** (`{ range?, daytimes? }`, `date-range.ts`): `shownSession`, `groupByNextSession`, `groupByListing`, `groupByReach`, `savedOffers`, `offerFitsAgeIn` und `splitByAge` nehmen ihn statt `range`, `ageVisibility` als `{ ageOnly, ...rule }`. `FilterState` erfüllt den Typ. `ruleActive(rule)` sagt, ob Zeitraum oder Tageszeit gesetzt sind (`applyFilters`, `openOnDay`, Alters-Markierung). `isCandidate` ist dieselbe Regel als Prädikat, damit `shownSession` nur bis zum ersten Treffer sucht. `rangeAgenda` bekommt die Regel erst in S3/S5 (Kalender je Termin über `inDaytime`); `inDaytime` kommt deshalb erst in S3 (knip).
+- **Badge:** Jede gewählte Tageszeit zählt als ein Wert, wie in den anderen Listen-Dimensionen (`activeFilterCount` summiert jetzt über `LIST_DIMENSIONS`).
+- **Abo-Toast:** „Suche abonniert, ohne Tageszeit“ ohne Schlusspunkt wie die übrigen Abo-Toasts; die Push-Varianten hängen an diesen Anfang an („… – Neues kommt in die wöchentliche Push-Nachricht“, „…. Push-Nachrichten sind …“). Mit Tageszeit steht er 6 s. `aboToast` nimmt die Zusätze jetzt als Objekt `{ noOrigin, iosTab, daytime }`.
+- **Statuszeile:** nennt die Tageszeit nicht („6 Angebote“), anders als den Zeitraum. Das Badge und das Sheet zeigen sie; ADR 0039 (kurze Statuszeile).
+- **`docs/ideas.md`:** „Tageszeit in Such-Abos und Push“ steht schon mit S2 drin (Arch-Review), S6 legt ihn nicht neu an.
+- **Screenshots:** `scripts/screenshots.ts` hat die Ansicht `filter-tageszeit`.
+- **Messung** (`pnpm build && pnpm size`, nach S1 und S2 zusammen): JS (initial) 109,82 kB, CSS 13,47 kB, Service Worker 9,18 kB (vorher 9,10 kB, also +0,08 kB durch `tageszeit` in `PARAMS` und die Kandidaten-Regel). Die Delta-Tabelle in ADR 0012 folgt in S6.

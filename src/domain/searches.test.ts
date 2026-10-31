@@ -51,6 +51,19 @@ describe("Zeitraum (Plan 0023, E12)", () => {
   });
 });
 
+describe("Tageszeit (Plan 0057, E7)", () => {
+  it("lässt die Tageszeit weg: allein ist die Suche leer", () => {
+    expect(searchOf(f({ daytimes: ["vormittags"] }))).toBe("");
+    expect(addSearch([], f({ daytimes: ["vormittags", "nachmittags"] }))).toEqual({ list: [], outcome: "leer" });
+  });
+
+  it("behält die übrigen Filter", () => {
+    expect(searchOf(f({ categories: ["musik"], daytimes: ["nachmittags"] }))).toBe("kat=musik");
+    expect(hasSearch(["kat=musik"], f({ categories: ["musik"], daytimes: ["vormittags"] }))).toBe(true);
+    expect(parseSearches('["kat=musik&tageszeit=vormittags","tageszeit=mittags"]')).toEqual(["kat=musik"]);
+  });
+});
+
 describe("removeSearch und hasSearch", () => {
   it("entfernt genau die eine Suche", () => {
     expect(removeSearch(["kat=musik", "kat=natur"], "kat=musik")).toEqual(["kat=natur"]);

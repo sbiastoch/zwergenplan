@@ -6,6 +6,7 @@ import { loadOnboardingDone, saveOnboardingDone, storageUsable } from "../data/p
 import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
+import { ruleActive } from "../domain/date-range.ts";
 import { activeFilterCount, EMPTY_FILTER, type FilterState, providerFilter, withDateRange } from "../domain/filter.ts";
 import { type MapExtent, viewNarrows } from "../domain/map-view.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
@@ -318,13 +319,13 @@ export function App() {
   const [bellBusy, setBellBusy] = useState(false);
   const bellBusyRef = useRef(false);
   const afterBell = useCallback(
-    (kind: "anbieter" | "suche", subscribed: boolean, noOrigin = false) => {
+    (kind: "anbieter" | "suche", subscribed: boolean, hints: { noOrigin?: boolean; daytime?: boolean } = {}) => {
       bellBusyRef.current = true;
       setBellBusy(true);
       void bellPush(subscribed).then((push) => {
         bellBusyRef.current = false;
         setBellBusy(false);
-        const { text, ms, tone } = aboToast(kind, subscribed, push, noOrigin, iosTab());
+        const { text, ms, tone } = aboToast(kind, subscribed, push, { ...hints, iosTab: iosTab() });
         say(text, ms, tone);
       });
     },
@@ -342,7 +343,10 @@ export function App() {
     const outcome = searchAbos.toggle(route.filter);
     if (outcome === "voll") say("Höchstens 5 Such-Abos. Erst eins entfernen.", undefined, "hint");
     else if (outcome === "neu" || outcome === "entfernt") {
-      afterBell("suche", outcome === "neu", route.filter.reachLimit !== undefined && origin === undefined);
+      afterBell("suche", outcome === "neu", {
+        noOrigin: route.filter.reachLimit !== undefined && origin === undefined,
+        daytime: route.filter.daytimes.length > 0,
+      });
     }
   };
 
@@ -712,7 +716,7 @@ export function App() {
                 hasData={offers.length > 0}
                 onResetFilter={resetIfActive}
                 age={ageEscape}
-                openOnDay={route.filter.range !== undefined}
+                openOnDay={ruleActive(route.filter)}
                 origin={origin}
               />
             )}

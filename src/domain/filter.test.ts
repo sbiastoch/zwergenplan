@@ -15,6 +15,7 @@ import {
 } from "./filter.ts";
 import { placeKey } from "./place-key.ts";
 import { airlineReach, type Origin, type ReachFn } from "./reach.ts";
+import type { SiteOffer } from "./site-data.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureSiteOffers } from "./test-fixtures.ts";
 
 const offers = fixtureSiteOffers();
@@ -55,14 +56,18 @@ describe("URL-Zustand", () => {
       formats: ["einmalig", "kurs"],
       registration: ["ohne-anmeldung"],
       cost: ["kostenlos"],
+      daytimes: ["nachmittags", "vormittags"],
     };
     const search = filterToSearch(state);
-    expect(search).toBe("kat=babykurse,musik&format=kurs,einmalig&anmeldung=ohne-anmeldung&kosten=kostenlos");
+    expect(search).toBe(
+      "kat=babykurse,musik&format=kurs,einmalig&anmeldung=ohne-anmeldung&kosten=kostenlos&tageszeit=vormittags,nachmittags",
+    );
     expect(filterFromSearch(`?${search}`)).toEqual({
       categories: ["babykurse", "musik"],
       formats: ["kurs", "einmalig"],
       registration: ["ohne-anmeldung"],
       cost: ["kostenlos"],
+      daytimes: ["vormittags", "nachmittags"],
     });
   });
 
@@ -231,7 +236,7 @@ describe("Filter bedienen", () => {
     expect(activeFilterCount(EMPTY_FILTER, { limitActive: false })).toBe(0);
     expect(
       activeFilterCount(
-        { categories: ["musik", "wasser"], formats: ["kurs"], registration: [], cost: ["kostenlos"] },
+        { categories: ["musik", "wasser"], formats: ["kurs"], registration: [], cost: ["kostenlos"], daytimes: [] },
         { limitActive: false },
       ),
     ).toBe(4);
@@ -313,6 +318,71 @@ describe("Zeitraum (Plan 0023)", () => {
   });
 });
 
+describe("Tageszeit (Plan 0057, E7)", () => {
+  const morning = { ...EMPTY_FILTER, daytimes: ["vormittags"] } satisfies FilterState;
+  const afternoon = { ...EMPTY_FILTER, daytimes: ["nachmittags"] } satisfies FilterState;
+
+  it("steht kanonisch als tageszeit nach den Kosten in der URL, Unbekanntes fällt weg", () => {
+    const state: FilterState = { ...EMPTY_FILTER, cost: ["kostenlos"], daytimes: ["nachmittags", "vormittags"] };
+    expect(filterToSearch(state)).toBe("kosten=kostenlos&tageszeit=vormittags,nachmittags");
+    expect(filterFromSearch("?tageszeit=nachmittags,abends,vormittags&kosten=kostenlos")).toEqual({
+      ...EMPTY_FILTER,
+      cost: ["kostenlos"],
+      daytimes: ["vormittags", "nachmittags"],
+    });
+    expect(filterFromSearch("?tageszeit=mittags").daytimes).toEqual(["mittags"]);
+    expect(filterFromSearch("?tageszeit=quatsch")).toEqual(EMPTY_FILTER);
+    expect(filterToSearch({ ...morning, range: { from: "2026-10-20" } })).toBe("tageszeit=vormittags&von=2026-10-20");
+  });
+
+  it("zählt jede gewählte Tageszeit im Badge und lässt sich umschalten", () => {
+    expect(activeFilterCount(morning, { limitActive: false })).toBe(1);
+    expect(activeFilterCount({ ...morning, daytimes: ["vormittags", "mittags"] }, { limitActive: false })).toBe(2);
+    expect(toggleIn(EMPTY_FILTER, "daytimes", "vormittags")).toEqual(morning);
+    expect(toggleIn(morning, "daytimes", "vormittags")).toEqual(EMPTY_FILTER);
+  });
+
+  it("filtert hart: ein Angebot nur mit Nachmittagsterminen fällt bei „vormittags“ heraus", () => {
+    // Musikgarten (Kurs, 16 Uhr) und Bewegungslandschaft (regelmäßig, 15 Uhr, ohne Testschlüssel) sind nachmittags
+    expect(ids(afternoon).sort()).toEqual(["musikgarten-1", undefined]);
+    expect(ids(morning)).not.toContain("musikgarten-1");
+    expect(ids(morning)).toHaveLength(ids(EMPTY_FILTER).length - 2);
+    expect(ids({ ...EMPTY_FILTER, daytimes: ["mittags"] })).toEqual([]);
+    expect(ids({ ...EMPTY_FILTER, daytimes: ["vormittags", "nachmittags"] })).toEqual(ids(EMPTY_FILTER));
+  });
+
+  it("Zeitraum und Tageszeit am selben Termin", () => {
+    const treff = offers.find((o) => fixtureKey(o) === "krabbeltreff");
+    if (!treff) throw new Error("Fixture fehlt");
+    const regular: SiteOffer = {
+      ...treff,
+      sessions: [
+        { start: "2026-10-12T09:00:00+02:00", end: "2026-10-12T10:00:00+02:00" }, // Mo vormittags
+        { start: "2026-10-13T16:00:00+02:00", end: "2026-10-13T17:00:00+02:00" }, // Di nachmittags
+      ],
+    };
+    const kept = (state: FilterState) => applyFilters([regular], state, { now: FIXTURE_NOW }).length;
+    const tuesday = { from: "2026-10-13", to: "2026-10-13" };
+    expect(kept({ ...morning, range: tuesday })).toBe(0);
+    expect(kept({ ...afternoon, range: tuesday })).toBe(1);
+    expect(kept(morning)).toBe(1);
+  });
+
+  it("Kurs: nur der Beginn zählt, für Zeitraum und Tageszeit", () => {
+    // Musikgarten beginnt am 5.11. um 16 Uhr; PEKiP am 13.10. um 9:30, dann wöchentlich
+    expect(ids({ ...afternoon, range: { from: "2026-11-05" } })).toContain("musikgarten-1");
+    expect(ids({ ...morning, range: { from: "2026-11-05" } })).not.toContain("musikgarten-1");
+    expect(ids({ ...morning, range: { from: "2026-10-20" } })).not.toContain("pekip-herbst");
+    expect(ids({ ...morning, range: { from: "2026-10-13" } })).toContain("pekip-herbst");
+  });
+
+  it("matchesFilter kennt die Tageszeit nicht", () => {
+    const musikgarten = offers.find((o) => fixtureKey(o) === "musikgarten-1");
+    if (!musikgarten) throw new Error("Fixture fehlt");
+    expect(matchesFilter(musikgarten, morning)).toBe(true);
+  });
+});
+
 describe("providerFilter (Plan 0055, E3)", () => {
   it("behält im Tab „Anbieter“ nur die Kategorien", () => {
     const full: FilterState = {
@@ -320,6 +390,7 @@ describe("providerFilter (Plan 0055, E3)", () => {
       formats: ["kurs"],
       registration: ["ohne-anmeldung"],
       cost: ["kostenlos"],
+      daytimes: ["vormittags"],
       reachLimit: { kind: "minuten", value: 20 },
       range: { from: "2026-10-06", to: "2026-10-12" },
     };

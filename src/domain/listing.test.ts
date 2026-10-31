@@ -54,11 +54,11 @@ describe("groupByListing: Liste „Neu eingestellt“ (Plan 0043, E4)", () => {
     ]);
   });
 
-  it("jedes Angebot am selben Termin wie bei „Nächste Termine“, auch mit Zeitraum und Alter", () => {
-    const range = { from: "2026-10-10", to: "2026-11-30" };
+  it("jedes Angebot am selben Termin wie bei „Nächste Termine“, auch mit Zeitraum, Tageszeit und Alter", () => {
+    const rule = { range: { from: "2026-10-10", to: "2026-11-30" }, daytimes: ["vormittags" as const] };
     const fits = sessionFit("2025-08-05");
-    const byDate = groupByNextSession(offers, FIXTURE_NOW, range, fits).flatMap((g) => g.items);
-    const byListing = groupByListing(offers, FIXTURE_NOW, range, fits).flatMap((g) => g.items);
+    const byDate = groupByNextSession(offers, FIXTURE_NOW, rule, fits).flatMap((g) => g.items);
+    const byListing = groupByListing(offers, FIXTURE_NOW, rule, fits).flatMap((g) => g.items);
     const at = (list: Occurrence<SiteOffer>[]) => new Map(list.map((i) => [i.offer.id, i.session.start] as const));
     expect(at(byListing)).toEqual(at(byDate));
   });
@@ -174,11 +174,11 @@ describe("groupByReach: Liste „Nächstgelegen“ (Plan 0043, E7)", () => {
     expect(groups.map((g) => g.key)).toEqual(["w:m:1000", "w:m:3000", "w:m:10000", "w:m:mehr"]);
   });
 
-  it("Zeitraum und Alter wirken wie bei „Nächste Termine“", () => {
-    const range = { from: "2026-10-10", to: "2026-11-30" };
+  it("Zeitraum, Tageszeit und Alter wirken wie bei „Nächste Termine“", () => {
+    const rule = { range: { from: "2026-10-10", to: "2026-11-30" }, daytimes: ["vormittags" as const] };
     const fits = sessionFit("2025-08-05");
-    const byDate = groupByNextSession(offers, FIXTURE_NOW, range, fits).flatMap((g) => g.items);
-    const byReach = groupByReach(offers, FIXTURE_NOW, () => undefined, range, fits).flatMap((g) => g.items);
+    const byDate = groupByNextSession(offers, FIXTURE_NOW, rule, fits).flatMap((g) => g.items);
+    const byReach = groupByReach(offers, FIXTURE_NOW, () => undefined, rule, fits).flatMap((g) => g.items);
     const at = (list: Occurrence<SiteOffer>[]) => new Map(list.map((i) => [i.offer.id, i.session.start] as const));
     expect(at(byReach)).toEqual(at(byDate));
   });

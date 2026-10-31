@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  candidateSessions,
   checkBound,
   type DateRange,
+  type Daytime,
   dateRange,
+  daytimeOf,
   fieldLimits,
   inDateRange,
   quickRanges,
@@ -173,5 +176,71 @@ describe("DateRange (Plan 0023, Arch-Review m5)", () => {
     // @ts-expect-error – ein Zeitraum ohne Grenze ist kein Zeitraum; der Typ verbietet ihn (Absicht des Tests)
     const empty: DateRange = {};
     expect(dateRange(empty.from, empty.to)).toBeUndefined();
+  });
+});
+
+describe("Tageszeit und candidateSessions (Plan 0057, E7)", () => {
+  const at = (start: string) => s(start, start);
+
+  it("teilt nach dem Beginn in Berliner Zeit: vor 12, 12 bis vor 15, ab 15 Uhr", () => {
+    // in Los Angeles ist 11:59 Berlin noch die Nacht davor: die Uhr des Geräts zählt nie
+    expect(daytimeOf(at("2026-10-14T11:59:00+02:00"))).toBe("vormittags");
+    expect(daytimeOf(at("2026-10-14T12:00:00+02:00"))).toBe("mittags");
+    expect(daytimeOf(at("2026-10-14T14:59:00+02:00"))).toBe("mittags");
+    expect(daytimeOf(at("2026-10-14T15:00:00+02:00"))).toBe("nachmittags");
+    expect(daytimeOf(at("2026-10-14T00:00:00+02:00"))).toBe("vormittags");
+    expect(daytimeOf(at("2026-10-14T23:59:00+02:00"))).toBe("nachmittags");
+  });
+
+  it("zählt am Tag der Zeitumstellung (25.10.2026) nach Berliner Uhr", () => {
+    expect(daytimeOf(at("2026-10-25T11:59:00+01:00"))).toBe("vormittags");
+    expect(daytimeOf(at("2026-10-25T12:00:00+01:00"))).toBe("mittags");
+    expect(daytimeOf(at("2026-10-25T14:59:00+01:00"))).toBe("mittags");
+    expect(daytimeOf(at("2026-10-25T15:00:00+01:00"))).toBe("nachmittags");
+    // dieselben Zeitpunkte in UTC geschrieben
+    expect(daytimeOf(at("2026-10-25T10:59:00Z"))).toBe("vormittags");
+    expect(daytimeOf(at("2026-10-25T11:00:00Z"))).toBe("mittags");
+  });
+
+  it("regelmäßig und einmalig: nicht beendete Termine im Zeitraum und in der Tageszeit", () => {
+    const regular = offer("regelmaessig", [
+      s("2026-10-05T09:00:00+02:00", "2026-10-05T10:00:00+02:00"), // beendet
+      s("2026-10-12T09:00:00+02:00", "2026-10-12T10:00:00+02:00"), // Mo vormittags
+      s("2026-10-13T16:00:00+02:00", "2026-10-13T17:00:00+02:00"), // Di nachmittags
+      s("2026-10-19T09:00:00+02:00", "2026-10-19T10:00:00+02:00"), // Mo vormittags
+    ]);
+    const starts = (range?: DateRange, daytimes?: Daytime[]) =>
+      candidateSessions(regular, FIXTURE_NOW, range, daytimes).map((x) => x.start.slice(0, 13));
+    expect(starts()).toEqual(["2026-10-12T09", "2026-10-13T16", "2026-10-19T09"]);
+    expect(starts(undefined, ["vormittags"])).toEqual(["2026-10-12T09", "2026-10-19T09"]);
+    expect(starts(undefined, [])).toEqual(starts());
+    expect(starts({ from: "2026-10-13" }, ["vormittags"])).toEqual(["2026-10-19T09"]);
+    // Zeitraum und Tageszeit am selben Termin: Dienstag vormittags gibt es nicht
+    expect(starts({ from: "2026-10-13", to: "2026-10-13" }, ["vormittags"])).toEqual([]);
+    expect(starts({ from: "2026-10-13", to: "2026-10-13" }, ["nachmittags"])).toEqual(["2026-10-13T16"]);
+    // ein beendeter Vormittagstermin ist kein Kandidat
+    expect(starts({ to: "2026-10-05" }, ["vormittags"])).toEqual([]);
+  });
+
+  it("Kurs: einziger Kandidat ist der Kursbeginn, auch beendet; Zeitraum und Tageszeit gelten für ihn", () => {
+    const course = offer("kurs", [
+      s("2026-10-05T09:00:00+02:00", "2026-10-05T10:00:00+02:00"),
+      s("2026-10-12T15:00:00+02:00", "2026-10-12T16:00:00+02:00"),
+    ]);
+    expect(candidateSessions(course, FIXTURE_NOW)).toEqual([course.sessions[0]]);
+    expect(candidateSessions(course, FIXTURE_NOW, undefined, ["vormittags"])).toEqual([course.sessions[0]]);
+    // spätere Termine zählen nicht, auch nicht mit passender Tageszeit
+    expect(candidateSessions(course, FIXTURE_NOW, undefined, ["nachmittags"])).toEqual([]);
+    expect(candidateSessions(course, FIXTURE_NOW, { from: "2026-10-12" }, ["nachmittags"])).toEqual([]);
+    expect(candidateSessions(course, FIXTURE_NOW, { from: "2026-10-05" }, ["nachmittags"])).toEqual([]);
+  });
+
+  it("rangeSession ist der erste Kandidat ohne Tageszeit", () => {
+    for (const key of ["krabbeltreff", "pekip-herbst", "babymassage-workshop", "vergangen"] as const) {
+      const o = fixtureOffer(key);
+      for (const range of [{ from: "2026-10-13" }, { to: "2026-10-20" }, { from: "2026-10-21", to: "2026-10-28" }]) {
+        expect(rangeSession(o, range, FIXTURE_NOW)).toEqual(candidateSessions(o, FIXTURE_NOW, range)[0]);
+      }
+    }
   });
 });
