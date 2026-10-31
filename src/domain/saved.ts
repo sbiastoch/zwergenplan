@@ -4,13 +4,13 @@
  * IDs, die im aktuellen Datenstand fehlen, werden nur ausgeblendet, nie gelöscht: Ein lückenhafter
  * Pipeline-Lauf soll keine Merkliste leeren.
  */
-import { fittingSessions, sessionFit } from "./age.ts";
+import { fittingSessions, sessionFit, splitByAge } from "./age.ts";
 import { type Occurrence, shownSession, upcomingSessions } from "./agenda.ts";
-import type { DateRange, SessionRule } from "./date-range.ts";
-import { applyFilters, EMPTY_FILTER, type FilterState, matchesFilter } from "./filter.ts";
+import type { SessionRule } from "./date-range.ts";
+import { activeFilterCount, applyFilters, EMPTY_FILTER, type FilterState, matchesFilter } from "./filter.ts";
 import { resolveOfferId, resolveProviderId } from "./ids.ts";
-import type { ReachTarget } from "./reach.ts";
-import type { Format, Offer, Registration, Session } from "./schema.ts";
+import type { ReachFn, ReachTarget } from "./reach.ts";
+import type { Offer, Session } from "./schema.ts";
 
 export function toggleId<T extends string>(ids: readonly T[], id: T): T[] {
   return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
@@ -74,7 +74,7 @@ export function savedOffers<T extends Offer>(
   ids: readonly string[],
   now: Date,
   birthDate: string | undefined,
-  /** Schnellwahl „ab …“ des Merklisten-Filters: Termin im Zeitraum (Plan 0025, E3a); Tageszeit ab Plan 0057, S3 */
+  /** Zeitraum und Tageszeit des Merklisten-Filters: Termin darin (Plan 0025, E3a; Plan 0057, E5, `savedRule`) */
   rule?: SessionRule,
 ): Occurrence<T>[] {
   const wanted = new Set(ids);
@@ -179,69 +179,103 @@ export function collectionExport<T extends Offer>(
   return { items, count, missing: fixed.length - items.length, tentative: offers.length - fixed.length };
 }
 
-/** Filter der Merkliste (Plan 0025, E6): getrennt vom Startseiten-Filter, nie in der URL. */
+/**
+ * Filter der Merkliste (Plan 0025, E6; Plan 0057, E5): derselbe Zustand wie auf der Startseite, getrennt von ihm und nie
+ * in der URL, dazu „Nur fest eingeplant“. Es gibt keine eigene Filterlogik.
+ */
 export interface SavedFilter {
-  formats: Format[];
-  registration: Registration[];
-  /** eine der Schnellwahlen „ab …“ (E7); wirkt nur in Liste und Karte */
-  range?: DateRange;
+  filter: FilterState;
+  onlyFixed: boolean;
 }
 
-export const EMPTY_SAVED_FILTER: SavedFilter = { formats: [], registration: [] };
+export const EMPTY_SAVED_FILTER: SavedFilter = { filter: EMPTY_FILTER, onlyFixed: false };
 
-/** Derselbe Filter als Startseiten-Zustand: Es gibt keine eigene Format-, Anmelde- oder Zeitraumlogik (E6). */
-function asFilterState({ formats, registration, range }: SavedFilter, useRange: boolean): FilterState {
-  return { ...EMPTY_FILTER, formats, registration, ...(useRange && range ? { range } : {}) };
+/** Der Merklisten-Filter dieser Darstellung: Im Kalender ist die Auswahl der Zeitraum, der Filter-Zeitraum fällt weg (E5). */
+function viewFilter(filter: FilterState, useRange: boolean): FilterState {
+  if (useRange || !filter.range) return filter;
+  const { range: _range, ...rest } = filter;
+  return rest;
 }
+
+/** Welche Termine zählen (gezeigter Termin, Alters-Markierung): Zeitraum nur außerhalb des Kalenders, Tageszeit immer. */
+export function savedRule({ filter }: SavedFilter, useRange: boolean): SessionRule {
+  return { range: useRange ? filter.range : undefined, daytimes: filter.daytimes };
+}
+
+const fixedOnly = (saved: SavedFilter, state: SavedState) => (offer: Offer) =>
+  !saved.onlyFixed || stageOf(state, offer.id) === "fest";
 
 /**
- * Gemerkte Angebote nach dem Merklisten-Filter (E6): Format und Anmeldung, mit `useRange` auch die Schnellwahl „ab …“
- * (im Kalender nicht, dort ist die Auswahl der Zeitraum, E5). Ohne kommenden Termin fällt ein Angebot heraus.
+ * Gemerkte Angebote nach dem Merklisten-Filter (E5) über `applyFilters` wie auf der Startseite: Kategorie, Format,
+ * Anmeldung, Kosten, Tageszeit, mit `useRange` der Zeitraum (im Kalender nicht), mit `reach` die Wegzeit-Grenze; danach
+ * „Nur fest eingeplant“. Ohne kommenden Termin fällt ein Angebot heraus.
  */
 export function applySavedFilter<T extends Offer & { venue: ReachTarget }>(
   offers: readonly T[],
-  filter: SavedFilter,
+  saved: SavedFilter,
+  state: SavedState,
   now: Date,
-  { useRange }: { useRange: boolean },
+  { useRange, reach }: { useRange: boolean; reach?: ReachFn | undefined },
 ): T[] {
   // Gemerkte laufende Kurse bleiben: Man nimmt vielleicht teil (Plan 0053, E1)
-  return applyFilters(offers, asFilterState(filter, useRange), { now, runningCourses: true });
-}
-
-/** Passt ein Angebot zu Format und Anmeldung, ohne Zeitbezug? Für „heute schon vorbei“ im Kalender (M7). */
-export function matchesSavedFilter(offer: Offer & { venue: ReachTarget }, filter: SavedFilter): boolean {
-  return matchesFilter(offer, asFilterState(filter, false));
-}
-
-/** Ein Chip der Filterzeile (E6, E7) */
-export type SavedFilterChip =
-  | { kind: "format"; value: Format }
-  | { kind: "registration"; value: Registration }
-  | { kind: "range"; range: DateRange };
-
-/** Ist der Chip gewählt? Dieselbe Regel wie in `toggleSavedFilter` (Arch-Review 0025, Etappe 4). */
-export function isSavedFilterChipOn(filter: SavedFilter, chip: SavedFilterChip): boolean {
-  if (chip.kind === "format") return filter.formats.includes(chip.value);
-  if (chip.kind === "registration") return filter.registration.includes(chip.value);
-  return filter.range?.from === chip.range.from && filter.range?.to === chip.range.to;
+  return applyFilters(offers, viewFilter(saved.filter, useRange), { now, reach, runningCourses: true }).filter(
+    fixedOnly(saved, state),
+  );
 }
 
 /**
- * Tipp auf einen Chip: Format als Mehrfachwahl, Anmeldung als Einfachwahl wie im Filter-Sheet, die Schnellwahlen
- * „ab …“ als Einfachwahl, die ein zweiter Tipp aufhebt. Ohne Zeitraum fehlt der Schlüssel (kanonisch wie `withDateRange`).
+ * Passt ein Angebot zum Merklisten-Filter, ohne Zeitbezug? Für „heute schon vorbei“ im Kalender (Plan 0025, M7). Die
+ * Tageszeit prüft der Kalender je Termin (`inDaytime`), nicht hier: Sonst fiele ein Angebot heraus, dessen einziger
+ * Termin heute schon vorbei ist (Plan 0057, E7).
  */
-export function toggleSavedFilter(filter: SavedFilter, chip: SavedFilterChip): SavedFilter {
-  if (chip.kind === "format") return { ...filter, formats: toggleId(filter.formats, chip.value) };
-  if (chip.kind === "registration") {
-    return { ...filter, registration: isSavedFilterChipOn(filter, chip) ? [] : [chip.value] };
-  }
-  const { range: _range, ...rest } = filter;
-  return isSavedFilterChipOn(filter, chip) ? rest : { ...rest, range: chip.range };
+export function matchesSavedFilter(
+  offer: Offer & { venue: ReachTarget },
+  saved: SavedFilter,
+  state: SavedState,
+  reach?: ReachFn,
+): boolean {
+  return matchesFilter(offer, saved.filter, reach) && fixedOnly(saved, state)(offer);
 }
 
-/** Gewählte Werte; der Zeitraum zählt als einer und nur mit `useRange` (Statuszeile, „Zurücksetzen“, Export-Name). */
-export function savedFilterCount(filter: SavedFilter, { useRange }: { useRange: boolean }): number {
-  return filter.formats.length + filter.registration.length + (useRange && filter.range ? 1 : 0);
+/**
+ * Gewählte Werte wie im Badge der Startseite (`activeFilterCount`), dazu eins für „Nur fest eingeplant“ (E5). Im
+ * Kalender zählt der Zeitraum nicht, er wirkt dort nicht.
+ */
+export function savedFilterCount(
+  saved: SavedFilter,
+  { useRange, limitActive }: { useRange: boolean; limitActive: boolean },
+): number {
+  return activeFilterCount(viewFilter(saved.filter, useRange), { limitActive }) + (saved.onlyFixed ? 1 : 0);
+}
+
+/**
+ * Alters-Markierung der Merkliste (E5, Review 3 M2): wie `unfitIds`, aber mit der Regel des Merklisten-Filters. Ein
+ * regelmäßiges Angebot, dessen passende Termine alle außerhalb von Zeitraum bzw. Tageszeit liegen, ist markiert.
+ */
+export function savedUnfitIds(
+  offers: readonly Offer[],
+  birthDate: string | undefined,
+  now: Date,
+  rule: SessionRule,
+): ReadonlySet<string> {
+  if (birthDate === undefined) return new Set();
+  return new Set(splitByAge(offers, birthDate, now, rule).unfit.map((o) => o.id));
+}
+
+/**
+ * Sortierung der Liste der Merkliste (E6): „Nächste Termine“ (Standard in S3), „Nächstgelegen“, „Zuletzt gemerkt“. Die
+ * Abschnitte „Was ist zu tun“ kommen in S4 dazu.
+ */
+export type SavedSort = "termine" | "nah" | "gemerkt";
+
+/** „Zuletzt gemerkt“ (E6): nach der Merk-Reihenfolge rückwärts; ein Stufenwechsel ändert sie nicht (E1). */
+export function recentlySaved<T extends Offer>(
+  items: readonly Occurrence<T>[],
+  ids: readonly string[],
+): Occurrence<T>[] {
+  const position = new Map(ids.map((id, i) => [id, i]));
+  const at = (item: Occurrence<T>) => position.get(item.offer.id) ?? -1;
+  return [...items].sort((a, b) => at(b) - at(a));
 }
 
 /**

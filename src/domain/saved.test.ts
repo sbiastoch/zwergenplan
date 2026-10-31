@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { offerFitsAge } from "./age.ts";
 import { upcomingSessions } from "./agenda.ts";
+import { EMPTY_FILTER, type FilterState } from "./filter.ts";
+import type { ReachFn } from "./reach.ts";
 import {
   applySavedFilter,
   cleanSavedProviders,
@@ -9,18 +11,19 @@ import {
   cycleStage,
   EMPTY_SAVED_FILTER,
   exportSessions,
-  isSavedFilterChipOn,
   matchesSavedFilter,
   migrateSavedIds,
+  recentlySaved,
   type SavedFilter,
   type SavedStage,
   type SavedState,
   savedFilterCount,
   savedOffers,
+  savedRule,
+  savedUnfitIds,
   seriesExport,
   stageOf,
   toggleId,
-  toggleSavedFilter,
   upcomingSessionCount,
   withStage,
 } from "./saved.ts";
@@ -452,7 +455,7 @@ describe("migrateSavedIds (ADR 0022)", () => {
   });
 });
 
-describe("Filter der Merkliste (Plan 0025, E6)", () => {
+describe("Filter der Merkliste (Plan 0025, E6; Plan 0057, E5)", () => {
   // Wie die Oberfläche sie hat: mit Ort (Typgrenze von `matchesFilter`)
   const siteOffers = fixtureSiteOffers();
   const site = (key: FixtureKey) => {
@@ -460,124 +463,146 @@ describe("Filter der Merkliste (Plan 0025, E6)", () => {
     if (!found) throw new Error(`Fixture-Angebot ${key} fehlt`);
     return found;
   };
-  // PEKiP: Kurs mit Anmeldung ab 13.10.; Musikgarten: Kurs mit Anmeldung ab 5.11.; Treff: regelmäßig ohne, bis 4.11.
+  // PEKiP: Kurs mit Anmeldung ab 13.10., 9:30; Musikgarten: Kurs mit Anmeldung ab 5.11., 16 Uhr; Treff: regelmäßig ohne,
+  // kostenlos, mittwochs 10 Uhr bis 4.11.
   const offers = [site("pekip-herbst"), site("musikgarten-1"), site("krabbeltreff")];
   const keys = (list: readonly Offer[]) => list.map((o) => fixtureKey(o));
-  const filter = (patch: Partial<SavedFilter>): SavedFilter => ({ ...EMPTY_SAVED_FILTER, ...patch });
+  const saved = (patch: Partial<FilterState>, onlyFixed = false): SavedFilter => ({
+    filter: { ...EMPTY_FILTER, ...patch },
+    onlyFixed,
+  });
+  // alles fest eingeplant (Bestand), nur der Treff vorgemerkt
+  const allFixed: SavedState = { ids: offers.map((o) => o.id), tentative: [] };
+  const treffTentative: SavedState = { ...allFixed, tentative: [site("krabbeltreff").id] };
   const all = { useRange: true };
+  const apply = (filter: SavedFilter, opts: { useRange: boolean; reach?: ReachFn } = all, state = allFixed) =>
+    keys(applySavedFilter(offers, filter, state, FIXTURE_NOW, opts));
 
   it("ein leerer Filter ergibt alle mit kommendem Termin", () => {
-    expect(keys(applySavedFilter(offers, EMPTY_SAVED_FILTER, FIXTURE_NOW, all))).toEqual([
-      "pekip-herbst",
-      "musikgarten-1",
-      "krabbeltreff",
-    ]);
-    expect(applySavedFilter([site("vergangen")], EMPTY_SAVED_FILTER, FIXTURE_NOW, all)).toEqual([]);
+    expect(apply(EMPTY_SAVED_FILTER)).toEqual(["pekip-herbst", "musikgarten-1", "krabbeltreff"]);
+    expect(applySavedFilter([site("vergangen")], EMPTY_SAVED_FILTER, allFixed, FIXTURE_NOW, all)).toEqual([]);
   });
 
   it("ein gemerkter laufender Kurs bleibt (Plan 0053, E1)", () => {
-    expect(keys(applySavedFilter(offers, EMPTY_SAVED_FILTER, new Date("2026-10-20T12:00:00+02:00"), all))).toEqual([
+    const later = new Date("2026-10-20T12:00:00+02:00");
+    expect(keys(applySavedFilter(offers, EMPTY_SAVED_FILTER, allFixed, later, all))).toEqual([
       "pekip-herbst",
       "musikgarten-1",
       "krabbeltreff",
     ]);
   });
 
-  it("Format wirkt als ODER, Anmeldung zusätzlich als UND", () => {
-    expect(keys(applySavedFilter(offers, filter({ formats: ["kurs"] }), FIXTURE_NOW, all))).toEqual([
+  it("Format als ODER, Anmeldung, Kategorie und Kosten zusätzlich als UND, wie auf der Startseite", () => {
+    expect(apply(saved({ formats: ["kurs"] }))).toEqual(["pekip-herbst", "musikgarten-1"]);
+    expect(apply(saved({ formats: ["kurs", "regelmaessig"] }))).toHaveLength(3);
+    expect(apply(saved({ formats: ["kurs"], registration: ["ohne-anmeldung"] }))).toEqual([]);
+    expect(apply(saved({ categories: ["musik"] }))).toEqual(["musikgarten-1"]);
+    expect(apply(saved({ cost: ["kostenlos"] }))).toEqual(["krabbeltreff"]);
+  });
+
+  it("Tageszeit filtert hart, am Kursbeginn bzw. an einem kommenden Termin (E7)", () => {
+    expect(apply(saved({ daytimes: ["vormittags"] }))).toEqual(["pekip-herbst", "krabbeltreff"]);
+    expect(apply(saved({ daytimes: ["nachmittags"] }))).toEqual(["musikgarten-1"]);
+    // ein laufender Kurs mit Beginn vormittags bleibt, auch wenn sein Beginn vorbei ist
+    const later = new Date("2026-10-20T12:00:00+02:00");
+    expect(keys(applySavedFilter(offers, saved({ daytimes: ["vormittags"] }), allFixed, later, all))).toContain(
       "pekip-herbst",
+    );
+  });
+
+  it("„Nur fest eingeplant“ blendet vorgemerkte aus", () => {
+    expect(apply(saved({}, true), all, treffTentative)).toEqual(["pekip-herbst", "musikgarten-1"]);
+    expect(apply(saved({}, true), all, allFixed)).toHaveLength(3);
+    expect(apply(saved({ formats: ["regelmaessig"] }, true), all, treffTentative)).toEqual([]);
+  });
+
+  it("Zeitraum: Kurse mit erstem Termin darin, regelmäßige mit irgendeinem Termin; ohne `useRange` nicht (Kalender)", () => {
+    const fromNov = saved({ range: { from: "2026-11-01" } });
+    expect(apply(fromNov)).toEqual(["musikgarten-1", "krabbeltreff"]);
+    expect(apply(fromNov, { useRange: false })).toHaveLength(3);
+    // Tageszeit wirkt auch im Kalender
+    expect(apply(saved({ range: { from: "2026-11-01" }, daytimes: ["nachmittags"] }), { useRange: false })).toEqual([
       "musikgarten-1",
     ]);
-    expect(applySavedFilter(offers, filter({ formats: ["kurs", "regelmaessig"] }), FIXTURE_NOW, all)).toHaveLength(3);
-    const none = filter({ formats: ["kurs"], registration: ["ohne-anmeldung"] });
-    expect(applySavedFilter(offers, none, FIXTURE_NOW, all)).toEqual([]);
   });
 
-  it("Zeitraum: Kurse mit erstem Termin darin, regelmäßige mit irgendeinem Termin", () => {
-    const fromNov = filter({ range: { from: "2026-11-01" } });
-    expect(keys(applySavedFilter(offers, fromNov, FIXTURE_NOW, all))).toEqual(["musikgarten-1", "krabbeltreff"]);
+  it("Wegzeit-Grenze nur mit Wegzeit (`reach`)", () => {
+    const within20 = saved({ reachLimit: { kind: "minuten", value: 20 } });
+    // Musikschule (Musikgarten) 29,6 Min., Beispielhof (Treff) 13,6, Gemeinde (PEKiP) 32,6
+    const minutes: Record<string, number> = { "musikgarten-1": 29.6, krabbeltreff: 13.6, "pekip-herbst": 32.6 };
+    const reach: ReachFn = (venue) => {
+      const offer = offers.find((o) => o.venue === venue);
+      return { kind: "oepnv", minutes: minutes[(offer && fixtureKey(offer)) ?? ""] ?? 99, byFoot: false };
+    };
+    expect(apply(within20, { useRange: true, reach })).toEqual(["krabbeltreff"]);
+    expect(apply(within20)).toHaveLength(3);
   });
 
-  it("ohne `useRange` zählt der Zeitraum nicht (Kalender)", () => {
-    const fromNov = filter({ range: { from: "2026-11-01" } });
-    expect(applySavedFilter(offers, fromNov, FIXTURE_NOW, { useRange: false })).toHaveLength(3);
+  it("matchesSavedFilter: ohne Zeitbezug und ohne Tageszeit, mit „Nur fest eingeplant“ (M7; Plan 0057, E7)", () => {
+    const cafe = site("vergangen"); // einmalig, ohne Anmeldung, heute 9 Uhr schon vorbei
+    const state: SavedState = { ids: [cafe.id], tentative: [] };
+    expect(matchesSavedFilter(cafe, saved({ formats: ["einmalig"] }), state)).toBe(true);
+    expect(matchesSavedFilter(cafe, saved({ formats: ["kurs"] }), state)).toBe(false);
+    expect(matchesSavedFilter(cafe, saved({ registration: ["mit-anmeldung"] }), state)).toBe(false);
+    expect(matchesSavedFilter(cafe, saved({ range: { from: "2027-01-01" } }), state)).toBe(true);
+    // einziger Termin heute schon vorbei: bleibt gezählt, die Tageszeit prüft der Kalender je Termin
+    expect(matchesSavedFilter(cafe, saved({ daytimes: ["nachmittags"] }), state)).toBe(true);
+    expect(matchesSavedFilter(cafe, saved({}, true), state)).toBe(true);
+    expect(matchesSavedFilter(cafe, saved({}, true), { ...state, tentative: [cafe.id] })).toBe(false);
   });
 
-  it("savedFilterCount zählt Werte, den Zeitraum als einen und nur mit `useRange`", () => {
-    expect(savedFilterCount(EMPTY_SAVED_FILTER, all)).toBe(0);
-    const f = filter({ formats: ["kurs", "einmalig"], registration: ["mit-anmeldung"], range: { from: "2026-11-01" } });
-    expect(savedFilterCount(f, all)).toBe(4);
-    expect(savedFilterCount(f, { useRange: false })).toBe(3);
-    expect(savedFilterCount(filter({ range: { from: "2026-11-01" } }), { useRange: false })).toBe(0);
+  it("savedFilterCount: Werte wie das Badge der Startseite, plus „Nur fest“; Zeitraum nur mit `useRange`", () => {
+    const off = { useRange: true, limitActive: false };
+    expect(savedFilterCount(EMPTY_SAVED_FILTER, off)).toBe(0);
+    const f = saved({ formats: ["kurs", "einmalig"], daytimes: ["vormittags"], range: { from: "2026-11-01" } }, true);
+    expect(savedFilterCount(f, off)).toBe(5);
+    expect(savedFilterCount(f, { useRange: false, limitActive: false })).toBe(4);
+    const limit = saved({ reachLimit: { kind: "minuten", value: 20 } });
+    expect(savedFilterCount(limit, off)).toBe(0);
+    expect(savedFilterCount(limit, { useRange: true, limitActive: true })).toBe(1);
   });
 
-  it("matchesSavedFilter prüft Format und Anmeldung ohne Zeitbezug, auch für Vorbei-es (M7)", () => {
-    const cafe = site("vergangen"); // einmalig, ohne Anmeldung, heute schon vorbei
-    expect(matchesSavedFilter(cafe, filter({ formats: ["einmalig"] }))).toBe(true);
-    expect(matchesSavedFilter(cafe, filter({ formats: ["kurs"] }))).toBe(false);
-    expect(matchesSavedFilter(cafe, filter({ registration: ["mit-anmeldung"] }))).toBe(false);
-    expect(matchesSavedFilter(cafe, filter({ range: { from: "2027-01-01" } }))).toBe(true);
-  });
-});
-
-describe("isSavedFilterChipOn (Arch-Review 0025, Etappe 4)", () => {
-  const nov = { from: "2026-11-01" };
-  const f: SavedFilter = { formats: ["kurs"], registration: ["mit-anmeldung"], range: nov };
-
-  it("ist an, wenn der Wert gewählt ist; Zeitraum über von und bis", () => {
-    expect(isSavedFilterChipOn(f, { kind: "format", value: "kurs" })).toBe(true);
-    expect(isSavedFilterChipOn(f, { kind: "format", value: "einmalig" })).toBe(false);
-    expect(isSavedFilterChipOn(f, { kind: "registration", value: "mit-anmeldung" })).toBe(true);
-    expect(isSavedFilterChipOn(f, { kind: "registration", value: "ohne-anmeldung" })).toBe(false);
-    expect(isSavedFilterChipOn(f, { kind: "range", range: { ...nov } })).toBe(true);
-    expect(isSavedFilterChipOn(f, { kind: "range", range: { from: "2026-12-01" } })).toBe(false);
-    expect(isSavedFilterChipOn(f, { kind: "range", range: { from: "2026-11-01", to: "2026-11-30" } })).toBe(false);
-    expect(isSavedFilterChipOn(EMPTY_SAVED_FILTER, { kind: "range", range: nov })).toBe(false);
-  });
-
-  it("passt zu toggleSavedFilter: ein Tipp schaltet genau diesen Chip um", () => {
-    const chip = { kind: "format", value: "regelmaessig" } as const;
-    expect(isSavedFilterChipOn(toggleSavedFilter(f, chip), chip)).toBe(true);
-    expect(isSavedFilterChipOn(toggleSavedFilter(toggleSavedFilter(f, chip), chip), chip)).toBe(false);
+  it("savedRule: Zeitraum nur mit `useRange`, die Tageszeit immer", () => {
+    const f = saved({ range: { from: "2026-11-01" }, daytimes: ["nachmittags"] });
+    expect(savedRule(f, true)).toEqual({ range: { from: "2026-11-01" }, daytimes: ["nachmittags"] });
+    expect(savedRule(f, false)).toEqual({ range: undefined, daytimes: ["nachmittags"] });
   });
 });
 
-describe("toggleSavedFilter (Plan 0025, E6, E7)", () => {
-  const nov = { from: "2026-11-01" };
-  const dez = { from: "2026-12-01" };
+describe("savedUnfitIds (Plan 0057, E5, Review 3 M2)", () => {
+  // Treff 6–24 Monate, mittwochs 10 Uhr ab 7.10.; geboren am 20.4.: passend erst ab 21.10.
+  const treff = fixtureOffer("krabbeltreff");
+  const birthDate = "2026-04-20";
 
-  it("Format: Mehrfachwahl", () => {
-    const kurse = toggleSavedFilter(EMPTY_SAVED_FILTER, { kind: "format", value: "kurs" });
-    expect(kurse.formats).toEqual(["kurs"]);
-    const both = toggleSavedFilter(kurse, { kind: "format", value: "einmalig" });
-    expect(both.formats).toEqual(["kurs", "einmalig"]);
-    expect(toggleSavedFilter(both, { kind: "format", value: "kurs" }).formats).toEqual(["einmalig"]);
+  it("ohne Geburtsdatum nichts, ohne Regel wie `offerFitsAge`", () => {
+    expect(savedUnfitIds([treff], undefined, FIXTURE_NOW, {}).size).toBe(0);
+    expect(savedUnfitIds([treff], birthDate, FIXTURE_NOW, {}).has(treff.id)).toBe(false);
   });
 
-  it("Anmeldung: Einfachwahl, der eine schaltet den anderen ab", () => {
-    const mit = toggleSavedFilter(EMPTY_SAVED_FILTER, { kind: "registration", value: "mit-anmeldung" });
-    expect(mit.registration).toEqual(["mit-anmeldung"]);
-    expect(toggleSavedFilter(mit, { kind: "registration", value: "ohne-anmeldung" }).registration).toEqual([
-      "ohne-anmeldung",
+  it("mit Zeitraum und Tageszeit zählt nur ein passender Termin darin", () => {
+    expect(savedUnfitIds([treff], birthDate, FIXTURE_NOW, { range: { to: "2026-10-14" } }).has(treff.id)).toBe(true);
+    // passende Termine gibt es nur vormittags: Mit „Nachmittags“ ist der Treff markiert
+    const mixed: Offer = {
+      ...treff,
+      sessions: [
+        ...treff.sessions,
+        { start: "2026-10-08T16:00:00+02:00", end: "2026-10-08T17:00:00+02:00" }, // Do nachmittags, 5 Monate
+      ],
+    };
+    expect(savedUnfitIds([mixed], birthDate, FIXTURE_NOW, { daytimes: ["vormittags"] }).has(mixed.id)).toBe(false);
+    expect(savedUnfitIds([mixed], birthDate, FIXTURE_NOW, { daytimes: ["nachmittags"] }).has(mixed.id)).toBe(true);
+  });
+});
+
+describe("recentlySaved (Plan 0057, E6)", () => {
+  it("ordnet nach der Merk-Reihenfolge rückwärts: zuletzt gemerkt zuerst", () => {
+    const ids = [id("krabbeltreff"), id("musikgarten-1"), id("pekip-herbst")];
+    const items = savedOffers(file.offers, ids, FIXTURE_NOW, undefined);
+    expect(recentlySaved(items, ids).map((i) => fixtureKey(i.offer))).toEqual([
+      "pekip-herbst",
+      "musikgarten-1",
+      "krabbeltreff",
     ]);
-    expect(toggleSavedFilter(mit, { kind: "registration", value: "mit-anmeldung" }).registration).toEqual([]);
-  });
-
-  it("Schnellwahl: Einfachwahl, ein zweiter Tipp hebt sie auf; ohne Zeitraum fehlt der Schlüssel", () => {
-    const a = toggleSavedFilter(EMPTY_SAVED_FILTER, { kind: "range", range: nov });
-    expect(a.range).toEqual(nov);
-    expect(toggleSavedFilter(a, { kind: "range", range: dez }).range).toEqual(dez);
-    const off = toggleSavedFilter(a, { kind: "range", range: { ...nov } });
-    expect(off).toEqual(EMPTY_SAVED_FILTER);
-    expect("range" in off).toBe(false);
-  });
-
-  it("lässt die übrigen Werte unverändert", () => {
-    const f: SavedFilter = { formats: ["kurs"], registration: ["mit-anmeldung"], range: nov };
-    expect(toggleSavedFilter(f, { kind: "format", value: "regelmaessig" })).toEqual({
-      ...f,
-      formats: ["kurs", "regelmaessig"],
-    });
   });
 });
 

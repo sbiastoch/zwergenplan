@@ -1,11 +1,11 @@
 import { createElement, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { EMPTY_FILTER } from "../domain/filter.ts";
+import { EMPTY_FILTER, type FilterState } from "../domain/filter.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { airlineReach, type Origin, type ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
-import { EMPTY_SAVED_FILTER, type SavedFilter } from "../domain/saved.ts";
+import type { SavedFilter } from "../domain/saved.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { fromBerlinLocal } from "../domain/time.ts";
 import { type OfferViews, type OfferViewsInput, useOfferViews } from "./use-offer-views.ts";
@@ -454,12 +454,26 @@ describe("useOfferViews", () => {
       expect(countPlaces(render({ offers: all, ...variants[0] }).visible)).toBe(1);
     });
 
-    it("der Kalender der Merkliste kennt keine Wegzeit-Grenze (Plan 0025, E8)", () => {
+    it("im Kalender der Merkliste wirkt die Grenze der Startseite nicht (Plan 0025, E8)", () => {
       const heuteFern = at(offer("heute-fern", "2026-10-05"), 49.4301, 11.0892);
       const route: Route = { ...within20, tab: "merkliste-kalender" };
       const v = render({ offers: [nah, fern, heuteFern], route, reach: wegzeit, savedIds: [fern.id, heuteFern.id] });
       expect([...(v.savedCalendar?.index.keys() ?? [])]).toEqual(["2026-10-12"]);
       expect(v.savedCalendar?.endedToday).toBe(1);
+    });
+
+    it("die eigene Grenze der Merkliste filtert den Kalender erst mit Wegzeit und zählt dann (Plan 0057, E7a)", () => {
+      const route: Route = { tab: "merkliste-kalender", filter: EMPTY_FILTER };
+      const savedFilter = { filter: within20.filter, onlyFixed: false };
+      const input = { offers: [nah, fern], route, savedIds: [nah.id, fern.id], savedFilter };
+      // Tabelle lädt noch: nichts gefiltert, nichts gezählt (Kalender wartet nicht)
+      const loading = render({ ...input, savedLimitActive: false });
+      expect([...(loading.savedCalendar?.index.keys() ?? [])].sort()).toEqual(["2026-10-10", "2026-10-12"]);
+      expect(loading.savedFilterCount).toBe(0);
+      const ready = render({ ...input, reach: wegzeit, savedLimitActive: true });
+      expect([...(ready.savedCalendar?.index.keys() ?? [])]).toEqual(["2026-10-10"]);
+      expect(ready.savedFilterCount).toBe(1);
+      expect(ready.savedFiltered).toBe(true);
     });
   });
 
@@ -542,8 +556,12 @@ describe("useOfferViews", () => {
     const heute = offer("heute", "2026-10-05");
     const offers = [kurs, treff, heute];
     const savedIds = [kurs.id, treff.id, heute.id];
-    const kurse: SavedFilter = { ...EMPTY_SAVED_FILTER, formats: ["kurs"] };
-    const abNov: SavedFilter = { ...EMPTY_SAVED_FILTER, range: { from: "2026-11-01" } };
+    const savedFilter = (patch: Partial<FilterState>, onlyFixed = false): SavedFilter => ({
+      filter: { ...EMPTY_FILTER, ...patch },
+      onlyFixed,
+    });
+    const kurse = savedFilter({ formats: ["kurs"] });
+    const abNov = savedFilter({ range: { from: "2026-11-01" } });
     const visibleTitles = (v: OfferViews) => ids(v.savedVisible.map((o) => o.offer));
 
     it("ohne Filter sind alle gemerkten sichtbar, nichts gilt als gefiltert", () => {
@@ -593,6 +611,76 @@ describe("useOfferViews", () => {
       expect(visibleTitles(nov)).toEqual(["treff", "kurs"]);
       expect(nov.savedFiltered).toBe(false);
       expect(nov.savedCalendar?.index).toEqual(nov.savedCalendar?.allIndex);
+    });
+
+    it("Badge zählt wie auf der Startseite plus „Nur fest eingeplant“; im Kalender ohne Zeitraum (Plan 0057, E5)", () => {
+      const both = savedFilter({ formats: ["kurs"], range: { from: "2026-11-01" } }, true);
+      const list = render({ offers, savedIds, route: { tab: "merkliste", filter: EMPTY_FILTER }, savedFilter: both });
+      expect(list.savedFilterCount).toBe(3);
+      const cal = render({
+        offers,
+        savedIds,
+        route: { tab: "merkliste-kalender", filter: EMPTY_FILTER },
+        savedFilter: both,
+      });
+      expect(cal.savedFilterCount).toBe(2);
+    });
+
+    it("„Nur fest eingeplant“ blendet vorgemerkte aus (Plan 0057, E5)", () => {
+      const route: Route = { tab: "merkliste", filter: EMPTY_FILTER };
+      const v = render({ offers, savedIds, tentative: [treff.id], route, savedFilter: savedFilter({}, true) });
+      expect(visibleTitles(v)).toEqual(["kurs"]);
+      expect(v.savedFiltered).toBe(true);
+    });
+
+    it("Kalender mit Tageszeit je Termin: Termine außerhalb fehlen, `endedToday` zählt nur darin (Plan 0057, E7)", () => {
+      const route: Route = { tab: "merkliste-kalender", filter: EMPTY_FILTER };
+      // alle Termine beginnen um 10 Uhr
+      const morning = render({ offers, savedIds, route, savedFilter: savedFilter({ daytimes: ["vormittags"] }) });
+      expect([...(morning.savedCalendar?.index.keys() ?? [])].sort()).toEqual([
+        "2026-10-07",
+        "2026-10-12",
+        "2026-11-04",
+      ]);
+      expect(morning.savedCalendar?.endedToday).toBe(1);
+      const afternoon = render({ offers, savedIds, route, savedFilter: savedFilter({ daytimes: ["nachmittags"] }) });
+      expect(afternoon.savedCalendar?.index.size).toBe(0);
+      // „heute“ (10–11 Uhr) passt zu keiner Nachmittagszeit: nicht „heute schon vorbei“
+      expect(afternoon.savedCalendar?.endedToday).toBe(0);
+    });
+  });
+
+  describe("Sortierung der Merkliste (Plan 0057, E6)", () => {
+    const early = offer("frueh", "2026-10-07");
+    const late = offer("spaet", "2026-10-09");
+    const route: Route = { tab: "merkliste", filter: EMPTY_FILTER };
+    // zuerst „spaet“ gemerkt, dann „frueh“
+    const input = { offers: [early, late], savedIds: [late.id, early.id], route };
+    const titles = (v: OfferViews) => v.savedGroups.map((g) => [g.kind, ...ids(g.items.map((i) => i.offer))]);
+
+    it("„Nächste Termine“ nach Tagen; ohne Wegzeit auch bei „Nächstgelegen“", () => {
+      const byDay = [
+        ["termin", "frueh"],
+        ["termin", "spaet"],
+      ];
+      expect(titles(render(input))).toEqual(byDay);
+      expect(titles(render({ ...input, savedSort: "nah" }))).toEqual(byDay);
+    });
+
+    it("„Nächstgelegen“ mit Wegzeit nach Bändern", () => {
+      const reach: ReachFn = () => ({ kind: "oepnv", minutes: 12, byFoot: false });
+      expect(titles(render({ ...input, savedSort: "nah", reach }))).toEqual([["wegzeit", "frueh", "spaet"]]);
+    });
+
+    it("„Zuletzt gemerkt“: eine Gruppe ohne Kopf, zuletzt gemerkt zuerst", () => {
+      expect(titles(render({ ...input, savedSort: "gemerkt" }))).toEqual([["flach", "frueh", "spaet"]]);
+      expect(titles(render({ ...input, savedIds: [early.id, late.id], savedSort: "gemerkt" }))).toEqual([
+        ["flach", "spaet", "frueh"],
+      ]);
+    });
+
+    it("nur in der Liste", () => {
+      expect(render({ ...input, route: { tab: "merkliste-kalender", filter: EMPTY_FILTER } }).savedGroups).toEqual([]);
     });
   });
 

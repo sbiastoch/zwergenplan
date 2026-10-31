@@ -90,6 +90,10 @@
     letter-spacing: 0.08em;
     color: var(--ink);
   }
+  /* Schnellwahlen „ab …“ über von/bis, nur im Sheet der Merkliste (Plan 0057, E5) */
+  .quick-ranges {
+    margin-bottom: 10px;
+  }
   /* Zeitraum (Plan 0023, E9): zwei Spalten, bei wenig Platz oder großer Schrift untereinander */
   .daterange {
     display: grid;

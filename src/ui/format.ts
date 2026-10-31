@@ -130,6 +130,9 @@ export function listingHeading(group: ListGroupHead, today: string, origin?: Ori
     }
     case "ohne-wegzeit":
       return { title: "Ohne Wegzeit" };
+    case "flach":
+      // kein sichtbarer Kopf, nur der Name des Abschnitts (Plan 0057, E6)
+      return { title: "Zuletzt gemerkt" };
   }
 }
 
@@ -627,6 +630,9 @@ export function savedFilterStatusParts(shown: number, total: number): [number, s
 export function savedFilteredEmpty(total: number): string {
   return total === 1 ? "Dein gemerktes Angebot passt nicht." : `Von deinen ${total} gemerkten Angeboten passt keins.`;
 }
+
+/** Hinweis im Filter-Sheet der Merkliste statt des Zeitraums, wenn der Kalender offen ist (Plan 0057, E5) */
+export const RANGE_IN_CALENDAR = "Im Kalender gilt stattdessen die gewählte Woche bzw. der Monat.";
 
 /** Schnellwahl „ab Nov.“ zu `YYYY-MM` (E7); Mai, Juni und Juli ohne Punkt */
 export function quickRangeLabel(month: string): string {

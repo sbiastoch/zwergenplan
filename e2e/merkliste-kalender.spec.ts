@@ -267,11 +267,10 @@ test.describe("mit Fixture-Uhr", () => {
     await expectAgenda(page, "Diese Woche", "1 Termin");
   });
 
-  test("Merklisten-Filter: „Kurse“ blendet den Treff aus, die leere Woche sagt es und setzt zurück (E5, E6)", async ({
+  test("Merklisten-Filter: „Kurs“ blendet den Treff aus, die leere Woche sagt es und setzt zurück (E5, E6)", async ({
     page,
   }) => {
-    const filters = page.getByRole("group", { name: "Merkliste filtern" });
-    await filters.getByRole("button", { name: "Kurse", exact: true }).click();
+    await savedFilter(page, "Kurs");
     // Die Statuszeile zählt die passenden gemerkten Angebote, ohne Zeitraum
     await expect(page.getByRole("status")).toHaveText("1 von 2 gemerkten Angeboten passt");
     // Woche 5.–11.: nur der Treff, und den blendet der Filter aus (Fall 1)
@@ -294,33 +293,62 @@ test.describe("mit Fixture-Uhr", () => {
     await expect(page.getByRole("status")).toBeFocused();
     await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
     await expectAgenda(page, "Diese Woche", "1 Termin");
-    await expect(filters.getByRole("button", { name: "Kurse", exact: true })).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
   });
 
-  test("Schnellwahl „ab …“: im Kalender ausgeblendet und ohne Wirkung, in der Liste gilt sie wieder (E5, E7)", async ({
+  test("Tageszeit je Termin: „Nachmittags“ blendet die Vormittagstermine aus und sagt es (Plan 0057, E7)", async ({
     page,
   }) => {
-    const filters = page.getByRole("group", { name: "Merkliste filtern" });
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Nachmittags" }).click();
+    // Treff (Mi 10 Uhr) und PEKiP (Di 9:30) beginnen vormittags
+    await expectAgenda(page, "Diese Woche", "0 Termine");
+    await expect(page.getByText("1 gemerkter Termin blendet der Filter aus.")).toBeVisible();
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
+    await expectAgenda(page, "Diese Woche", "1 Termin");
+  });
+
+  test("Zeitraum: im Kalender ausgeblendet und ohne Wirkung, in der Liste gilt er wieder (E5, E7)", async ({
+    page,
+  }) => {
     const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
-    await expect(filters.getByRole("button", { name: /^ab / })).toHaveCount(0);
+    const sheet = page.getByRole("dialog", { name: "Merkliste filtern" });
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await expect(sheet.getByText("Im Kalender gilt stattdessen die gewählte Woche bzw. der Monat.")).toBeVisible();
+    await expect(sheet.getByRole("button", { name: /^ab / })).toHaveCount(0);
+    await expect(sheet.getByLabel("von")).toHaveCount(0);
+    await page.keyboard.press("Escape");
     await views.getByRole("button", { name: "Liste", exact: true }).click();
-    await filters.getByRole("button", { name: "ab Nov.", exact: true }).click();
+    await savedFilter(page, "ab Nov.");
     // PEKiP beginnt im Oktober (Kurs-Regel), der Treff hat noch Termine im November
     await expect(offers(page)).toHaveCount(1);
     await expect(page.getByRole("status")).toHaveText("1 von 2 gemerkten Angeboten passt");
 
     await views.getByRole("button", { name: "Kalender", exact: true }).click();
-    await expect(filters.getByRole("button", { name: /^ab / })).toHaveCount(0);
-    // Kein „Zurücksetzen“: Im Kalender wirkt kein Filter, die Statuszeile zählt wie ohne
-    await expect(filters.getByRole("button", { name: "Zurücksetzen" })).toHaveCount(0);
+    // Im Kalender wirkt kein Filter: Badge und Statuszeile zählen wie ohne
+    await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
     await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
     await expectAgenda(page, "Diese Woche", "1 Termin");
 
     await views.getByRole("button", { name: "Liste", exact: true }).click();
-    await expect(filters.getByRole("button", { name: "ab Nov.", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await expect(sheet.getByRole("button", { name: "ab Nov." })).toHaveAttribute("aria-pressed", "true");
+    await page.keyboard.press("Escape");
     await expect(offers(page)).toHaveCount(1);
   });
 });
+
+/** Merklisten-Filter-Sheet öffnen, die Chips der Reihe nach tippen und schließen (Plan 0057, E5) */
+async function savedFilter(page: Page, ...names: string[]) {
+  await page
+    .getByRole("group", { name: "Merkliste filtern" })
+    .getByRole("button", { name: /^Alle Filter/ })
+    .click();
+  const sheet = page.getByRole("dialog", { name: "Merkliste filtern" });
+  await expect(sheet).toBeVisible();
+  for (const name of names) await sheet.getByRole("button", { name, exact: true }).click();
+  await sheet.getByRole("button", { name: /gemerkte zeigen$/ }).click();
+  await expect(sheet).toBeHidden();
+}
 
 test("regelmäßig gemerkt, Kind wächst erst hinein: nur Tage, an denen es zum Alter passt (Plan 0028, E3)", async ({
   page,

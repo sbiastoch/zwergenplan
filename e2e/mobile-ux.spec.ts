@@ -149,6 +149,19 @@ async function openSavedList(page: Page) {
   await expect(page.getByTestId("offer")).toHaveCount(3);
 }
 
+/** Merklisten-Filter-Sheet öffnen, die Chips der Reihe nach tippen und schließen (Plan 0057, E5) */
+async function savedFilter(page: Page, ...names: string[]) {
+  await page
+    .getByRole("group", { name: "Merkliste filtern" })
+    .getByRole("button", { name: /^Alle Filter/ })
+    .click();
+  const sheet = page.getByRole("dialog", { name: "Merkliste filtern" });
+  await expect(sheet).toBeVisible();
+  for (const name of names) await sheet.getByRole("button", { name, exact: true }).click();
+  await sheet.getByRole("button", { name: /gemerkte zeigen$/ }).click();
+  await expect(sheet).toBeHidden();
+}
+
 /** Weg zu jeder Ansicht, ausgehend von der geladenen Startseite */
 const VIEWS: Record<string, (page: Page) => Promise<void>> = {
   entdecken: async () => {},
@@ -213,20 +226,29 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByTestId("offer")).toHaveCount(2);
     await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
   },
-  // Plan 0025, E6 (Test 15): Liste mit drei gemerkten, Filter „Kurse“ aktiv; Filterzeile mit „ab …“ und „Zurücksetzen“
+  // Plan 0025, E6 (Test 15); seit Plan 0057, E5 wie auf der Startseite: Liste mit drei gemerkten, „Vormittags“ aktiv
+  // und „ab Nov.“ im Sheet; Filterzeile mit Badge
   "merkliste-liste": async (page) => {
     await openSavedList(page);
-    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Kurse" }).click();
-    await expect(page.getByTestId("offer")).toHaveCount(2);
-    await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten passen");
+    await savedFilter(page, "ab Nov.");
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
+    await expect(page.getByRole("button", { name: "Alle Filter, 2 aktiv" })).toBeVisible();
+    await expect(page.getByRole("status")).toContainText(/von 3 gemerkten Angeboten/);
   },
   // Plan 0025, E5a: Der Filter blendet alle gemerkten aus
   "merkliste-gefiltert-leer": async (page) => {
     await openSavedList(page);
-    const filters = page.getByRole("group", { name: "Merkliste filtern" });
-    await filters.getByRole("button", { name: "Kurse" }).click();
-    await filters.getByRole("button", { name: "Ohne Anmeldung" }).click();
+    await savedFilter(page, "Kurs", "Ohne Anmeldung");
     await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();
+  },
+  // Plan 0057, E5: Filter-Sheet der Merkliste, offen
+  "merkliste-filter-sheet": async (page) => {
+    await openSavedList(page);
+    await page
+      .getByRole("group", { name: "Merkliste filtern" })
+      .getByRole("button", { name: /^Alle Filter/ })
+      .click();
+    await expect(page.getByRole("dialog", { name: "Merkliste filtern" })).toBeVisible();
   },
   // Plan 0025, E4: Karte der Merkliste mit drei gemerkten Angeboten an zwei Orten
   "merkliste-karte": async (page) => {

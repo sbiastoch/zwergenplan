@@ -102,9 +102,10 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/domain\/(camera|places|provider-places|geo|category-look|map-view)\.ts$/,
   ],
   // Querschnitt Layout über Breiten, Lagen und Textgrößen: nur die globale Hülle (Review 2, M1).
-  // SHELL plus die Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4); Herz-Animation ohne
-  // Überlauf und Toast mit „Rückgängig“ neben der Herz-Spalte (Plan 0057, Test 14)
-  "e2e/layout.spec.ts": [...SHELL, /^src\/ui\/(SavedFilters|OfferCard|Toast)\.tsx$/, /^src\/ui\/heart-gesture\.ts$/],
+  // SHELL plus Kopf und Filterzeile der Merkliste: Abstand zur Statuszeile (Plan 0025, Etappe 4; seit Plan 0057, E5 die
+  // Schnellfilter in SavedView); Herz-Animation ohne Überlauf und Toast mit „Rückgängig“ neben der Herz-Spalte
+  // (Plan 0057, Test 14)
+  "e2e/layout.spec.ts": [...SHELL, /^src\/ui\/(SavedView|OfferCard|Toast)\.tsx$/, /^src\/ui\/heart-gesture\.ts$/],
   // Anbieter-Abos: Glocke in Liste und Sheet, Reihenfolge im Tab, Suche, Privatsphäre auch beim Glocken-Tipp
   // (preferences, useSavedProviders, bellPush in AppExtras; Plan 0054).
   "e2e/merkliste-anbieter.spec.ts": [
@@ -122,6 +123,13 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
     /^src\/ui\/(use-offer-views|use-app-state)\.ts$/,
     /^src\/data\/preferences\.ts$/,
     /^src\/domain\/(agenda|calendar|time|saved|age)\.ts$/,
+  ],
+  // Liste der Merkliste mit Filter-Sheet, Schnellfiltern und Sortierung wie auf der Startseite (Plan 0057, E5, E6,
+  // E7a, Test 16)
+  "e2e/merkliste-liste.spec.ts": [
+    /^src\/ui\/(SavedView|OfferCard|ListView|SortMenu|Sheets|Chrome)\.tsx$/,
+    /^src\/ui\/use-offer-views\.ts$/,
+    /^src\/domain\/(saved|listing|agenda|filter)\.ts$/,
   ],
   // Querschnitt Mobile-UX-Gates je Ansicht: die globale Hülle (Review 2, M1), dazu die Vorschauseite ohne JS und
   // 404.html, die nur diese Spec durch die Gates schickt (share-pages.ts).
@@ -180,7 +188,7 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Badge (useSaved), Sammel-ICS aus dem Browser, Export-Chunk, Kopf und Umschalter Liste | Karte (MapPanel), passend
   // zum Alter. ICS-Dateien aus build-data.ts.
   "e2e/saved.spec.ts": [
-    /^src\/ui\/(SavedView|SavedFilters|OfferCard|MapPanel|Toast)\.tsx$/,
+    /^src\/ui\/(SavedView|OfferCard|MapPanel|Toast)\.tsx$/,
     /^src\/ui\/(ics-export|use-app-state|use-offer-views|heart-gesture)\.ts$/,
     /^src\/data\/(preferences|haptics)\.ts$/,
     /^src\/domain\/(saved|ics|age)\.ts$/,

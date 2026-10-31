@@ -1,5 +1,13 @@
-import { discoverable, nextSession } from "./agenda.ts";
-import { candidateSessions, DAYTIMES, type DateRange, type Daytime, dateRange, ruleActive } from "./date-range.ts";
+import { discoverable, nextSession, type SessionFit } from "./agenda.ts";
+import {
+  candidateSessions,
+  DAYTIMES,
+  type DateRange,
+  type Daytime,
+  dateRange,
+  daytimeOf,
+  ruleActive,
+} from "./date-range.ts";
 import { LIMIT_MINUTES, type ReachFn, type ReachLimit, type ReachTarget, withinLimit } from "./reach.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
 import { CATEGORIES, type Category } from "./topics.ts";
@@ -147,6 +155,18 @@ export function withDateRange(state: FilterState, from: string | undefined, to: 
   return range ? { ...rest, range } : rest;
 }
 
+/** Ist die Schnellwahl „ab …“ gewählt? Nur genau dieser Beginn ohne Ende (Plan 0025, E7; Plan 0057, E5). */
+export function quickRangeOn(state: FilterState, range: DateRange): boolean {
+  return state.range?.from === range.from && state.range?.to === range.to;
+}
+
+/** Tipp auf eine Schnellwahl: Einfachwahl, ein zweiter Tipp hebt den Zeitraum auf (Plan 0025, E7). */
+export function toggleQuickRange(state: FilterState, range: DateRange): FilterState {
+  return quickRangeOn(state, range)
+    ? withDateRange(state, undefined, undefined)
+    : withDateRange(state, range.from, range.to);
+}
+
 /**
  * Passt ein Angebot zu den Filtern (Kategorie, Format, Anmeldung, Kosten, Wegzeit)? Ohne Zeitbezug:
  * Auch ein vorbei-es Angebot kann passen. Gebraucht für „Für heute ist alles vorbei“ (Plan 0007, E2).
@@ -161,6 +181,15 @@ export function matchesFilter(offer: Offer & { venue: ReachTarget }, state: Filt
   const limit = state.reachLimit;
   if (reach && limit && withinLimit(reach(offer.venue), limit) === false) return false;
   return true;
+}
+
+/**
+ * Tageszeit als Prädikat je Termin (Plan 0057, E7, Review 3 M1): Im Kalender der Merkliste wirkt sie an jedem Termin,
+ * nicht über die Kandidaten. Ohne Auswahl kein Prädikat; verknüpft wird es mit der Altersregel (`allFits`).
+ */
+export function inDaytime(daytimes: readonly Daytime[]): SessionFit | undefined {
+  if (daytimes.length === 0) return undefined;
+  return (_offer, session) => daytimes.includes(daytimeOf(session));
 }
 
 /**

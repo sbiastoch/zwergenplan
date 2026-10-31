@@ -60,7 +60,11 @@ test("Herz: Tipp merkt vor, zweiter plant fest ein, dritter entfernt; Badge zäh
   await expect(page).toHaveURL(/ansicht=merkliste$/);
   await expect(page.getByRole("heading", { level: 2, name: "Meine Merkliste" })).toBeVisible();
   await expect(page.getByTestId("offer")).toHaveCount(2);
-  await expect(page.getByTestId("offer").first()).toContainText("Mi 7.10. · 10:00 Uhr");
+  // nach Terminen mit Tagesköpfen wie auf der Startseite (Plan 0057, E6)
+  await expect(page.getByRole("region", { name: /^Mittwoch, 7\. Oktober/ }).getByTestId("offer")).toContainText(
+    "Offener Krabbeltreff",
+  );
+  await expect(page.getByTestId("offer").first()).toContainText("10:00–11:30 Uhr");
   await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 13 Terminen gemerkt");
   expect(
     await page.evaluate(() => [
@@ -295,7 +299,7 @@ test.describe("Merkliste passend zum Alter (Plan 0018)", () => {
     const cards = page.getByTestId("offer");
     await expect(cards.nth(0)).toContainText("PEKiP");
     await expect(cards.nth(1)).toContainText("Offener Krabbeltreff");
-    await expect(cards.nth(1)).toContainText("Mi 21.10. · 10:00 Uhr");
+    await expect(page.getByRole("region", { name: /^Mittwoch, 21\. Oktober/ })).toContainText("Offener Krabbeltreff");
     await expect(page.getByRole("status")).toHaveText("2 Angebote mit insgesamt 11 Terminen gemerkt");
     const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
     expect(await vevents(download)).toBe(11);
@@ -468,22 +472,32 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
   });
 
   for (const width of [320, 412]) {
-    test(`Umschalter über die ganze Breite des Inhalts bei ${width} px`, async ({ page }) => {
+    test(`Umschalter über die ganze Breite des Inhalts bei ${width} px, in der Liste mit Sortier-Knopf`, async ({
+      page,
+    }) => {
       await page.setViewportSize({ width, height: 800 });
       await preset(page, FIVE.slice(0, 2));
       await page.goto("./?ansicht=merkliste");
       await expect(segment(page, "Liste")).toHaveAttribute("aria-pressed", "true");
-      const widths = await page.evaluate(() => {
-        const body = document.querySelector("main.body");
-        const toggle = document.querySelector("fieldset.view-toggle.full");
-        if (!body || !toggle) throw new Error("kein Inhalt oder kein Umschalter");
-        const style = getComputedStyle(body);
-        return {
-          content: body.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight),
-          toggle: toggle.getBoundingClientRect().width,
-        };
-      });
-      expect(Math.abs(widths.toggle - widths.content), JSON.stringify(widths)).toBeLessThanOrEqual(1);
+      const measure = () =>
+        page.evaluate(() => {
+          const body = document.querySelector("main.body");
+          const toggle = document.querySelector("fieldset.view-toggle.full");
+          const sort = document.querySelector(".saved-tools .sortbtn");
+          if (!body || !toggle) throw new Error("kein Inhalt oder kein Umschalter");
+          const style = getComputedStyle(body);
+          // Umschalter, Abstand (8 px) und Sortier-Knopf füllen die Zeile (Plan 0057, E6)
+          const sortWidth = sort ? sort.getBoundingClientRect().width + 8 : 0;
+          return {
+            content: body.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight),
+            toggle: toggle.getBoundingClientRect().width + sortWidth,
+          };
+        });
+      const list = await measure();
+      expect(Math.abs(list.toggle - list.content), JSON.stringify(list)).toBeLessThanOrEqual(1);
+      await segment(page, "Kalender").click();
+      const calendar = await measure();
+      expect(Math.abs(calendar.toggle - calendar.content), JSON.stringify(calendar)).toBeLessThanOrEqual(1);
     });
   }
 
@@ -632,13 +646,27 @@ test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () 
 });
 
 /**
- * Filter der Merkliste (Plan 0025, E6, E7, Test 9): PEKiP (Kurs, mit Anmeldung, ab 13.10.), Krabbeltreff (regelmäßig,
- * ohne Anmeldung, bis 4.11.) und Musikgarten (Kurs, mit Anmeldung, ab 5.11.). 8 + 5 + 6 = 19 kommende Termine.
+ * Filter der Merkliste (Plan 0025, E6, E7, Test 9; seit Plan 0057, E5 im Sheet wie auf der Startseite): PEKiP (Kurs,
+ * mit Anmeldung, ab 13.10.), Krabbeltreff (regelmäßig, ohne Anmeldung, bis 4.11.) und Musikgarten (Kurs, mit
+ * Anmeldung, ab 5.11.). 8 + 5 + 6 = 19 kommende Termine.
  */
+const savedSheet = (page: Page) => page.getByRole("dialog", { name: "Merkliste filtern" });
+
+/** Merklisten-Filter-Sheet öffnen, die Chips der Reihe nach tippen und schließen (Plan 0057, E5) */
+async function savedFilter(page: Page, ...names: string[]) {
+  await page
+    .getByRole("group", { name: "Merkliste filtern" })
+    .getByRole("button", { name: /^Alle Filter/ })
+    .click();
+  const sheet = savedSheet(page);
+  await expect(sheet).toBeVisible();
+  for (const name of names) await sheet.getByRole("button", { name, exact: true }).click();
+  await sheet.getByRole("button", { name: /gemerkte zeigen$/ }).click();
+  await expect(sheet).toBeHidden();
+}
+
 test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
   const THREE = FIVE.slice(0, 3);
-  const filters = (page: Page) => page.getByRole("group", { name: "Merkliste filtern" });
-  const chip = (page: Page, name: string) => filters(page).getByRole("button", { name, exact: true });
 
   test.beforeEach(async ({ page }) => {
     await preset(page, THREE);
@@ -647,16 +675,14 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
   });
 
   test("Format und Anmeldung, Leerzustand mit „Filter zurücksetzen“", async ({ page }) => {
-    await chip(page, "Kurse").click();
-    await expect(chip(page, "Kurse")).toHaveAttribute("aria-pressed", "true");
+    await savedFilter(page, "Kurs");
     await expect(page.getByTestId("offer")).toHaveCount(2);
     await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten passen");
 
     // Anmeldung ist eine Einfachwahl: „Ohne“ schaltet „Mit“ ab
-    await chip(page, "Mit Anmeldung").click();
+    await savedFilter(page, "Mit Anmeldung");
     await expect(page.getByTestId("offer")).toHaveCount(2);
-    await chip(page, "Ohne Anmeldung").click();
-    await expect(chip(page, "Mit Anmeldung")).toHaveAttribute("aria-pressed", "false");
+    await savedFilter(page, "Ohne Anmeldung");
     await expect(page.getByTestId("offer")).toHaveCount(0);
     await expect(page.getByText("Nichts, was zu deinem Filter passt")).toBeVisible();
     await expect(page.getByText("Von deinen 3 gemerkten Angeboten passt keins.")).toBeVisible();
@@ -666,38 +692,40 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
     await expect(page.getByRole("status")).toBeFocused();
     await expect(page.getByTestId("offer")).toHaveCount(3);
     await expect(page.getByRole("status")).toHaveText("3 Angebote mit insgesamt 19 Terminen gemerkt");
-    await expect(chip(page, "Zurücksetzen")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
   });
 
   test("„ab Nov.“: Kurse mit Beginn ab dann, Regelmäßiges mit Terminen dann; nur Monate mit Daten", async ({
     page,
   }) => {
     // Der letzte Termin im Datenstand ist am 10.12. (Musikgarten): kein „ab Jan.“
-    await expect(filters(page).getByRole("button", { name: /^ab / })).toHaveText(["ab Nov.", "ab Dez."]);
-    await chip(page, "ab Nov.").click();
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await expect(savedSheet(page).getByRole("button", { name: /^ab / })).toHaveText(["ab Nov.", "ab Dez."]);
+    await page.keyboard.press("Escape");
+    await savedFilter(page, "ab Nov.");
     const cards = page.getByTestId("offer");
     await expect(cards).toHaveCount(2);
     await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten passen");
     // Der Treff steht am Termin im Zeitraum, nicht am nächsten (Mi 7.10.)
     await expect(cards.nth(0)).toContainText("Offener Krabbeltreff");
-    await expect(cards.nth(0)).toContainText("Mi 4.11.");
+    await expect(page.getByRole("region", { name: /^Mittwoch, 4\. November/ })).toContainText("Offener Krabbeltreff");
     await expect(cards.nth(1)).toContainText("Musikgarten");
     await expect(cards.filter({ hasText: "PEKiP" })).toHaveCount(0);
 
     // Einfachwahl; ein zweiter Tipp hebt die Schnellwahl auf
-    await chip(page, "ab Dez.").click();
-    await expect(chip(page, "ab Nov.")).toHaveAttribute("aria-pressed", "false");
+    await savedFilter(page, "ab Dez.");
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await expect(savedSheet(page).getByRole("button", { name: "ab Nov." })).toHaveAttribute("aria-pressed", "false");
+    await page.keyboard.press("Escape");
     await expect(cards).toHaveCount(0);
-    await chip(page, "ab Dez.").click();
+    await savedFilter(page, "ab Dez.");
     await expect(cards).toHaveCount(3);
   });
 
   test("Filter übersteht den Tab-Wechsel, nicht das Neuladen; nie in der URL, „Angebote“ bleibt unberührt", async ({
     page,
   }) => {
-    await chip(page, "Kurse").click();
-    await chip(page, "Mit Anmeldung").click();
-    await chip(page, "ab Nov.").click();
+    await savedFilter(page, "Kurs", "Mit Anmeldung", "ab Nov.");
     await expect(page.getByTestId("offer")).toHaveCount(1);
     await expect(page).toHaveURL(/\?ansicht=merkliste$/);
 
@@ -708,16 +736,16 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
     await expect(quick.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
 
     await tabButton(page, "Merkliste").click();
-    await expect(chip(page, "Kurse")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Alle Filter, 3 aktiv" })).toBeVisible();
     await expect(page.getByTestId("offer")).toHaveCount(1);
 
     await page.reload();
     await expect(page.getByTestId("offer")).toHaveCount(3);
-    await expect(chip(page, "Kurse")).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
   });
 
   test("Export mit Filter: Name sagt es, die Datei enthält weiter alle Termine (E9)", async ({ page }) => {
-    await chip(page, "Kurse").click();
+    await savedFilter(page, "Kurs");
     await expect(page.getByTestId("offer")).toHaveCount(2);
     const button = page.getByRole("button", {
       name: "Alle 3 fest eingeplanten in meinen Kalender, auch ausgeblendete",
@@ -729,8 +757,7 @@ test.describe("Filter der Merkliste (Plan 0025, E6, E7)", () => {
   });
 
   test("Karte ohne passendes Angebot: derselbe Leerzustand, keine Karte (E5a)", async ({ page }) => {
-    await chip(page, "Kurse").click();
-    await chip(page, "Ohne Anmeldung").click();
+    await savedFilter(page, "Kurs", "Ohne Anmeldung");
     await segment(page, "Karte").click();
     await expect(page).toHaveURL(/\?ansicht=merkliste-karte$/);
     await expect(page.getByText("Von deinen 3 gemerkten Angeboten passt keins.")).toBeVisible();
@@ -747,7 +774,7 @@ test.describe("Karte der Merkliste mit Filter (Plan 0025, E3a)", () => {
     await preset(page, FIVE.slice(0, 3));
     await page.goto("./?ansicht=merkliste-karte");
     await expect(page.getByRole("status")).toHaveText("3 Angebote gemerkt");
-    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Kurse" }).click();
+    await savedFilter(page, "Kurs");
     await expect(page.getByRole("status")).toHaveText("2 von 3 gemerkten Angeboten");
     await mapSettled(page);
   });

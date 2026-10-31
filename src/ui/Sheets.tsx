@@ -5,8 +5,23 @@
  * Der Fuß steht außerhalb des scrollenden Teils (Plan 0007, H7): So bleibt er sichtbar, ohne Inhalt zu verdecken.
  */
 import { type ReactNode, type RefObject, useEffect, useId, useRef, useState } from "react";
-import { type BoundCheck, type BoundLimits, checkBound, DAYTIMES, fieldLimits } from "../domain/date-range.ts";
-import { type FilterState, FORMATS, toggleIn, withDateRange, withReachLimit } from "../domain/filter.ts";
+import {
+  type BoundCheck,
+  type BoundLimits,
+  checkBound,
+  DAYTIMES,
+  type DateRange,
+  fieldLimits,
+} from "../domain/date-range.ts";
+import {
+  type FilterState,
+  FORMATS,
+  quickRangeOn,
+  toggleIn,
+  toggleQuickRange,
+  withDateRange,
+  withReachLimit,
+} from "../domain/filter.ts";
 import { LIMIT_MINUTES, type ReachLimit } from "../domain/reach.ts";
 import type { Cost, Registration } from "../domain/schema.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
@@ -18,6 +33,8 @@ import {
   FORMAT_LABELS,
   limitReason,
   plural,
+  quickRangeLabel,
+  RANGE_IN_CALENDAR,
   reachLimitLabel,
   SHARE_MANUAL_HINT,
 } from "./format.ts";
@@ -165,7 +182,20 @@ function DateField({
   );
 }
 
+/**
+ * Teile, die nur das Sheet der Merkliste hat (Plan 0057, E5): „Nur fest eingeplant“, die Schnellwahlen „ab …“ zum
+ * Zeitraum, und im Kalender statt des Zeitraums ein Hinweis (dort ist die Auswahl der Zeitraum).
+ */
+export interface SavedSheetParts {
+  onlyFixed: boolean;
+  onOnlyFixed: (on: boolean) => void;
+  /** Schnellwahlen „ab …“ (`quickRanges`) */
+  quick: readonly { month: string; range: DateRange }[];
+  calendar: boolean;
+}
+
 export function FilterSheet({
+  saved,
   filter,
   onChange,
   onReset,
@@ -176,6 +206,11 @@ export function FilterSheet({
   today,
   onClose,
 }: {
+  /**
+   * Nur auf der Merkliste (Plan 0057, E5): macht daraus das Sheet „Merkliste filtern“ mit eigenen Abschnitten und Fuß;
+   * derselbe `FilterState`. Ohne ist es das Sheet der Startseite.
+   */
+  saved?: SavedSheetParts | undefined;
   filter: FilterState;
   onChange: (f: FilterState) => void;
   /** „Zurücksetzen“: URL-Filter leeren und Altersfilter wieder an (Plan 0021, E2) */
@@ -206,7 +241,20 @@ export function FilterSheet({
     <div className="sheet-body">
       <div className="sheet-scroll">
         <div className="grab" />
-        <h2>Filter</h2>
+        <h2>{saved ? "Merkliste filtern" : "Filter"}</h2>
+        {saved && (
+          <>
+            <h3>Merkliste</h3>
+            <div className="wrap">
+              <Chip on={!saved.onlyFixed} onClick={() => saved.onOnlyFixed(false)}>
+                Alle gemerkten
+              </Chip>
+              <Chip on={saved.onlyFixed} onClick={() => saved.onOnlyFixed(true)}>
+                Nur fest eingeplant
+              </Chip>
+            </div>
+          </>
+        )}
         {age && (
           <>
             <h3>Alter</h3>
@@ -293,40 +341,60 @@ export function FilterSheet({
         <h3 ref={rangeHeading} id={rangeHeadingId} tabIndex={-1}>
           Zeitraum
         </h3>
-        <fieldset className="plain" aria-labelledby={rangeHeadingId}>
-          <div className="daterange">
-            <DateField
-              label="von"
-              value={filter.range?.from ?? ""}
-              limits={limits.from}
-              hints={{ "zu-frueh": "Frühestens heute", "zu-spaet": "Nicht nach „bis“", ungueltig: PICK_DATE }}
-              onCommit={(from) => onChange(withDateRange(filter, from, filter.range?.to))}
-            />
-            <DateField
-              label="bis"
-              value={filter.range?.to ?? ""}
-              limits={limits.to}
-              hints={{
-                "zu-frueh": filter.range?.from ? "Nicht vor „von“" : "Frühestens heute",
-                "zu-spaet": PICK_DATE,
-                ungueltig: PICK_DATE,
-              }}
-              onCommit={(to) => onChange(withDateRange(filter, filter.range?.from, to))}
-            />
-          </div>
-        </fieldset>
-        {filter.range && (
-          <button
-            type="button"
-            className="linkbtn"
-            onClick={() => {
-              // Der Knopf verschwindet: vorher den Fokus auf die Überschrift, sonst fiele er auf <body> (wie LimitAction)
-              rangeHeading.current?.focus();
-              onChange(withDateRange(filter, undefined, undefined));
-            }}
-          >
-            Zeitraum entfernen
-          </button>
+        {saved?.calendar ? (
+          // Im Kalender ist die Auswahl der Zeitraum (Plan 0025, E5); der Wert bleibt für Liste und Karte erhalten
+          <p className="small">{RANGE_IN_CALENDAR}</p>
+        ) : (
+          <>
+            {saved && saved.quick.length > 0 && (
+              <div className="wrap quick-ranges">
+                {saved.quick.map(({ month, range }) => (
+                  <Chip
+                    key={month}
+                    on={quickRangeOn(filter, range)}
+                    onClick={() => onChange(toggleQuickRange(filter, range))}
+                  >
+                    {quickRangeLabel(month)}
+                  </Chip>
+                ))}
+              </div>
+            )}
+            <fieldset className="plain" aria-labelledby={rangeHeadingId}>
+              <div className="daterange">
+                <DateField
+                  label="von"
+                  value={filter.range?.from ?? ""}
+                  limits={limits.from}
+                  hints={{ "zu-frueh": "Frühestens heute", "zu-spaet": "Nicht nach „bis“", ungueltig: PICK_DATE }}
+                  onCommit={(from) => onChange(withDateRange(filter, from, filter.range?.to))}
+                />
+                <DateField
+                  label="bis"
+                  value={filter.range?.to ?? ""}
+                  limits={limits.to}
+                  hints={{
+                    "zu-frueh": filter.range?.from ? "Nicht vor „von“" : "Frühestens heute",
+                    "zu-spaet": PICK_DATE,
+                    ungueltig: PICK_DATE,
+                  }}
+                  onCommit={(to) => onChange(withDateRange(filter, filter.range?.from, to))}
+                />
+              </div>
+            </fieldset>
+            {filter.range && (
+              <button
+                type="button"
+                className="linkbtn"
+                onClick={() => {
+                  // Der Knopf verschwindet: vorher den Fokus auf die Überschrift, sonst fiele er auf <body> (wie LimitAction)
+                  rangeHeading.current?.focus();
+                  onChange(withDateRange(filter, undefined, undefined));
+                }}
+              >
+                Zeitraum entfernen
+              </button>
+            )}
+          </>
         )}
         <h3 ref={reachHeading} tabIndex={-1}>
           Wegzeit
@@ -356,7 +424,7 @@ export function FilterSheet({
           Zurücksetzen
         </button>
         <button type="button" className="btn primary" onClick={onClose}>
-          {plural(resultCount, "Angebot", "Angebote")} zeigen
+          {saved ? `${resultCount} gemerkte` : plural(resultCount, "Angebot", "Angebote")} zeigen
         </button>
       </div>
     </div>

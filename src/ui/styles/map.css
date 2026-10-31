@@ -110,8 +110,9 @@
   /*
    * Merkliste (Plan 0025, E4): allein über die ganze Breite unter der Überschrift, die Segmente einzeilig. Zu schmal
    * (320 px bei 200 %) wird er einspaltig wie der Darstellungs-Umschalter im Kind-Sheet (.seg3, chrome.css): kein
-   * Daumen, der gewählte Knopf trägt die Fläche selbst (Review Nachtrag B1). Die Schwelle liegt unter 18rem: Bei
-   * 320 px und 100 % ist der Inhalt 288 px breit und bleibt zweispaltig, bei 200 % sind es nur 9rem.
+   * Daumen, der gewählte Knopf trägt die Fläche selbst (Review Nachtrag B1). In der Liste teilt er die Zeile mit dem
+   * Sortier-Knopf (Plan 0057, E6): Bei 320 px und 100 % bleiben ihm 236 px, bei 200 % nur 6rem. Die Schwelle liegt
+   * deshalb bei 14rem; darunter bis 17rem rücken die Segmente enger zusammen, damit „Kalender“ einzeilig passt.
    */
   fieldset.view-toggle.full {
     flex: none;
@@ -125,6 +126,11 @@
     white-space: nowrap;
   }
   @container seg-full (width < 17rem) {
+    .view-toggle.full .seg-btn {
+      padding: 0 2px;
+    }
+  }
+  @container seg-full (width < 14rem) {
     .view-toggle.full .seg {
       grid-template-columns: minmax(0, 1fr);
       border-radius: 22px;
@@ -139,6 +145,23 @@
         inset 0 0 0 2px var(--line),
         2px 2px 0 var(--shadow);
     }
+  }
+  /*
+   * Kopf der Merkliste (Plan 0057, E6): Umschalter und, nur in der Liste, der Sortier-Knopf rechts daneben wie auf der
+   * Startseite. Der Umschalter nimmt den Rest der Zeile; seine Container-Query (oben) sieht dann die schmalere Breite.
+   */
+  .saved-tools {
+    /* Bezug des Sortiermenüs (rechtsbündig darunter), wie `.status-row` auf der Startseite */
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+  }
+  .saved-tools fieldset.view-toggle.full {
+    flex: 1 1 auto;
+    width: auto;
+    margin: 0;
   }
 
   /*

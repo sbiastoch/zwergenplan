@@ -7,24 +7,41 @@ import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { ruleActive } from "../domain/date-range.ts";
-import { activeFilterCount, EMPTY_FILTER, type FilterState, providerFilter, withDateRange } from "../domain/filter.ts";
+import {
+  activeFilterCount,
+  EMPTY_FILTER,
+  type FilterState,
+  providerFilter,
+  toggleIn,
+  withDateRange,
+} from "../domain/filter.ts";
 import { type MapExtent, viewNarrows } from "../domain/map-view.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { type Sort, type Tab, tabSection } from "../domain/route.ts";
-import { EMPTY_SAVED_FILTER, type SavedFilter, type SavedStage } from "../domain/saved.ts";
+import { EMPTY_SAVED_FILTER, type SavedFilter, type SavedSort, type SavedStage, savedRule } from "../domain/saved.ts";
 import { searchOf } from "../domain/searches.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
 import { type Category, withCategory } from "../domain/topics.ts";
 import { bellPush, preloadBell } from "./AppExtras.tsx";
-import { Header, QuickFilters, Stickers, TabBar, type ViewOption, ViewToggle } from "./Chrome.tsx";
+import {
+  Header,
+  type QuickChip,
+  QuickFilters,
+  Stickers,
+  startQuickChips,
+  TabBar,
+  type ViewOption,
+  ViewToggle,
+} from "./Chrome.tsx";
 import {
   aboToast,
   ageChipLabel,
   ageWarnText,
+  DAYTIME_LABELS,
   inViewStatusParts,
   limitHint,
   listStatusParts,
@@ -99,6 +116,13 @@ const SORT_TITLES: Record<SortChoice, string> = {
   nah: "Nächstgelegen",
 };
 
+/** Sortierungen der Merkliste (Plan 0057, E6); Titel wie auf der Startseite */
+const SAVED_SORT_TITLES: Record<SavedSort, string> = {
+  termine: SORT_TITLES.termine,
+  nah: SORT_TITLES.nah,
+  gemerkt: "Zuletzt gemerkt",
+};
+
 export function App() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [attempt, setAttempt] = useState(0);
@@ -129,9 +153,10 @@ export function App() {
   // Ausschnitt der Angebots- bzw. Merklisten-Karte für die Liste darunter, „Alle zeigen“ dort (Plan 0056, E5)
   const [mapView, setMapView] = useState<MapExtent>();
   const [mapReset, setMapReset] = useState(0);
-  // Filter der Merkliste: getrennt vom Startseiten-Filter, nie in der URL, übersteht Tab- und Darstellungswechsel,
-  // nicht das Neuladen (Plan 0025, E6)
+  // Filter und Sortierung der Merkliste: getrennt von der Startseite, nie in der URL, überstehen Tab- und
+  // Darstellungswechsel, nicht das Neuladen (Plan 0025, E6; Plan 0057, E5, E6)
   const [savedFilter, setSavedFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER);
+  const [savedSort, setSavedSort] = useState<SavedSort>("termine");
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. Aus der
   // Aufforderung „Wovon aus gerechnet?“ geht er stattdessen auf die Statuszeile (`originFromPrompt`, Plan 0043, E7).
   const filterButton = useRef<HTMLButtonElement>(null);
@@ -206,7 +231,21 @@ export function App() {
       }),
     [refreshTransit, say],
   );
-  const views = useOfferViews({ offers, route, birthDate, savedIds, savedFilter, now, reach: transit.reach, mapView });
+  const limitOn = limitActive(reachMode);
+  const views = useOfferViews({
+    offers,
+    route,
+    birthDate,
+    savedIds,
+    tentative: savedApi.state.tentative,
+    savedFilter,
+    savedSort,
+    // Kalender und Karte der Merkliste warten nicht: Die Grenze zählt dort erst mit Wegzeit (Plan 0057, E7a)
+    savedLimitActive: route.tab === "merkliste" ? limitOn : reachMode?.kind === "oepnv",
+    now,
+    reach: transit.reach,
+    mapView,
+  });
   // Neuer Ausschnitt: Die Liste darunter beginnt wieder mit dem ersten Schritt (Plan 0056, N9)
   const { resetPage } = views;
   const onMapInView = useCallback(
@@ -366,6 +405,8 @@ export function App() {
   };
   // Liste und Karte in „Entdecken“ markieren mit dem Zeitraum des Filters, alles andere ohne (Plan 0053, E2)
   const discoverCtx: CardContext = { ...ctx, isUnfit: (id) => views.listUnfitIds.has(id) };
+  // die Merkliste mit Zeitraum und Tageszeit ihres eigenen Filters (Plan 0057, E5, Review 3 M2)
+  const savedCtx: CardContext = { ...ctx, isUnfit: (id) => views.savedUnfitIds.has(id) };
   // Liste und Karte: nur die Zahl, mit Zeitraum dieser dazu (Plan 0056, E2, N1)
   const [listCount, listWords] = listStatusParts(visible.length, route.filter.range);
   // „5 Anbieter“: so viele aktive Zeilen zeigt die Liste im Chunk (Plan 0010, E4). Im Tab wirken nur Kategorie und
@@ -447,18 +488,77 @@ export function App() {
   const dialogOpen =
     sheet !== null || detailOffer !== undefined || placeSheet || sheetProviderId !== undefined || onboarding !== "aus";
   const limit = route.filter.reachLimit;
-  const limitOn = limitActive(reachMode);
   // Wegzeit-Grenze und Zeitraum gelten nur in „Entdecken“, nicht im Tab „Anbieter“ (Plan 0055, E3, Review M2)
   const inProviders = section === "anbieter";
   const hint = section === "entdecken" && limit && limitHint(limit, reachMode);
   // gespeicherter Startpunkt + wegzeit=: Platzhalter statt ungefilterter Liste, bis die Wegzeit da ist (M7, Arch-Review
-  // 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11). Die Merkliste kennt keine Wegzeit-Grenze
-  // und wartet nie (Plan 0025, E8).
+  // 0009, Befund 4). Die Karte zeigt solange alle Orte (bewusste Lücke, E11). Die Merkliste hat ihre eigene Grenze
+  // (`savedListPending`, Plan 0057, E7a).
   const listPending = section === "entdecken" && reachMode?.kind === "laedt" && limit !== undefined;
   // „Nächstgelegen“ wartet ebenso auf die Wegzeit, damit die Liste nicht nachträglich umsortiert (Plan 0043, E7). Nur
   // die Liste: Die Zahl der Statuszeile stimmt, und `finish.pending` des Onboardings hängt an `listPending`.
   const listWaits = listPending || (route.sort === "nah" && reachMode?.kind === "laedt");
   const askOrigin = route.sort === "nah" && !origin;
+  /*
+   * Liste der Merkliste wie die Startseite (Plan 0057, E7a), ohne neuen Lade-Anlass (kein `want()`): mit ihrer Grenze
+   * oder „Nächstgelegen“ Platzhalter, solange die Tabelle lädt; „Nächstgelegen“ ohne Startpunkt fragt „Wovon aus
+   * gerechnet?“. Kalender und Karte der Merkliste warten nie.
+   */
+  const savedLimit = savedFilter.filter.reachLimit;
+  const savedListPending = route.tab === "merkliste" && reachMode?.kind === "laedt" && savedLimit !== undefined;
+  const savedListWaits = savedListPending || (savedSort === "nah" && reachMode?.kind === "laedt");
+  const savedAskOrigin = savedSort === "nah" && !origin;
+  const savedHint = section === "merkliste" && savedLimit && limitHint(savedLimit, reachMode);
+  /** Merklisten-Filter leeren; der Knopf verschwindet, der Fokus geht vorher auf die Statuszeile (Plan 0021, E3) */
+  const resetSavedFilter = () => {
+    statusLine.current?.focus();
+    setSavedFilter(EMPTY_SAVED_FILTER);
+  };
+  const savedChips: QuickChip[] = [
+    {
+      label: "Nur fest eingeplant",
+      on: savedFilter.onlyFixed,
+      toggle: () => setSavedFilter({ ...savedFilter, onlyFixed: !savedFilter.onlyFixed }),
+    },
+    ...(["vormittags", "nachmittags"] as const).map(
+      (daytime): QuickChip => ({
+        label: DAYTIME_LABELS[daytime],
+        on: savedFilter.filter.daytimes.includes(daytime),
+        toggle: () => setSavedFilter({ ...savedFilter, filter: toggleIn(savedFilter.filter, "daytimes", daytime) }),
+      }),
+    ),
+  ];
+  const savedSortOptions: readonly SortOption<SavedSort>[] = [
+    { value: "termine", title: SORT_TITLES.termine, sub: "was als Nächstes stattfindet" },
+    { value: "nah", title: SORT_TITLES.nah, sub: nearSortSub(reachMode, origin) },
+    { value: "gemerkt", title: SAVED_SORT_TITLES.gemerkt, sub: "was du zuletzt gemerkt hast" },
+  ];
+  const onSavedSort = (value: SavedSort) => {
+    setSavedSort(value);
+    window.scrollTo({ top: 0 });
+  };
+  // „Wovon aus gerechnet?“ über der Liste, bis dahin nach Terminen (Plan 0043, E7); auf beiden Seiten gleich
+  const originPrompt = (
+    <>
+      <div className="empty">
+        <b>Wovon aus gerechnet?</b>
+        Wähle einen Startpunkt, dann stehen die Angebote mit der kürzesten Wegzeit mit Bus & Bahn oben.
+        <span className="empty-actions">
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              setSheet("origin");
+              setOriginFromPrompt(true);
+            }}
+          >
+            Startpunkt wählen
+          </button>
+        </span>
+      </div>
+      <p className="status">Bis dahin nach Terminen</p>
+    </>
+  );
   /** „Zurücksetzen“: URL-Filter leer, Altersfilter wieder an – zurück auf den Standard (Plan 0021, E2) */
   const resetFilters = () => {
     setFilter(EMPTY_FILTER);
@@ -543,9 +643,8 @@ export function App() {
       {/* Kosten, Anmeldung, Format, Wegzeit und Zeitraum beschreiben Termine, nicht Anbieter (Plan 0055, E3) */}
       {section === "entdecken" && (
         <QuickFilters
-          filter={route.filter}
-          limitActive={limitOn}
-          onChange={setFilter}
+          chips={startQuickChips(route.filter, setFilter)}
+          count={activeFilterCount(route.filter, { limitActive: limitOn })}
           onOpenSheet={() => setSheet("filter")}
           sheetButton={filterButton}
           bell={
@@ -674,27 +773,7 @@ export function App() {
         {load.kind === "ready" && route.tab === "karte" && mapPanel(visible, discoverCtx, true)}
         {load.kind === "ready" && (route.tab === "entdecken" || route.tab === "karte") && (
           <>
-            {askOrigin && (
-              <>
-                <div className="empty">
-                  <b>Wovon aus gerechnet?</b>
-                  Wähle einen Startpunkt, dann stehen die Angebote mit der kürzesten Wegzeit mit Bus & Bahn oben.
-                  <span className="empty-actions">
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => {
-                        setSheet("origin");
-                        setOriginFromPrompt(true);
-                      }}
-                    >
-                      Startpunkt wählen
-                    </button>
-                  </span>
-                </div>
-                <p className="status">Bis dahin nach Terminen</p>
-              </>
-            )}
+            {askOrigin && originPrompt}
             {listWaits ? (
               <ListPending />
             ) : offersNarrowed && views.inView.length === 0 ? (
@@ -758,30 +837,72 @@ export function App() {
             inView={views.savedInView}
             narrowed={route.tab === "merkliste-karte" && viewNarrows(mapView)}
             onShowAll={showAll}
-            filter={savedFilter}
             filtered={views.savedFiltered}
-            onFilter={setSavedFilter}
-            quick={views.savedQuick}
+            onResetFilter={resetSavedFilter}
+            filters={
+              <QuickFilters
+                chips={savedChips}
+                count={views.savedFilterCount}
+                legend="Merkliste filtern"
+                onOpenSheet={() => setSheet("saved-filter")}
+                sheetButton={filterButton}
+              />
+            }
+            sortMenu={
+              <SortMenu options={savedSortOptions} current={savedSort} plain="termine" onChange={onSavedSort} />
+            }
+            status={statusLine}
+            sortNote={savedSort === "termine" ? undefined : SAVED_SORT_TITLES[savedSort]}
+            pending={savedListPending}
+            notes={
+              savedHint && (
+                // Grenze wirkt nicht (ohne Startpunkt, Fehler, außerhalb): Hinweis wie auf der Startseite (E7a)
+                <p className="status">
+                  {savedHint}
+                  {limitAction(statusLine)}
+                </p>
+              )
+            }
             tab={route.tab === "merkliste-karte" || route.tab === "merkliste-kalender" ? route.tab : "merkliste"}
             onTab={(tab) => replace({ ...route, tab })}
             // Startseiten-Filter und Alter wirken auf der Merkliste nicht: Zurücksetzen meint den Merklisten-Filter,
             // einen Altersausweg gibt es nicht
-            renderMap={(savedOffers) => mapPanel(savedOffers, ctx, false)}
+            renderMap={(savedOffers) => mapPanel(savedOffers, savedCtx, false)}
             renderCalendar={(onResetSaved) =>
               views.savedCalendar && (
                 <SavedCalendar
                   calendar={views.savedCalendar}
                   now={now}
                   today={today}
-                  ctx={ctx}
+                  ctx={savedCtx}
                   onDiscover={discoverRange}
                   onResetFilter={onResetSaved}
                 />
               )
             }
+            renderList={() => (
+              <>
+                {savedAskOrigin && originPrompt}
+                {savedListWaits ? (
+                  <ListPending />
+                ) : (
+                  <ListView
+                    groups={views.savedGroups}
+                    remaining={0}
+                    onMore={views.showMore}
+                    today={today}
+                    ctx={savedCtx}
+                    hasData
+                    openOnDay={ruleActive(savedRule(savedFilter, true))}
+                    origin={origin}
+                    numbered
+                  />
+                )}
+              </>
+            )}
             generatedAt={load.data.generatedAt}
             birthDate={birthDate}
-            ctx={ctx}
+            ctx={savedCtx}
             onDiscover={() => onTab("entdecken")}
             onExported={say}
           />
@@ -825,6 +946,14 @@ export function App() {
         setBirthDate={setBirthDate}
         filterAge={birthDate ? { label: ageLabel, on: ageOnly, unfitCount, onChange: views.setAgeOnly } : undefined}
         resetFilters={resetFilters}
+        savedFilter={{
+          filter: savedFilter,
+          onChange: setSavedFilter,
+          onReset: () => setSavedFilter(EMPTY_SAVED_FILTER),
+          resultCount: views.savedVisible.length,
+          quick: views.savedQuick,
+          calendar: route.tab === "merkliste-kalender",
+        }}
         theme={theme}
         today={today}
         originApi={originApi}

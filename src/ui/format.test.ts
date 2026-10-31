@@ -154,6 +154,7 @@ describe("Texte in fremder Zeitzone (Test läuft in America/Los_Angeles)", () =>
     });
     expect(listingHeading({ kind: "wegzeit", band: { unit: "m" } }, today, gostenhof).title).toBe("Über 10 km");
     expect(listingHeading({ kind: "ohne-wegzeit" }, today)).toEqual({ title: "Ohne Wegzeit" });
+    expect(listingHeading({ kind: "flach" }, today)).toEqual({ title: "Zuletzt gemerkt" });
     expect(nearSortSub(undefined, undefined)).toBe("Startpunkt wählen");
     expect(nearSortSub({ kind: "oepnv" }, gostenhof)).toBe("Wegzeit ab Gostenhof");
     expect(nearSortSub({ kind: "laedt" }, gostenhof)).toBe("Wegzeit ab Gostenhof");

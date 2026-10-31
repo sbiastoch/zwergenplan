@@ -145,15 +145,21 @@ test("ein Tipp daneben schließt das Menü und öffnet keine Karte", async ({ pa
   await expect(page).toHaveURL((url) => url.search === "");
 });
 
-test("Deep-Link ?sortierung=neu öffnet sortiert; der Tab-Wechsel behält die Wahl, die Kartenansicht hat keinen Knopf", async ({
+test("Deep-Link ?sortierung=neu öffnet sortiert; der Tab-Wechsel behält die Wahl, die Merkliste sortiert eigenständig", async ({
   page,
 }) => {
+  await page.addInitScript(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["lxizt974"])));
   await ready(page, "./?sortierung=neu");
   await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Neu eingestellt");
   await expect(page.getByRole("heading", { level: 2 }).first()).toHaveText(/^Neu diese Woche/);
   await page.getByRole("button", { name: /^Merkliste/ }).click();
   await expect(page).toHaveURL(/ansicht=merkliste&sortierung=neu$/);
+  // Die Liste der Merkliste hat ihren eigenen Knopf (Plan 0057, E6), Kalender und Karte keinen
+  await expect(sortButton(page)).toHaveAccessibleName("Sortierung: Nächste Termine");
+  const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
+  await views.getByRole("button", { name: "Kalender", exact: true }).click();
   await expect(sortButton(page)).toHaveCount(0);
+  await views.getByRole("button", { name: "Liste", exact: true }).click();
   await page
     .getByRole("navigation", { name: "Hauptnavigation" })
     .getByRole("button", { name: /^Angebote/ })

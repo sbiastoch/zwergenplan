@@ -148,6 +148,21 @@ test("Zeitraum mit Alter: regelmäßig zählt nur ein passender Termin darin, di
   const saved = page.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" });
   await expect(saved).toBeVisible();
   await expect(saved).not.toHaveClass(/\bunfit\b/);
+
+  // eigener Zeitraum im Sheet der Merkliste (Plan 0057, E5): leer, nicht der aus „Entdecken“; bis 14.10. ist der Treff
+  // (erst ab 21.10. passend) markiert wie in „Entdecken“
+  await page
+    .getByRole("group", { name: "Merkliste filtern" })
+    .getByRole("button", { name: /^Alle Filter/ })
+    .click();
+  const savedSheet = page.getByRole("dialog", { name: "Merkliste filtern" });
+  await expect(savedSheet.getByLabel("von")).toHaveValue("");
+  await savedSheet.getByLabel("bis").fill("2026-10-14");
+  await expect(savedSheet.getByRole("button", { name: "1 gemerkte zeigen" })).toBeVisible();
+  await savedSheet.getByRole("button", { name: "1 gemerkte zeigen" }).click();
+  await expect(saved).toHaveClass(/\bunfit\b/);
+  // nie in der URL: Dort steht weiter nur der Zeitraum aus „Entdecken“
+  expect(page.url()).not.toContain("2026-10-14");
 });
 
 test("Detail eines Kurses mit Zeitraum bezieht sich auf den Kursbeginn", async ({ page }) => {

@@ -2,7 +2,8 @@
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,merkliste-kalender,…] [--text=200]   Standard: lokale Preview mit
  * Fixtures
- * Ansichten: start, merkliste, detail, filter, filter-tageszeit (Plan 0057, E7), kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
+ * Ansichten: start, merkliste, merkliste-sortieren, merkliste-filter, merkliste-filter-kalender, merkliste-nah (Plan 0057,
+ * E5–E7a), detail, filter, filter-tageszeit (Plan 0057, E7), kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
  * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
  * (Plan 0017, 0054: Abos im Kind-Sheet mit langem Such-Abo), onboarding (Plan 0033, E15: alle Schritte der Einführung
@@ -110,6 +111,36 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.locator(".toast").waitFor({ state: "detached", timeout: 10_000 });
     await page.getByRole("button", { name: /^Merkliste/ }).click();
     await page.getByRole("button", { name: "Kalender", exact: true }).click();
+  },
+  // Filter und Sortierung der Merkliste (Plan 0057, E5, E6): Liste mit „Vormittags“ und offenem Sortiermenü
+  "merkliste-sortieren": async (page) => {
+    for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 4)) await heart.click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
+    await page.getByRole("button", { name: /^Sortierung:/ }).click();
+    await page.getByRole("menu").waitFor();
+  },
+  // Filter-Sheet der Merkliste in der Liste (mit Schnellwahlen „ab …“) und im Kalender (Hinweis statt Zeitraum)
+  "merkliste-filter": async (page) => {
+    for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    await page.getByRole("dialog", { name: "Merkliste filtern" }).getByRole("button", { name: "Nachmittags" }).click();
+  },
+  "merkliste-filter-kalender": async (page) => {
+    for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("button", { name: "Kalender", exact: true }).click();
+    await page.getByRole("button", { name: /^Alle Filter/ }).click();
+    const sheet = page.getByRole("dialog", { name: "Merkliste filtern" });
+    await sheet.getByRole("heading", { name: "Zeitraum" }).scrollIntoViewIfNeeded();
+  },
+  // „Nächstgelegen“ ohne Startpunkt: „Wovon aus gerechnet?“ über der Liste nach Terminen (Plan 0057, E7a)
+  "merkliste-nah": async (page) => {
+    for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 3)) await heart.click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("button", { name: /^Sortierung:/ }).click();
+    await page.getByRole("menuitemradio", { name: "Nächstgelegen" }).click();
   },
   detail: async (page) => {
     await page.getByTestId("offer").first().getByRole("heading").getByRole("button").click();

@@ -17,6 +17,13 @@ export interface Occurrence<T extends Offer = Offer> {
  */
 export type SessionFit = (offer: Offer, session: Session) => boolean;
 
+/** Beide Prädikate müssen passen (Altersregel und Tageszeit im Kalender, Plan 0057, E7); fehlt eins, gilt das andere. */
+export function allFits(a: SessionFit | undefined, b: SessionFit | undefined): SessionFit | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return (offer, session) => a(offer, session) && b(offer, session);
+}
+
 export interface DayGroup<I> {
   /** Berliner Kalendertag (ISO) */
   day: string;

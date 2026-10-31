@@ -28,6 +28,8 @@ interface ListViewProps {
   openOnDay: boolean;
   /** Startpunkt für die Unterzeilen der Wegzeit-Bänder (Plan 0043, E7) */
   origin?: Origin | undefined;
+  /** Kachel mit „Termin 3 von 8“ bei laufenden Kursen, wie bisher auf der Merkliste (Plan 0057, E6) */
+  numbered?: boolean;
 }
 
 export function ListView({
@@ -41,6 +43,7 @@ export function ListView({
   age,
   openOnDay,
   origin,
+  numbered = false,
 }: ListViewProps) {
   if (groups.length === 0) return <NoOffers hasData={hasData} onResetFilter={onResetFilter} age={age} />;
   return (
@@ -51,16 +54,20 @@ export function ListView({
         const dated = group.kind !== "termin";
         return (
           <section key={group.key} aria-label={sub ? `${title}, ${sub}` : title}>
-            <h2 className={group.kind === "termin" && group.day === today ? "daylabel is-today" : "daylabel"}>
-              <span>{title}</span>
-              {sub && <small>{sub}</small>}
-            </h2>
+            {/* „flach“: eine Gruppe ohne sichtbaren Kopf („Zuletzt gemerkt“, Plan 0057, E6) */}
+            {group.kind !== "flach" && (
+              <h2 className={group.kind === "termin" && group.day === today ? "daylabel is-today" : "daylabel"}>
+                <span>{title}</span>
+                {sub && <small>{sub}</small>}
+              </h2>
+            )}
             {group.items.map((item) => (
               <OfferCard
                 key={item.offer.id}
                 item={item}
                 ctx={ctx}
                 dated={dated}
+                numbered={numbered}
                 calendarDay={openOnDay ? berlinIsoDate(item.session.start) : undefined}
               />
             ))}

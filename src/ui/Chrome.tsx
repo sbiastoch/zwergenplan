@@ -1,6 +1,6 @@
 /** Kopf, Kategorie-Sticker, Schnellfilter und Tab-Leiste (Plan 0003, E10, E15, E16). */
 import type { CSSProperties, Ref } from "react";
-import { activeFilterCount, type FilterState, toggleIn } from "../domain/filter.ts";
+import { type FilterState, toggleIn } from "../domain/filter.ts";
 import type { Section, Tab } from "../domain/route.ts";
 import { CATEGORIES, CATEGORY_LABELS } from "../domain/topics.ts";
 import { CATEGORY_UI } from "./categories.ts";
@@ -65,45 +65,59 @@ export function Stickers({ filter, onChange }: { filter: FilterState; onChange: 
   );
 }
 
+/** Ein Chip der Schnellfilter-Zeile (Plan 0057, E5): Startseite und Merkliste geben ihre eigenen. */
+export interface QuickChip {
+  label: string;
+  on: boolean;
+  toggle: () => void;
+}
+
+/** Die fünf Chips der Startseite (Plan 0003, E16) */
+export function startQuickChips(filter: FilterState, onChange: (f: FilterState) => void): QuickChip[] {
+  const chip = (label: string, on: boolean, next: () => FilterState): QuickChip => ({
+    label,
+    on,
+    toggle: () => onChange(next()),
+  });
+  return [
+    chip("Kostenlos", filter.cost.includes("kostenlos"), () => toggleIn(filter, "cost", "kostenlos")),
+    chip("Ohne Anmeldung", filter.registration.includes("ohne-anmeldung"), () =>
+      toggleIn(filter, "registration", "ohne-anmeldung"),
+    ),
+    chip("Kurse", filter.formats.includes("kurs"), () => toggleIn(filter, "formats", "kurs")),
+    chip("Regelmäßig", filter.formats.includes("regelmaessig"), () => toggleIn(filter, "formats", "regelmaessig")),
+    chip("Einmalig", filter.formats.includes("einmalig"), () => toggleIn(filter, "formats", "einmalig")),
+  ];
+}
+
+/**
+ * Knopf „Filter“ mit Badge und Chips, waagrecht scrollend (Plan 0003, E16). Startseite und Merkliste (Plan 0057, E5)
+ * geben Chips, Zahl im Badge und Namen der Gruppe; die Glocke gibt es nur auf der Startseite.
+ */
 export function QuickFilters({
-  filter,
-  limitActive,
-  onChange,
+  chips,
+  count,
+  legend = "Schnellfilter",
   onOpenSheet,
   sheetButton,
   bell,
 }: {
-  filter: FilterState;
-  /** die Wegzeit-Grenze zählt nur, wenn sie wirkt (Plan 0009, E8) */
-  limitActive: boolean;
-  onChange: (f: FilterState) => void;
+  chips: readonly QuickChip[];
+  /** Zahl im Badge (`activeFilterCount`; die Wegzeit-Grenze zählt nur, wenn sie wirkt, Plan 0009, E8) */
+  count: number;
+  /** Name der Gruppe für Screenreader */
+  legend?: string;
   onOpenSheet: () => void;
   /** der Knopf „Alle Filter“, Fokus-Rückweg für das Kind-Sheet */
   sheetButton?: Ref<HTMLButtonElement>;
   /** Glocke der Suche (Plan 0054, E6): nur im Tab „Angebote“ und nur mit einem Filter außer Zeitraum und Tageszeit */
   bell?: { label: string; subscribed: boolean; busy: boolean; onToggle: () => void } | undefined;
 }) {
-  const count = activeFilterCount(filter, { limitActive });
-  const chips = [
-    { label: "Kostenlos", on: filter.cost.includes("kostenlos"), next: () => toggleIn(filter, "cost", "kostenlos") },
-    {
-      label: "Ohne Anmeldung",
-      on: filter.registration.includes("ohne-anmeldung"),
-      next: () => toggleIn(filter, "registration", "ohne-anmeldung"),
-    },
-    { label: "Kurse", on: filter.formats.includes("kurs"), next: () => toggleIn(filter, "formats", "kurs") },
-    {
-      label: "Regelmäßig",
-      on: filter.formats.includes("regelmaessig"),
-      next: () => toggleIn(filter, "formats", "regelmaessig"),
-    },
-    { label: "Einmalig", on: filter.formats.includes("einmalig"), next: () => toggleIn(filter, "formats", "einmalig") },
-  ];
   return (
     // Die Glocke ist kein Filter: rechts neben der scrollenden Gruppe, nicht darin (Plan 0054, E6)
     <div className="quickbar">
       <fieldset className="plain">
-        <legend className="sr-only">Schnellfilter</legend>
+        <legend className="sr-only">{legend}</legend>
         <div className="chips">
           <button
             ref={sheetButton}
@@ -117,13 +131,7 @@ export function QuickFilters({
             {count > 0 && <span className="badge">{count}</span>}
           </button>
           {chips.map((chip) => (
-            <button
-              key={chip.label}
-              type="button"
-              className="chip"
-              aria-pressed={chip.on}
-              onClick={() => onChange(chip.next())}
-            >
+            <button key={chip.label} type="button" className="chip" aria-pressed={chip.on} onClick={chip.toggle}>
               {chip.on && <Icon name="check" size={18} />}
               {chip.label}
             </button>

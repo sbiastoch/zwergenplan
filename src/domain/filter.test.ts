@@ -7,9 +7,12 @@ import {
   type FilterState,
   filterFromSearch,
   filterToSearch,
+  inDaytime,
   matchesFilter,
   providerFilter,
+  quickRangeOn,
   toggleIn,
+  toggleQuickRange,
   withDateRange,
   withReachLimit,
 } from "./filter.ts";
@@ -376,10 +379,47 @@ describe("Tageszeit (Plan 0057, E7)", () => {
     expect(ids({ ...morning, range: { from: "2026-10-13" } })).toContain("pekip-herbst");
   });
 
+  it("inDaytime: Prädikat je Termin für den Kalender der Merkliste, ohne Auswahl keins (Plan 0057, E7)", () => {
+    const pekip = offers.find((o) => fixtureKey(o) === "pekip-herbst");
+    if (!pekip) throw new Error("Fixture fehlt");
+    expect(inDaytime([])).toBeUndefined();
+    const morningFit = inDaytime(["vormittags"]);
+    const afternoonFit = inDaytime(["nachmittags", "mittags"]);
+    // jeder PEKiP-Termin beginnt um 9:30: alle passen, keiner am Nachmittag
+    expect(pekip.sessions.every((s) => morningFit?.(pekip, s))).toBe(true);
+    expect(pekip.sessions.some((s) => afternoonFit?.(pekip, s))).toBe(false);
+  });
+
   it("matchesFilter kennt die Tageszeit nicht", () => {
     const musikgarten = offers.find((o) => fixtureKey(o) === "musikgarten-1");
     if (!musikgarten) throw new Error("Fixture fehlt");
     expect(matchesFilter(musikgarten, morning)).toBe(true);
+  });
+});
+
+describe("Schnellwahlen „ab …“ (Plan 0025, E7; Plan 0057, E5)", () => {
+  const nov = { from: "2026-11-01" };
+  const dez = { from: "2026-12-01" };
+
+  it("Einfachwahl, ein zweiter Tipp hebt sie auf; ohne Zeitraum fehlt der Schlüssel", () => {
+    const a = toggleQuickRange(EMPTY_FILTER, nov);
+    expect(a.range).toEqual(nov);
+    expect(quickRangeOn(a, nov)).toBe(true);
+    expect(quickRangeOn(a, dez)).toBe(false);
+    expect(toggleQuickRange(a, dez).range).toEqual(dez);
+    const off = toggleQuickRange(a, { ...nov });
+    expect(off).toEqual(EMPTY_FILTER);
+    expect("range" in off).toBe(false);
+  });
+
+  it("ein Zeitraum mit Ende ist keine Schnellwahl; die übrigen Werte bleiben", () => {
+    const withEnd: FilterState = {
+      ...EMPTY_FILTER,
+      formats: ["kurs"],
+      range: { from: "2026-11-01", to: "2026-11-30" },
+    };
+    expect(quickRangeOn(withEnd, nov)).toBe(false);
+    expect(toggleQuickRange(withEnd, nov)).toEqual({ ...EMPTY_FILTER, formats: ["kurs"], range: nov });
   });
 });
 

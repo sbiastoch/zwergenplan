@@ -1,18 +1,12 @@
 /**
  * „Meine Merkliste“ (Plan 0003, E12; bis Plan 0022 „Mein Stickerheft“) mit Sammel-ICS aus dem Browser (ADR 0007).
- * Kopf nach Plan 0025, E3a: Umschalter Liste | Karte | Kalender über die ganze Breite, Filterzeile (E6), Statuszeile mit
- * rundem Export-Knopf (nur in der Liste). Karte und Kalender rendert App über `renderMap` bzw. `renderCalendar`.
+ * Kopf nach Plan 0025, E3a: Umschalter Liste | Karte | Kalender, in der Liste mit Sortier-Knopf daneben (Plan 0057, E6),
+ * Filterzeile wie auf der Startseite (Plan 0057, E5), Statuszeile mit rundem Export-Knopf (nur in der Liste). Liste,
+ * Karte und Kalender rendert App über `renderList`, `renderMap` bzw. `renderCalendar`.
  */
-import { type ReactNode, useMemo, useRef } from "react";
+import { type ReactNode, type RefObject, useMemo } from "react";
 import type { Occurrence } from "../domain/agenda.ts";
-import type { DateRange } from "../domain/date-range.ts";
-import {
-  collectionExport,
-  EMPTY_SAVED_FILTER,
-  type SavedFilter,
-  type SavedState,
-  upcomingSessionCount,
-} from "../domain/saved.ts";
+import { collectionExport, type SavedState, upcomingSessionCount } from "../domain/saved.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { type ViewOption, ViewToggle } from "./Chrome.tsx";
 import {
@@ -31,7 +25,6 @@ import { Icon } from "./icons.tsx";
 import { download, type IcsExport, loadExport } from "./ics-export.ts";
 import { EmptyState } from "./ListView.tsx";
 import { type CardContext, OfferCard } from "./OfferCard.tsx";
-import { SavedFilters } from "./SavedFilters.tsx";
 import { LONG_TOAST_MS, type Say } from "./use-app-state.ts";
 import { ANNOUNCE_DELAY_MS, useSettled } from "./use-settled.ts";
 
@@ -56,12 +49,25 @@ interface SavedViewProps {
   /** Der Kartenausschnitt blendet Gemerktes aus: Statuszeile „im Kartenausschnitt“ mit „Alle zeigen“ */
   narrowed: boolean;
   onShowAll: () => void;
-  /** Merklisten-Filter (E6) und ob er in dieser Darstellung wirkt (`views.savedFiltered`) */
-  filter: SavedFilter;
+  /** Merklisten-Filter wirkt in dieser Darstellung (`views.savedFiltered`) */
   filtered: boolean;
-  onFilter: (filter: SavedFilter) => void;
-  /** Schnellwahlen „ab …“ (E7) */
-  quick: readonly { month: string; range: DateRange }[];
+  /**
+   * ganzen Filter zurücksetzen, auch einen im Kalender ausgeblendeten Zeitraum. Der Knopf verschwindet danach: App
+   * setzt den Fokus vorher auf die Statuszeile (`status`), sie meldet die neue Zahl selbst (Muster aus Plan 0021, E3).
+   */
+  onResetFilter: () => void;
+  /** Filterzeile wie auf der Startseite (`QuickFilters`, Plan 0057, E5) */
+  filters: ReactNode;
+  /** Sortier-Knopf neben dem Umschalter, nur in der Liste (Plan 0057, E6) */
+  sortMenu: ReactNode;
+  /** Ansage der Sortierung in der Liste ohne sichtbare Änderung, wie auf der Startseite (Plan 0043, E4; Plan 0057, E6) */
+  sortNote?: string | undefined;
+  /** Statuszeile: Fokus-Ziel von App (Zurücksetzen, Startpunkt, „Alle zeigen“) */
+  status: RefObject<HTMLParagraphElement | null>;
+  /** Wegzeit lädt zur Grenze: Die Zahl stünde erst mit Tabelle fest, die Statuszeile ist unsichtbar (Plan 0057, E7a) */
+  pending: boolean;
+  /** Hinweise unter der Statuszeile (Wegzeit-Grenze ohne Wirkung, E7a) */
+  notes: ReactNode;
   tab: SavedTab;
   onTab: (tab: SavedTab) => void;
   /**
@@ -69,8 +75,10 @@ interface SavedViewProps {
    * E5a)
    */
   renderMap: (offers: readonly SiteOffer[]) => ReactNode;
-  /** Kalender der gemerkten Termine (E5); „Filter zurücksetzen“ nur, wenn Format oder Anmeldung wirkt */
+  /** Kalender der gemerkten Termine (E5); „Filter zurücksetzen“ nur, wenn der Filter dort wirkt */
   renderCalendar: (onResetFilter: (() => void) | undefined) => ReactNode;
+  /** Liste der Merkliste nach der Sortierung (E6, E7a): `ListView`, Platzhalter oder „Wovon aus gerechnet?“ */
+  renderList: () => ReactNode;
   generatedAt: SiteData["generatedAt"];
   /**
    * mit Geburtsdatum zählen bei regelmäßigen Angeboten nur die Termine, die zum Alter passen: in der Datei (Plan 0018,
@@ -90,21 +98,25 @@ export function SavedView({
   inView,
   narrowed,
   onShowAll,
-  filter,
   filtered,
-  onFilter,
-  quick,
+  onResetFilter,
+  filters,
+  sortMenu,
+  status,
+  sortNote,
+  pending,
+  notes,
   tab,
   onTab,
   renderMap,
   renderCalendar,
+  renderList,
   generatedAt,
   birthDate,
   ctx,
   onDiscover,
   onExported,
 }: SavedViewProps) {
-  const status = useRef<HTMLParagraphElement>(null);
   const offers = savedItems.map((item) => item.offer);
   // stabile Identität: Die Karte meldet sonst bei jedem Render einen neuen Ausschnitt (Endlosschleife, Plan 0056, S4)
   const shown = useMemo(() => visible.map((item) => item.offer), [visible]);
@@ -136,14 +148,7 @@ export function SavedView({
     const long = missing > 0 || tentative > 0;
     onExported(collectionToast(count, missing, tentative), long ? LONG_TOAST_MS : undefined);
   };
-  /*
-   * Ganzen Filter zurücksetzen, auch einen im Kalender ausgeblendeten Zeitraum (E6). Der Knopf verschwindet danach: Der
-   * Fokus geht vorher auf die Statuszeile, sie meldet die neue Zahl selbst (Muster aus Plan 0021, E3).
-   */
-  const reset = () => {
-    status.current?.focus();
-    onFilter(EMPTY_SAVED_FILTER);
-  };
+  const reset = onResetFilter;
   const calendar = tab === "merkliste-kalender";
   // Ausschnitt der Merklisten-Karte (Plan 0056, E5): Ansage erst, wenn die Karte ruht, wie im Tab „Anbieter“ (N8)
   const mapNarrowed = tab === "merkliste-karte" && narrowed;
@@ -168,16 +173,13 @@ export function SavedView({
         </EmptyState>
       ) : (
         <>
-          <ViewToggle options={VIEW_OPTIONS} current={tab} onChange={onTab} legend="Darstellung der Merkliste" full />
-          <SavedFilters
-            filter={filter}
-            quick={quick}
-            showRange={!calendar}
-            onChange={onFilter}
-            onReset={filtered ? reset : undefined}
-          />
+          <div className="saved-tools">
+            <ViewToggle options={VIEW_OPTIONS} current={tab} onChange={onTab} legend="Darstellung der Merkliste" full />
+            {tab === "merkliste" && sortMenu}
+          </div>
+          <div className="saved-filters">{filters}</div>
           <div className="status-row">
-            <p ref={status} className="status" role="status" tabIndex={-1}>
+            <p ref={status} className={pending ? "status pending" : "status"} role="status" tabIndex={-1}>
               {mapNarrowed ? (
                 <span>
                   <span aria-hidden="true">
@@ -191,6 +193,7 @@ export function SavedView({
                   parts={statusParts({ offers, shown, filtered, tab, now: ctx.now, birthDate, missing: unfitting })}
                 />
               )}
+              {tab === "merkliste" && sortNote && <span className="sr-only">. Sortiert nach {sortNote}</span>}
             </p>
             {mapNarrowed && (
               <button type="button" className="linkbtn" onClick={showAll}>
@@ -209,6 +212,7 @@ export function SavedView({
               </button>
             )}
           </div>
+          {notes}
           {!calendar && shown.length === 0 ? (
             // Filter blendet alle aus (E5a): in Liste und Karte derselbe Leerzustand, ohne Karte und damit ohne Kacheln
             <EmptyState icon="search" title="Nichts, was zu deinem Filter passt">
@@ -238,8 +242,7 @@ export function SavedView({
                 </>
               )}
               {calendar && renderCalendar(filtered ? reset : undefined)}
-              {tab === "merkliste" &&
-                visible.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated numbered />)}
+              {tab === "merkliste" && renderList()}
             </>
           )}
         </>

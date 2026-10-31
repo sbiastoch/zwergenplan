@@ -44,14 +44,16 @@ export function isNewlyListed(offer: Pick<Offer, "listedAt">, now: Date): boolea
 
 /**
  * Kopf einer Gruppe der Liste „Entdecken“ (Plan 0043, E4): ein Termin-Tag oder eine Wochengruppe von „Neu
- * eingestellt“ mit erstem und letztem Kalendertag (`frueher` ohne).
+ * eingestellt“ mit erstem und letztem Kalendertag (`frueher` ohne). Die Liste der Merkliste nutzt dieselben Köpfe.
  */
 export type ListGroupHead =
   | { kind: "termin"; day: string }
   | { kind: "diese-woche" | "vorige-woche"; from: string; to: string }
   | { kind: "frueher" }
   | { kind: "wegzeit"; band: ReachBand }
-  | { kind: "ohne-wegzeit" };
+  | { kind: "ohne-wegzeit" }
+  /** eine Gruppe ohne sichtbaren Kopf: „Zuletzt gemerkt“ auf der Merkliste (Plan 0057, E6) */
+  | { kind: "flach" };
 
 /**
  * Band der Sortierung „Nächstgelegen“ (Plan 0043, E7): Wegzeit in Minuten (5er-Schritte) oder Luftlinie

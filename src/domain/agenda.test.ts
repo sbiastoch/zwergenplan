@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  allFits,
   collapsedSessions,
   courseProgress,
   discoverable,
@@ -22,6 +23,7 @@ import {
   upcomingSessions,
   weekDays,
 } from "./agenda.ts";
+import { inDaytime } from "./filter.ts";
 import type { Offer, Session } from "./schema.ts";
 import { FIXTURE_NOW, fixtureKey, fixtureOffer, loadFixtures } from "./test-fixtures.ts";
 
@@ -225,6 +227,38 @@ describe("sessionsByDay", () => {
         ?.map((o) => fixtureKey(o.offer)),
     ).toEqual(["krabbeltreff"]);
   });
+
+  it("mit Tageszeit je Termin: ein Kurs steht an allen Terminen darin, nicht nur am Beginn (Plan 0057, E7)", () => {
+    const kurs: Offer = {
+      ...withSessions("Kurs", [
+        s("2026-10-06T09:00:00+02:00", "2026-10-06T10:00:00+02:00"),
+        s("2026-10-13T16:00:00+02:00", "2026-10-13T17:00:00+02:00"),
+        s("2026-10-20T09:00:00+02:00", "2026-10-20T10:00:00+02:00"),
+      ]),
+      format: "kurs",
+    };
+    const index = sessionsByDay([kurs], inDaytime(["vormittags"]));
+    expect([...index.keys()]).toEqual(["2026-10-06", "2026-10-20"]);
+    // mit Altersregel verknüpft: beide müssen passen
+    const notTuesday20: SessionFit = (_o, session) => !session.start.startsWith("2026-10-20");
+    expect([...sessionsByDay([kurs], allFits(notTuesday20, inDaytime(["vormittags"]))).keys()]).toEqual(["2026-10-06"]);
+  });
+});
+
+describe("allFits", () => {
+  const offer = fixtureOffer("krabbeltreff");
+  const [first] = offer.sessions;
+  if (!first) throw new Error("Fixture ohne Termin");
+  const yes: SessionFit = () => true;
+  const no: SessionFit = () => false;
+
+  it("ohne Prädikat keins, eins bleibt dasselbe, sonst UND", () => {
+    expect(allFits(undefined, undefined)).toBeUndefined();
+    expect(allFits(yes, undefined)).toBe(yes);
+    expect(allFits(undefined, no)).toBe(no);
+    expect(allFits(yes, no)?.(offer, first)).toBe(false);
+    expect(allFits(yes, yes)?.(offer, first)).toBe(true);
+  });
 });
 
 describe("Kalenderraster", () => {
@@ -426,6 +460,12 @@ describe("endedOnDay", () => {
     expect(endedOnDay([treff], "2026-10-07", new Date("2026-10-07T20:00:00+02:00"))).toBe(1);
     expect(endedOnDay([treff], "2026-10-07", new Date("2026-10-07T11:00:00+02:00"))).toBe(0);
     expect(endedOnDay([treff], "2026-10-14", new Date("2026-10-07T20:00:00+02:00"))).toBe(0);
+  });
+
+  it("mit Tageszeit je Termin: ein vergangener Vormittagstermin zählt bei „nachmittags“ nicht (Plan 0057, E7)", () => {
+    const evening = new Date("2026-10-07T20:00:00+02:00");
+    expect(endedOnDay([treff], "2026-10-07", evening, inDaytime(["vormittags"]))).toBe(1);
+    expect(endedOnDay([treff], "2026-10-07", evening, inDaytime(["nachmittags"]))).toBe(0);
   });
 
   it("zählt einen Termin, der genau jetzt endet, noch nicht (er läuft noch)", () => {

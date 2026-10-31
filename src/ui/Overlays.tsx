@@ -5,6 +5,7 @@
 import type { RefObject } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import type { FilterState } from "../domain/filter.ts";
+import type { SavedFilter } from "../domain/saved.ts";
 import { offerSharePath, providerSharePath } from "../domain/share.ts";
 import type { SiteOffer } from "../domain/site-data.ts";
 import { DetailContent } from "./DetailDialog.tsx";
@@ -12,13 +13,27 @@ import { Dialog } from "./Dialog.tsx";
 import { type AboListProps, KidSheet } from "./KidSheet.tsx";
 import type { CardContext } from "./OfferCard.tsx";
 import { ProviderSheetLoader } from "./ProviderPanel.tsx";
-import { type AgeFilter, FilterSheet, type LimitActionFor, ManualLinkSheet } from "./Sheets.tsx";
+import { type AgeFilter, FilterSheet, type LimitActionFor, ManualLinkSheet, type SavedSheetParts } from "./Sheets.tsx";
 import type { ToastMessage } from "./Toast.tsx";
 import { type OriginApi, type Say, useShare } from "./use-app-state.ts";
 import type { TransitApi } from "./use-transit.ts";
 
-/** „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl) */
-export type SheetKind = "filter" | "kid" | "origin" | null;
+/**
+ * „origin“: Kind-Sheet, geöffnet über „Startpunkt wählen“ (Fokus auf die Stadtteil-Auswahl); „saved-filter“: Filter der
+ * Merkliste (Plan 0057, E5)
+ */
+export type SheetKind = "filter" | "saved-filter" | "kid" | "origin" | null;
+
+/** Filter-Sheet der Merkliste (Plan 0057, E5): eigener Zustand, nie in der URL */
+interface SavedFilterSheet {
+  filter: SavedFilter;
+  onChange: (filter: SavedFilter) => void;
+  onReset: () => void;
+  /** gemerkte Angebote, die in dieser Darstellung zum Filter passen */
+  resultCount: number;
+  quick: SavedSheetParts["quick"];
+  calendar: boolean;
+}
 
 interface OverlaysProps {
   toast: ToastMessage;
@@ -58,6 +73,7 @@ interface OverlaysProps {
   filterAge: AgeFilter | undefined;
   /** „Zurücksetzen“ im Filter-Sheet: URL-Filter leeren, Altersfilter wieder an (Plan 0021, E2) */
   resetFilters: () => void;
+  savedFilter: SavedFilterSheet;
   theme: { choice: ThemeChoice; setChoice: (choice: ThemeChoice) => void };
   today: string;
   originApi: OriginApi;
@@ -166,6 +182,21 @@ export function Overlays(props: OverlaysProps) {
         />
       </Dialog>
       <Dialog
+        open={sheet === "saved-filter"}
+        onClose={() => setSheet(null)}
+        label="Merkliste filtern"
+        className="sheet"
+        toast={toast}
+      >
+        <SavedFilterContent
+          sheet={props.savedFilter}
+          transit={transit}
+          limitAction={props.limitAction}
+          today={today}
+          onClose={() => setSheet(null)}
+        />
+      </Dialog>
+      <Dialog
         open={sheet === "kid" || sheet === "origin"}
         onClose={() => setSheet(null)}
         label="Kind und Einstellungen"
@@ -200,5 +231,41 @@ export function Overlays(props: OverlaysProps) {
         {manualLink !== undefined && <ManualLinkSheet url={manualLink} onClose={closeManualLink} />}
       </Dialog>
     </>
+  );
+}
+
+/** Inhalt des Merklisten-Filter-Sheets: dasselbe `FilterSheet` mit `saved`, ohne Alter (Plan 0028) */
+function SavedFilterContent({
+  sheet,
+  transit,
+  limitAction,
+  today,
+  onClose,
+}: {
+  sheet: SavedFilterSheet;
+  transit: TransitApi;
+  limitAction: LimitActionFor;
+  today: string;
+  onClose: () => void;
+}) {
+  const { filter: saved, onChange } = sheet;
+  return (
+    <FilterSheet
+      saved={{
+        onlyFixed: saved.onlyFixed,
+        onOnlyFixed: (onlyFixed) => onChange({ ...saved, onlyFixed }),
+        quick: sheet.quick,
+        calendar: sheet.calendar,
+      }}
+      filter={saved.filter}
+      onChange={(filter) => onChange({ ...saved, filter })}
+      onReset={sheet.onReset}
+      age={undefined}
+      resultCount={sheet.resultCount}
+      mode={transit.mode}
+      limitAction={limitAction}
+      today={today}
+      onClose={onClose}
+    />
   );
 }
