@@ -813,6 +813,26 @@ describe("ID-Gate: Fassung und Halten (Plan 0049, Nachtrag 2, B1/B4)", () => {
     return { prev, held: UnitState.parse(holdUnit(prev, candidate, { since: NOW, reason, lost: ["abc12345"] })) };
   };
 
+  it("holdUnit: Beginn des Haltens bleibt nur ohne neue verlorene ID (Arch-Review 2, B1)", () => {
+    const { prev, held } = heldAs("unklar");
+    const candidate = nextOf(run(ctx({ prev, keyParts: NEW_PROMPT, fetched: changed }), ok(renamed)));
+    const later = "2026-10-08T03:00:00+02:00";
+    const again = (lost: string[]) => holdUnit(held, candidate, { since: later, reason: "unklar", lost }).held;
+    // gleiche Verluste oder weniger: Beginn bleibt, `lost` ist die neue Liste
+    expect(again(["abc12345"])).toMatchObject({ since: NOW, lost: ["abc12345"] });
+    expect(again([])).toMatchObject({ since: NOW, lost: [] });
+    // eine neue verlorene ID: Beginn neu, sonst deckte ein Hinnehmen ab NOW sie mit
+    expect(again(["abc12345", "neu00001"])).toMatchObject({ since: later, lost: ["abc12345", "neu00001"] });
+    expect(again(["neu00001"])?.since).toBe(later);
+    // erstes Halten: Beginn ist `since`
+    expect(holdUnit(prev, candidate, { since: later, reason: "grenze", lost: ["abc12345"] }).held?.since).toBe(later);
+    // `lost` wird kopiert, nicht geteilt
+    const lost = ["abc12345"];
+    const out = holdUnit(held, candidate, { since: later, reason: "unklar", lost });
+    lost.push("x");
+    expect(out.held?.lost).toEqual(["abc12345"]);
+  });
+
   it("unverändert trägt partsHash nach; Übernahme setzt die Fassung", () => {
     expect(nextOf(run(ctx())).partsHash).toBe(fullKey(fetched()).parts);
     expect(nextOf(run(ctx({ fetched: changed }), ok(events(4)))).partsHash).toBe(fullKey(changed).parts);
