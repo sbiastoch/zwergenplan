@@ -460,7 +460,6 @@ export function App() {
   // Liste und Karte gehören zu „Entdecken“ (Plan 0005, E5) bzw. zur Merkliste (Plan 0025, E4). Alle Weichen nach
   // Tab-Leisten-Eintrag laufen über `section`, sonst griffen sie auf der Merklisten-Karte falsch (Review M1).
   const section = tabSection(route.tab);
-  // Suche ohne Zeitraum (Plan 0023, E12); die Glocke nur im Tab „Angebote“ (Plan 0054, E6)
   // Liste | Karte steht rechts neben der Statuszeile und bricht bei wenig Platz darunter (Plan 0005, E5). Kein
   // Scroll nach oben: Das gibt es nur beim Tab-Wechsel (Plan 0025, E4).
   const viewToggle = (

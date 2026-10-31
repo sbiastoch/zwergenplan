@@ -38,7 +38,6 @@ const SENT_AT = "2026-10-05T12:00:00+02:00";
 const sheet = (page: Page) => page.getByRole("dialog", { name: "Kind und Einstellungen" });
 const section = (page: Page) => sheet(page).getByRole("region", { name: "Als App" });
 const pushSwitch = (page: Page) => section(page).getByRole("switch", { name: "Wöchentliche Push-Nachricht" });
-/** Glocke der Suche in der Schnellfilter-Zeile (Plan 0054, E6) */
 /** Glocke eines Fixture-Anbieters im Tab „Anbieter“ (`fv3fpfp2`) */
 const theaterBell = (page: Page) =>
   page.getByRole("button", { name: "Kleines Theater Beispiel (fiktiv) abonnieren", exact: true });

@@ -67,7 +67,7 @@ export interface Route {
   filter: FilterState;
   /**
    * Sortierung der Liste „Entdecken“ (Plan 0043, E4): fehlt = „Nächste Termine“. Kein Filter: zählt nicht in Filterzahl
-   * und Zurücksetzen und steht nicht im Such-Abo; in der URL steht nur der Wert, nie der Startpunkt (ADR 0017).
+   * und Zurücksetzen; in der URL steht nur der Wert, nie der Startpunkt (ADR 0017).
    */
   sort?: Sort;
 }

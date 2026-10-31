@@ -239,7 +239,8 @@ export function useOfferViews({
     () => ageVisibility(filtered, upcoming, birthDate, now, { ageOnly, ...rule }),
     [filtered, upcoming, birthDate, now, ageOnly, rule],
   );
-  // Ohne Chip (Review m5): Das Anbieter-Sheet fragt, ob Angebote außerhalb der Filter liegen; der Chip zählt dort nicht
+  // Ohne Chip (Review m5): Das Anbieter-Sheet fragt, ob Angebote außerhalb der Filter liegen; der Chip zählt dort nicht.
+  // Bewusst eine zweite Rechnung nur bei gedrücktem Chip: wenige hundert Angebote, gemerkt bis sich die Eingaben ändern.
   const withoutOwn = useMemo(
     () => (ownProviders ? ageVisibility(filteredAll, upcoming, birthDate, now, { ageOnly, ...rule }) : undefined),
     [ownProviders, filteredAll, upcoming, birthDate, now, ageOnly, rule],

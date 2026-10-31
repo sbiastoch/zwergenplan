@@ -2,6 +2,8 @@
 
 Status: angenommen (2026-10-05), Umsetzung mit Plan 0009. Ersetzt Teile von ADR 0005, ergänzt ADR 0002, ADR 0003 und ADR 0006. Details, Messungen und Begründungen stehen in Plan 0009.
 
+**Geändert durch ADR 0042 (Plan 0054, Nachtrag A):** Der Anlass „beim Push“ für `wegzeit.json` (Nachtrag 2026-10-06 über ADR 0014) entfällt; der Service Worker lädt beim Push nur `site.json`.
+
 **Geändert durch ADR 0015 (Plan 0012):** Punkt 2 (Radius) und Punkt 3, Satz 2 ersetzt durch ADR 0015; Punkte 4, 5 und 6 ergänzt.
 
 **Geändert durch ADR 0017 (Plan 0016):** Punkt 6, Spiegelstriche 1 und 3 (Laden beim Start und das verratene Bit gelten für jeden gespeicherten Startpunkt, nicht nur für einen Stadtteil).

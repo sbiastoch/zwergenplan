@@ -45,7 +45,7 @@ export async function tailorPush({
   env,
 }: {
   now: Date;
-  /** Testversand (`data.test`): nichts schreiben (E3) */
+  /** Testversand (`data.test`): nichts schreiben (E3), außer dem Löschen der Altlast `origin`/`searches` (ADR 0042) */
   test: boolean;
   env: TailorEnv;
 }): Promise<TailorOutcome> {

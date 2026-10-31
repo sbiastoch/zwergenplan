@@ -28,9 +28,9 @@ Icons entstehen aus `design/icon.svg` mit `node scripts/icons.ts` (die PNGs in `
 
 ### Wöchentliche Push-Nachricht
 
-Einmal pro Woche, samstags gegen 10 Uhr, kommt eine Push-Nachricht aufs Gerät (keine Mail), auch wenn es nichts Neues gibt (Plan 0017, ADR 0014). Eingeschaltet wird sie im Kind-Sheet unter „Als App“ oder im letzten Schritt der Einführung (Schalter „Wöchentliche Push-Nachricht“); dort lassen sich auch Such-Abos anlegen („Aktuelle Suche abonnieren“). Auf dem iPhone geht das nur in der installierten App.
+Einmal pro Woche, samstags gegen 10 Uhr, kommt eine Push-Nachricht aufs Gerät (keine Mail), auch wenn es nichts Neues gibt (Plan 0017, ADR 0014). Eingeschaltet wird sie im Kind-Sheet unter „Als App“ oder im letzten Schritt der Einführung (Schalter „Wöchentliche Push-Nachricht“). Anbieter werden an der Glocke im Tab „Anbieter“ und im Anbieter-Sheet abonniert und im Kind-Sheet verwaltet. Auf dem iPhone geht das nur in der installierten App.
 
-- **Zuschnitt auf dem Gerät:** Der Service Worker rechnet die Nachricht aus Such-Abos, Alter und Wegzeit ab dem gespeicherten Startpunkt. Der Push-Worker kennt nur das Abo.
+- **Zuschnitt auf dem Gerät:** Der Service Worker rechnet die Nachricht aus Anbieter-Abos und Alter, ohne Startpunkt und Wegzeit (ADR 0042). Der Push-Worker kennt nur das Abo.
 - **Push-Worker:** `push-worker/` (Cloudflare Worker mit KV, `https://zwergenplan-push.sbiastoch.workers.dev`). Deploy von Hand: `pnpm push:deploy`, danach zeigt `/version` den Commit. Secret im Worker: `pnpm exec wrangler secret put PUSH_ADMIN_TOKEN -c push-worker/wrangler.toml`.
 - **Versand:** `.github/workflows/push-weekly.yml` (Zeitplan Sa 10:07 Europe/Berlin) ruft `node scripts/push-weekly.ts`. Secrets: `VAPID_PRIVATE_KEY`, `PUSH_ADMIN_TOKEN` (GitHub). Jeder Zeitplan-Lauf sendet, auch wenn GitHub ihn verspätet startet; höchstens ein Versand je Tag (Versand-Marke im Worker).
 - **Nachholen:** Ist ein Zeitplan-Lauf ausgefallen, unter Actions → „Wochen-Nachricht“ → „Run workflow“ mit leerem `only` und `dry_run` aus. Das sendet an alle wie der Zeitplan (Plan 0040). Vorher mit `dry_run` an die Abos zählen.

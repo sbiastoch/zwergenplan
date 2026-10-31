@@ -1,6 +1,6 @@
 /**
  * Die allgemeine Wochen-Nachricht, die die CI samstags an alle Abos schickt (Plan 0017, E2, E5). Sie nennt nur Zahlen
- * aus den öffentlichen Daten – den Zuschnitt auf Such-Abos und Alter macht der Service Worker auf dem Gerät
+ * aus den öffentlichen Daten – den Zuschnitt auf Anbieter-Abos und Alter macht der Service Worker auf dem Gerät
  * (`news.ts`, ADR 0014). Den allgemeinen Text sieht man nur, wenn das Gerät nicht zuschneiden kann.
  */
 import type { DeclarativePushPayload } from "./push-types.ts";

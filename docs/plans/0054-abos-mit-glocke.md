@@ -446,3 +446,21 @@ Jeder Schritt endet mit `pnpm verify` grün.
 
 Abgelehnt: keins. Kein Blocker offen.
 
+### Arch-Review Nachtrag A (2026-10-31) – Verdict: Nacharbeit nötig (kein Blocker) → behoben
+
+- **M1**: ADR 0011 und 0017 tragen die Kopfzeile „Geändert durch ADR 0042“, ADR 0030 ebenso (m5).
+- **M2**: `README.md` nennt Anbieter-Abos statt Such-Abos und den Zuschnitt ohne Startpunkt.
+- **M3**: `e2e/app.spec.ts` vergleicht die Kacheln der Karte mit und ohne Chip (`tileLog`).
+- **m1**: Der Testversand löscht die Altlast; `architecture.md` und das JSDoc in `push-tailor.ts` sagen es.
+- **m2**: Verwaiste Kommentare in `App.tsx`, `e2e/push.spec.ts`, `route.ts` und `push-payload.ts` sind bereinigt.
+- **m3**: Invariante „Startpunkt“: „wird nicht mehr ins IndexedDB geschrieben“ statt „nie“.
+- **m4**: Die zweite `ageVisibility`-Rechnung bei gedrücktem Chip bleibt, mit Kommentar (wenige hundert Angebote, gemerkt).
+
+### Browser-Review Nachtrag A (2026-10-31, lokal, Fixture-Build)
+
+Ansichten `meine-anbieter`, `push`, `start`, `filter` und `kind`, je 320, 360, iPhone, Pixel und quer, hell und dunkel. Ohne Befund:
+- Der gedrückte Chip ist klar markiert (dunkel gefüllt bzw. gelb), die Zeile scrollt, die Statuszeile zeigt „2 Angebote“.
+- Ohne Abo fehlt der Chip.
+- Das Kind-Sheet zeigt nur noch Anbieter-Abos, bei 320 px bricht „Entfernen“ sauber um.
+- Prüfzeile m9: Bei gedrücktem Chip zählt die Schaltfläche im Filter-Sheet die Auswahl mit, ohne den Chip zu zeigen. Das ist gewollt wie in Plan 0058; ein Schalter im Sheet steht in `docs/ideas.md`.
+

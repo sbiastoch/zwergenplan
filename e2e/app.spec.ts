@@ -74,7 +74,7 @@ test("Impressum: dezent unter der Liste und im Kind-Sheet, öffnet die eigene Se
 
 test("Chip „Meine Anbieter“ (Plan 0054, Nachtrag A): nur mit Abo, Liste und Karte, nicht in der URL, kein Request; Such-Abos gelöscht", {
   tag: OWN_START,
-}, async ({ page }) => {
+}, async ({ page, tileLog }) => {
   const own = page.getByRole("group", { name: "Schnellfilter" }).getByRole("button", { name: "Meine Anbieter" });
   // ohne Abo kein Chip
   await page.goto("./");
@@ -107,11 +107,23 @@ test("Chip „Meine Anbieter“ (Plan 0054, Nachtrag A): nur mit Abo, Liste und 
   await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
   expect(requests).toEqual([]);
 
-  // Karte: dieselbe Auswahl
+  // Karte: dieselbe Auswahl, aber derselbe Startausschnitt wie ohne Chip; die Kacheln hängen nie an den Abos (Review M2)
+  const tilesSince = (index: number) => [...new Set(tileLog.slice(index).map((t) => t.path))].sort();
+  let mark = tileLog.length;
   await page.getByRole("button", { name: "Karte", exact: true }).click();
   await mapSettled(page);
   await expect(page.getByRole("status")).toHaveText("2 Angebote");
-  await page.getByRole("button", { name: "Liste", exact: true }).click();
+  const withChip = tilesSince(mark);
+  expect(withChip.length).toBeGreaterThan(0);
+  mark = tileLog.length;
+  // nach dem Neuladen ist der Chip aus (nur im Speicher)
+  await page.goto("./?ansicht=karte");
+  await mapSettled(page);
+  await expect(page.getByRole("status")).toHaveText("8 Angebote");
+  expect(tilesSince(mark)).toEqual(withChip);
+  await page.goto("./");
+  await own.click();
+  await expect(offers(page)).toHaveCount(2);
 
   // mit einem Filter leer: „Filter zurücksetzen“ schaltet auch den Chip aus
   await page.getByRole("button", { name: "Kurse", exact: true }).click();
