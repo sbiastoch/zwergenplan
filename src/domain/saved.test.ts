@@ -12,17 +12,20 @@ import {
   EMPTY_SAVED_FILTER,
   exportSessions,
   followUpFilter,
+  isSoon,
+  matchesListChips,
   matchesSavedFilter,
   migrateSavedIds,
   recentlySaved,
+  SAVED_LIST_CHIPS,
   type SavedFilter,
+  type SavedListChip,
   type SavedStage,
   type SavedState,
   SOON_DAYS,
   savedFilterCount,
   savedOffers,
   savedRule,
-  savedSections,
   savedUnfitIds,
   seriesExport,
   stageOf,
@@ -579,18 +582,8 @@ describe("savedOffers mit Zeitraum (Plan 0025, E3a)", () => {
   });
 });
 
-describe("savedSections (Plan 0057, E8)", () => {
+describe("Schnellfilter der Liste (Plan 0058, E1)", () => {
   const all = file.offers.map((o) => o.id);
-  const sections = (offers: readonly Offer[], now: Date) =>
-    savedSections(
-      savedOffers(
-        offers,
-        offers.map((o) => o.id),
-        now,
-        undefined,
-      ),
-      now,
-    ).map((g) => (g.kind === "abschnitt" ? [g.section, g.count, ...g.items.map((i) => i.offer.title)] : [g.kind]));
   /** Termin zur Berliner Uhrzeit, eine Stunde lang */
   const at = (day: string, time: string) => {
     const start = fromBerlinLocal(`${day}T${time}`);
@@ -604,71 +597,124 @@ describe("savedSections (Plan 0057, E8)", () => {
     sessions,
     ...extra,
   });
+  /** Titel der gemerkten Angebote, die zu den Chips passen, am gezeigten Termin nach `savedOffers` */
+  const matching = (offers: readonly Offer[], chips: readonly SavedListChip[], now = FIXTURE_NOW) =>
+    savedOffers(
+      offers,
+      offers.map((o) => o.id),
+      now,
+      undefined,
+    )
+      .filter((item) => matchesListChips(item, chips, now))
+      .map((item) => item.offer.title);
+  const keys = (chips: readonly SavedListChip[]) =>
+    savedOffers(file.offers, all, FIXTURE_NOW, undefined)
+      .filter((item) => matchesListChips(item, chips, FIXTURE_NOW))
+      .map((item) => fixtureKey(item.offer) ?? item.offer.title.slice(0, 17));
 
-  it("gliedert die Fixtures in fester Reihenfolge; leere Abschnitte entfallen, im Abschnitt nach Termin", () => {
-    const items = savedOffers(file.offers, all, FIXTURE_NOW, undefined);
-    const groups = savedSections(items, FIXTURE_NOW);
-    expect(groups.map((g) => g.key)).toEqual(["demnaechst", "anmelden", "spontan", "spaeter"]);
-    expect(
-      groups.map((g) => [g.kind === "abschnitt" && g.section, g.kind === "abschnitt" && g.count, g.items.length]),
-    ).toEqual([
-      ["demnaechst", 2, 2],
-      ["anmelden", 3, 3],
-      ["spontan", 2, 2],
-      ["spaeter", 1, 1],
-    ]);
-    expect(groups.map((g) => g.items.map((i) => fixtureKey(i.offer) ?? i.offer.title.slice(0, 17)))).toEqual([
-      // PEKiP beginnt 13.10., der Workshop 17.10.
-      ["pekip-herbst", "babymassage-workshop"],
-      // die Bewegungslandschaft (regelmäßig mit Anmeldung) beginnt am 20.10., dem 15. Tag
-      ["Eltern-Kind-Beweg", "musikgarten-1", "kuckuck-im-nest"],
-      ["krabbeltreff", "krabbelreime"],
-      ["babykonzert-advent"],
-    ]);
+  it("Reihenfolge der Chipzeile", () => {
+    expect(SAVED_LIST_CHIPS).toEqual(["demnaechst", "anmelden", "spontan", "laeuft", "kurse", "einmalig"]);
   });
 
-  it("„Läuft gerade“ geht vor: begonnener Kurs, auch mit Termin in 3 Tagen und ohne Anmeldung", () => {
+  it("ohne Chip passt alles", () => {
+    expect(matching(file.offers, []).length).toBe(savedOffers(file.offers, all, FIXTURE_NOW, undefined).length);
+  });
+
+  it("„Demnächst“ in den Fixtures wie der frühere Abschnitt: PEKiP und der Workshop, nicht die Treffs", () => {
+    expect(keys(["demnaechst"])).toEqual(["pekip-herbst", "babymassage-workshop"]);
+  });
+
+  it("„Demnächst“: Grenze nach Berliner Kalendertagen, 14. Tag 23:30 drin, 15. Tag 0:30 nicht", () => {
+    expect(SOON_DAYS).toBe(14);
+    const last = make("Am letzten Tag", "kuckuck-im-nest", [at(addDays(today, 14), "23:30")]);
+    const after = make("Am Tag danach", "kuckuck-im-nest", [at(addDays(today, 15), "00:30")]);
+    expect(matching([last, after], ["demnaechst"])).toEqual([last.title]);
+  });
+
+  it("„Demnächst“: ohne laufende Kurse und ohne Regelmäßiges ohne Anmeldung, mit Regelmäßigem mit Anmeldung", () => {
     const now = new Date("2026-10-27T08:00:00+01:00"); // Di; PEKiP läuft seit 13.10., nächster Termin heute
+    const pekip = fixtureOffer("pekip-herbst");
+    const day = berlinIsoDate(now);
+    const withReg = make("Regelmäßig mit Anmeldung", "krabbeltreff", weeklySessions(addDays(day, 3), 3), {
+      registration: "mit-anmeldung",
+    });
+    const open = make("Regelmäßig offen", "krabbeltreff", weeklySessions(addDays(day, 1), 3));
+    const once = make("Bald offen", "babykonzert-advent", [at(addDays(day, 3), "10:00")]);
+    expect(matching([pekip, withReg, open, once], ["demnaechst"], now)).toEqual([withReg.title, once.title]);
+  });
+
+  it("„Anmelden“: mit Anmeldung ohne laufende Kurse, auch wenn der Termin bald ist", () => {
+    const now = new Date("2026-10-27T08:00:00+01:00");
+    const pekip = fixtureOffer("pekip-herbst"); // läuft, mit Anmeldung
+    const soon = make("Bald mit Anmeldung", "kuckuck-im-nest", [at(addDays(berlinIsoDate(now), 2), "10:00")]);
+    expect(soon.registration).toBe("mit-anmeldung");
+    expect(matching([pekip, soon], ["anmelden"], now)).toEqual([soon.title]);
+  });
+
+  it("„Spontan“: ohne Anmeldung, auch ein laufender Kurs ohne Anmeldung", () => {
+    const now = new Date("2026-10-27T08:00:00+01:00");
+    const running = make(
+      "Laufender Kurs ohne Anmeldung",
+      "pekip-herbst",
+      [at("2026-10-01", "10:00"), at("2026-10-30", "10:00")],
+      { registration: "ohne-anmeldung" },
+    );
+    const open = make("Regelmäßig offen", "krabbeltreff", weeklySessions(addDays(berlinIsoDate(now), 1), 3));
+    const pekip = fixtureOffer("pekip-herbst");
+    // nach gezeigtem Termin: der Treff morgen, der laufende Kurs am 30.10.
+    expect(matching([running, open, pekip], ["spontan"], now)).toEqual([open.title, running.title]);
+  });
+
+  it("„Läuft gerade“: begonnene Kurse, mit oder ohne Anmeldung", () => {
+    const now = new Date("2026-10-27T08:00:00+01:00");
     const pekip = fixtureOffer("pekip-herbst");
     const running = make(
       "Laufender Kurs ohne Anmeldung",
       "pekip-herbst",
       [at("2026-10-01", "10:00"), at("2026-10-30", "10:00")],
-      {
-        registration: "ohne-anmeldung",
-      },
+      { registration: "ohne-anmeldung" },
     );
-    expect(sections([pekip, running], now)).toEqual([["laeuft", 2, pekip.title, running.title]]);
+    const musik = fixtureOffer("musikgarten-1"); // beginnt 5.11.
+    expect(matching([pekip, running, musik], ["laeuft"], now)).toEqual([pekip.title, running.title]);
   });
 
-  it("Grenze nach Berliner Kalendertagen: 14. Tag 23:30 ist „Demnächst“, 15. Tag 0:30 nicht", () => {
-    expect(SOON_DAYS).toBe(14);
-    const last = make("Am letzten Tag", "kuckuck-im-nest", [at(addDays(today, 14), "23:30")]);
-    const after = make("Am Tag danach", "kuckuck-im-nest", [at(addDays(today, 15), "00:30")]);
-    expect(sections([last, after], FIXTURE_NOW)).toEqual([
-      ["demnaechst", 1, last.title],
-      ["anmelden", 1, after.title],
-    ]);
+  it("„Kurse“ und „Einmalig“ nach dem Format", () => {
+    const formats = (chips: readonly SavedListChip[]) =>
+      savedOffers(file.offers, all, FIXTURE_NOW, undefined)
+        .filter((item) => matchesListChips(item, chips, FIXTURE_NOW))
+        .map((item) => item.offer.format);
+    expect(new Set(formats(["kurse"]))).toEqual(new Set(["kurs"]));
+    expect(new Set(formats(["einmalig"]))).toEqual(new Set(["einmalig"]));
+    expect(new Set(formats(["kurse", "einmalig"]))).toEqual(new Set(["kurs", "einmalig"]));
   });
 
-  it("regelmäßig mit Anmeldung in 3 Tagen ist „Demnächst“, ohne Anmeldung „Spontan möglich“", () => {
-    const withReg = make("Regelmäßig mit Anmeldung", "krabbeltreff", weeklySessions(addDays(today, 3), 3), {
-      registration: "mit-anmeldung",
-    });
-    const open = make("Regelmäßig offen", "krabbeltreff", weeklySessions(addDays(today, 1), 3));
-    expect(sections([withReg, open], FIXTURE_NOW)).toEqual([
-      ["demnaechst", 1, withReg.title],
-      ["spontan", 1, open.title],
-    ]);
+  it("ODER in der Gruppe, UND zwischen Gruppen", () => {
+    const union = (a: SavedListChip, b: SavedListChip) => new Set([...keys([a]), ...keys([b])]);
+    expect(new Set(keys(["anmelden", "spontan"]))).toEqual(union("anmelden", "spontan"));
+    expect(new Set(keys(["demnaechst", "laeuft"]))).toEqual(union("demnaechst", "laeuft"));
+    const both = keys(["demnaechst", "anmelden"]);
+    expect(both).toEqual(keys(["demnaechst"]).filter((k) => keys(["anmelden"]).includes(k)));
+    expect(keys(["laeuft", "einmalig"])).toEqual([]);
   });
 
-  it("ohne Anmeldung und später: „Später“; ohne Anmeldung bald: „Demnächst“", () => {
-    const soon = make("Bald offen", "babykonzert-advent", [at(addDays(today, 3), "10:00")]);
-    const later = make("Später offen", "babykonzert-advent", [at(addDays(today, 30), "10:00")]);
-    expect(sections([later, soon], FIXTURE_NOW)).toEqual([
-      ["demnaechst", 1, soon.title],
-      ["spaeter", 1, later.title],
+  it("„Läuft gerade“ + „Anmelden“ ist immer leer: „Anmelden“ schließt laufende Kurse aus (Review 2 m2)", () => {
+    const now = new Date("2026-10-27T08:00:00+01:00");
+    const pekip = fixtureOffer("pekip-herbst"); // läuft, mit Anmeldung
+    const soon = make("Bald mit Anmeldung", "kuckuck-im-nest", [at(addDays(berlinIsoDate(now), 2), "10:00")]);
+    expect(matching([pekip, soon], ["laeuft"], now)).toEqual([pekip.title]);
+    expect(matching([pekip, soon], ["anmelden"], now)).toEqual([soon.title]);
+    expect(matching([pekip, soon], ["laeuft", "anmelden"], now)).toEqual([]);
+  });
+
+  it("isSoon prüft den gezeigten Termin, nicht den ersten", () => {
+    // Einmalig mit zwei Terminen: der erste ist vorbei, der gezeigte liegt in 20 Tagen
+    const offer = make("Zwei Termine", "kuckuck-im-nest", [
+      at(addDays(today, -1), "10:00"),
+      at(addDays(today, 20), "10:00"),
     ]);
+    const [item] = savedOffers([offer], [offer.id], FIXTURE_NOW, undefined);
+    expect(item && berlinIsoDate(item.session.start)).toBe(addDays(today, 20));
+    expect(item && isSoon(item, FIXTURE_NOW)).toBe(false);
   });
 });
 

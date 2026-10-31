@@ -23,10 +23,13 @@ import { isSavedTab, type SavedTab, type Sort, type Tab, tabSection } from "../d
 import {
   EMPTY_SAVED_FILTER,
   followUpFilter,
+  SAVED_LIST_CHIPS,
   type SavedFilter,
+  type SavedListChip,
   type SavedSort,
   type SavedStage,
   savedRule,
+  toggleId,
 } from "../domain/saved.ts";
 import { searchOf } from "../domain/searches.ts";
 import { IMPRINT_PATH } from "../domain/share.ts";
@@ -50,6 +53,7 @@ import {
   ageWarnText,
   DAYTIME_LABELS,
   inViewStatusParts,
+  LIST_CHIP_LABELS,
   limitHint,
   listStatusParts,
   loadErrorText,
@@ -125,7 +129,6 @@ const SORT_TITLES: Record<SortChoice, string> = {
 
 /** Sortierungen der Merkliste (Plan 0057, E6); Titel wie auf der Startseite */
 const SAVED_SORT_TITLES: Record<SavedSort, string> = {
-  zutun: "Was ist zu tun",
   termine: SORT_TITLES.termine,
   nah: SORT_TITLES.nah,
   gemerkt: "Zuletzt gemerkt",
@@ -164,7 +167,9 @@ export function App() {
   // Filter und Sortierung der Merkliste: getrennt von der Startseite, nie in der URL, überstehen Tab- und
   // Darstellungswechsel, nicht das Neuladen (Plan 0025, E6; Plan 0057, E5, E6)
   const [savedFilter, setSavedFilter] = useState<SavedFilter>(EMPTY_SAVED_FILTER);
-  const [savedSort, setSavedSort] = useState<SavedSort>("zutun");
+  const [savedSort, setSavedSort] = useState<SavedSort>("termine");
+  // Schnellfilter der Liste (Plan 0058, E1): nur im Speicher, wirken nur in der Liste
+  const [listChips, setListChips] = useState<readonly SavedListChip[]>([]);
   // Fokus-Rückweg des Kind-Sheets: „Startpunkt wählen“ im Wegzeit-Hinweis verschwindet mit der Wahl. Aus der
   // Aufforderung „Wovon aus gerechnet?“ geht er stattdessen auf die Statuszeile (`originFromPrompt`, Plan 0043, E7).
   const filterButton = useRef<HTMLButtonElement>(null);
@@ -248,6 +253,7 @@ export function App() {
     tentative: savedApi.state.tentative,
     savedFilter,
     savedSort,
+    listChips,
     // Kalender und Karte der Merkliste warten nicht: Die Grenze zählt dort erst mit Wegzeit (Plan 0057, E7a)
     savedLimitActive: route.tab === "merkliste" ? limitOn : reachMode?.kind === "oepnv",
     now,
@@ -536,23 +542,38 @@ export function App() {
   const resetSavedFilter = () => {
     statusLine.current?.focus();
     setSavedFilter(EMPTY_SAVED_FILTER);
+    setListChips([]);
   };
-  const savedChips: QuickChip[] = [
-    {
-      label: "Nur fest eingeplant",
-      on: savedFilter.onlyFixed,
-      toggle: () => setSavedFilter({ ...savedFilter, onlyFixed: !savedFilter.onlyFixed }),
-    },
-    ...(["vormittags", "nachmittags"] as const).map(
-      (daytime): QuickChip => ({
-        label: DAYTIME_LABELS[daytime],
-        on: savedFilter.filter.daytimes.includes(daytime),
-        toggle: () => setSavedFilter({ ...savedFilter, filter: toggleIn(savedFilter.filter, "daytimes", daytime) }),
-      }),
-    ),
-  ];
+  const onlyFixedChip: QuickChip = {
+    label: "Nur fest eingeplant",
+    on: savedFilter.onlyFixed,
+    toggle: () => setSavedFilter({ ...savedFilter, onlyFixed: !savedFilter.onlyFixed }),
+  };
+  // Liste: Schnellfilter statt Abschnitten (Plan 0058, E1); Karte und Kalender: Tageszeit wie bisher
+  const savedChips: QuickChip[] =
+    route.tab === "merkliste"
+      ? [
+          ...SAVED_LIST_CHIPS.map(
+            (chip): QuickChip => ({
+              label: LIST_CHIP_LABELS[chip],
+              on: listChips.includes(chip),
+              toggle: () => setListChips(toggleId(listChips, chip)),
+            }),
+          ),
+          onlyFixedChip,
+        ]
+      : [
+          onlyFixedChip,
+          ...(["vormittags", "nachmittags"] as const).map(
+            (daytime): QuickChip => ({
+              label: DAYTIME_LABELS[daytime],
+              on: savedFilter.filter.daytimes.includes(daytime),
+              toggle: () =>
+                setSavedFilter({ ...savedFilter, filter: toggleIn(savedFilter.filter, "daytimes", daytime) }),
+            }),
+          ),
+        ];
   const savedSortOptions: readonly SortOption<SavedSort>[] = [
-    { value: "zutun", title: SAVED_SORT_TITLES.zutun, sub: "Demnächst, anmelden, spontan, läuft" },
     { value: "termine", title: SORT_TITLES.termine, sub: "was als Nächstes stattfindet" },
     { value: "nah", title: SORT_TITLES.nah, sub: nearSortSub(reachMode, origin) },
     { value: "gemerkt", title: SAVED_SORT_TITLES.gemerkt, sub: "was du zuletzt gemerkt hast" },
@@ -857,7 +878,7 @@ export function App() {
           <SavedView
             items={saved}
             savedState={savedApi.state}
-            visible={views.savedVisible}
+            visible={views.savedListVisible}
             inView={views.savedInView}
             narrowed={route.tab === "merkliste-karte" && viewNarrows(mapView)}
             onShowAll={showAll}
@@ -872,9 +893,11 @@ export function App() {
                 sheetButton={filterButton}
               />
             }
-            sortMenu={<SortMenu options={savedSortOptions} current={savedSort} plain="zutun" onChange={onSavedSort} />}
+            sortMenu={
+              <SortMenu options={savedSortOptions} current={savedSort} plain="termine" onChange={onSavedSort} />
+            }
             status={statusLine}
-            sortNote={savedSort === "zutun" ? undefined : SAVED_SORT_TITLES[savedSort]}
+            sortNote={savedSort === "termine" ? undefined : SAVED_SORT_TITLES[savedSort]}
             pending={savedListPending}
             notes={
               savedHint && (
@@ -918,7 +941,7 @@ export function App() {
                     openOnDay={ruleActive(savedRule(savedFilter, true))}
                     origin={origin}
                     numbered
-                    onFollowUp={followUp}
+                    savedExtras={{ now, onFollowUp: followUp }}
                   />
                 )}
               </>
@@ -973,7 +996,8 @@ export function App() {
           filter: savedFilter,
           onChange: setSavedFilter,
           onReset: () => setSavedFilter(EMPTY_SAVED_FILTER),
-          resultCount: views.savedVisible.length,
+          // in der Liste mit den Schnellfiltern, wie die Statuszeile (Plan 0058, Review M3)
+          resultCount: views.savedListVisible.length,
           quick: views.savedQuick,
           calendar: route.tab === "merkliste-kalender",
         }}

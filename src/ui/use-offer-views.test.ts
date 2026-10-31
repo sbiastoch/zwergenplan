@@ -658,14 +658,33 @@ describe("useOfferViews", () => {
     const input = { offers: [early, late], savedIds: [late.id, early.id], route };
     const titles = (v: OfferViews) => v.savedGroups.map((g) => [g.kind, ...ids(g.items.map((i) => i.offer))]);
 
-    it("Standard „Was ist zu tun“: Abschnitte (E8)", () => {
-      const later = offer("spaeter", "2026-11-20");
-      expect(
-        titles(render({ ...input, offers: [early, late, later], savedIds: [later.id, ...input.savedIds] })),
-      ).toEqual([
-        ["abschnitt", "frueh", "spaet"],
-        ["abschnitt", "spaeter"],
+    it("Standard „Nächste Termine“ nach Tagen (Plan 0058, E3)", () => {
+      expect(titles(render(input))).toEqual([
+        ["termin", "frueh"],
+        ["termin", "spaet"],
       ]);
+    });
+
+    it("Schnellfilter der Liste: in allen Sortierungen, nicht auf Karte und Kalender; Badge bleibt (Plan 0058, E3)", () => {
+      const course = offer("kurs", "2026-10-08", undefined, "kurs");
+      const all = { ...input, offers: [early, late, course], savedIds: [...input.savedIds, course.id] };
+      const listChips = ["kurse"] as const;
+      for (const savedSort of ["termine", "nah", "gemerkt"] as const) {
+        // „Nächstgelegen“ mit Wegzeit, damit der Zweig `groupByReach` läuft (Arch-Review m2)
+        const reach = savedSort === "nah" ? () => ({ kind: "oepnv" as const, minutes: 12, byFoot: false }) : undefined;
+        const views = render({ ...all, savedSort, listChips, reach });
+        if (savedSort === "nah") expect(views.savedGroups.map((g) => g.kind)).toEqual(["wegzeit"]);
+        expect(views.savedGroups.flatMap((g) => ids(g.items.map((i) => i.offer)))).toEqual(["kurs"]);
+        expect(ids(views.savedListVisible.map((i) => i.offer))).toEqual(["kurs"]);
+        expect(views.savedFiltered).toBe(true);
+        expect(views.savedFilterCount).toBe(0);
+      }
+      for (const tab of ["merkliste-karte", "merkliste-kalender"] as const) {
+        const views = render({ ...all, route: { tab, filter: EMPTY_FILTER }, listChips });
+        expect(views.savedListVisible).toHaveLength(3);
+        expect(views.savedFiltered).toBe(false);
+      }
+      expect(render(all).savedFiltered).toBe(false);
     });
 
     it("„Nächste Termine“ nach Tagen; ohne Wegzeit auch bei „Nächstgelegen“", () => {

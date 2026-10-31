@@ -1,6 +1,6 @@
 # Plan 0058 – Schnellfilter statt Abschnitte in der Liste der Merkliste
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 
 ## Anlass
 
@@ -202,3 +202,11 @@ Keine Blocker. Alle Punkte übernommen; sie ergänzen die Tests 1–7 und E3:
 - **m5** In `use-offer-views.test.ts` entfällt der Test „Standard Was ist zu tun“, in `format.test.ts` der `listingHeading`-Fall `abschnitt`.
 - **m6** Risiko: „Kurse“ und „Einmalig“ heißen wie auf der Startseite, schreiben aber nicht ins Sheet (Entscheidung 3).
 - **m7** Der Sheet-Zähler mit Listen-Chip wird im Browser-Review geprüft. Verwirrt er, kommt eine Zeile nach `docs/ideas.md`.
+
+## Arch-Review (2026-10-31) – Verdict: Nacharbeit nötig, keine Blocker
+
+- **M1** Übernommen: `docs/architecture.md` (Schichten-Tabelle zu `listing`, Abschnitt „Laufende Kurse“) nennt nicht mehr die Abschnitte.
+- **m1** Übernommen: Unit-Fall „Läuft gerade“ + „Anmelden“ ist leer, am 27.10. mit laufendem PEKiP.
+- **m2** Übernommen: Der Hook-Test prüft „Nächstgelegen“ mit Wegzeit (`groupByReach`) samt Chip.
+- **m3** Abgelehnt: Der Test zu `isSoon` trennt den gezeigten vom ersten Termin. Ein Fall mit Tageszeit-Regel brächte keinen weiteren Schutz, denn `isSoon` liest nur `item.session` und wählt keinen Termin selbst.
+- **m4** Übernommen: Status „in Umsetzung“.

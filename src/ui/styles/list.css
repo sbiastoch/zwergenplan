@@ -85,21 +85,6 @@
     font-size: 1.4375rem;
     letter-spacing: -0.04em;
   }
-  /* Zahlmarke im Kopf der Abschnitte „Was ist zu tun“ (Plan 0057, E8); Inversfläche wie gewählte Zustände (`--sel`),
-     im Dunkeln keine helle Insel */
-  .section-count {
-    align-self: center;
-    min-width: 1.5rem;
-    height: 1.5rem;
-    padding: 0 6px;
-    border-radius: 999px;
-    background: var(--sel);
-    color: var(--on-sel);
-    font-size: 0.8125rem;
-    letter-spacing: 0;
-    display: inline-grid;
-    place-items: center;
-  }
   .daylabel small {
     font-weight: 600;
     font-size: 0.875rem;

@@ -189,13 +189,13 @@
     background: none;
     border: 1.5px dashed var(--muted);
   }
-  /* „heute“, „morgen“, „in N Tagen“ in „Demnächst“ (Plan 0057, E8): Inversfläche (`--sel`), im dunklen Thema gelb
+  /* „heute“, „morgen“, „in N Tagen“ für „Demnächst“ (Plan 0057, E8; Plan 0058, E4): Inversfläche (`--sel`), im dunklen Thema gelb
      statt hell */
   .fact.soon {
     background: var(--sel);
     color: var(--on-sel);
   }
-  /* „Endet Di 1.12.“ mit „Anschluss suchen“ in „Läuft gerade“ (Plan 0057, E8); unter dem Herz, also volle Breite */
+  /* „Endet Di 1.12.“ mit „Anschluss suchen“ an laufenden Kursen (Plan 0057, E8; Plan 0058, E4); unter dem Herz, also volle Breite */
   .card-next {
     display: flex;
     flex-wrap: wrap;

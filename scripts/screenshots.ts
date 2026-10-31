@@ -2,7 +2,7 @@
  * Screenshot-Matrix für /browser-review (kein Gate, sondern Futter für die Sichtprüfung).
  *   node scripts/screenshots.ts [URL] [--views=start,merkliste-kalender,…] [--text=200]   Standard: lokale Preview mit
  * Fixtures
- * Ansichten: start, merkliste, merkliste-zutun, merkliste-laeuft (Plan 0057, E8), merkliste-sortieren, merkliste-filter, merkliste-filter-kalender, merkliste-nah (Plan 0057,
+ * Ansichten: start, merkliste, merkliste-chips, merkliste-laeuft (Plan 0058), merkliste-sortieren, merkliste-filter, merkliste-filter-kalender, merkliste-nah (Plan 0057,
  * E5–E7a), detail, filter, filter-tageszeit (Plan 0057, E7), kind (Plan 0003), merkliste-kalender (Plan 0025, E8; früher der Tab
  * „kalender“), start-startpunkt (Plan 0004), karte, ort (Plan 0005), filter-wegzeit, kind-quelle (Plan 0009: Filtergruppe „Wegzeit“, Quellenhinweis im Kind-Sheet), anbieter,
  * anbieter-sheet, tabs (Plan 0010: Liste, Sheet, Tab-Leiste mit Badge; im Viewport „quer“ als Seitenleiste), push
@@ -116,11 +116,11 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await page.locator(".toast").waitFor({ state: "detached", timeout: 10_000 });
     await page.getByRole("button", { name: /^Merkliste/ }).click();
   },
-  // Filter und Sortierung der Merkliste (Plan 0057, E5, E6): Liste mit „Vormittags“ und offenem Sortiermenü
+  // Filter und Sortierung der Merkliste (Plan 0057, E5, E6): Liste mit Schnellfilter „Anmelden“ und offenem Sortiermenü
   "merkliste-sortieren": async (page) => {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 4)) await heart.click();
     await savedList(page);
-    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Anmelden" }).click();
     await page.getByRole("button", { name: /^Sortierung:/ }).click();
     await page.getByRole("menu").waitFor();
   },
@@ -138,10 +138,11 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     const sheet = page.getByRole("dialog", { name: "Merkliste filtern" });
     await sheet.getByRole("heading", { name: "Zeitraum" }).scrollIntoViewIfNeeded();
   },
-  // „Was ist zu tun“ (Plan 0057, E8): alle gemerkt, Abschnitte mit Zahlmarke und Marke „in N Tagen“
-  "merkliste-zutun": async (page) => {
+  // Schnellfilter der Liste (Plan 0058): alle gemerkt, „Demnächst“ gewählt, Kacheln mit Marke „in N Tagen“
+  "merkliste-chips": async (page) => {
     for (const heart of await page.getByRole("button", { name: / merken$/ }).all()) await heart.click();
     await savedList(page);
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Demnächst" }).click();
   },
   // „Läuft gerade“ mit „Anschluss suchen“: lokal am Di 27.10., wenn PEKiP läuft. Ein laufender Kurs steht nicht mehr in
   // „Angebote“, deshalb lokal gemerkt über den Speicher (Fixture-IDs: PEKiP, Musikgarten, Krabbeltreff)
@@ -157,7 +158,7 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
       for (const heart of await page.getByRole("button", { name: / merken$/ }).all()) await heart.click();
     }
     await savedList(page);
-    await page.getByRole("region", { name: /^Läuft gerade/ }).scrollIntoViewIfNeeded();
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Läuft gerade" }).click();
   },
   // „Nächstgelegen“ ohne Startpunkt: „Wovon aus gerechnet?“ über der Liste nach Terminen (Plan 0057, E7a)
   "merkliste-nah": async (page) => {

@@ -53,15 +53,7 @@ export type ListGroupHead =
   | { kind: "wegzeit"; band: ReachBand }
   | { kind: "ohne-wegzeit" }
   /** eine Gruppe ohne sichtbaren Kopf: „Zuletzt gemerkt“ auf der Merkliste (Plan 0057, E6) */
-  | { kind: "flach" }
-  /** Abschnitt der Merkliste „Was ist zu tun“ mit der Anzahl als Zahlmarke (Plan 0057, E8; `savedSections`) */
-  | { kind: "abschnitt"; section: SavedSection; count: number };
-
-/**
- * Abschnitte der Liste „Was ist zu tun“ (Plan 0057, E8). Der Typ steht hier beim Kopf, nicht in saved.ts: saved.ts baut
- * die Gruppen und importiert dafür `ListGroup`, so entsteht kein Zyklus.
- */
-export type SavedSection = "demnaechst" | "anmelden" | "spontan" | "laeuft" | "spaeter";
+  | { kind: "flach" };
 
 /**
  * Band der Sortierung „Nächstgelegen“ (Plan 0043, E7): Wegzeit in Minuten (5er-Schritte) oder Luftlinie

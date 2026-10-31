@@ -233,17 +233,17 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await expect(page.getByTestId("offer")).toHaveCount(2);
     await expect(page.getByRole("status")).toHaveText("2 Angebote gemerkt");
   },
-  // Plan 0025, E6 (Test 15); seit Plan 0057, E5 wie auf der Startseite: Liste mit drei gemerkten, „Vormittags“ aktiv
-  // und „ab Nov.“ im Sheet; Filterzeile mit Badge
+  // Plan 0025, E6 (Test 15); seit Plan 0057, E5 wie auf der Startseite: Liste mit drei gemerkten, „ab Nov.“ im Sheet
+  // und Schnellfilter „Anmelden“ (Plan 0058, E1; zählt nicht im Badge); Filterzeile mit Badge
   "merkliste-liste": async (page) => {
     await openSavedList(page);
     await savedFilter(page, "ab Nov.");
-    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
-    await expect(page.getByRole("button", { name: "Alle Filter, 2 aktiv" })).toBeVisible();
+    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Anmelden" }).click();
+    await expect(page.getByRole("button", { name: "Alle Filter, 1 aktiv" })).toBeVisible();
     await expect(page.getByRole("status")).toContainText(/von 3 gemerkten Angeboten/);
   },
-  // Plan 0057, E8: „Was ist zu tun“ am Di 27.10. mit „Läuft gerade“ (PEKiP, Fußzeile „Endet …“ mit „Anschluss suchen“)
-  // und „Demnächst“ (Musikgarten mit Marke „in 9 Tagen“)
+  // Plan 0057, E8; Plan 0058, E4: am Di 27.10. der laufende PEKiP (Fußzeile „Endet …“ mit „Anschluss suchen“) und der
+  // Musikgarten mit Marke „in 9 Tagen“, nach Terminen
   "merkliste-laeuft": async (page) => {
     await page.clock.setFixedTime(new Date("2026-10-27T08:00:00+01:00"));
     await page.evaluate(() => localStorage.setItem("zwergenplan.merkliste", JSON.stringify(["nle21y1x", "qxdibmkc"])));
