@@ -58,6 +58,8 @@ export interface RefreshOptions {
   rawDir?: string;
   /** Zustand schreiben (Standard wie `rawDir`; `--dry-run` schreibt nach runs/<datum>/raw) */
   outDir?: string;
+  /** ID-Gate (ADR 0041): Hat ein Mensch das seit `heldSince` gehaltene Ergebnis hingenommen (`data/id-hinnehmen.yaml`)? */
+  acceptHeld?: (heldSince: string) => boolean;
 }
 
 type UnitResult = RefreshResult | "offen";
@@ -310,6 +312,7 @@ export async function refreshProvider(o: RefreshOptions): Promise<RefreshOutcome
       today: o.today,
       now: o.now,
       freeDays: o.freeDays,
+      ...(prev?.held && o.acceptHeld?.(prev.held.since) ? { acceptHeld: true } : {}),
     };
     const r = await refreshUnit(o, ctx, calls);
     if (r.kind !== "done") {

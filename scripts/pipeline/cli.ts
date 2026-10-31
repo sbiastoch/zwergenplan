@@ -111,6 +111,7 @@ import { checkFaelle, createGeocoder, GeocodeFaelle, recordingKey } from "./io/g
 import { fetchFeed, readCurrentTimetable, TIMETABLE_FILE, unzipFeed, writeTimetable } from "./io/gtfs.ts";
 import { loadFreeDays } from "./io/holidays.ts";
 import { fetchPage, setAbruf } from "./io/http.ts";
+import { createJudge } from "./io/judge.ts";
 import { liveStatus } from "./io/live.ts";
 import { EFFORTS } from "./io/llm.ts";
 import { DEFAULT_BUDGET_MIN, runBuildOnly, runNightly } from "./io/nightly.ts";
@@ -341,6 +342,8 @@ async function nightly() {
     keyParts: { ...EXTRACT_KEY_PARTS, model: modelKey(model, effort) },
     // immer, auch bei gleichem Fallback-Modell (Plan 0048, E5)
     strongRetry: true,
+    // ID-Gate (ADR 0041): Richter mit LLM_MODEL_JUDGE (Standard opus)
+    judge: createJudge(),
     ...(umstellen ? { forceMigrate: umstellen } : {}),
     budgetMin,
     brakes: brakes.brakes,

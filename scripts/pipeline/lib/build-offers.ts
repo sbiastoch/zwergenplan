@@ -172,10 +172,10 @@ export function buildFromState(o: {
   freeDays: Readonly<Record<string, string>>;
   generatedAt: string;
   sources: BuildInput["sources"];
-}): { file?: OffersFile; report: BuildReport; notes: string[] } {
+}): { file?: OffersFile; report: BuildReport; notes: string[]; unitOf: Record<string, string> } {
   const { horizon } = nightlyWindow(o.today);
   // vor `buildOffers`: Abgleich und Vereinigung der Einheiten brauchen die freien Tage (Plan 0048, E6)
-  const { batches, extracted, notes } = batchesFromRaw(o.raws, o.catalog, {
+  const { batches, extracted, notes, unitOf } = batchesFromRaw(o.raws, o.catalog, {
     previous: o.previous?.offers,
     horizon,
     freeDays: o.freeDays,
@@ -191,7 +191,7 @@ export function buildFromState(o: {
     perProviderStatus: true,
     extracted,
   });
-  return { ...built, notes };
+  return { ...built, notes, unitOf };
 }
 
 export interface BuildReport {

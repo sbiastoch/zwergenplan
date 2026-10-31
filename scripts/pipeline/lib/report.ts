@@ -68,6 +68,31 @@ const AdapterSummary = z.object({
 });
 
 /** `runs/<datum>/nightly.json`, geschrieben von `runNightly` (io/nightly.ts), gelesen von `pipeline status`. */
+/**
+ * Ergebnis des ID-Gates je gerichteter Einheit (ADR 0041; Plan 0049, Nachtrag 2, B5): `uebernommen` nach Urteil ohne
+ * `unklar`, `hingenommen` über `data/id-hinnehmen.yaml`, `gehalten` bei `unklar` oder einer Grenze (Bremse, Zeit,
+ * Fehler des Richters).
+ */
+export const IdGateEntry = z.object({
+  provider: z.string(),
+  unit: z.string(),
+  outcome: z.enum(["uebernommen", "hingenommen", "gehalten"]),
+  /** nur bei `gehalten`: Grund des Haltens */
+  held: z.enum(["unklar", "grenze"]).optional(),
+  /** Urteil je verlorener ID; bei Grenze oder Hinnehmen ohne Urteil `kind` fehlt */
+  ids: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      kind: z.enum(["gleich", "fehlerhaft", "entfallen", "unklar"]).optional(),
+      reason: z.string().optional(),
+    }),
+  ),
+  /** Grund aus `data/id-hinnehmen.yaml` bzw. Fehler des Richters */
+  note: z.string().optional(),
+});
+export type IdGateEntry = z.infer<typeof IdGateEntry>;
+
 export const NightlyReport = z.object({
   date: z.string(),
   durationMs: z.number(),
@@ -109,6 +134,8 @@ export const NightlyReport = z.object({
   }),
   /** Vorstand `data/offers.json` vor dem Lauf; fehlt ohne Vorstand */
   previous: z.object({ offers: z.number(), sessions: z.number() }).optional(),
+  /** ID-Gate (ADR 0041); fehlt, wenn keine Einheit eine ID verloren hätte */
+  idGate: z.array(IdGateEntry).optional(),
 });
 export type NightlyReport = z.infer<typeof NightlyReport>;
 
@@ -377,6 +404,7 @@ export function renderStatus(s: StatusInput): string {
       );
   }
   if (r.removed.length > 0) out.push("", `Zustand entfernt (nicht mehr im Katalog): ${r.removed.join(", ")}`);
+  if (r.idGate && r.idGate.length > 0) out.push("", ...idGateSection(r.idGate));
 
   const warned = Object.entries(r.warnings);
   if (warned.length > 0) {
@@ -412,6 +440,7 @@ export function nightlyCommitMessage(r: NightlyReport, raws: Readonly<Record<str
   ];
   if (failing.length > 0) lines.push(`Fehler: ${failing.join(", ")}`);
   lines.push(...categoryLines(r, raws));
+  if (r.idGate && r.idGate.length > 0) lines.push(idGateLine(r.idGate));
   if (r.abort || r.brake || r.budgetHit)
     lines.push(`Vorzeitig beendet: ${r.abort ?? r.brake ?? "Zeitbudget"} (Rest unverändert)`);
   lines.push(
@@ -420,4 +449,36 @@ export function nightlyCommitMessage(r: NightlyReport, raws: Readonly<Record<str
     "Plan 0032, E6 (pnpm pipeline nightly, publish)",
   );
   return lines.join("\n");
+}
+
+const GATE_KIND: Record<string, string> = {
+  gleich: "geerbt",
+  fehlerhaft: "fehlerhaft",
+  entfallen: "entfallen",
+  unklar: "unklar",
+};
+
+/** Abschnitt des Berichts: jede gerichtete Einheit mit Ergebnis und Urteil je ID (ADR 0041, Konsequenzen: jedes Erbe). */
+function idGateSection(entries: readonly IdGateEntry[]): string[] {
+  const out = ["## ID-Gate (ADR 0041)", "", "| Anbieter | Ergebnis | ID | Titel | Urteil |", "|---|---|---|---|---|"];
+  for (const e of entries) {
+    const result = e.outcome === "gehalten" ? `gehalten (${e.held ?? "unklar"})` : e.outcome;
+    for (const id of e.ids)
+      out.push(
+        `| ${cell(`${e.provider} ${e.unit}`)} | ${result} | ${id.id} | ${cell(id.title)} | ${cell(
+          [id.kind ? GATE_KIND[id.kind] : "", id.reason ?? ""].filter((x) => x !== "").join(": "),
+        )} |`,
+      );
+    if (e.note) out.push(`| ${cell(`${e.provider} ${e.unit}`)} | | | | ${cell(e.note)} |`);
+  }
+  return out;
+}
+
+/** Zeile im Commit-Text: Summen je Urteil über alle gerichteten Einheiten. */
+function idGateLine(entries: readonly IdGateEntry[]): string {
+  const ids = entries.flatMap((e) => e.ids.map((id) => ({ outcome: e.outcome, kind: id.kind })));
+  const n = (f: (x: (typeof ids)[number]) => boolean) => ids.filter(f).length;
+  return `ID-Gate: ${n((x) => x.outcome !== "gehalten" && x.kind === "gleich")} geerbt, ${n(
+    (x) => x.outcome !== "gehalten" && x.kind !== "gleich",
+  )} weggefallen, ${n((x) => x.outcome === "gehalten")} gehalten (ADR 0041)`;
 }

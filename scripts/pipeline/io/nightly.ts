@@ -16,17 +16,21 @@ import {
   type Brakes,
   brakeHit,
   costJsonl,
+  JUDGE_BUDGET_MIN,
+  judgeBrakeHit,
   NIGHT_BRAKES,
   summarizeCosts,
 } from "../lib/cost.ts";
 import type { CallRecord, ExtractKeyParts, Extractor } from "../lib/extract.ts";
 import { renderFetchMarkdown, runLimited } from "../lib/fetch.ts";
+import type { Judge } from "../lib/judge.ts";
 import { offerUnits } from "../lib/refresh.ts";
 import { changedProviders, type NightlyReport, type ProviderState } from "../lib/report.ts";
 import { planFetch } from "../lib/select.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
-import { readCatalog, readPreviousOffers, readRawDir, removeRaw, writeJson, writeOffers } from "./files.ts";
+import { readCatalog, readPreviousOffers, readRawDir, removeRaw, writeJson, writeOffers, writeRaw } from "./files.ts";
 import { loadFreeDays } from "./holidays.ts";
+import { runIdGate } from "./id-gate.ts";
 import { refreshProvider } from "./refresh.ts";
 
 /** Zeitbudget des Laufs in Minuten (E6, `RUN_BUDGET_MIN`) */
@@ -59,6 +63,13 @@ export interface NightlyOptions {
   strongRetry?: boolean;
   /** Anbieter, deren Umstellung auf V2 erzwungen wird (Plan 0048, E7, `--umstellen` nach Prüfung) */
   forceMigrate?: readonly string[];
+  /**
+   * ID-Gate (ADR 0041; Plan 0049, Nachtrag 2): mit Richter an. `pipeline nightly` setzt ihn; ohne (Tests älterer
+   * Regeln) übernimmt der Lauf neue Fassungen wie vor dem Gate.
+   */
+  judge?: Judge;
+  /** Eintrag in `data/id-hinnehmen.yaml` für Anbieter und Beginn des Haltens; ohne: nichts hingenommen */
+  accepted?: (providerId: string, heldSince: string) => { grund: string } | undefined;
   /** für Tests: Abruf und Ferien ohne Netz */
   fetch?: typeof fetchInputs;
   freeDays?: typeof loadFreeDays;
@@ -75,6 +86,8 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const byId = new Map(catalog.map((p) => [p.id, p] as const));
   const previous = readPreviousOffers(join(o.dataDir, "offers.json"));
   const brakes = o.brakes ?? NIGHT_BRAKES;
+  // Zustand vor dem Lauf für das ID-Gate: Vergleich der Fassungen und Stand (b)
+  const before = o.judge ? readRawDir(rawDir) : {};
 
   const plan = planFetch(catalog, { today: o.today, ...(o.only ? { only: o.only } : {}) });
   // erst hier geladen: fetch-inputs zieht Playwright nach, das Tests mit Fake-Abruf nicht brauchen
@@ -153,6 +166,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
           mayContinue: mayGo,
           ...(o.strongRetry ? { mayRetry: mayGo } : {}),
           forceMigrate: force.has(provider.id),
+          ...(o.accepted ? { acceptHeld: (since: string) => o.accepted?.(provider.id, since) !== undefined } : {}),
           freeDays,
           today: o.today,
           now: fetchedAt,
@@ -200,6 +214,33 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   const sources = Object.fromEntries(
     Object.entries(fetched.adapters).flatMap(([name, a]) => (isSource(name) ? [[name, a.status]] : [])),
   );
+  let idGate: NightlyReport["idGate"];
+  if (o.judge) {
+    // ID-Gate (ADR 0041): nach allen Anbietern, vor dem Build; eigene Bremse und eigenes Zeitbudget
+    const judgeStarted = performance.now();
+    const gate = await runIdGate({
+      prev: before,
+      next: { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(outDir) : {}) },
+      catalog,
+      previous,
+      today: o.today,
+      now: fetchedAt,
+      generatedAt: o.now(),
+      freeDays,
+      sources,
+      inputs: fetched.inputs,
+      judge: o.judge,
+      signal: controller.signal,
+      mayJudge: (own) =>
+        (performance.now() - judgeStarted) / 60_000 < JUDGE_BUDGET_MIN && judgeBrakeHit(own) === undefined,
+      accepted: o.accepted ?? (() => undefined),
+    });
+    calls.push(...gate.calls);
+    for (const [id, raw] of Object.entries(gate.raws)) writeRaw(outDir, id, raw);
+    for (const [id, list] of Object.entries(gate.held))
+      for (const unit of list) units[id] = { ...units[id], [unit]: "gehalten" };
+    if (gate.entries.length > 0) idGate = gate.entries;
+  }
   const { removed, build } = await buildFromRaw({
     dataDir: o.dataDir,
     catalog,
@@ -227,6 +268,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     removed,
     adapters: fetched.adapters,
     build,
+    ...(idGate ? { idGate } : {}),
     ...(previous
       ? {
           previous: {
