@@ -2,7 +2,8 @@
  * ID-Gate im Nachtlauf (ADR 0041; Plan 0049, Nachtrag 2, B2–B5): nach dem Bearbeiten aller Anbieter und vor dem Build.
  * Baut (a) und (b), bestimmt die Verluste je gated Einheit (`lib/id-gate.ts`) und entscheidet je Einheit:
  * hingenommen (`data/id-hinnehmen.yaml`), Urteil des Richters ohne `unklar` → Übernahme samt `keepIds`, sonst Halten
- * (`holdUnit`, Grund `unklar` oder `grenze`). Gibt die geänderten Zustände zurück; schreiben tut der Nachtlauf.
+ * (`holdUnit`, Grund `unklar` oder `grenze`). Danach prüft ein dritter Build das Ergebnis aller Entscheidungen gegen
+ * (b) (`recheck`). Gibt die geänderten Zustände zurück; schreiben tut der Nachtlauf.
  */
 import type { OffersFile, Provider } from "../../../src/domain/schema.ts";
 import { type BuildInput, buildFromState, nightlyWindow } from "../lib/build-offers.ts";
@@ -86,6 +87,8 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
   const byId = new Map(o.catalog.map((p) => [p.id, p] as const));
   const window = { from: o.today, to: nightlyWindow(o.today).horizon.to, freeDays: o.freeDays };
   let stopped = false;
+  /** Verluste, die gehen dürfen: Urteil `fehlerhaft`/`entfallen` oder hingenommen */
+  const allowed = new Set<string>();
 
   for (const loss of losses) {
     const raw = out.raws[loss.providerId] ?? o.next[loss.providerId];
@@ -126,6 +129,7 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
         ? o.accepted(loss.providerId, prevUnit.held.since)
         : undefined;
     if (acceptance) {
+      for (const x of loss.lost) allowed.add(x.id);
       out.raws[loss.providerId] = raw;
       out.entries.push({
         provider: loss.providerId,
@@ -166,18 +170,101 @@ export async function runIdGate(o: IdGateOptions): Promise<IdGateResult> {
       hold("grenze", undefined, r.outcome.kind === "abort" ? `Richter: ${r.outcome.abort}` : r.outcome.reason);
       continue;
     }
-    const decision = decide(r.outcome.verdicts);
+    // je verlorener ID genau ein Urteil; fehlt eins (Richter ohne `readVerdicts`), ist es unklar
+    const given = r.outcome.verdicts;
+    const verdicts = loss.lost.map(
+      (x): Verdict => given.find((v) => v.id === x.id) ?? { id: x.id, kind: "unklar", reason: "kein Urteil" },
+    );
+    const decision = decide(verdicts);
     if (!decision.adopt) {
-      hold("unklar", r.outcome.verdicts);
+      hold("unklar", verdicts);
       continue;
     }
+    for (const v of decision.dropped) allowed.add(v.id);
     set(withKeepIds(nextUnit, decision.keepIds));
     out.entries.push({
       provider: loss.providerId,
       unit: loss.unit,
       outcome: "uebernommen",
-      ids: titled(loss, r.outcome.verdicts),
+      ids: titled(loss, verdicts),
     });
   }
+  recheck({ o, out, b: b.file, origins: b.report.origins, unitOf: b.unitOf, gated, allowed, build });
   return out;
+}
+
+/**
+ * Nachprüfung nach den Urteilen: Der Build mit allen Übernahmen darf keine ID verlieren, die (b) hat, außer der
+ * Richter ließ sie gehen (`fehlerhaft`/`entfallen`) oder ein Mensch nahm sie hin (`allowed`). Die Verluste in (a)
+ * gelten nur, solange alle gated Einheiten übernommen werden: Hält das Gate eine davon, kann eine andere eine ID
+ * kosten, die in (a) die gehaltene trug; ein Erbe (`keepIds`) kann im Build an einer Dublette oder einem Konflikt
+ * scheitern. Je solchem Verlust wird erst die Einheit gehalten, aus der das Angebot in (b) stammt, sonst jede
+ * übernommene gated Einheit des Anbieters, mit Grund `grenze` (nächste Nacht erneut gerichtet), bis nichts fehlt.
+ */
+function recheck(p: {
+  o: IdGateOptions;
+  out: IdGateResult;
+  b: OffersFile;
+  origins: Readonly<Record<string, string>>;
+  unitOf: Readonly<Record<string, string>>;
+  gated: ReturnType<typeof gatedUnits>;
+  allowed: ReadonlySet<string>;
+  build: (raws: Readonly<Record<string, ProviderRaw>>) => ReturnType<typeof buildFromState>;
+}): void {
+  const { o, out } = p;
+  const isHeld = (providerId: string, unit: string) => out.held[providerId]?.includes(unit) ?? false;
+  for (;;) {
+    const c = p.build({ ...o.next, ...out.raws });
+    // scheitert der Build, schreibt der Nachtlauf ohnehin keine offers.json
+    if (!c.file) return;
+    const missing = unitLosses({
+      previous: o.previous,
+      a: c.file,
+      b: p.b,
+      origins: p.origins,
+      unitOf: p.unitOf,
+      gated: p.gated,
+      today: o.today,
+    })
+      .map((loss) => ({ ...loss, lost: loss.lost.filter((x) => !p.allowed.has(x.id)) }))
+      .filter((loss) => loss.lost.length > 0);
+    let changed = false;
+    for (const loss of missing) {
+      const units = isHeld(loss.providerId, loss.unit)
+        ? [...(p.gated.get(loss.providerId) ?? [])].filter((u) => !isHeld(loss.providerId, u))
+        : [loss.unit];
+      for (const unit of units) changed = holdAfterCheck(o, out, loss, unit) || changed;
+    }
+    if (!changed) return;
+  }
+}
+
+/** Halten nach der Nachprüfung; ersetzt einen Eintrag `uebernommen`/`hingenommen` der Einheit. */
+function holdAfterCheck(o: IdGateOptions, out: IdGateResult, loss: UnitLoss, unit: string): boolean {
+  const prevRaw = o.prev[loss.providerId];
+  const raw = out.raws[loss.providerId] ?? o.next[loss.providerId];
+  const fresh = o.next[loss.providerId];
+  if (!prevRaw || !isV2(prevRaw) || !raw || !isV2(raw) || !fresh || !isV2(fresh)) return false;
+  const prevUnit = prevRaw.units[unit];
+  // das Ergebnis der neuen Fassung ohne `keepIds`: Das Erbe gilt nur mit dem Urteil, das hier nicht trug
+  const nextUnit = fresh.units[unit];
+  if (!prevUnit || !nextUnit || nextUnit.inputHash === undefined || nextUnit.model === undefined) return false;
+  const ids = loss.lost.map((x) => x.id);
+  out.raws[loss.providerId] = {
+    ...raw,
+    units: { ...raw.units, [unit]: holdUnit(prevUnit, nextUnit, { since: o.now, reason: "grenze", lost: ids }) },
+  };
+  out.held[loss.providerId] = [...(out.held[loss.providerId] ?? []), unit];
+  const at = out.entries.findIndex((e) => e.provider === loss.providerId && e.unit === unit);
+  const entry: IdGateEntry = {
+    provider: loss.providerId,
+    unit,
+    outcome: "gehalten",
+    held: "grenze",
+    ids: loss.lost.map((x) => ({ id: x.id, title: x.title })),
+    note: `Nachprüfung: ohne Halten fehlten ${ids.join(", ")}`,
+  };
+  if (at >= 0) out.entries.splice(at, 1, entry);
+  else out.entries.push(entry);
+  return true;
 }

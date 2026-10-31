@@ -1044,6 +1044,63 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
     expect(r.idGate?.[0]).toMatchObject({ outcome: "gehalten", held: "unklar" });
   });
 
+  it("Halten einer Einheit kostet keine ID, die in (a) eine andere gated Einheit hielt (Nachprüfung nach dem Urteil)", async () => {
+    const { dirsOf, ids } = await baseline(true);
+    // neue Fassung: Seite A formuliert um und nennt jetzt auch die Babymassage; Seite B nennt stattdessen ein Elterncafé
+    const cafe = RawEvent.parse({
+      ...massage,
+      title: "Elterncafé",
+      schedule: { ...massage.schedule, weekdays: ["TU"] },
+    });
+    const j = fakeJudge(all("unklar"));
+    const { r } = await gateNight(dirsOf, {
+      judge: j.judge,
+      events: (u) => (u === UNIT_B ? [cafe] : [...renamed, massage]),
+    });
+    // gerichtet wird nur A (B verliert in (a) nichts: A hält die ID der Babymassage); A wird gehalten
+    expect(j.seen.map((x) => x.unit)).toEqual([UNIT_A]);
+    expect(rawUnit(dirsOf, UNIT_A)?.held?.reason).toBe("unklar");
+    // mit A im alten Stand fehlte die Babymassage, wenn B übernommen würde: B muss mit gehalten werden
+    const now = idsByTitle(dirsOf);
+    for (const [title, id] of Object.entries(ids)) expect(now[title]).toBe(id);
+    expect(rawUnit(dirsOf, UNIT_B)?.held).toMatchObject({ reason: "grenze", lost: [ids["Babymassage"]] });
+    expect(r.idGate?.find((e) => e.unit === UNIT_B)).toMatchObject({ outcome: "gehalten", held: "grenze" });
+    expect(r.units?.[PROVIDER]?.[UNIT_B]).toBe("gehalten");
+    // nächste Nacht: B wird ohne Extraktion vorgelegt; A bleibt gehalten, also fehlt die Babymassage und B wird gerichtet
+    const j2 = fakeJudge(all("unklar"));
+    const n2 = await gateNight(dirsOf, {
+      judge: j2.judge,
+      events: (u) => (u === UNIT_B ? [cafe] : [...renamed, massage]),
+    });
+    expect(n2.seen).toEqual([]);
+    expect(j2.seen.map((x) => [x.unit, x.lost.map((l) => l.id)])).toEqual([[UNIT_B, [ids["Babymassage"]]]]);
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+  });
+
+  it("scheitert ein Erbe im Build (zwei Erben treffen in einem Angebot zusammen), wird die Einheit gehalten", async () => {
+    const { dirsOf, ids } = await baseline();
+    // neue Fassung: Treffs 1 und 2 heißen gleich und werden im Build ein regelmäßiges Angebot (Termine vereinigt)
+    const twins = [0, 1].map((k) => ({ ...renamed[k], title: "Spielgruppe Zwerge" }) as RawEvent);
+    const fresh = [...twins, treffs[2] as RawEvent];
+    const j = fakeJudge((input) => ({
+      kind: "ok",
+      // je für sich plausibel: Treff 1 → Event 0, Treff 2 → Event 1
+      verdicts: input.lost.map((l): Verdict => {
+        const f = input.fresh[Number(lastWord(l.title)) - 1];
+        return f?.starts[0]
+          ? { id: l.id, kind: "gleich", index: f.index, start: f.starts[0] }
+          : { id: l.id, kind: "unklar" };
+      }),
+    }));
+    const { r } = await gateNight(dirsOf, { judge: j.judge, events: () => fresh });
+    expect(j.seen[0]?.lost.map((l) => l.title).sort()).toEqual(["Offener Krabbeltreff 1", "Offener Krabbeltreff 2"]);
+    // ohne Nachprüfung gingen beide IDs verloren („ID-Erbe … treffen zusammen – keins gilt“)
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    expect(rawUnit(dirsOf)?.held?.reason).toBe("grenze");
+    expect(r.idGate).toEqual([expect.objectContaining({ unit: UNIT_A, outcome: "gehalten", held: "grenze" })]);
+    expect(r.idGate?.[0]?.note).toMatch(/^Nachprüfung/);
+  });
+
   it("Einzeltermine: je Termin ein Angebot, je Termin ein Urteil gleich@Beginn, jede ID bleibt", async () => {
     const dirsOf = tempData();
     const concert = (title: string, at: string) =>
@@ -1087,6 +1144,14 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
       Object.fromEntries(offers.map((o) => [o.sessions[0]?.start.slice(0, 10), o.id]));
     expect(after.every((o) => o.title === "Musik im Kinderwagen")).toBe(true);
     expect(dayToId(after)).toEqual(dayToId(before));
+  });
+
+  it("ein Richter ohne Urteil zu einer verlorenen ID übernimmt nicht (fehlendes Urteil = unklar)", async () => {
+    const { dirsOf, ids } = await baseline();
+    const { r } = await gateNight(dirsOf, { judge: fakeJudge(() => ({ kind: "ok", verdicts: [] })).judge });
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    expect(rawUnit(dirsOf)?.held?.reason).toBe("unklar");
+    expect(r.idGate?.[0]?.ids.every((x) => x.kind === "unklar" && x.reason === "kein Urteil")).toBe(true);
   });
 
   it("neue Einheit (zusätzliche Programmseite): nicht gated, die übrige Einheit mit geändertem Auszug schon", async () => {
