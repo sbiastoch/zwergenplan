@@ -10,16 +10,21 @@ import type { Bounds } from "../../domain/map-view.ts";
 import { placeKey as keyOf } from "../../domain/place-key.ts";
 import { offersInBounds, type Place } from "../../domain/places.ts";
 import type { SiteOffer } from "../../domain/site-data.ts";
+import { BigSlot } from "../BigMapBar.tsx";
 import { Dialog } from "../Dialog.tsx";
 import { LoadFailed, useLazy } from "../Lazy.tsx";
 import type { MapLayer, MapProblem, MapScreenProps, MapViewProps } from "../map-types.ts";
 import { mapData } from "./map-data.ts";
 import { PlaceSheet } from "./PlaceSheet.tsx";
 import { useInViewReport } from "./use-in-view.ts";
+import { useSelection } from "./use-selection.ts";
 
 async function loadMapView(): Promise<ComponentType<MapViewProps>> {
   return (await import("../map/MapView.tsx")).MapView;
 }
+
+const LIST_REST = "Alle Angebote stehen unten in der Liste.";
+const BIG_REST = "Mit „Karte verkleinern“ stehen alle Angebote in der Liste.";
 
 const NOTES: Record<MapProblem, string> = {
   webgl: "Dein Browser kann die Karte nicht zeigen.",
@@ -44,6 +49,7 @@ export function MapScreen(props: MapScreenProps) {
   // Orts-Sheet: Sitzungszustand, nie in der URL (E5)
   const [placeKey, setPlaceKey] = useState<string>();
   const place = places.find((p) => p.key === placeKey);
+  const { selected, tap } = useSelection(placeKey, props.overlayOpen);
   const state = module.kind === "fehler" || problem ? "fehler" : ready && module.kind === "da" ? "bereit" : "laden";
   // Ausschnitt an die Liste unter der Karte, nach Orten (Plan 0056, E5)
   const known = useMemo(() => new Set(offers.map((o) => keyOf(o.venue.geo))), [offers]);
@@ -57,10 +63,13 @@ export function MapScreen(props: MapScreenProps) {
 
   // Ort mit einem Angebot: gleich das Detail (E6)
   const openPlace = (p: Place<SiteOffer>) => {
+    tap(p.key);
     const [only, ...more] = p.offers;
     if (only && more.length === 0) ctx.onOpen(only);
     else setPlaceKey(p.key);
   };
+  // In der großen Karte ist die Liste verborgen: Der Ausweg heißt „Karte verkleinern“ (Plan 0059, Review M6)
+  const rest = props.big ? BIG_REST : LIST_REST;
   const rebuild = () => {
     setProblem(undefined);
     setReady(false);
@@ -69,7 +78,7 @@ export function MapScreen(props: MapScreenProps) {
 
   return (
     <>
-      <div className="map-box" data-state={state}>
+      <div className={props.big ? "map-box big" : "map-box"} data-state={state}>
         {module.kind === "da" && !problem && (
           <module.View
             key={build}
@@ -87,17 +96,20 @@ export function MapScreen(props: MapScreenProps) {
             onProblem={setProblem}
             onViewport={onViewport}
             resetKey={props.resetKey}
+            big={props.big}
+            selected={selected}
           />
         )}
+        <BigSlot {...props} failed={state === "fehler"} />
         {state === "laden" && <p className="map-note">Karte wird geladen …</p>}
         {module.kind === "fehler" && (
           <LoadFailed attempt={attempt} retry={retry}>
-            Die Karte konnte nicht geladen werden. Alle Angebote stehen unten in der Liste.
+            {`Die Karte konnte nicht geladen werden. ${rest}`}
           </LoadFailed>
         )}
         {problem && (
           <p className="map-note">
-            {NOTES[problem]} Alle Angebote stehen unten in der Liste.
+            {NOTES[problem]} {rest}
             {problem === "kacheln" && (
               <button type="button" className="btn" onClick={rebuild}>
                 Nochmal versuchen
@@ -110,7 +122,7 @@ export function MapScreen(props: MapScreenProps) {
         open={place !== undefined}
         onClose={() => setPlaceKey(undefined)}
         label={place?.names.join(" / ") ?? "Ort"}
-        className="sheet"
+        className={props.big ? "sheet over-map" : "sheet"}
         toast={props.toast}
       >
         {place && <PlaceSheet place={place} origin={origin} ctx={ctx} onClose={() => setPlaceKey(undefined)} />}

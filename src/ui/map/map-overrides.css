@@ -105,3 +105,13 @@
   background: rgba(19, 33, 46, 0.6);
   font-weight: 700;
 }
+
+/* Karte groß (Plan 0059, E2): MapLibres Bedienelemente rücken aus Notch und Home-Indikator */
+.map-box.big .maplibregl-ctrl-top-right {
+  top: env(safe-area-inset-top);
+  right: env(safe-area-inset-right);
+}
+.map-box.big .maplibregl-ctrl-bottom-right {
+  bottom: env(safe-area-inset-bottom);
+  right: env(safe-area-inset-right);
+}

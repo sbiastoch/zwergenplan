@@ -47,6 +47,9 @@ interface TestMap {
   getContainer: () => HTMLElement;
   getCanvas: () => HTMLCanvasElement;
   once: (event: string, listener: () => void) => void;
+  /** Ein- oder Zwei-Finger-Bewegung (Plan 0059, E2) */
+  cooperativeGestures: { isEnabled: () => boolean };
+  panBy: (offset: [number, number], options: { duration: number }) => void;
 }
 declare global {
   interface Window {

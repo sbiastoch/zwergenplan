@@ -4,6 +4,9 @@ import { describe, expect, it } from "vitest";
 import { classify, isDocPath } from "./change-class.ts";
 import { withoutGitEnv } from "./git-env.ts";
 
+/** eigenes Zeitlimit für den Biome-Kindprozess (CLAUDE.md, Stolperfallen: CPU-gebundene Tests über 1 s) */
+const BIOME_SPAWN_TIMEOUT_MS = 30_000;
+
 describe("isDocPath: Positivliste der Doku (Plan 0027, E1)", () => {
   it.each([
     "docs/plans/0027-verifikation-nach-risiko.md",
@@ -143,7 +146,9 @@ describe("Doku liest niemand", () => {
     expect(links).toEqual([]);
   });
 
-  it("Biome verarbeitet weder docs/ noch CLAUDE.md", () => {
+  // Startet `pnpm exec biome` als Kindprozess (≈ 1–2 s). Unter der Last paralleler E2E-Läufe riss das am 2026-10-31
+  // dreimal die Standardgrenze von 5 s (Stop-Gate, Plan 0059); wie `REFERENCE_TIMEOUT_MS` in profile-csa.test.ts.
+  it("Biome verarbeitet weder docs/ noch CLAUDE.md", { timeout: BIOME_SPAWN_TIMEOUT_MS }, () => {
     const r = spawnSync("pnpm", ["exec", "biome", "check", "docs", "CLAUDE.md", "README.md"], { encoding: "utf8" });
     expect(`${r.stdout}${r.stderr}`).toContain("Checked 0 files");
   });

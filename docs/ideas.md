@@ -47,7 +47,12 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Wegzeit-Gebiet auf der Karte**: die gewählte Grenze (20/30/45 Min.) um den Startpunkt zeichnen (Plan 0005, Nicht-Ziel; mit Plan 0009 eine Isochrone statt eines Kreises).
 - **„Auf der Karte zeigen“ im Detail**: aus einem Angebot in die Kartenansicht mit diesem Ort (Plan 0005, Nicht-Ziel).
 - **Wegzeit je Ort im Anbieter-Sheet**: Die Orte dort öffnen seit Plan 0019 die Route in Google Maps, zeigen aber keine Wegzeit. Seit Plan 0055 haben die Katalog-Orte in `anbieter.json` `geo`; offen ist nur noch die Wegzeit je Katalog-Ort (Plan 0019, Nicht-Ziel; Plan 0055, Nicht-Ziel).
-- **Anbieterkarte groß**: ein Knopf „Karte groß“ bzw. Vollbild für die Anbieterkarte aus Mockup C (Plan 0055, Nicht-Ziel).
+- **Große Karte, Feinschliff** (Plan 0059, Nicht-Ziele):
+  - Kompakte Zeilen statt Kacheln im Orts-Sheet (Mockup D3).
+  - Zeitraum-Chip in der Kopfleiste.
+  - Knopf „Zum Startpunkt“.
+  - Filter-Knopf im Tab „Anbieter“.
+  - Wischen am Griff des Detail-Sheets.
 - **Kompakter Kopf im Querformat**: Bei 844×390 belegen Kopf, Sticker und Suche im Tab „Anbieter“ ≈ 250 px, die Statuszeile liegt unter der Karte erst nach Scrollen (Plan 0055, Abweichung von Review M5).
 - **Haltestellennamen, Umstiegsort und Abfahrtszeiten** in der Karte „Wege ab …“: `wegzeit.json` kennt je Zeile nur die Koordinate des Haltbereichs. Bräuchte eine Datenänderung (Plan 0019, Nicht-Ziel).
 - **Mehrere Verbindungen ab demselben Halt**: Der Build speichert je Halt-Ort-Paar eine Verbindung, andere Wege gibt es nur über andere Zugangshalte (Plan 0019, E4).

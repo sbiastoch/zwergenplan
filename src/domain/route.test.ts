@@ -3,12 +3,15 @@ import { DISTRICTS } from "./districts.ts";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
 import { LIMIT_MINUTES } from "./reach.ts";
 import {
+  afterBigClosed,
+  hasMap,
   isLegacyView,
   isSavedTab,
   OFFER_PARAM,
   PROVIDER_PARAM,
   parseRoute,
   routeToSearch,
+  strayBig,
   tabSection,
 } from "./route.ts";
 
@@ -167,6 +170,56 @@ describe("URL-Route", () => {
     );
     // kein Filter: zählt nicht im Filter
     expect(parseRoute("?sortierung=neu").filter).toEqual(EMPTY_FILTER);
+  });
+
+  it("große Karte (Plan 0059, E1): karte=gross nur zu den drei Karten, hinter der Ansicht geschrieben", () => {
+    for (const tab of ["karte", "merkliste-karte", "anbieter"] as const) {
+      const route = parseRoute(`?ansicht=${tab}&karte=gross`);
+      expect(route).toEqual({ tab, big: true, filter: EMPTY_FILTER });
+      expect(routeToSearch(route)).toBe(`ansicht=${tab}&karte=gross`);
+    }
+    for (const tab of ["entdecken", "merkliste", "merkliste-kalender"] as const) {
+      expect(parseRoute(`?ansicht=${tab}&karte=gross`).big).toBeUndefined();
+      expect(routeToSearch({ tab, big: true, filter: EMPTY_FILTER })).not.toContain("karte=");
+    }
+    expect(parseRoute("?ansicht=karte&karte=klein").big).toBeUndefined();
+    const full = { tab: "karte" as const, big: true as const, sort: "neu" as const, offerId, filter: EMPTY_FILTER };
+    expect(routeToSearch(full)).toBe(`ansicht=karte&karte=gross&sortierung=neu&${OFFER_PARAM}=${offerId}`);
+    expect(parseRoute(`?${routeToSearch(full)}`)).toEqual(full);
+  });
+
+  it("afterBigClosed: Filter und Sortierung aus der großen Karte überstehen „Zurück“ (Plan 0059, Review 2, N1)", () => {
+    const music = { ...EMPTY_FILTER, categories: ["musik" as const] };
+    const current = { tab: "karte" as const, big: true as const, sort: "neu" as const, filter: music };
+    expect(afterBigClosed(current, { tab: "karte", filter: EMPTY_FILTER })).toEqual({
+      tab: "karte",
+      sort: "neu",
+      filter: music,
+    });
+    expect(
+      afterBigClosed({ tab: "karte", big: true, filter: music }, { tab: "karte", sort: "nah", filter: EMPTY_FILTER }),
+    ).toEqual({ tab: "karte", filter: music });
+    // andere Ansicht, weiter groß (Detail zu) oder vorher nicht groß: der Eintrag gilt
+    const other = { tab: "entdecken" as const, filter: EMPTY_FILTER };
+    expect(afterBigClosed(current, other)).toBe(other);
+    const stillBig = { tab: "karte" as const, big: true as const, filter: EMPTY_FILTER };
+    expect(afterBigClosed(current, stillBig)).toBe(stillBig);
+    const small = { tab: "karte" as const, filter: music };
+    expect(afterBigClosed(small, { tab: "karte", filter: EMPTY_FILTER })).toEqual({
+      tab: "karte",
+      filter: EMPTY_FILTER,
+    });
+  });
+
+  it("strayBig: karte= ohne gültige große Karte (Plan 0059, E1)", () => {
+    expect(strayBig("?karte=gross", parseRoute("?karte=gross"))).toBe(true);
+    expect(strayBig("?ansicht=karte&karte=klein", parseRoute("?ansicht=karte&karte=klein"))).toBe(true);
+    expect(strayBig("?ansicht=karte&karte=gross", parseRoute("?ansicht=karte&karte=gross"))).toBe(false);
+    expect(strayBig("?ansicht=karte", parseRoute("?ansicht=karte"))).toBe(false);
+  });
+
+  it("hasMap: nur Karte, Merklisten-Karte und Tab „Anbieter“ haben eine Karte (Plan 0059, E1)", () => {
+    expect(TABS.filter(hasMap)).toEqual(["karte", "anbieter", "merkliste-karte"]);
   });
 
   it("kennt kein Geburtsdatum", () => {

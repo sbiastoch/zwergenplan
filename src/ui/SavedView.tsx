@@ -44,6 +44,8 @@ interface SavedViewProps {
   visible: readonly Occurrence<SiteOffer>[];
   /** dieselben im Kartenausschnitt (`views.savedInView`, Plan 0056, E5): die Liste unter der Karte */
   inView: readonly Occurrence<SiteOffer>[];
+  /** Karte groß offen (Plan 0059, Review B1): Die Karte bleibt auch ohne Treffer stehen, mit ihr „Karte verkleinern“ */
+  bigMap: boolean;
   /** Der Kartenausschnitt blendet Gemerktes aus: Statuszeile „im Kartenausschnitt“ mit „Alle zeigen“ */
   narrowed: boolean;
   onShowAll: () => void;
@@ -97,6 +99,7 @@ export function SavedView({
   visible,
   inView,
   narrowed,
+  bigMap,
   onShowAll,
   filtered,
   statusChip,
@@ -215,7 +218,7 @@ export function SavedView({
             )}
           </div>
           {notes}
-          {!calendar && shown.length === 0 ? (
+          {!calendar && shown.length === 0 && !(bigMap && tab === "merkliste-karte") ? (
             // Filter blendet alle aus (E5a): in Liste und Karte derselbe Leerzustand, ohne Karte und damit ohne Kacheln
             <EmptyState icon="search" title="Nichts, was zu deinem Filter passt">
               {savedFilteredEmpty(offers.length)}

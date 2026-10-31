@@ -28,6 +28,9 @@ const PATHS = {
   swing: "M4 18c3-6 13-6 16 0M7 10a5 5 0 0 1 10 0",
   // zwei gegenläufige Pfeile: Sortierung der Liste (Plan 0043, E4)
   sort: "M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4",
+  // vier Ecken nach außen bzw. innen (Plan 0059, E3): Karte groß und wieder klein
+  expand: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5",
+  shrink: "M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5",
   // Laden mit Markise über der Tür (Plan 0010, E2): Tab „Anbieter“ und Knopf im Detail
   store:
     "M3.5 8 5 4h14l1.5 4M3.5 8a2.1 2.1 0 0 0 4.25 0 2.1 2.1 0 0 0 4.25 0 2.1 2.1 0 0 0 4.25 0 2.1 2.1 0 0 0 4.25 0M5 10.5V20h14v-9.5M10 20v-5h4v5",

@@ -22,10 +22,17 @@ import { type StartCamera, zoomForRadius } from "../../domain/camera.ts";
 import type { GeoPoint } from "../../domain/geo.ts";
 import type { MapLayer, MapViewProps } from "../map-types.ts";
 import { BASEMAP_PAINT, basemapChanges, basemapPalette, type MapTokens } from "./basemap.ts";
-import { nearestHit, originToFeatures, placesToFeatures, providerPlacesToFeatures } from "./geojson.ts";
+import {
+  nearestHit,
+  originToFeatures,
+  placesToFeatures,
+  providerPlacesToFeatures,
+  selectionToFeatures,
+} from "./geojson.ts";
 import { germanTextField } from "./labels.ts";
 import { addOwnLayers, LOCALE, PLACE_LAYERS, PROVIDER_LAYERS, readMapTokens } from "./layers.ts";
 import { addCategoryImages, addProviderImages } from "./marker-images.ts";
+import { revealOffset } from "./reveal.ts";
 
 // Die Worker-URL aus import.meta.url stimmt nach dem Bündeln nicht mehr (Spike, E2).
 setWorkerUrl(workerUrl);
@@ -216,7 +223,7 @@ function moveTo(map: MapLibre, camera: StartCamera, kind: Kind) {
 }
 
 export function MapView(props: MapViewProps) {
-  const { layer, origin, dark, resetKey, startKey } = props;
+  const { layer, origin, dark, resetKey, startKey, big, selected } = props;
   // je Mount fest: Angebots- und Anbieterkarte sind getrennte Mounts (Plan 0055, E5)
   const kind = useRef(layer.kind).current;
   const container = useRef<HTMLDivElement>(null);
@@ -239,8 +246,8 @@ export function MapView(props: MapViewProps) {
         // Attribution aus der TileJSON von OpenFreeMap (genau einmal, W1). `compact` auch auf breiten Karten: Beim
         // Öffnen steht sie ausgeschrieben, nach dem ersten Verschieben oder nach 5 s nur noch das „i“ (Plan 0056, E3).
         attributionControl: { compact: true },
-        // Handy: zwei Finger bewegen die Karte, einer scrollt die Seite (E7)
-        cooperativeGestures: true,
+        // Handy: zwei Finger bewegen die Karte, einer scrollt die Seite (E7); groß bewegt einer (Plan 0059, E2)
+        cooperativeGestures: !start.big,
         locale: LOCALE,
         // ohne Kompass gäbe es keinen Weg zurück nach Norden
         dragRotate: false,
@@ -287,6 +294,7 @@ export function MapView(props: MapViewProps) {
         kind,
         places: featuresOf(latest.current.layer),
         origin: originToFeatures(latest.current.origin),
+        selection: selectionToFeatures(latest.current.layer.places, latest.current.selected),
       });
       // Nach den eigenen Layern: Paint ändert die Reihenfolge nicht, und ein Fehler hier kostet nur die Farben.
       tintBasemap(map, tokens, latest.current.dark);
@@ -343,6 +351,29 @@ export function MapView(props: MapViewProps) {
   useEffect(() => {
     mapRef.current?.getSource<GeoJSONSource>("startpunkt")?.setData(originToFeatures(origin));
   }, [origin]);
+
+  // Groß bewegt ein Finger die Karte, klein zwei (Plan 0059, E2): Im Vollbild gibt es keine Seite zu scrollen.
+  useEffect(() => {
+    const gestures = mapRef.current?.cooperativeGestures;
+    if (big) gestures?.disable();
+    else gestures?.enable();
+  }, [big]);
+
+  // Auswahl-Ring am getippten Ort (Plan 0059, E5). Neu gewählt in der großen Karte: liegt er unter dem Sheet, fährt
+  // die Karte ihn darüber; bei reduzierter Bewegung springt MapLibre selbst.
+  const shownSelected = useRef<string>(undefined);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.getSource<GeoJSONSource>("auswahl")?.setData(selectionToFeatures(layer.places, selected));
+    if (selected === shownSelected.current) return;
+    shownSelected.current = selected;
+    const place = layer.places.find((p) => p.key === selected);
+    if (!place || !latest.current.big) return;
+    const center = lngLat(place.geo);
+    const offset = revealOffset(map.project(center).y, map.getContainer().clientHeight);
+    if (offset) map.easeTo({ center, offset });
+  }, [selected, layer]);
 
   // Neuer Startpunkt bei offener Karte: Sie fährt auf den neuen Startausschnitt, auf allen Karten außer der
   // Merkliste (Plan 0056, E6; ADR 0039). Derselbe Startpunkt noch einmal bewegt nichts (N12).

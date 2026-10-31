@@ -2,7 +2,7 @@
  * Overlays der App (Plan 0003, E3; ausgelagert mit Plan 0005): Anbieter-Sheet, Detail, Filter-Sheet, Kind-Sheet als
  * native <dialog>. Das Orts-Sheet gehört zur Karten-Oberfläche (karte/MapScreen.tsx).
  */
-import type { RefObject } from "react";
+import { type RefObject, useState } from "react";
 import type { ThemeChoice } from "../data/preferences.ts";
 import type { FilterState } from "../domain/filter.ts";
 import type { SavedFilter } from "../domain/saved.ts";
@@ -75,6 +75,11 @@ interface OverlaysProps {
   resetFilters: () => void;
   savedFilter: SavedFilterSheet;
   theme: { choice: ThemeChoice; setChoice: (choice: ThemeChoice) => void };
+  /**
+   * Karte groß offen (Plan 0059, E4): Detail, Anbieter-Sheet als Sheet über der Karte, Fokus-Rückweg auf „Karte
+   * verkleinern“ statt der verborgenen Tab-Leiste (Review M7)
+   */
+  overMap: { closeRef: RefObject<HTMLButtonElement | null> } | undefined;
   today: string;
   originApi: OriginApi;
   /** Wegzeit: Modus für die Filtergruppe, Quelle für den Hinweis im Kind-Sheet */
@@ -95,6 +100,9 @@ interface OverlaysProps {
   onIntro: () => void;
 }
 
+/** Ab so viel Scrollen im Detail über der großen Karte steht es ganz oben (Plan 0059, E4, Review: Minor) */
+const FULL_AFTER_PX = 24;
+
 export function Overlays(props: OverlaysProps) {
   const { toast, sheet, setSheet, detailOffer, detailDay, closeDetail, ctx, say, filter, setFilter } = props;
   const { birthDate, setBirthDate, theme, today, originApi, kidFallback, activeTab } = props;
@@ -108,6 +116,14 @@ export function Overlays(props: OverlaysProps) {
     share({ title: provider.name, path: providerSharePath(provider.id) });
   // Das Sheet dieses Anbieters liegt schon unter dem Detail: zurück dorthin, ohne neuen History-Eintrag (E3).
   const onProvider = (id: string) => (id === providerId ? closeDetail() : openProvider(id));
+  const { overMap } = props;
+  const backFocus = overMap ? overMap.closeRef : activeTab;
+  // Detail über der großen Karte: halb oder ganz hochgezogen (E4); je Angebot neu halb
+  // gemerkt je Angebots-ID: Ein anderes Angebot beginnt ohne Effekt und ohne Zwischen-Frame wieder halb
+  const [fullFor, setFullFor] = useState<string>();
+  const full = detailOffer !== undefined && fullFor === detailOffer.id;
+  const setFull = (on: boolean) => setFullFor(on ? detailOffer?.id : undefined);
+  const detailClass = overMap ? (full ? "detail over-map voll" : "detail over-map") : "detail";
   return (
     <>
       {/*
@@ -118,9 +134,9 @@ export function Overlays(props: OverlaysProps) {
         open={providerId !== undefined}
         onClose={closeProvider}
         label="Anbieter"
-        className="sheet"
+        className={overMap ? "sheet over-map" : "sheet"}
         toast={toast}
-        fallbackFocus={activeTab}
+        fallbackFocus={backFocus}
       >
         {providerId !== undefined && (
           <ProviderSheetLoader
@@ -143,10 +159,21 @@ export function Overlays(props: OverlaysProps) {
         open={detailOffer !== undefined}
         onClose={closeDetail}
         label={detailOffer?.title ?? "Angebot"}
-        className="detail"
+        className={detailClass}
         toast={toast}
-        fallbackFocus={activeTab}
+        fallbackFocus={backFocus}
       >
+        {detailOffer && overMap && (
+          <button
+            type="button"
+            className="detail-grab"
+            aria-label={full ? "Detail verkleinern" : "Detail ganz zeigen"}
+            aria-expanded={full}
+            onClick={() => setFull(!full)}
+          >
+            <span className="grab" />
+          </button>
+        )}
         {detailOffer && (
           <DetailContent
             key={detailOffer.id}
@@ -165,6 +192,7 @@ export function Overlays(props: OverlaysProps) {
             onClose={closeDetail}
             onProvider={onProvider}
             onIcs={say}
+            onScrolled={overMap ? (top) => top > FULL_AFTER_PX && setFull(true) : undefined}
           />
         )}
       </Dialog>

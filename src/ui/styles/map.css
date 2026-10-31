@@ -287,4 +287,118 @@
     font-weight: 700;
     color: var(--ink);
   }
+
+  /*
+   * Karte groß (Plan 0059, E2): derselbe Rahmen als Vollbild, kein Neuaufbau von MapLibre. Verborgen wird der Rest nur,
+   * solange ein großer Rahmen im DOM steht (Review B1): Ohne Karte (Laden, Fehler, leere Merkliste) bleibt die Seite
+   * sichtbar. `visibility` nimmt den Rest auch aus Fokus und Accessibility-Baum; Overlays bleiben bedienbar.
+   */
+  .app:has(.map-box.big) {
+    visibility: hidden;
+  }
+  .app:has(.map-box.big) :is(.map-box.big, dialog, .toast, .onb-cover) {
+    visibility: visible;
+  }
+  :root:has(.map-box.big) {
+    overflow: hidden;
+  }
+  .map-box.big,
+  .map-box.anbieter.big:is([data-state="laden"], [data-state="fehler"]) {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    height: 100dvh;
+    min-height: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  /* Hinweis beim Laden und im Fehlerfall unter der Kopfleiste */
+  .map-box.big > .map-note {
+    padding-top: calc(76px + env(safe-area-inset-top));
+  }
+  /* „Groß“ oben links im kleinen Rahmen (E3); rechts stehen die Zoom-Knöpfe */
+  .map-grow {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 0 14px 0 11px;
+    border: 2px solid var(--line);
+    border-radius: 22px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--shadow);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .map-grow:active,
+  .bigmap-close:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--shadow);
+  }
+  /* Kopfleiste der großen Karte: links, rechts bleibt Platz für die Zoom-Knöpfe (44 + 10 + 16 px) */
+  .bigmap-bar {
+    position: absolute;
+    z-index: 2;
+    top: calc(10px + env(safe-area-inset-top));
+    left: calc(10px + env(safe-area-inset-left));
+    right: calc(70px + env(safe-area-inset-right));
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .bigmap-close {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--shadow);
+  }
+  /* Zahl unten links; rechts bleibt das „i“ der Quellenangabe frei (44 + 10 + 12 px) */
+  .bigmap-count {
+    position: absolute;
+    z-index: 2;
+    left: calc(10px + env(safe-area-inset-left));
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    max-width: calc(100% - 76px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    box-sizing: border-box;
+    margin: 0;
+    padding: 8px 14px;
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 3px 3px 0 var(--shadow);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+  /*
+   * Solange die Quellenangabe ausgeschrieben ist (beim Öffnen, bis 5 s, oder nach Tipp auf „i“), steht die Zahl darüber,
+   * sonst verdeckte sie die Angabe (Browser-Review Plan 0059). Die Angabe ist bis zu zwei Zeilen und 56 px hoch.
+   */
+  .map-box.big:has(.maplibregl-compact-show) .bigmap-count {
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+  /* Ohne Tab-Leiste steht der Toast unten mittig, auch quer neben der (verborgenen) Seitenleiste */
+  :root:has(.map-box.big) .toast {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+  :root:has(.map-box.big) .toast:not(.has-action) {
+    left: 50%;
+    width: min(26rem, 100vw - 32px);
+  }
 }

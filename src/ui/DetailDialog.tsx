@@ -62,6 +62,8 @@ interface DetailProps {
   onProvider: (providerId: string) => void;
   /** Toast nach dem Tipp auf einen ICS-Knopf; `ms` für lange Meldungen (Plan 0018, E4) */
   onIcs: Say;
+  /** Inhalt gescrollt, mit `scrollTop`: Über der großen Karte zieht das das Sheet ganz hoch (Plan 0059, E4) */
+  onScrolled?: ((top: number) => void) | undefined;
 }
 
 export function DetailContent({
@@ -80,6 +82,7 @@ export function DetailContent({
   onClose,
   onProvider,
   onIcs,
+  onScrolled,
 }: DetailProps) {
   const [allDates, setAllDates] = useState(false);
   // Etikett wie auf der Kachel, nur aus der Hauptkategorie (Plan 0037, E11)
@@ -142,7 +145,7 @@ export function DetailContent({
   return (
     // Hülle als Größen-Container (Plan 0008, E6): Bei wenig Höhe scrollt sie samt ICS-Fuß. Der Toast bleibt
     // außerhalb (Dialog.tsx), denn ein Container ist umgebender Block für feste Nachfahren.
-    <div className="detail-body">
+    <div className="detail-body" onScroll={(e) => onScrolled?.(e.currentTarget.scrollTop)}>
       <div className="detail-col dhead">
         <button type="button" className="iconbtn" onClick={onClose} aria-label="Zurück">
           <Icon name="back" />
@@ -154,7 +157,7 @@ export function DetailContent({
           <HeartButton offer={offer} stage={stage} onCycle={onCycle} onHold={onHold} inline />
         </div>
       </div>
-      <div className="dscroll">
+      <div className="dscroll" onScroll={(e) => onScrolled?.(e.currentTarget.scrollTop)}>
         <div className="detail-col">
           <div className={`hero k-${category}`}>
             <span className="bigsticker">

@@ -6,9 +6,17 @@
  * - `ProviderMapPanel`: Anbieterkarte im Tab „Anbieter“ (Plan 0055), lädt mit dem Tab (ADR 0038).
  */
 import type { ComponentType } from "react";
+import { BigSlot } from "./BigMapBar.tsx";
 import { LoadFailed, useLazy } from "./Lazy.tsx";
 import type { KarteModule, MapScreenProps, ProviderMapScreenProps } from "./map-types.ts";
 import { useProviderDirectory } from "./ProviderPanel.tsx";
+
+/** Ausweg im Fehlerfall: In der großen Karte ist die Liste verborgen (Plan 0059, Review M6) */
+const LIST_REST = { Angebote: "Alle Angebote stehen in der Liste.", Anbieter: "Alle Anbieter stehen in der Liste." };
+const BIG_REST = {
+  Angebote: "Mit „Karte verkleinern“ stehen alle Angebote in der Liste.",
+  Anbieter: "Mit „Karte verkleinern“ stehen alle Anbieter in der Liste.",
+};
 
 /** Destrukturiert direkt am `import()`: So sieht knip, welche Exporte des Chunks genutzt werden. */
 async function loadKarte(): Promise<KarteModule> {
@@ -39,14 +47,13 @@ export function ProviderMapPanel({ generatedAt, ...props }: ProviderMapPanelProp
   if (module.kind === "da" && directory.kind === "da") {
     return <module.View {...props} directory={directory.directory} />;
   }
+  const failed = module.kind === "fehler" || directory.kind === "fehler";
   return (
-    <div
-      className="map-box anbieter"
-      data-state={module.kind === "fehler" || directory.kind === "fehler" ? "fehler" : "laden"}
-    >
+    <div className={props.big ? "map-box anbieter big" : "map-box anbieter"} data-state={failed ? "fehler" : "laden"}>
+      <BigSlot {...props} failed={failed} />
       {module.kind === "fehler" ? (
         <LoadFailed attempt={attempt} retry={retry}>
-          Die Karte konnte nicht geladen werden. Alle Anbieter stehen in der Liste.
+          {`Die Karte konnte nicht geladen werden. ${props.big ? BIG_REST.Anbieter : LIST_REST.Anbieter}`}
         </LoadFailed>
       ) : directory.kind === "fehler" ? (
         <p className="map-note">Anbieter lassen sich gerade nicht laden.</p>
@@ -68,12 +75,13 @@ export function MapPanel(props: MapScreenProps) {
    */
   return (
     <>
-      <div className="map-box" data-state={module.kind}>
+      <div className={props.big ? "map-box big" : "map-box"} data-state={module.kind}>
+        <BigSlot {...props} failed={module.kind === "fehler"} />
         {module.kind === "laden" ? (
           <p className="map-note">Karte wird geladen …</p>
         ) : (
           <LoadFailed attempt={attempt} retry={retry}>
-            Die Karte konnte nicht geladen werden. Alle Angebote stehen in der Liste.
+            {`Die Karte konnte nicht geladen werden. ${props.big ? BIG_REST.Angebote : LIST_REST.Angebote}`}
           </LoadFailed>
         )}
       </div>
