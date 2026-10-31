@@ -761,4 +761,6 @@ Abgelehnt: nichts.
   - Kartenmarker in den sieben Farben.
   - Das Parkgrün ist lokal ohne Kacheln nicht sichtbar. Es prüfen `karte.spec.ts` (Token gelesen) und `basemap.test.ts`, live folgt ein Blick darauf.
   - Checkliste: Lesbarkeit gut, Touch-Ziele unverändert, keine abgeschnittenen Labels, Dunkelmodus ohne Kontrastloch, Pressed-State der Sticker unverändert.
-- **Offen:** Push, CI, Fast-Forward nach `main`, `/browser-review live`. Nach dem nächsten Nachtlauf prüfen, dass `data/offers.json` nur noch sieben Werte hat.
+- **Live seit `569aa0c` (2026-10-31).** Die Branch-CI war grün; ein abgebrochener Shard (chromium 2/4) lief beim zweiten Versuch grün. Danach `origin/main` (Plan 0049, S1) eingeführt, Konflikt nur in einer Importzeile von `io/extract.test.ts`. Die CI auf `main` ist grün, `meta.json` zeigt `569aa0c`.
+- **Kurzcheck live (2026-10-31): bestanden.** `site.json` hat sieben Werte (bewegung 128, musik 87, babykurse 65, krabbel-spielgruppen 54, buehne 41, wasser 36, treffs-cafes 25). Der Build faltet also schon, bevor der Nachtlauf `data/offers.json` umschreibt. Screenshots start, filter und karte-gross bei 390 px, hell und dunkel: Etiketten „Bewegung & Draußen“, sieben Markerfarben, Parkgrün unverändert.
+- **Offen:** Nach dem nächsten Nachtlauf prüfen, dass `data/offers.json` nur noch sieben Werte hat. Der Nachtrag selbst ist damit abgeschlossen. Der Plan bleibt `in Umsetzung` wegen Stufe C.
