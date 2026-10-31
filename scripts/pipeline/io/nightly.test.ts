@@ -53,11 +53,28 @@ vi.mock("../lib/build-offers.ts", async (importOriginal) => {
   };
 });
 
+/**
+ * Eingriff in `holdUnit` für den letzten Ausweg des Gates (`revertAll`): Dass auch das Halten wirft, ist ein
+ * Programmfehler und mit Daten nicht herstellbar. Standard: unverändert.
+ */
+const holdHook: { fail: boolean } = vi.hoisted(() => ({ fail: false }));
+vi.mock("../lib/refresh.ts", async (importOriginal) => {
+  const orig = await importOriginal<typeof import("../lib/refresh.ts")>();
+  return {
+    ...orig,
+    holdUnit: (...args: Parameters<typeof orig.holdUnit>) => {
+      if (holdHook.fail) throw new Error("Halten kaputt");
+      return orig.holdUnit(...args);
+    },
+  };
+});
+
 const dirs: string[] = [];
 afterEach(() => {
   for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
   buildHook.fail = undefined;
   buildHook.calls = 0;
+  holdHook.fail = false;
   vi.restoreAllMocks();
 });
 
@@ -1390,6 +1407,46 @@ describe("runNightly: ID-Gate (ADR 0041; Plan 0049, Nachtrag 2, B)", () => {
         note: expect.stringMatching(/^Build nach den Urteilen gescheitert: .*Testfehler im Build/),
       }),
     ]);
+  });
+
+  it("scheitert auch das Halten (letzter Ausweg): Einheiten mit neuem Ergebnis auf den Vorstand, Lauf baut, IDs bleiben", async () => {
+    const { dirsOf, ids } = await baseline(true);
+    const rawDir = join(dirsOf.dataDir, "raw");
+    const before = readRaw(rawDir, PROVIDER);
+    const beforeA = rawUnit(dirsOf, UNIT_A);
+    // Richter unklar → Halten wirft → Fehlerpfad hält alle → wirft wieder → revertAll (Einträge nach Einheit sortiert)
+    holdHook.fail = true;
+    const j = fakeJudge(all("unklar"));
+    const { r, seen } = await gateNight(dirsOf, {
+      judge: j.judge,
+      events: (u) => (u === UNIT_B ? [massage] : renamed),
+    });
+    expect(seen).toEqual([UNIT_A, UNIT_B]);
+    expect(j.seen.map((x) => x.unit)).toEqual([UNIT_A]);
+    expect(r.build.errors).toEqual([]);
+    expect(r.build.written).toBeDefined();
+    expect(idsByTitle(dirsOf)).toEqual(ids);
+    // A ist exakt der Vorstand: keine neuen Events, kein held, alte Fassung
+    expect(rawUnit(dirsOf, UNIT_A)).toEqual(beforeA);
+    // B hat in der neuen Fassung ebenfalls ein neues Ergebnis (anderer Schlüssel), ohne Verlust; auch B geht auf den Vorstand
+    const after = readRaw(rawDir, PROVIDER);
+    expect(after && isV2(after) && before && isV2(before) ? after.units : undefined).toEqual(
+      before && isV2(before) ? before.units : undefined,
+    );
+    expect(r.idGate?.map((e) => [e.unit, e.outcome, e.held, e.ids])).toEqual([
+      [UNIT_B, "gehalten", "grenze", []],
+      [UNIT_A, "gehalten", "grenze", []],
+    ]);
+    expect(r.idGate?.every((e) => e.note?.startsWith("ID-Gate: Halten kaputt"))).toBe(true);
+    expect(r.units?.[PROVIDER]).toEqual({ [UNIT_A]: "gehalten", [UNIT_B]: "gehalten" });
+    // nächste Nacht ohne Störung: dieselbe neue Fassung wird neu extrahiert und gerichtet
+    holdHook.fail = false;
+    const j2 = fakeJudge(sameByNumber);
+    const n2 = await gateNight(dirsOf, { judge: j2.judge, events: (u) => (u === UNIT_B ? [massage] : renamed) });
+    expect([...n2.seen].sort()).toEqual([UNIT_A, UNIT_B].sort());
+    expect(j2.seen.map((x) => x.unit)).toEqual([UNIT_A]);
+    expectInherited(dirsOf, ids);
+    expect(idsByTitle(dirsOf)["Babymassage"]).toBe(ids["Babymassage"]);
   });
 
   /** Uhr des Laufs: verschiebt `performance.now` ab dem Aufruf von `jump` um `ms` (Zeitbudget, Frist des Richters) */
