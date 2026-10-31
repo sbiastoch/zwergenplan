@@ -1,6 +1,6 @@
 # Plan 0059 – Karte groß: nur Karte, Detail als Overlay
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 10be9c9 (2026-10-31)
 Datum: 2026-10-31
 
 Bezug:
@@ -272,3 +272,7 @@ Der erste Branch-Lauf war rot. `karte.spec.ts` „Tipp auf Marker öffnet das Or
 - **Behoben:** Der Knopf ist jetzt rund und 44 px groß, nur mit Symbol, wie „Karte verkleinern“. `aria-label` bleibt „Karte groß zeigen“.
 - **Startausschnitt:** Er hält links 54 px frei (`GROW_CONTROL_INSET` in `MapView.tsx`), wie rechts für die Zoom-Knöpfe. Padding Angebotskarte 32 / 90 / 98 / 86 px, Anbieterkarte 24 / 82 / 90 / 78 px; `docs/architecture.md` ist angepasst.
 - **Abweichung vom Mockup:** Dort stand eine Pille „Groß“ mit Text.
+
+## Live (2026-10-31)
+
+CI auf `main` grün (Lauf 41217898519), Deploy 10be9c9. `/browser-review live`: `karte-gross` und `anbieter-gross` mit echten Daten, 390 px hell und dunkel. Die Zahl im Ausschnitt (214 Angebote, 69 Anbieter) steht über der ausgeschriebenen Quellenangabe, der Knopf verdeckt keinen Marker. Restpunkte stehen in `docs/ideas.md`.

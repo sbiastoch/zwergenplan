@@ -119,6 +119,8 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0059** (Karte groß, live seit 10be9c9, 2026-10-31; Einzelheiten in „Browser-Review“ und „Branch-CI“ des Plans):
+  - **Am echten Handy prüfen:** Bewegt ein Finger die große Karte? Schließt ein Tipp auf den Schleier über der Karte das Detail? Und wie verhält sich iPhone-Safari mit der Leiste unten (`100dvh`)?
 - **Plan 0057** (Merkliste als Wochenplaner, live seit 5534f02, 2026-10-31; Einzelheiten in den Nachträgen S1–S6 des Plans):
   - **Spike an echten Geräten** (Plan, „Schritte“): Langes Halten aufs Herz in der installierten App am iPhone (Textauswahl, Lupe, Kontextmenü) und an Android (System-Long-Press, `contextmenu`); Herz mit VoiceOver bzw. TalkBack (Doppeltipp schaltet genau eine Stufe, Ansage „teilweise gedrückt“/„gedrückt“, „Rückgängig“ erreichbar); ob Chrome die Vibration aus dem Halte-Timer blockt, wenn das Halten die erste Berührung der Seite ist. Scheitert das Halten auf einer Plattform, wird es dort abgeschaltet (der zweite Tipp bleibt).
   - **Kalender, heutiger Tag** (Browser-Review live): Die rote Wellenlinie unter dem Datum überdeckt die Kategorie-Formen, bei 320 px liegt das Plus halb darunter.
