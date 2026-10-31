@@ -582,7 +582,7 @@ describe("buildOffers", () => {
   });
 
   describe("Hauptkategorie category (Plan 0037, E5, E6)", () => {
-    it("a) category aus dem Rohevent landet im Angebot, auch in jedem zerlegten Einzeltermin", () => {
+    it("a) category aus dem Rohevent landet gefaltet im Angebot (kreativ → buehne, Nachtrag A), auch in jedem zerlegten Einzeltermin", () => {
       const { file, report } = buildOffers(
         base({
           batches: [
@@ -599,7 +599,7 @@ describe("buildOffers", () => {
         }),
       );
       expect(report.errors).toEqual([]);
-      expect(file?.offers.map((o) => o.category)).toEqual(["kreativ", "kreativ"]);
+      expect(file?.offers.map((o) => o.category)).toEqual(["buehne", "buehne"]);
       expect(report.derivedCategories).toBe(0);
       expect(report.notes.join("\n")).not.toContain("aus den Themen abgeleitet");
     });

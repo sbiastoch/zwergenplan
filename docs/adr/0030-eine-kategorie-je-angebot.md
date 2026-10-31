@@ -1,6 +1,6 @@
 # ADR 0030 – Eine Kategorie je Angebot, gewählt von der Extraktion und gespeichert
 
-Status: angenommen (2026-10-12), mit Plan 0037, Stufe A (Schritt A5): Ab dann wird `category` gespeichert. **Geändert durch ADR 0042**: Such-Abos (Punkt 2) entfallen. **Löst teilweise ab:** ADR 0003, Punkt „Themen und Kategorien“ (Kategorien nur abgeleitet), und die Invariante „Abgeleitete Werte wie Kategorien werden berechnet, nie gespeichert“ (`docs/architecture.md`, zitiert in ADR 0012). **Ersetzt** Plan 0014, E1–E3 (Etikett folgt dem Filter). **Ergänzt** ADR 0024, Punkt 3 (Kategorien eines Anbieters aus den Hauptkategorien seiner kommenden Angebote).
+Status: angenommen (2026-10-12), mit Plan 0037, Stufe A (Schritt A5): Ab dann wird `category` gespeichert. **Geändert durch ADR 0042**: Such-Abos (Punkt 2) entfallen. **Geändert durch ADR 0043**: sieben statt zwölf Kategorien (Punkt 1), gefaltet im Datenvertrag. **Löst teilweise ab:** ADR 0003, Punkt „Themen und Kategorien“ (Kategorien nur abgeleitet), und die Invariante „Abgeleitete Werte wie Kategorien werden berechnet, nie gespeichert“ (`docs/architecture.md`, zitiert in ADR 0012). **Ersetzt** Plan 0014, E1–E3 (Etikett folgt dem Filter). **Ergänzt** ADR 0024, Punkt 3 (Kategorien eines Anbieters aus den Hauptkategorien seiner kommenden Angebote).
 
 ## Kontext
 

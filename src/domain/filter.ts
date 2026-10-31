@@ -10,7 +10,7 @@ import {
 } from "./date-range.ts";
 import { LIMIT_MINUTES, type ReachFn, type ReachLimit, type ReachTarget, withinLimit } from "./reach.ts";
 import type { Cost, Format, Offer, Registration } from "./schema.ts";
-import { CATEGORIES, type Category } from "./topics.ts";
+import { CATEGORIES, type Category, EXTRACT_CATEGORIES, foldCategory } from "./topics.ts";
 
 export const FORMATS = ["kurs", "regelmaessig", "einmalig"] as const satisfies readonly Format[];
 const REGISTRATIONS = ["mit-anmeldung", "ohne-anmeldung"] as const satisfies readonly Registration[];
@@ -62,6 +62,12 @@ function parseList<T extends string>(raw: string | null, allowed: readonly T[]):
   return allowed.filter((v) => wanted.has(v));
 }
 
+/** `kat=` nimmt auch die alten zwölf Werte aus geteilten Links und faltet sie (Plan 0037, Nachtrag A, NA6). */
+function parseCategories(raw: string | null): Category[] {
+  const folded = new Set(parseList(raw, EXTRACT_CATEGORIES).map(foldCategory));
+  return CATEGORIES.filter((c) => folded.has(c));
+}
+
 /** Nur genau „20“, „30“ oder „45“; alles andere wird verworfen. */
 function parseReachLimit(raw: string | null): ReachLimit | undefined {
   const value = LIMIT_MINUTES.find((m) => String(m) === raw);
@@ -73,7 +79,7 @@ export function filterFromSearch(search: string): FilterState {
   const reachLimit = parseReachLimit(p.get(REACH_KEY));
   const range = dateRange(p.get(FROM_KEY) ?? undefined, p.get(TO_KEY) ?? undefined);
   return {
-    categories: parseList(p.get(PARAMS.categories.key), PARAMS.categories.values),
+    categories: parseCategories(p.get(PARAMS.categories.key)),
     formats: parseList(p.get(PARAMS.formats.key), PARAMS.formats.values),
     registration: parseList(p.get(PARAMS.registration.key), PARAMS.registration.values),
     cost: parseList(p.get(PARAMS.cost.key), PARAMS.cost.values),

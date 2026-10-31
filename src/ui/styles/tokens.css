@@ -259,6 +259,8 @@
   --edge2: rgba(19, 33, 46, 0.28);
   --line: #13212e;
   --shadow: #13212e;
+  /* Grün der Grundkarte (Parks, Wald), hell und dunkel gleich; bis Plan 0037, Nachtrag A, die Farbe von .k-natur */
+  --map-green: #a6db5e;
   --primary: #13212e;
   --on-primary: #fff;
   --tape: #ffe38a;
@@ -389,21 +391,6 @@
 .k-musik {
   --k: #ff7070;
 }
-.k-kreativ {
-  --k: #ffd93b;
-}
-.k-buecher {
-  --k: #7bd389;
-}
-.k-museum {
-  --k: #e3a872;
-}
 .k-buehne {
   --k: #ee8bfa;
-}
-.k-natur {
-  --k: #a6db5e;
-}
-.k-beratung {
-  --k: #a3bdd0;
 }

@@ -230,7 +230,7 @@ describe("URL-Route", () => {
     const filters: FilterState[] = LIMIT_MINUTES.flatMap((value) => [
       { ...EMPTY_FILTER, reachLimit: { kind: "minuten", value } },
       {
-        categories: ["musik", "buecher"],
+        categories: ["musik", "buehne"],
         formats: ["kurs"],
         registration: ["ohne-anmeldung"],
         cost: ["kostenlos"],

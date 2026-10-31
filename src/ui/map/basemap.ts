@@ -19,6 +19,8 @@ export interface MapTokens {
   primary: string;
   onPrimary: string;
   onColor: string;
+  /** Grün für Parks und Wald (`--map-green`); bis Plan 0037, Nachtrag A, die Farbe der Kategorie „natur“ */
+  green: string;
   /** `--k` je Kategorie (`.k-<kategorie>`) */
   categories: Record<Category, string>;
 }
@@ -71,7 +73,7 @@ export function mixHex(a: string, b: string, t: number): string {
 export function basemapPalette(tokens: MapTokens, dark: boolean): BasemapPalette {
   const { bg, surface, rim, ink, muted, line } = tokens;
   const water = tokens.categories.wasser;
-  const nature = tokens.categories.natur;
+  const nature = tokens.green;
   if (dark) {
     return {
       land: bg,

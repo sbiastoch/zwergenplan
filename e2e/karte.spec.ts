@@ -532,12 +532,7 @@ test.describe("mit gemockten Kacheln", () => {
           "bewegung",
           "wasser",
           "musik",
-          "kreativ",
-          "buecher",
-          "museum",
           "buehne",
-          "natur",
-          "beratung",
         ];
         const probe = document.createElement("span");
         document.body.append(probe);
@@ -566,7 +561,7 @@ test.describe("mit gemockten Kacheln", () => {
       }, background);
 
     const light = await state("bg-hell");
-    expect(light.images).toBe(12);
+    expect(light.images).toBe(7);
     expect(light.places).toBeGreaterThan(0);
     expect(light.symbols).toBe(light.places);
     // im Ausschnitt: Badge genau an den Orten mit mehr als einem Angebot
@@ -619,7 +614,7 @@ test.describe("mit gemockten Kacheln", () => {
     await expect.poll(() => page.evaluate(() => !!window.__zpMap?.getLayer("bg-dunkel"))).toBe(true);
     await idle(page);
     const dark = await state("bg-dunkel");
-    expect(dark.images).toBe(12);
+    expect(dark.images).toBe(7);
     expect(dark.symbols).toBe(dark.places);
     expect(dark.background).not.toBe(light.background);
     expect(dark.labelColor).not.toBe(light.labelColor);

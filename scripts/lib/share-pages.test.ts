@@ -210,7 +210,7 @@ describe("Vorschauseite eines Anbieters (Plan 0026, E3)", () => {
     expect(page.path).toBe("p/b5nuus36/index.html");
     expect(meta(page.html, "og:title")).toBe("Familientreff Beispielhof (fiktiv)");
     expect(meta(page.html, "og:description")).toBe(
-      "4 kommende Angebote im Zwergenplan · Babykurse · Krabbel- &amp; Spielgruppen · Treffs &amp; Cafés · Altstadt",
+      "4 kommende Angebote im Zwergenplan · Baby- &amp; Elternkurse · Krabbel- &amp; Spielgruppen · Treffs &amp; Cafés · Altstadt",
     );
     expect(meta(page.html, "og:image")).toBe(`${SITE_URL}og/vorschau-v1.jpg`);
     expect(page.html).toContain(`href="${BASE}?anbieter=b5nuus36"`);

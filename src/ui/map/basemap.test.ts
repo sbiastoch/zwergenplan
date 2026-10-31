@@ -136,12 +136,7 @@ const categories = {
   bewegung: "#2ec4b6",
   wasser: "#5cb8ff",
   musik: "#ff7070",
-  kreativ: "#ffd93b",
-  buecher: "#7bd389",
-  museum: "#e3a872",
   buehne: "#ee8bfa",
-  natur: "#a6db5e",
-  beratung: "#a3bdd0",
 };
 const LIGHT: MapTokens = {
   bg: "#e8f1ff",
@@ -154,6 +149,7 @@ const LIGHT: MapTokens = {
   primary: "#13212e",
   onPrimary: "#fff",
   onColor: "#13212e",
+  green: "#a6db5e",
   categories,
 };
 const NIGHT: MapTokens = {
@@ -167,6 +163,7 @@ const NIGHT: MapTokens = {
   primary: "#ffd93b",
   onPrimary: "#13212e",
   onColor: "#13212e",
+  green: "#a6db5e",
   categories,
 };
 

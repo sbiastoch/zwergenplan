@@ -177,7 +177,7 @@ describe("useOfferViews", () => {
     });
 
     it("Kategorie wirkt", () => {
-      const route: Route = { ...ANBIETER, filter: { ...ANBIETER.filter, categories: ["buecher"] } };
+      const route: Route = { ...ANBIETER, filter: { ...ANBIETER.filter, categories: ["wasser"] } };
       expect(ids(render({ route }).providerVisible)).toEqual([]);
     });
 

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
-import { CATEGORIES } from "../../../src/domain/topics.ts";
+import { EXTRACT_CATEGORIES } from "../../../src/domain/topics.ts";
 import { createExtractor, EXTRACT_KEY_PARTS, effortOf, modelKey } from "./extract.ts";
 
 const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
@@ -72,7 +72,7 @@ const input = (text: string) => ({
 });
 
 describe("Prompt (Plan 0037, E8)", () => {
-  it("die Kategorietabelle unter category nennt genau die 12 IDs aus CATEGORIES, jede einmal", () => {
+  it("die Kategorietabelle unter category nennt genau die 12 IDs aus EXTRACT_CATEGORIES, jede einmal (Plan 0037, Nachtrag A: Prompt unverändert)", () => {
     const lines = EXTRACT_KEY_PARTS.prompt.split("\n").map((l) => l.trim());
     const head = lines.findIndex((l) => /^\|\s*`category`\s*\|/.test(l));
     expect(head, "Tabellenkopf „| `category` | … |“ fehlt im Prompt").toBeGreaterThanOrEqual(0);
@@ -82,8 +82,8 @@ describe("Prompt (Plan 0037, E8)", () => {
       if (!m?.[1]) break;
       rows.push(m[1]);
     }
-    expect([...rows].sort()).toEqual([...CATEGORIES].sort());
-    expect(rows).toHaveLength(CATEGORIES.length);
+    expect([...rows].sort()).toEqual([...EXTRACT_CATEGORIES].sort());
+    expect(rows).toHaveLength(EXTRACT_CATEGORIES.length);
   });
 });
 

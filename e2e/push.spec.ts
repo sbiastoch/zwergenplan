@@ -354,7 +354,7 @@ test("Einschalten meldet nur das Abo; der Geräte-Speicher folgt dem offenen She
     localStorage.setItem("zwergenplan.geburtsdatum", "2025-08-05");
     localStorage.setItem("zwergenplan.entfernung-ab", "gostenhof");
   });
-  await installed(page, context, "./?kat=natur");
+  await installed(page, context, "./?kat=bewegung");
   await openKidSheet(page);
   await pushSwitch(page).click();
   await expect(pushSwitch(page)).toHaveAttribute("aria-checked", "true");

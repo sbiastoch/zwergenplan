@@ -34,7 +34,7 @@ export function readMapTokens(): MapTokens {
         probe.className = `k-${category}`;
         return [category, read(getComputedStyle(probe), "--k")];
       }),
-      // `as` begründet: `fromEntries` über genau `CATEGORIES`, also ist jeder Schlüssel da (E2E prüft alle 12 Bilder).
+      // `as` begründet: `fromEntries` über genau `CATEGORIES`, also ist jeder Schlüssel da (E2E prüft alle Bilder).
     ) as Record<Category, string>;
     return {
       bg: token("--bg"),
@@ -47,6 +47,7 @@ export function readMapTokens(): MapTokens {
       primary: token("--primary"),
       onPrimary: token("--on-primary"),
       onColor: token("--on-color"),
+      green: token("--map-green"),
       categories,
     };
   } finally {

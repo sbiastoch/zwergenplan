@@ -204,7 +204,7 @@ test.describe("Anbieterkarte (Plan 0055)", () => {
     await openTab(page);
     await page
       .getByRole("group", { name: "Kategorien" })
-      .getByRole("button", { name: /Bücher/ })
+      .getByRole("button", { name: /^Musik/ })
       .click();
     await expect.poll(async () => (await features(page)).filter((p) => p["blass"] === false).length).toBe(1);
     expect(await features(page)).toHaveLength(7);

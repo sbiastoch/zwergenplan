@@ -3,7 +3,7 @@ import type { Offer, Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import {
   type CaseResult,
-  type EvalOffer,
+  EvalOffer,
   hasResultFor,
   predictOffers,
   promptHash,
@@ -173,6 +173,14 @@ describe("predictOffers", () => {
     });
     expect(r.errors).toEqual([]);
     expect(r.offers).toHaveLength(1);
+  });
+});
+
+describe("gefaltete Kategorie (Plan 0037, Nachtrag A, NA5)", () => {
+  it("Soll museum, Ist buecher: beide gefaltet buehne, also ein Treffer", () => {
+    const soll = EvalOffer.parse({ ...offer(), category: "museum", topics: ["museum"] });
+    const ist = EvalOffer.parse({ ...offer(), category: "buecher", topics: ["vorlesen"] });
+    expect(scoreCase([soll], [ist]).fields.category).toEqual({ hits: 1, total: 1 });
   });
 });
 

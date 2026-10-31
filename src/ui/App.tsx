@@ -34,7 +34,7 @@ import {
 import { IMPRINT_PATH } from "../domain/share.ts";
 import type { SiteData, SiteOffer } from "../domain/site-data.ts";
 import { berlinIsoDate } from "../domain/time.ts";
-import { type Category, withCategory } from "../domain/topics.ts";
+import { type ExtractCategory, withCategory } from "../domain/topics.ts";
 import { bellPush, preloadBell } from "./AppExtras.tsx";
 import { BigMapBar } from "./BigMapBar.tsx";
 import {
@@ -95,16 +95,19 @@ import { useOfferViews } from "./use-offer-views.ts";
 import { ANNOUNCE_DELAY_MS, useSettled } from "./use-settled.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
-/** `site.json` im lockeren Format: Angebote ohne `category` aus einem Datencache vor Plan 0037, Stufe A (E13). */
+/**
+ * `site.json` im lockeren Format: Angebote ohne `category` aus einem Datencache vor Plan 0037, Stufe A (E13), oder mit
+ * einem der zwölf alten Werte aus einem Cache vor Nachtrag A (NA6).
+ */
 type LooseSiteData = Omit<SiteData, "offers"> & {
-  offers: Array<Omit<SiteOffer, "category"> & { category?: Category }>;
+  offers: Array<Omit<SiteOffer, "category"> & { category?: ExtractCategory }>;
 };
 
 /**
- * Übernimmt geladene Daten; ein Angebot ohne `category` bekommt den Rückfall aus den Themen. Einzige Stelle in
- * `src/ui` dafür, nicht in `src/data` (ADR 0010, `data-domain-runtime-allowlist`).
+ * Übernimmt geladene Daten; ein Angebot ohne `category` bekommt den Rückfall aus den Themen, ein alter Wert wird
+ * gefaltet. Einzige Stelle in `src/ui` dafür, nicht in `src/data` (ADR 0010, `data-domain-runtime-allowlist`).
  */
-// Übergang Plan 0037 (E13): site.json aus einem Cache vor Stufe A hat kein category; Rückfall bleibt bis Stufe C
+// Übergang Plan 0037 (E13): Themen-Rückfall bis Stufe C; das Falten alter Werte bleibt (Nachtrag A, NA6)
 function adoptSite(data: LooseSiteData): SiteData {
   return { ...data, offers: data.offers.map((offer) => withCategory<SiteOffer>(offer)) };
 }

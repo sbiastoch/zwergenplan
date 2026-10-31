@@ -1,5 +1,5 @@
 /**
- * Darstellung der 12 Kategorien: Kurzlabel für die Sticker-Leiste und eine eigene Form (SVG-Pfad,
+ * Darstellung der 7 Kategorien: Kurzlabel für die Sticker-Leiste und eine eigene Form (SVG-Pfad,
  * 24er-Raster) – überall gleich. Die Farbe kommt aus CSS (`.k-<kategorie>`, styles.css). Die Formen liegen in
  * src/domain/category-look.ts, damit auch das Kachelbild der Vorschau sie zeichnet (Plan 0026, Nachtrag A).
  */
@@ -13,10 +13,5 @@ export const CATEGORY_UI: Record<Category, { short: string; shape: string }> = {
   bewegung: { short: "Bewegung", shape: S.bewegung },
   wasser: { short: "Wasser", shape: S.wasser },
   musik: { short: "Musik", shape: S.musik },
-  kreativ: { short: "Kreativ", shape: S.kreativ },
-  buecher: { short: "Bücher", shape: S.buecher },
-  museum: { short: "Museum", shape: S.museum },
-  buehne: { short: "Bühne", shape: S.buehne },
-  natur: { short: "Natur", shape: S.natur },
-  beratung: { short: "Beratung", shape: S.beratung },
+  buehne: { short: "Kultur", shape: S.buehne },
 };

@@ -202,7 +202,7 @@ test("Suche trifft nur einen abonnierten: steht oben, kein „Kein Anbieter hei�
 
 test("Startseiten-Filter blendet den abonnierten Anbieter aus: Zeile bleibt oben, blass", async ({ page }) => {
   await preset(page, ["fv3fpfp2"]);
-  await page.goto("./?ansicht=anbieter&kat=buecher");
+  await page.goto("./?ansicht=anbieter&kat=musik");
   const row = savedList(page).locator("li");
   await expect(row).toHaveCount(1);
   await expect(row.locator(".place.idle")).toContainText("keins passt zur Auswahl");
@@ -310,8 +310,8 @@ test("per Tastatur: Enter auf der Glocke abonniert, der Fokus geht auf die näch
 test("Filter trifft nur einen abonnierten Anbieter: die ausgeblendeten stehen blass darunter, kein Leerzustand", async ({
   page,
 }) => {
-  await preset(page, ["kgjeqq3k"]);
-  await page.goto("./?ansicht=anbieter&kat=buecher");
+  await preset(page, ["un8dc9t4"]);
+  await page.goto("./?ansicht=anbieter&kat=musik");
   await expect(savedList(page).locator(".place:not(.idle)")).toHaveCount(1);
   await expect(restRows(page).filter({ hasText: "zur Auswahl" })).toHaveCount(4);
   await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();

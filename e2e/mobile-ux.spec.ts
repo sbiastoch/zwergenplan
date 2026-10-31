@@ -608,9 +608,9 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     await openProviders(page);
     await expect(providerRow(page, "Kleines Theater")).toContainText("5 Min.");
   },
-  // Sticker „Bücher“: eine aktive Zeile, „Filter zurücksetzen“, vier ausgeblendete und der Turnverein blass
+  // Sticker „Musik“: eine aktive Zeile, „Filter zurücksetzen“, vier ausgeblendete und der Turnverein blass
   "anbieter-filter": async (page) => {
-    await page.goto("./?kat=buecher&ansicht=anbieter");
+    await page.goto("./?kat=musik&ansicht=anbieter");
     await expect(page.getByRole("button", { name: "Filter zurücksetzen" })).toBeVisible();
     await expect(page.locator(".place.idle")).toHaveCount(5);
   },

@@ -1,11 +1,31 @@
 /**
  * Geschlossenes Themen-Vokabular (aus dem Recherche-Skill übernommen) und die
- * feste Zuordnung zu den 12 Filter-Kategorien der Oberfläche.
+ * feste Zuordnung zu den 7 Filter-Kategorien der Oberfläche (Plan 0037, Nachtrag A; ADR 0043).
  * Kategorien eines Angebots stehen seit ADR 0030 in `category`; `TOPIC_CATEGORIES` dient Themenregel, Warnung und
  * Rückfall.
  */
 
+/**
+ * Die sieben Kategorien der Oberfläche. Die IDs stammen aus dem alten Bestand der zwölf (ADR 0043): `buehne` heißt
+ * „Kultur & Kreativ“, `bewegung` „Bewegung & Draußen“, `babykurse` „Baby- & Elternkurse“. So bricht alter Code mit
+ * neuen Daten nicht, und alte Links bleiben gültig.
+ */
 export const CATEGORIES = [
+  "babykurse",
+  "krabbel-spielgruppen",
+  "treffs-cafes",
+  "bewegung",
+  "wasser",
+  "musik",
+  "buehne",
+] as const;
+export type Category = (typeof CATEGORIES)[number];
+
+/**
+ * Die zwölf Werte, aus denen das Modell in der Extraktion wählt, in der alten Reihenfolge. Teil des Cache-Schlüssels
+ * der Extraktion (Antwortschema): nur zusammen mit einer Neu-Extraktion ändern (Plan 0037, Nachtrag A, NA3).
+ */
+export const EXTRACT_CATEGORIES = [
   "babykurse",
   "krabbel-spielgruppen",
   "treffs-cafes",
@@ -19,21 +39,37 @@ export const CATEGORIES = [
   "natur",
   "beratung",
 ] as const;
-export type Category = (typeof CATEGORIES)[number];
+export type ExtractCategory = (typeof EXTRACT_CATEGORIES)[number];
+
+/** Faltung der zwölf auf die sieben; vollständig, damit `tsc` jeden Wert verlangt. */
+const FOLD: Record<ExtractCategory, Category> = {
+  babykurse: "babykurse",
+  "krabbel-spielgruppen": "krabbel-spielgruppen",
+  "treffs-cafes": "treffs-cafes",
+  bewegung: "bewegung",
+  wasser: "wasser",
+  musik: "musik",
+  kreativ: "buehne",
+  buecher: "buehne",
+  museum: "buehne",
+  buehne: "buehne",
+  natur: "bewegung",
+  beratung: "babykurse",
+};
+
+/** Alter oder neuer Kategoriewert → eine der sieben (Datenvertrag, Cache im Browser, `kat=` in Links). */
+export function foldCategory(c: ExtractCategory): Category {
+  return FOLD[c];
+}
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  babykurse: "Babykurse",
+  babykurse: "Baby- & Elternkurse",
   "krabbel-spielgruppen": "Krabbel- & Spielgruppen",
   "treffs-cafes": "Treffs & Cafés",
-  bewegung: "Bewegung & Turnen",
+  bewegung: "Bewegung & Draußen",
   wasser: "Wasser",
   musik: "Musik & Singen",
-  kreativ: "Kreativ & Basteln",
-  buecher: "Bücher & Vorlesen",
-  museum: "Museum & Ausstellung",
-  buehne: "Bühne & Konzert",
-  natur: "Natur & Draußen",
-  beratung: "Beratung & Gesundheit",
+  buehne: "Kultur & Kreativ",
 };
 
 /** Themen → Kategorien. Ein leeres Array markiert ein reines Merkmal (z. B. „mehrsprachig“). */
@@ -54,9 +90,9 @@ export const TOPIC_CATEGORIES = {
   rueckbildung: ["bewegung"],
   "spielplatz-indoor": ["bewegung"],
   tanz: ["bewegung", "musik"],
-  waldgruppe: ["natur"],
-  "tiere-natur": ["natur"],
-  kreativ: ["kreativ"],
+  waldgruppe: ["bewegung"],
+  "tiere-natur": ["bewegung"],
+  kreativ: ["buehne"],
   elterncafe: ["treffs-cafes"],
   stillcafe: ["treffs-cafes"],
   elterntreff: ["treffs-cafes"],
@@ -65,15 +101,15 @@ export const TOPIC_CATEGORIES = {
   vaeter: [],
   muetter: [],
   mehrsprachig: [],
-  beratung: ["beratung"],
-  hebamme: ["beratung"],
-  "erste-hilfe": ["beratung"],
-  beikost: ["beratung"],
+  beratung: ["babykurse"],
+  hebamme: ["babykurse"],
+  "erste-hilfe": ["babykurse"],
+  beikost: ["babykurse"],
   babyschwimmen: ["wasser"],
   kleinkindschwimmen: ["wasser"],
-  bibliothek: ["buecher"],
-  vorlesen: ["buecher"],
-  museum: ["museum"],
+  bibliothek: ["buehne"],
+  vorlesen: ["buehne"],
+  museum: ["buehne"],
   kino: ["buehne"],
   konzert: ["buehne"],
   theater: ["buehne"],
@@ -96,13 +132,16 @@ export function fallbackCategory(topics: readonly Topic[]): Category {
 }
 
 /**
- * Angebot mit `category`, auch wenn es aus einem Stand ohne das Feld kommt: vorhandene `category` bleibt, sonst
- * `fallbackCategory(topics)`. Für `adoptSite` in `App.tsx` (Plan 0037, E13). Der Rückgabetyp ist für ein konkretes
- * `T` (etwa `SiteOffer`) ohne Cast an `T` zuweisbar.
+ * Angebot mit `category`, auch wenn es aus einem älteren Stand kommt: Eine vorhandene `category` wird auf die sieben
+ * gefaltet (Plan 0037, Nachtrag A, NA6), eine fehlende kommt aus `fallbackCategory(topics)`. Für `adoptSite` in
+ * `App.tsx` (Plan 0037, E13). Der Rückgabetyp ist für ein konkretes `T` (etwa `SiteOffer`) ohne Cast an `T` zuweisbar.
  */
-// Übergang Plan 0037 (E13): site.json aus einem Cache vor Stufe A hat kein category; Rückfall bleibt bis Stufe C
+// Übergang Plan 0037 (E13): Der Themen-Rückfall entfällt in Stufe C, das Falten alter Werte bleibt (Nachtrag A)
 export function withCategory<T extends { category: Category; topics: readonly Topic[] }>(
-  offer: Omit<T, "category"> & { category?: Category },
+  offer: Omit<T, "category"> & { category?: ExtractCategory },
 ): Omit<T, "category"> & { category: Category } {
-  return { ...offer, category: offer.category ?? fallbackCategory(offer.topics) };
+  return {
+    ...offer,
+    category: offer.category === undefined ? fallbackCategory(offer.topics) : foldCategory(offer.category),
+  };
 }

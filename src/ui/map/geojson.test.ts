@@ -17,7 +17,7 @@ describe("GeoJSON für die Karte (Plan 0005, E6)", () => {
   const bibliothek = {
     key: "49.4521,11.0767",
     geo: { lat: 49.4521, lon: 11.0767 },
-    offers: [{ category: "buecher" as const }],
+    offers: [{ category: "musik" as const }],
   };
 
   it("ein Punkt je Ort, Koordinaten als [lon, lat], Zahl der Angebote", () => {
@@ -32,7 +32,7 @@ describe("GeoJSON für die Karte (Plan 0005, E6)", () => {
         {
           type: "Feature",
           geometry: { type: "Point", coordinates: [11.0767, 49.4521] },
-          properties: { key: "49.4521,11.0767", angebote: 1, kategorie: "buecher" },
+          properties: { key: "49.4521,11.0767", angebote: 1, kategorie: "musik" },
         },
       ],
     });
@@ -42,7 +42,7 @@ describe("GeoJSON für die Karte (Plan 0005, E6)", () => {
     const zoo = {
       key: "49.4467,11.1428",
       geo: { lat: 49.4467, lon: 11.1428 },
-      offers: [{ category: "natur" as const }],
+      offers: [{ category: "bewegung" as const }],
     };
     const input = [zoo, bibliothek, theater];
     const copy = [...input];

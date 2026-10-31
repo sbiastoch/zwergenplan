@@ -17,7 +17,8 @@ const catalog = toProviderDirectory(loadFixtures().providers, FIXTURE_NOW.toISOS
 const offers = fixtureSiteOffers();
 const upcoming = mapUpcoming(offers, FIXTURE_NOW);
 const visibleWith = (state: FilterState) => applyFilters(offers, state, { now: FIXTURE_NOW });
-const buecher: FilterState = { ...EMPTY_FILTER, categories: ["buecher"] };
+// Bibliothek allein: nach dem Falten (Plan 0037, Nachtrag A) teilt sie „buehne“ mit dem Theater, „regelmaessig“ trennt.
+const kultur: FilterState = { ...EMPTY_FILTER, categories: ["buehne"], formats: ["regelmaessig"] };
 
 const TREFF_GEO = { lat: 49.4521, lon: 11.0767 };
 /** ein zweiter Anbieter am Ort des Familientreffs, ohne Angebote (wie die Route in anbieter-karte.spec.ts) */
@@ -102,7 +103,7 @@ describe("providerPlaces", () => {
   });
 
   it("Sticker „Bücher“: ausgeblendete und die ohne Termine stehen blass, wie in der Liste", () => {
-    const places = providerPlaces({ providers: catalog, upcoming, visible: visibleWith(buecher) });
+    const places = providerPlaces({ providers: catalog, upcoming, visible: visibleWith(kultur) });
     expect(places.flatMap((p) => p.providers.map((a) => [a.id, a.state]))).toEqual(
       expect.arrayContaining([
         [pid("stadtbibliothek-beispiel"), "aktiv"],
@@ -130,7 +131,7 @@ describe("providerPlaces", () => {
     const at = (id: string, name: string): SiteProvider => ({ ...NACHBAR, id, name });
     const providers = [...catalog, at("z1", "Aaa ohne Termine"), at("z2", "Zzz ohne Termine")];
     // Sticker „Bücher“: Der Familientreff ist ausgeblendet, die beiden Nachbarn haben keine Termine
-    const places = providerPlaces({ providers, upcoming, visible: visibleWith(buecher) });
+    const places = providerPlaces({ providers, upcoming, visible: visibleWith(kultur) });
     const place = places.find((p) => p.key === placeKey(TREFF_GEO));
     expect(place?.providers.map((a) => [a.name, a.state])).toEqual([
       ["Familientreff Beispielhof (fiktiv)", "ausgeblendet"],
