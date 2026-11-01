@@ -154,7 +154,9 @@ test("Filter-Sheet wirkt sofort, Einfachwahl bei Anmeldung, Zurücksetzen leert"
   await expect(sheet).toBeVisible();
   await sheet.getByRole("button", { name: "Ohne Anmeldung" }).click();
   await expect(sheet.getByRole("button", { name: "Ohne Anmeldung" })).toHaveAttribute("aria-pressed", "true");
-  await expect(sheet.getByRole("button", { name: "Egal" }).first()).toHaveAttribute("aria-pressed", "false");
+  // „Egal“ der Anmeldung: Wegzeit und Kosten haben eigene „Egal“ (Reihenfolge Plan 0060, E1)
+  const registrationAny = sheet.locator("h3:text-is('Anmeldung') + .wrap").getByRole("button", { name: "Egal" });
+  await expect(registrationAny).toHaveAttribute("aria-pressed", "false");
   await expect(sheet.getByRole("button", { name: "3 Angebote zeigen" })).toBeVisible();
   await sheet.getByRole("button", { name: "Mit Anmeldung" }).click();
   await expect(sheet.getByRole("button", { name: "Ohne Anmeldung" })).toHaveAttribute("aria-pressed", "false");
@@ -171,9 +173,9 @@ test("Tageszeit im Filter-Sheet (Plan 0057, E7): URL, gleiche Zahl in Liste, Sta
   const sheet = page.getByRole("dialog", { name: "Filter" });
   const daytime = sheet.getByRole("group", { name: "Tageszeit" });
   await expect(daytime).toHaveAccessibleDescription("Beginn vor 12 Uhr, 12–15 Uhr, ab 15 Uhr");
-  // zwischen Alter und Art: vor „Art“ (ohne Geburtsdatum gibt es keinen Abschnitt „Alter“)
+  // Wichtiges zuerst (Plan 0060, E1); ohne Geburtsdatum gibt es keinen Abschnitt „Alter“
   const headings = await sheet.getByRole("heading", { level: 3 }).allTextContents();
-  expect(headings.slice(0, 2)).toEqual(["Tageszeit", "Art"]);
+  expect(headings).toEqual(["Wegzeit", "Zeitraum", "Tageszeit", "Art", "Kosten", "Anmeldung", "Format"]);
   await daytime.getByRole("button", { name: "Vormittags" }).click();
   await expect(daytime.getByRole("button", { name: "Vormittags" })).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/\?tageszeit=vormittags$/);

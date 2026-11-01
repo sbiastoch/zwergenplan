@@ -279,65 +279,28 @@ export function FilterSheet({
             </div>
           </>
         )}
-        <h3 id={daytimeHeadingId}>Tageszeit</h3>
-        <fieldset className="plain" aria-labelledby={daytimeHeadingId} aria-describedby={daytimeNoteId}>
-          <div className="wrap">
-            {DAYTIMES.map((d) => (
-              <Chip key={d} on={filter.daytimes.includes(d)} onClick={() => onChange(toggleIn(filter, "daytimes", d))}>
-                {DAYTIME_LABELS[d]}
-              </Chip>
-            ))}
-          </div>
-        </fieldset>
-        <p id={daytimeNoteId} className="small">
-          {DAYTIME_HINT}
-        </p>
-        <h3>Art</h3>
+        <h3 ref={reachHeading} tabIndex={-1}>
+          Wegzeit
+        </h3>
         <div className="wrap">
-          {CATEGORIES.map((c) => (
-            <Chip
-              key={c}
-              className={`chip cat k-${c}`}
-              on={filter.categories.includes(c)}
-              onClick={() => onChange(toggleIn(filter, "categories", c))}
-            >
-              <Shape category={c} ink={false} />
-              {CATEGORY_LABELS[c]}
-            </Chip>
-          ))}
-        </div>
-        <h3>Format</h3>
-        <div className="wrap">
-          {FORMATS.map((f) => (
-            <Chip key={f} on={filter.formats.includes(f)} onClick={() => onChange(toggleIn(filter, "formats", f))}>
-              {FORMAT_CHIPS[f]}
-            </Chip>
-          ))}
-        </div>
-        <h3>Anmeldung</h3>
-        <div className="wrap">
-          {REGISTRATION_CHIPS.map(([value, label]) => (
+          {REACH_CHIPS.map(([limit, label]) => (
             <Chip
               key={label}
-              on={single(filter.registration, value)}
-              onClick={() => onChange({ ...filter, registration: value ? [value] : [] })}
+              on={limit ? filter.reachLimit?.value === limit.value : !filter.reachLimit}
+              // „Egal“ bleibt immer bedienbar: So lässt sich eine gesetzte Grenze jederzeit entfernen.
+              disabled={limit !== undefined && reason !== undefined}
+              onClick={() => onChange(withReachLimit(filter, limit))}
             >
               {label}
             </Chip>
           ))}
         </div>
-        <h3>Kosten</h3>
-        <div className="wrap">
-          {COST_CHIPS.map(([value, label]) => (
-            <Chip
-              key={label}
-              on={single(filter.cost, value)}
-              onClick={() => onChange({ ...filter, cost: value ? [value] : [] })}
-            >
-              {label}
-            </Chip>
-          ))}
-        </div>
+        {reason && (
+          <p className="small origin-need">
+            {reason}
+            {limitAction(reachHeading)}
+          </p>
+        )}
         <h3 ref={rangeHeading} id={rangeHeadingId} tabIndex={-1}>
           Zeitraum
         </h3>
@@ -396,28 +359,65 @@ export function FilterSheet({
             )}
           </>
         )}
-        <h3 ref={reachHeading} tabIndex={-1}>
-          Wegzeit
-        </h3>
+        <h3 id={daytimeHeadingId}>Tageszeit</h3>
+        <fieldset className="plain" aria-labelledby={daytimeHeadingId} aria-describedby={daytimeNoteId}>
+          <div className="wrap">
+            {DAYTIMES.map((d) => (
+              <Chip key={d} on={filter.daytimes.includes(d)} onClick={() => onChange(toggleIn(filter, "daytimes", d))}>
+                {DAYTIME_LABELS[d]}
+              </Chip>
+            ))}
+          </div>
+        </fieldset>
+        <p id={daytimeNoteId} className="small">
+          {DAYTIME_HINT}
+        </p>
+        <h3>Art</h3>
         <div className="wrap">
-          {REACH_CHIPS.map(([limit, label]) => (
+          {CATEGORIES.map((c) => (
+            <Chip
+              key={c}
+              className={`chip cat k-${c}`}
+              on={filter.categories.includes(c)}
+              onClick={() => onChange(toggleIn(filter, "categories", c))}
+            >
+              <Shape category={c} ink={false} />
+              {CATEGORY_LABELS[c]}
+            </Chip>
+          ))}
+        </div>
+        <h3>Kosten</h3>
+        <div className="wrap">
+          {COST_CHIPS.map(([value, label]) => (
             <Chip
               key={label}
-              on={limit ? filter.reachLimit?.value === limit.value : !filter.reachLimit}
-              // „Egal“ bleibt immer bedienbar: So lässt sich eine gesetzte Grenze jederzeit entfernen.
-              disabled={limit !== undefined && reason !== undefined}
-              onClick={() => onChange(withReachLimit(filter, limit))}
+              on={single(filter.cost, value)}
+              onClick={() => onChange({ ...filter, cost: value ? [value] : [] })}
             >
               {label}
             </Chip>
           ))}
         </div>
-        {reason && (
-          <p className="small origin-need">
-            {reason}
-            {limitAction(reachHeading)}
-          </p>
-        )}
+        <h3>Anmeldung</h3>
+        <div className="wrap">
+          {REGISTRATION_CHIPS.map(([value, label]) => (
+            <Chip
+              key={label}
+              on={single(filter.registration, value)}
+              onClick={() => onChange({ ...filter, registration: value ? [value] : [] })}
+            >
+              {label}
+            </Chip>
+          ))}
+        </div>
+        <h3>Format</h3>
+        <div className="wrap">
+          {FORMATS.map((f) => (
+            <Chip key={f} on={filter.formats.includes(f)} onClick={() => onChange(toggleIn(filter, "formats", f))}>
+              {FORMAT_CHIPS[f]}
+            </Chip>
+          ))}
+        </div>
       </div>
       <div className="sheetfoot">
         <button type="button" className="linkbtn" onClick={onReset}>

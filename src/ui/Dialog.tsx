@@ -4,6 +4,7 @@
  * (`cancel`) und ein Tipp auf den Backdrop nehmen denselben Weg wie der Schließen-Knopf.
  */
 import { type ReactNode, type RefObject, useEffect, useRef } from "react";
+import { swipesFor, useSheetSwipe } from "./sheet-swipe.ts";
 import { Toast, type ToastMessage } from "./Toast.tsx";
 
 /**
@@ -33,6 +34,8 @@ interface DialogProps {
 
 export function Dialog({ open, onClose, label, className, toast, fallbackFocus, children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  // Sheets von unten mit Griff (`sheet`, `over-map`) lassen sich nach unten wegwischen, wie ein Backdrop-Tipp (Plan 0060, E3)
+  useSheetSwipe(ref, swipesFor(className) ? onClose : undefined);
 
   useEffect(() => {
     const dialog = ref.current;

@@ -206,6 +206,13 @@ export const SPEC_COVERS: Readonly<Record<string, readonly RegExp[]>> = {
   // Deploy-Build mit echten Daten: data/, alle Ausgaben von build-data.ts, Vorschauseiten und Kachelbilder, der
   // Service Worker im Deploy-Build („mit Service Worker“).
   "e2e/smoke.spec.ts": [/^data\//, BUILD_DATA, SHARE_PAGES, OG_IMAGES, VITE_SW, /^src\/sw\//],
+  // Sheets nach unten wegwischen (Plan 0060): Geste, Einbau in Dialog, Animation und touch-action der Sheets. Die
+  // Styles lösen ohnehin die volle Auswahl aus (oben); sie stehen hier als Doku, welche CSS die Geste trägt.
+  "e2e/sheet-swipe.spec.ts": [
+    /^src\/ui\/sheet-swipe\.ts$/,
+    /^src\/ui\/Dialog\.tsx$/,
+    /^src\/ui\/styles\/(sheet|dialog|motion)\.css$/,
+  ],
   // Sortierung und Etikett „Neu“ (Plan 0043, E4, E5)
   "e2e/sortierung.spec.ts": [
     /^src\/ui\/(SortMenu|ListView|OfferCard|DetailDialog)\.tsx$/,

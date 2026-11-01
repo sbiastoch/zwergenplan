@@ -56,13 +56,13 @@ test.describe("Filter der Merkliste (E5)", () => {
     await expect(sheet(page).getByRole("switch")).toHaveCount(0);
     await expect(sheet(page).getByRole("heading", { level: 3 })).toHaveText([
       "Merkliste",
+      "Wegzeit",
+      "Zeitraum",
       "Tageszeit",
       "Art",
-      "Format",
-      "Anmeldung",
       "Kosten",
-      "Zeitraum",
-      "Wegzeit",
+      "Anmeldung",
+      "Format",
     ]);
     await expect(sheet(page).getByRole("button", { name: "5 gemerkte zeigen" })).toBeVisible();
     await sheet(page).getByRole("button", { name: "Musik & Singen" }).click();
