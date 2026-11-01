@@ -200,7 +200,7 @@ test.describe("Test 4: Weg und Privatsphäre", () => {
     // Linien kommen erst nach der Tabelle (use-transit.ts); die Tabelle hält der Test noch fest
     await expect.poll(() => transit).toEqual(["wegzeit.json"]);
     const chips = intro(page).getByRole("group", { name: "Höchstens unterwegs" });
-    await expect(chips.getByRole("button")).toHaveText(["20 Min.", "30 Min.", "45 Min.", "Egal"]);
+    await expect(chips.getByRole("button")).toHaveText(["10 Min.", "20 Min.", "30 Min.", "45 Min.", "Egal"]);
     await intro(page).getByRole("combobox", { name: "Stadtteil" }).selectOption("gostenhof");
     // Tabelle noch unterwegs: Minuten gesperrt, „Egal“ geht immer
     await expect(chips.getByRole("button", { name: "30 Min." })).toBeDisabled();

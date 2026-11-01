@@ -95,7 +95,7 @@ describe("URL-Zustand", () => {
     const search = filterToSearch(state);
     expect(search).toBe("kosten=kostenlos&wegzeit=30");
     expect(filterFromSearch(`?wegzeit=30&kosten=kostenlos`)).toEqual(state);
-    for (const value of [20, 45] as const) {
+    for (const value of [10, 20, 45] as const) {
       expect(filterFromSearch(`?wegzeit=${value}`).reachLimit).toEqual({ kind: "minuten", value });
     }
   });

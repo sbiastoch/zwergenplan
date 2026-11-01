@@ -34,6 +34,9 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    /* nie per Finger waagerecht verschiebbar, auch wenn ein Feld übersteht (Nutzer, 2026-11-01). Kein
+       `overflow-x: hidden`: Das Text-Gate hält die Bereiche unter der Falz dann für abgeschnitten. */
+    touch-action: pan-y;
     overscroll-behavior: contain;
     padding: 6px 16px 20px;
     scrollbar-width: none;
@@ -90,6 +93,11 @@
     letter-spacing: 0.08em;
     color: var(--ink);
   }
+  /* Fokus über die Kante statt Rahmen (base.css): hell Dunkelblau, dunkel Gelb, nie eine weiße Box */
+  .input:focus {
+    border-color: var(--primary);
+    box-shadow: 3px 3px 0 var(--primary);
+  }
   /* Schnellwahlen „ab …“ über von/bis, nur im Sheet der Merkliste (Plan 0057, E5) */
   .quick-ranges {
     margin-bottom: 10px;
@@ -97,10 +105,21 @@
   /* Zeitraum (Plan 0023, E9): zwei Spalten, bei wenig Platz oder großer Schrift untereinander */
   .daterange {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    /* minmax(0, …): iOS gibt Datumsfeldern eine eigene Mindestbreite, sie überlappten sich (Nutzer, 2026-11-01) */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
+  @container sheet (width < 20rem) {
+    .daterange {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* ohne native Darstellung hebt iOS die Mindestbreite auf; der Picker öffnet trotzdem */
   .input.date {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    line-height: 52px;
     font-size: 1.0625rem;
     letter-spacing: 0;
   }

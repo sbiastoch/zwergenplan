@@ -79,8 +79,8 @@ describe("compareReach", () => {
 });
 
 describe("withinLimit", () => {
-  it("kennt genau die Stufen 20, 30 und 45 Min.", () => {
-    expect(LIMIT_MINUTES).toEqual([20, 30, 45]);
+  it("kennt genau die Stufen 10, 20, 30 und 45 Min. (10 seit 2026-11-01)", () => {
+    expect(LIMIT_MINUTES).toEqual([10, 20, 30, 45]);
   });
 
   it("schließt die Grenze ein und vergleicht ungerundete Minuten", () => {

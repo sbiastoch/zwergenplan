@@ -214,5 +214,39 @@ test("nur „bis“ aus der URL, ungültiges „von“ wird verworfen", async ({
   await expect(sheet.getByLabel("bis")).toHaveValue("2026-10-12");
 });
 
+test("von/bis überlappen nicht, das Sheet ist nie waagerecht verschiebbar, Fokus ohne Rahmen (Nutzer, 2026-11-01)", async ({
+  page,
+}) => {
+  await page.goto("./?von=2026-10-20&bis=2026-12-31");
+  for (const width of [412, 360, 320]) {
+    await page.setViewportSize({ width, height: 800 });
+    const sheet = await openFilter(page);
+    // erst nach der Öffnungsanimation messen, alle Kästen in einem Schritt (sonst wandert das Sheet dazwischen)
+    await sheet.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
+    const m = await sheet.evaluate((el) => {
+      const [from, to] = [...el.querySelectorAll("input[type=date]")].map((i) => i.getBoundingClientRect());
+      const scroll = el.querySelector(".sheet-scroll");
+      if (!from || !to || !scroll) throw new Error("von, bis oder .sheet-scroll fehlt");
+      return {
+        overlap: from.right > to.left + 0.5 && from.bottom > to.top + 0.5,
+        toRight: to.right,
+        right: scroll.getBoundingClientRect().right,
+        sw: scroll.scrollWidth,
+        cw: scroll.clientWidth,
+      };
+    });
+    expect(m.overlap, `${width} px: von und bis überlappen nicht`).toBe(false);
+    expect(m.sw, `${width} px: kein waagerechter Überlauf`).toBeLessThanOrEqual(m.cw);
+    expect(m.toRight, `${width} px: bis im Sheet`).toBeLessThanOrEqual(m.right);
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+  }
+  // Eingabefelder zeigen den Fokus über die Kante, nie als Rahmen (im Dunkelmodus eine weiße Box)
+  const field = (await openFilter(page)).getByLabel("von");
+  await field.focus();
+  await expect(field).toHaveCSS("outline-style", "none");
+  expect(await field.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe("none");
+});
+
 // „der Kalender zeigt die gefilterten Angebote …“ (E8) entfiel mit dem Tab „Kalender“ (Plan 0025, E8): Der Zeitraum gilt im
 // Kalender der Merkliste nicht, und `?von=…&ansicht=kalender` landet in „Angebote“ mit Zeitraum (e2e/app.spec.ts).

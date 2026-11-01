@@ -259,7 +259,7 @@ describe("feste Texte (E3, E10)", () => {
 
 describe("LIMIT_CHOICES (E7)", () => {
   it("deckt jede Wegzeit-Stufe ab, dazu „Egal“ ohne Grenze", () => {
-    expect(LIMIT_CHOICES.map((c) => c.label)).toEqual(["20 Min.", "30 Min.", "45 Min.", "Egal"]);
+    expect(LIMIT_CHOICES.map((c) => c.label)).toEqual(["10 Min.", "20 Min.", "30 Min.", "45 Min.", "Egal"]);
     expect(LIMIT_CHOICES.map((c) => c.limit?.value)).toEqual([...LIMIT_MINUTES, undefined]);
     for (const c of LIMIT_CHOICES) if (c.limit) expect(c.limit.kind).toBe("minuten");
   });

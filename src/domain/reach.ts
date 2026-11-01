@@ -52,7 +52,7 @@ export function compareReach(a: Reach, b: Reach): number {
 }
 
 /** Stufen des Filters „Wegzeit“ (Plan 0009, E8) */
-export const LIMIT_MINUTES = [20, 30, 45] as const;
+export const LIMIT_MINUTES = [10, 20, 30, 45] as const;
 
 /** Grenze für den Filter „Wegzeit“ */
 export type ReachLimit = { kind: "minuten"; value: (typeof LIMIT_MINUTES)[number] };

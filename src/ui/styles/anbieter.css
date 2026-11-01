@@ -29,6 +29,11 @@
     font-weight: 700;
     color: var(--ink);
   }
+  /* Fokus über die Kante wie .input (sheet.css, base.css) */
+  .provider-search input:focus {
+    border-color: var(--primary);
+    box-shadow: 3px 3px 0 var(--primary);
+  }
   /* normal statt fett: sonst liest sich der Platzhalter wie ein eingegebener Wert */
   .provider-search input::placeholder {
     color: var(--muted);

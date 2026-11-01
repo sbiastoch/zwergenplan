@@ -65,12 +65,18 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Eingabefelder immer: bei manchen Feldern greift :focus-visible nicht zuverlässig. */
-  :focus-visible,
-  input:focus,
-  select:focus {
+  :focus-visible {
     outline: 3px solid var(--ink);
     outline-offset: 2px;
+  }
+  /*
+   * Eingabefelder matchen :focus-visible auch beim Antippen. Der Rahmen in --ink war dann im Dunkelmodus eine weiße
+   * Box (Nutzer, 2026-11-01). Sie zeigen den Fokus über die eigene Kante (`.input:focus`, sheet.css; Anbietersuche).
+   */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
   }
   /*
    * Fokus-Anker (`tabIndex={-1}`: Name im Sheet, Statuszeile, Überschriften) sind nicht bedienbar, nur Ziel für
