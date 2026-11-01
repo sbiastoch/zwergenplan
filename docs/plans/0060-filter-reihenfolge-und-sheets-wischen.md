@@ -105,3 +105,7 @@ Kein Blocker ist offen. Status nach Umsetzung: in Umsetzung.
 - m1 (zweiter Finger lässt Versatz stehen): `onStart` setzt außer beim Ausgleiten immer zurück, dazu ein E2E-Fall mit zwei Touch-Punkten. Übernommen.
 - m2 (Geste nur in Chromium getestet): bleibt Handprüfung am iPhone, beim Archivieren Restpunkt in `docs/ideas.md`.
 - m3 (Ref-Write im Render): `useLayoutEffect`. Übernommen.
+
+## Nachtrag (2026-11-01): Reihenfolge nach Nutzerwunsch
+
+Der Nutzer hat E1 ersetzt: Format, Anmeldung, Wegzeit, Zeitraum, Tageszeit, Kosten, Art, Alter (live seit 15714e1, auf Wunsch ohne Plan umgesetzt, zusammen mit Chips je Darstellung der Merkliste und dem Fix für „Zeitraum entfernen“ unter iOS). Offen bleibt die Prüfung am iPhone.
