@@ -206,13 +206,161 @@
    "status": "ok",
    "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
+   "pending": {
+    "inputHash": "ae4e81d4b68be937fd58f43a7a3f1ac4055882fa957c26187b6201ab49fbea8a",
+    "model": "haiku",
+    "events": [
+     {
+      "providerId": "wolf-pack-yoga",
+      "venueId": "wolf-pack-yoga",
+      "title": "Yoga mit Baby (Babys 3–12 Monate), donnerstags",
+      "summary": "Kräftigende, fließende Übungen nach Schwangerschaft und Geburt, das Baby ist dabei. Ein Block hat 6 Donnerstage; Einstieg nur zu den Blockstarts. Der Block ab 22.10. ist derzeit nicht buchbar.",
+      "topics": [
+       "yoga-mit-baby",
+       "bewegung"
+      ],
+      "format": "kurs",
+      "registration": "mit-anmeldung",
+      "cost": "kostenpflichtig",
+      "price": "102 € (6 Termine)",
+      "url": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
+      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
+      "category": "bewegung",
+      "age": {
+       "minMonths": 3,
+       "maxMonths": 12
+      },
+      "availability": {
+       "status": "unbekannt",
+       "note": "Block ab 22.10. laut Eversports „Nicht buchbar“; spätere Blöcke über „hier buchen“ auf wolfpack.yoga"
+      },
+      "schedule": {
+       "kind": "dates",
+       "dates": [
+        {
+         "start": "2026-11-05T09:30",
+         "end": "2026-11-05T10:30"
+        },
+        {
+         "start": "2026-11-12T09:30",
+         "end": "2026-11-12T10:30"
+        },
+        {
+         "start": "2026-11-19T09:30",
+         "end": "2026-11-19T10:30"
+        },
+        {
+         "start": "2026-11-26T09:30",
+         "end": "2026-11-26T10:30"
+        },
+        {
+         "start": "2026-12-10T09:30",
+         "end": "2026-12-10T10:30"
+        },
+        {
+         "start": "2026-12-17T09:30",
+         "end": "2026-12-17T10:30"
+        },
+        {
+         "start": "2027-01-07T09:30",
+         "end": "2027-01-07T10:30"
+        },
+        {
+         "start": "2027-01-14T09:30",
+         "end": "2027-01-14T10:30"
+        },
+        {
+         "start": "2027-01-21T09:30",
+         "end": "2027-01-21T10:30"
+        },
+        {
+         "start": "2027-01-28T09:30",
+         "end": "2027-01-28T10:30"
+        },
+        {
+         "start": "2027-02-11T09:30",
+         "end": "2027-02-11T10:30"
+        },
+        {
+         "start": "2027-02-18T09:30",
+         "end": "2027-02-18T10:30"
+        },
+        {
+         "start": "2027-02-25T09:30",
+         "end": "2027-02-25T10:30"
+        },
+        {
+         "start": "2027-03-04T09:30",
+         "end": "2027-03-04T10:30"
+        },
+        {
+         "start": "2027-03-11T09:30",
+         "end": "2027-03-11T10:30"
+        },
+        {
+         "start": "2027-03-18T09:30",
+         "end": "2027-03-18T10:30"
+        },
+        {
+         "start": "2027-04-01T09:30",
+         "end": "2027-04-01T10:30"
+        },
+        {
+         "start": "2027-04-08T09:30",
+         "end": "2027-04-08T10:30"
+        },
+        {
+         "start": "2027-04-15T09:30",
+         "end": "2027-04-15T10:30"
+        },
+        {
+         "start": "2027-04-22T09:30",
+         "end": "2027-04-22T10:30"
+        },
+        {
+         "start": "2027-04-29T09:30",
+         "end": "2027-04-29T10:30"
+        },
+        {
+         "start": "2027-05-06T09:30",
+         "end": "2027-05-06T10:30"
+        },
+        {
+         "start": "2027-06-03T09:30",
+         "end": "2027-06-03T10:30"
+        },
+        {
+         "start": "2027-06-10T09:30",
+         "end": "2027-06-10T10:30"
+        },
+        {
+         "start": "2027-06-17T09:30",
+         "end": "2027-06-17T10:30"
+        },
+        {
+         "start": "2027-06-24T09:30",
+         "end": "2027-06-24T10:30"
+        },
+        {
+         "start": "2027-07-01T09:30",
+         "end": "2027-07-01T10:30"
+        },
+        {
+         "start": "2027-07-08T09:30",
+         "end": "2027-07-08T10:30"
+        }
+       ]
+      }
+     }
+    ]
+   },
    "partsHash": "766e03d83a107d8c166739ed26c23c79486547433de07097e17bb784a4f8c7f9"
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00"
+   "checkedAt": "2026-11-01T08:58:52+01:00"
   }
  }
 }

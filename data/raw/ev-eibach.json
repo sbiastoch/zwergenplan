@@ -17,7 +17,7 @@
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107133.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
-     "category": "natur",
+     "category": "bewegung",
      "availability": {
       "status": "unbekannt",
       "note": "Im Kalender keine Anmeldung oder Platzangabe genannt; bei Fragen beim Veranstalter nachfragen."
@@ -215,7 +215,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
   }

@@ -6,11 +6,10 @@
     {
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
-     "title": "Baby & Museum: Kurzführung für Erwachsene mit Babys",
-     "summary": "Monatlich wechselnde Kurzführung durchs Museum, bei der Pausen zum Füttern und Wickeln eingeplant sind. Kinderwagen und Trage sind erlaubt. Danach gibt es Kaffee zum Austausch.",
+     "title": "Baby & Museum: Führung für Erwachsene mit Babys",
+     "summary": "Monatlich wechselnde Kurzführung durch das Neue Museum für Erwachsene mit Babys, Kinderwagen und Trage sind erlaubt. Pausen zum Füttern und Wickeln sind eingeplant, danach Austausch bei Kaffee. Zusätzlich zum Eintritt.",
      "topics": [
-      "museum",
-      "elterntreff"
+      "museum"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -18,10 +17,14 @@
      "price": "3 € zzgl. Eintritt (für Erwachsene)",
      "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
      "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
-     "category": "museum",
+     "category": "buehne",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 12
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets je Termin über den Ticket-Button im go~mus-Shop; Restkontingent ist nur dort sichtbar."
+      "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Kontingent dort nicht auf der Programmseite sichtbar"
      },
      "schedule": {
       "kind": "dates",
@@ -46,11 +49,11 @@
      }
     }
    ],
-   "inputHash": "e4f7fe86af25a67a69c63d24215b8601aab0f7adc2cb71db6ec244e3eb947d82",
+   "inputHash": "4fb0f305831a8afceb478f14c5b3addb511b49068dc89d2e9f265beb5e520b4a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "changedAt": "2026-11-01T08:58:52+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
@@ -59,7 +62,7 @@
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
      "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-     "summary": "Die Schauspielerin Mara Wengel liest Geschichten rund um Kunst und Design in der Ausstellung und lädt zum Mitmachen ein. Für Kinder ab zwei Jahren mit Begleitung. Tickets über den Onlineshop des Museums.",
+     "summary": "Eine Schauspielerin liest und spielt Geschichten rund um Kunst und Design im Ausstellungsraum „Double Up!“, die Kinder machen aktiv mit. Erwachsene zahlen Eintritt; Tickets nur über den Museumsshop.",
      "topics": [
       "vorlesen",
       "museum"
@@ -70,14 +73,14 @@
      "price": "3 € zzgl. Eintritt (für Erwachsene)",
      "url": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
      "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm",
-     "category": "buecher",
+     "category": "buehne",
      "age": {
       "minMonths": 24,
       "maxMonths": 36
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Ticket über den go~mus-Shop (nmn-tickets.de) buchen; Restkontingent dort einsehen"
+      "note": "Ticket über den go~mus-Shop; Restplätze sind auf der Programmseite nicht sichtbar"
      },
      "schedule": {
       "kind": "dates",
@@ -89,11 +92,11 @@
      }
     }
    ],
-   "inputHash": "05a1e746dca5ca85c021c50c49998e99e41a0ab06f47c32f86ea26b3e14ca7a2",
+   "inputHash": "8058997767362d57278084ef4c3aaece143e318920c683df31f838bc7ab70600",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "changedAt": "2026-11-01T08:58:52+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "kandidaten": {
@@ -112,7 +115,7 @@
      "cost": "kostenpflichtig",
      "url": "https://nmn-tickets.de/#/product/event/161?date_id=5140",
      "sourceUrl": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=378173",
-     "category": "museum",
+     "category": "buehne",
      "age": {
       "minMonths": 0,
       "maxMonths": 12
@@ -156,7 +159,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

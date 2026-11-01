@@ -6,22 +6,21 @@
     {
      "providerId": "ev-thomaskirche-grossreuth",
      "venueId": "ev-thomaskirche-grossreuth",
-     "title": "Krabbelgruppe (montags, Gemeindehaus Thomaskirche)",
-     "summary": "Montagnachmittags Spielen, Krabbeln, Singen und Fingerspiele mit Erfahrungsaustausch unter Eltern im kleinen Saal. Termine mit Pausen in Ferien und Sommer; Kosten und Anmeldung bitte beim Anbieter erfragen.",
+     "title": "Krabbelgruppe Thomaskirche (montags)",
+     "summary": "Spielen, Krabbeln, Musik und Fingerspiele sowie Erfahrungsaustausch für Eltern mit Kleinkindern. Montags 15:30–17:30 Uhr im kleinen Saal des Gemeindehauses. Die Termine folgen der Quelle, Ferienpausen sind nicht eingerechnet.",
      "topics": [
       "krabbelgruppe",
-      "spielgruppe",
-      "singen"
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/detail-bt?ID=8004136",
      "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8004136",
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle. Anfrage bei der Ev. Thomaskirche Großreuth."
+      "note": "Anmeldung und Kosten stehen nicht in der Quelle (Eintrag ist daher ohne Gewähr); bitte vorab beim Gemeindehaus der Thomaskirche nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -181,11 +180,10 @@
     {
      "providerId": "ev-thomaskirche-grossreuth",
      "venueId": "ev-thomaskirche-grossreuth",
-     "title": "Eltern-Kind-Yoga (Kurs, 6 Termine ab 10.11.2026)",
-     "summary": "Sechs Yoga-Termine dienstags nachmittags im großen Saal des Gemeindehauses, Eltern und Kind gemeinsam. Keine Angaben zu Preis und Anmeldung in der Quelle; bitte beim Anbieter erfragen.",
+     "title": "Eltern-Kind-Yoga (dienstags, Nov./Dez. 2026)",
+     "summary": "Yoga für Eltern gemeinsam mit dem Kind im großen Saal des Gemeindehauses. Sechs Termine dienstags 15:15–16:00 Uhr bis 15. Dezember 2026. Anmeldung und Preis stehen nicht in der Quelle; bitte beim Veranstalter erfragen.",
      "topics": [
-      "yoga-mit-baby",
-      "bewegung"
+      "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -195,7 +193,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle. Anfrage bei der Ev. Thomaskirche Großreuth."
+      "note": "Anmeldung und Preis stehen nicht in der Quelle (Eintrag ist daher ohne Gewähr); bitte beim Gemeindehaus der Thomaskirche nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -273,12 +271,16 @@
     "2027-10-04": "071b521867f4f499ac47430f87a3ed8237839a21f9def114a5b6d44c68a7dbf9",
     "2027-10-11": "72ecb947faf2e47da1a06e9b6624b63c82110bee7bb8eb29318f9a2bfc6bd495",
     "2027-10-18": "98fbbfe5a489570083a85027024d76fc851b341e56a8d8b47c160b5719161e46",
-    "2027-10-25": "016ff8b8fcfa54877d69ffcba2baea607e8abd263a48b29e8d1d0538e1493a09"
+    "2027-10-25": "016ff8b8fcfa54877d69ffcba2baea607e8abd263a48b29e8d1d0538e1493a09",
+    "2027-11-08": "eef248dc91ce9c62e3a2f09ad46817580d6349629332e7c8f27caf926634fcba",
+    "2027-11-15": "58a9bcbe7f48a0a9f1570ea2a1468ad30101ddfce8b3c40773cb2071589deef2",
+    "2027-11-22": "37c37c1bc2cb1478cf5b957588d08c64d1621018dccd7f17d2949aa64510a510",
+    "2027-11-29": "b6c1404f8e4a5d5bed5f643625391bdd9bbef1a2b6aa5ce5cbf4bb90263ade46"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "changedAt": "2026-11-01T08:58:52+01:00",
    "sources": [
     "evtermine"
    ],

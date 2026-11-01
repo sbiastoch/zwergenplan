@@ -6,11 +6,10 @@
     {
      "providerId": "ev-stephanus-gebersdorf",
      "venueId": "ev-stephanus-gebersdorf",
-     "title": "Eltern-Kind-Gruppe (Vater-Mutter-Kind, donnerstags)",
-     "summary": "Gemeinsam spielen, singen und Erfahrungen unter Eltern austauschen; die Kinder lernen miteinander umzugehen. Donnerstags 9:30–11:30 Uhr im Gemeindehaus, Termine in den Ferien sind nicht eingeplant. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+     "title": "Eltern-Kind-Gruppe Stephanuskirche (donnerstags 9:30–11:30)",
+     "summary": "Vater-Mutter-Kind-Gruppe mit Spielen, Singen und Austausch für Eltern. Angaben zu Anmeldung und Kosten fehlen im Eintrag, bitte bei der Gemeinde nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
@@ -19,13 +18,9 @@
      "url": "https://www.evangelische-termine.de/detail-bt?ID=7670264",
      "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7670264",
      "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle. Bei der Gemeinde (Gemeindehaus Stephanuskirche, Neumühlweg 20a) nachfragen."
+      "note": "Keine Angaben zu Plätzen oder Anmeldung im Eintrag; bei der Gemeinde nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -206,12 +201,15 @@
     "2027-10-07": "fa0b6c857b1367168b0914b1914bab56e8ea3df3992810e5651d211ed4f0049f",
     "2027-10-14": "8e27a125e99a6f70642abe8e6edabe7404052f6e67503e98dd0465199e5bfe7a",
     "2027-10-21": "6d0e83ae87e2b11a1a358f9dff837a1b57e226190eb9d76380ed54d589e7ff01",
-    "2027-10-28": "ea1f93e7b78227c328d19785cb3b5461dbf7bff208b2d1447b52be0badf8ce8f"
+    "2027-10-28": "ea1f93e7b78227c328d19785cb3b5461dbf7bff208b2d1447b52be0badf8ce8f",
+    "2027-11-11": "feeea11e3e915a4c3962b7887fa234030231dd9d710c47a3756c299c0df8044a",
+    "2027-11-18": "81cc7dcffffdeb680e533717f7c7c910db40c92d2425d2c9ff4204a86ff33d27",
+    "2027-11-25": "acc040e072e4eb75a5217e88098f36a19624e5ba4c4ea2d54fc3d8b1f10893d8"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "changedAt": "2026-11-01T08:58:52+01:00",
    "sources": [
     "evtermine"
    ],

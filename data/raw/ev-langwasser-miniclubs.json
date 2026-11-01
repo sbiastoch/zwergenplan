@@ -115,7 +115,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "emptySince": "2026-10-30T08:39:48+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
@@ -604,7 +604,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -644,7 +644,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -685,7 +685,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -694,14 +694,14 @@
     {
      "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Donnerstag 9–10:30 Uhr (Passionskirche)",
-     "summary": "Eltern-Kind-Gruppe mit ersten Liedern und Reimen, Spiel und Kontakt zu Gleichaltrigen, dazu Austausch für Eltern. Kosten und Anmeldung stehen nicht in der Quelle; bitte bei der Gemeinde erfragen.",
+     "title": "Mini-Club Passionskirche (Do 9–10:30 Uhr, Eltern-Kind)",
+     "summary": "Eltern-Kind-Gruppe für junge Familien mit Spiel, ersten Liedern und Reimen für die Kinder sowie Austausch und Anregungen für Eltern. Donnerstags 9–10:30 Uhr, Termine bis Oktober 2027 mit Sommerpause. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.evangelische-termine.de/detail-bt?ID=8009818",
      "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8009818",
@@ -712,7 +712,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Anfrage bei der Gemeinde (Passionskirche, Dr.-Linnert-Ring 28)."
+      "note": "Keine Platzangabe in der Quelle; bei Fragen zu Anmeldung und Kosten die Gemeinde Passionskirche kontaktieren."
      },
      "schedule": {
       "kind": "dates",
@@ -884,14 +884,14 @@
     {
      "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs",
-     "title": "MiniClub Montag 15–17 Uhr (Dietrich-Bonhoeffer-Kirche)",
-     "summary": "Eltern-Kind-Gruppe zum gemeinsamen Spielen, mit Liedern und Reimen und Austausch für Eltern. Kosten und Anmeldung stehen nicht in der Quelle; bitte bei der Gemeinde erfragen.",
+     "title": "MiniClub Dietrich-Bonhoeffer-Kirche (Mo 15–17 Uhr)",
+     "summary": "Eltern-Kind-Gruppe mit Spiel, ersten Liedern und Reimen für die Kinder sowie Austausch für Eltern. Montags 15–17 Uhr; bekannte Termine bis 21.12.2026, weitere Termine und Anmeldung bitte bei der Gemeinde erfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.evangelisch-in-langwasser.de",
      "sourceUrl": "https://www.evangelisch-in-langwasser.de",
@@ -902,7 +902,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Anfrage bei der Gemeinde (Zugspitzstraße 201)."
+      "note": "Keine Platzangabe in der Quelle; bei Fragen zu Anmeldung und Kosten die Gemeinde Dietrich-Bonhoeffer-Kirche kontaktieren."
      },
      "schedule": {
       "kind": "dates",
@@ -988,12 +988,15 @@
     "2027-10-07": "eadb9c9b6d88a6810d1f3a7f003766e3172f05f5054fc30588d2ed7a81aaf297",
     "2027-10-14": "aaa708f4b89bb9bc2a845eadda8ddfb25c262cb2157d6065a6b7d63996c5ee8e",
     "2027-10-21": "534ac52e26e39917da31ccca636114840b3492a8f68ec12934d06dc0c64c2204",
-    "2027-10-28": "845183bbeca57d9438df31462a4d6a27081a54862708ce997823b67c6cf43cdd"
+    "2027-10-28": "845183bbeca57d9438df31462a4d6a27081a54862708ce997823b67c6cf43cdd",
+    "2027-11-11": "4bd7c98541d82580ac1df9483f796058d7477aa689d426cca35b6b08922c247b",
+    "2027-11-18": "e54d1be69f15fbecb2a076b4ed0b5e57a502fc3f02f9fa2e24cc46d1054b20a6",
+    "2027-11-25": "25f2ae7cbeedd9b5c5ab898b11197f1ee7c091c737f55fad80488025c4f3e4b2"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "changedAt": "2026-11-01T08:58:52+01:00",
    "sources": [
     "evtermine"
    ],

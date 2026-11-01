@@ -42,7 +42,7 @@
    "inputHash": "381791ef31df43a5178a9a7f991899c2d36c494af3bca50d036d4cae377cbdc1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
@@ -51,7 +51,7 @@
    "inputHash": "a9949d26eb6f088ab240ac25c36d181bd7fedfa0599f71af8bede2a62f168110",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-31T12:36:21+01:00",
    "emptySince": "2026-10-31T12:36:21+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
@@ -61,7 +61,7 @@
    "inputHash": "838582b1370f1ad427b6757d85bf5b3a4d0f5d0a51e3b0deb154d49d1b506ec7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
@@ -71,7 +71,7 @@
    "inputHash": "9c086ebf9bf21d8f713a845f846a3dc1d7a5029d207ef9f981a9765581bf4076",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
@@ -124,6 +124,15 @@
    "status": "ok",
    "checkedAt": "2026-10-31T12:36:21+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
+   "pending": {
+    "inputHash": "9014d4bb27ab7dbb3157a73c8dd388cfde0e579cdb5bcae0a8ad63e084098ab1",
+    "dated": {
+     "2026-11-13": "14ee7260088e25ca0b829b815a2ff79504087d6daad6fb51afb3f0fe280546b5",
+     "2026-11-27": "6e208ae887e397b8aa072b44c9ef8699549b6e5911fe091436d2196cd61c8f37"
+    },
+    "model": "haiku",
+    "events": []
+   },
    "sources": [
     "frankenkids"
    ],

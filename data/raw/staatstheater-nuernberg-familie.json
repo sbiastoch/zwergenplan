@@ -16,7 +16,7 @@
      "cost": "kostenpflichtig",
      "url": "https://staatstheater-nuernberg.de/spielplan-26-27",
      "sourceUrl": "https://staatstheater-nuernberg.de/spielplan-26-27",
-     "category": "museum",
+     "category": "buehne",
      "availability": {
       "status": "unbekannt",
       "note": "Tickets im Eventim-Webshop (Ticket-Link je Termin)"
@@ -70,7 +70,7 @@
    "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "pending": {
-    "inputHash": "2f5feaa58abbfe8e2893909d67a1ac72da78e49f08a7bfb8c7e19033fd9b7a11",
+    "inputHash": "dc4dfee52311d5acb4d6b27ab3c925d77cbe64eab4e29255c262e10fbb3faf01",
     "model": "haiku",
     "events": []
    },
@@ -92,7 +92,7 @@
    "inputHash": "7dcc184d1f1ccb0b91366c74e36f25c629d9ebc5806d33601a10c4342b1da14f",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-10-31T12:36:21+01:00",
+   "checkedAt": "2026-11-01T08:58:52+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "0f480c78bfd0dba598297cfacf6fb3e4c58ad7d92531c1e477facc8971bdc162"
   }
