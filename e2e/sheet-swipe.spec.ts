@@ -104,6 +104,8 @@ test("ein zittriger Anfang (erst schräg 1–2 px) bricht den Wisch nicht ab (Re
 });
 
 test("waagerechter Wisch und Start auf einem Eingabefeld schließen nicht", async ({ page }) => {
+  // Hochformat: Im Querformat (412 px hoch) läge das Feld „von“ hinter dem Fuß, der Wisch begänne dort (CI, pixel-7-quer)
+  await page.setViewportSize({ width: 412, height: 915 });
   const sheet = await openFilter(page);
   const from = await grabPoint(sheet);
   await touchPath(
