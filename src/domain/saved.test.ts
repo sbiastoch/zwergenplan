@@ -4,7 +4,9 @@ import { upcomingSessions } from "./agenda.ts";
 import { EMPTY_FILTER, type FilterState } from "./filter.ts";
 import type { ReachFn } from "./reach.ts";
 import {
+  activeChips,
   applySavedFilter,
+  chipsForView,
   cleanSavedProviders,
   cleanSavedState,
   collectionExport,
@@ -686,6 +688,21 @@ describe("Schnellfilter der Liste (Plan 0058, E1)", () => {
     expect(new Set(formats(["kurse"]))).toEqual(new Set(["kurs"]));
     expect(new Set(formats(["einmalig"]))).toEqual(new Set(["einmalig"]));
     expect(new Set(formats(["kurse", "einmalig"]))).toEqual(new Set(["kurs", "einmalig"]));
+    expect(new Set(formats(["regelmaessig"]))).toEqual(new Set(["regelmaessig"]));
+    expect(new Set(formats(["regelmaessig", "kurse"]))).toEqual(new Set(["regelmaessig", "kurs"]));
+  });
+
+  it("Chips je Darstellung (Nutzer, 2026-11-01): Liste wie bisher, Kalender und Karte eigene", () => {
+    expect(chipsForView("liste")).toEqual(SAVED_LIST_CHIPS);
+    expect(chipsForView("kalender")).toEqual(["einmalig", "spontan"]);
+    expect(chipsForView("karte")).toEqual(["regelmaessig", "kurse", "einmalig"]);
+  });
+
+  it("es wirken nur die Chips, die in der Darstellung zu sehen sind", () => {
+    const chosen: SavedListChip[] = ["demnaechst", "einmalig", "regelmaessig", "spontan"];
+    expect(activeChips(chosen, "liste")).toEqual(["demnaechst", "einmalig", "spontan"]);
+    expect(activeChips(chosen, "kalender")).toEqual(["einmalig", "spontan"]);
+    expect(activeChips(chosen, "karte")).toEqual(["einmalig", "regelmaessig"]);
   });
 
   it("ODER in der Gruppe, UND zwischen Gruppen", () => {

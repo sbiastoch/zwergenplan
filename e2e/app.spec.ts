@@ -173,9 +173,9 @@ test("Tageszeit im Filter-Sheet (Plan 0057, E7): URL, gleiche Zahl in Liste, Sta
   const sheet = page.getByRole("dialog", { name: "Filter" });
   const daytime = sheet.getByRole("group", { name: "Tageszeit" });
   await expect(daytime).toHaveAccessibleDescription("Beginn vor 12 Uhr, 12–15 Uhr, ab 15 Uhr");
-  // Wichtiges zuerst (Plan 0060, E1); ohne Geburtsdatum gibt es keinen Abschnitt „Alter“
+  // Reihenfolge nach Nutzerwunsch (2026-11-01); ohne Geburtsdatum gibt es keinen Abschnitt „Alter“
   const headings = await sheet.getByRole("heading", { level: 3 }).allTextContents();
-  expect(headings).toEqual(["Wegzeit", "Zeitraum", "Tageszeit", "Art", "Kosten", "Anmeldung", "Format"]);
+  expect(headings).toEqual(["Format", "Anmeldung", "Wegzeit", "Zeitraum", "Tageszeit", "Kosten", "Art"]);
   await daytime.getByRole("button", { name: "Vormittags" }).click();
   await expect(daytime.getByRole("button", { name: "Vormittags" })).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/\?tageszeit=vormittags$/);

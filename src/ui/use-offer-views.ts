@@ -25,11 +25,14 @@ import { placeKey } from "../domain/place-key.ts";
 import type { Reach, ReachFn } from "../domain/reach.ts";
 import type { Route } from "../domain/route.ts";
 import {
+  activeChips,
   applySavedFilter,
   EMPTY_SAVED_FILTER,
   matchesListChips,
+  matchesOfferChips,
   matchesSavedFilter,
   recentlySaved,
+  type SavedChipView,
   type SavedFilter,
   type SavedListChip,
   type SavedSort,
@@ -185,6 +188,14 @@ const NO_REACH = (): undefined => undefined;
 const NO_IDS: readonly string[] = [];
 const NO_CHIPS: readonly SavedListChip[] = [];
 
+/** Welche Chipzeile der Merkliste ein Tab zeigt (Nutzer, 2026-11-01); außerhalb der Merkliste keine */
+export function savedChipView(tab: Route["tab"]): SavedChipView | undefined {
+  if (tab === "merkliste") return "liste";
+  if (tab === "merkliste-kalender") return "kalender";
+  if (tab === "merkliste-karte") return "karte";
+  return undefined;
+}
+
 /** Entfernung je Koordinate zwischengespeichert: Viele Angebote teilen sich einen Ort. */
 function reachCache(reachFn: ReachFn | undefined): (offer: SiteOffer) => Reach | undefined {
   if (!reachFn) return NO_REACH;
@@ -308,22 +319,24 @@ export function useOfferViews({
     birthDate,
     savedSessionRule,
   ]);
-  const savedVisibleList = useMemo(() => savedVisible.map((o) => o.offer), [savedVisible]);
   const savedListTab = route.tab === "merkliste";
-  // Schnellfilter der Liste (Plan 0058, E1, E3): nur auf dem Tab „merkliste“, am gezeigten Termin
-  const listChipsActive = savedListTab && listChips.length > 0;
+  // Schnellfilter (Plan 0058, E1, E3), am gezeigten Termin. Jede Darstellung hat eigene Chips; es wirken nur die dort
+  // gezeigten (Nutzer, 2026-11-01)
+  const chipView = savedChipView(route.tab);
+  const tabChips = useMemo(() => (chipView ? activeChips(listChips, chipView) : NO_CHIPS), [chipView, listChips]);
+  const listChipsActive = tabChips.length > 0;
   const savedListVisible = useMemo(
-    () => (listChipsActive ? savedVisible.filter((item) => matchesListChips(item, listChips, now)) : savedVisible),
-    [listChipsActive, savedVisible, listChips, now],
+    () => (listChipsActive ? savedVisible.filter((item) => matchesListChips(item, tabChips, now)) : savedVisible),
+    [listChipsActive, savedVisible, tabChips, now],
   );
   const savedListVisibleList = useMemo(() => savedListVisible.map((o) => o.offer), [savedListVisible]);
   const savedFiltered = sheetFiltered || listChipsActive;
   const savedInView = useMemo(
     () =>
       route.tab === "merkliste-karte" && extent
-        ? savedVisible.filter((o) => !isOutside(extent, placeKey(o.offer.venue.geo)))
-        : savedVisible,
-    [route.tab, extent, savedVisible],
+        ? savedListVisible.filter((o) => !isOutside(extent, placeKey(o.offer.venue.geo)))
+        : savedListVisible,
+    [route.tab, extent, savedListVisible],
   );
   // Der Kalender der Merkliste zeigt regelmäßige Angebote nur an Terminen, die zum Alter passen, wie Liste, Statuszeile
   // und Datei (Plan 0028, E3). Unabhängig vom Altersfilter in „Entdecken“: Gemerktes ist bewusst gewählt.
@@ -367,14 +380,15 @@ export function useOfferViews({
     () => (onCalendar ? sessionsByDay(savedList, savedFits) : undefined),
     [onCalendar, savedList, savedFits],
   );
+  // mit den Chips des Kalenders (Nutzer, 2026-11-01): `savedListVisibleList` sind die gefilterten samt Chips
   const savedIndex = useMemo(
-    () => (onCalendar && sheetFiltered ? sessionsByDay(savedVisibleList, calendarFits) : allIndex),
-    [onCalendar, sheetFiltered, savedVisibleList, calendarFits, allIndex],
+    () => (onCalendar && savedFiltered ? sessionsByDay(savedListVisibleList, calendarFits) : allIndex),
+    [onCalendar, savedFiltered, savedListVisibleList, calendarFits, allIndex],
   );
   // ohne Altersprüfung, aber mit Tageszeit: Die Differenz zu `index` ist genau, was das Alter verdeckt
   const ageIndex = useMemo(
-    () => (onCalendar && birthDate !== undefined ? sessionsByDay(savedVisibleList, dayFit) : undefined),
-    [onCalendar, birthDate, savedVisibleList, dayFit],
+    () => (onCalendar && birthDate !== undefined ? sessionsByDay(savedListVisibleList, dayFit) : undefined),
+    [onCalendar, birthDate, savedListVisibleList, dayFit],
   );
   // Bewusst nicht über `saved`: Das kennt nur Angebote mit kommendem Termin. Ein gemerktes Angebot, dessen einziger
   // Termin heute schon vorbei ist, zählt sonst nicht (Review M7, B2). Mit demselben Prädikat wie der Index: Ein
@@ -384,13 +398,18 @@ export function useOfferViews({
     () =>
       onCalendar
         ? endedOnDay(
-            offers.filter((o) => savedIds.includes(o.id) && matchesSavedFilter(o, savedFilter, savedState, reach)),
+            offers.filter(
+              (o) =>
+                savedIds.includes(o.id) &&
+                matchesSavedFilter(o, savedFilter, savedState, reach) &&
+                matchesOfferChips(o, tabChips, now),
+            ),
             today,
             now,
             calendarFits,
           )
         : 0,
-    [onCalendar, offers, savedIds, savedFilter, savedState, reach, today, now, calendarFits],
+    [onCalendar, offers, savedIds, savedFilter, savedState, reach, tabChips, today, now, calendarFits],
   );
   const map = useMemo(
     () => (route.tab === "karte" || route.tab === "merkliste-karte" ? { cameraOffers: upcoming } : undefined),

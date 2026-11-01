@@ -149,7 +149,14 @@ function DateField({
   const hintId = useId();
   const [text, setText] = useState(value);
   const [shown, setShown] = useState(value);
+  /**
+   * Wert vor einem Leeren von außen („Zeitraum entfernen“, „Zurücksetzen“). Der Datums-Picker von iOS meldet `change`
+   * erst beim Schließen, also nach dem Tipp auf den Knopf; dieses späte Ereignis brachte das Enddatum zurück (Nutzer,
+   * 2026-11-01). Es kommt aus einem Feld ohne Fokus und trägt den alten Wert, und genau das wird verworfen.
+   */
+  const [dropped, setDropped] = useState<string | undefined>(undefined);
   if (value !== shown) {
+    if (value === "" && shown !== "") setDropped(shown);
     setShown(value);
     setText(value);
   }
@@ -166,8 +173,13 @@ function DateField({
           value={text}
           aria-invalid={check !== "ok"}
           aria-describedby={check !== "ok" ? hintId : undefined}
+          onFocus={() => setDropped(undefined)}
           onChange={(e) => {
             const next = e.target.value;
+            if (next === dropped && document.activeElement !== e.target) {
+              e.target.value = "";
+              return;
+            }
             setText(next);
             if (checkBound(next, limits) === "ok") onCommit(next);
           }}
@@ -255,30 +267,26 @@ export function FilterSheet({
             </div>
           </>
         )}
-        {age && (
-          <>
-            <h3>Alter</h3>
-            <div className="swrow">
-              <span className="swtext">
-                <b id={ageLabelId}>Nur passend für {age.label}</b>
-                <small id={ageNoteId}>{ageOnlyNote(age.unfitCount, age.on)}</small>
-              </span>
-              <button
-                type="button"
-                className="switch"
-                role="switch"
-                aria-checked={age.on}
-                aria-labelledby={ageLabelId}
-                aria-describedby={ageNoteId}
-                onClick={() => age.onChange(!age.on)}
-              >
-                <span className="track">
-                  <span className="knob" />
-                </span>
-              </button>
-            </div>
-          </>
-        )}
+        <h3>Format</h3>
+        <div className="wrap">
+          {FORMATS.map((f) => (
+            <Chip key={f} on={filter.formats.includes(f)} onClick={() => onChange(toggleIn(filter, "formats", f))}>
+              {FORMAT_CHIPS[f]}
+            </Chip>
+          ))}
+        </div>
+        <h3>Anmeldung</h3>
+        <div className="wrap">
+          {REGISTRATION_CHIPS.map(([value, label]) => (
+            <Chip
+              key={label}
+              on={single(filter.registration, value)}
+              onClick={() => onChange({ ...filter, registration: value ? [value] : [] })}
+            >
+              {label}
+            </Chip>
+          ))}
+        </div>
         <h3 ref={reachHeading} tabIndex={-1}>
           Wegzeit
         </h3>
@@ -372,6 +380,18 @@ export function FilterSheet({
         <p id={daytimeNoteId} className="small">
           {DAYTIME_HINT}
         </p>
+        <h3>Kosten</h3>
+        <div className="wrap">
+          {COST_CHIPS.map(([value, label]) => (
+            <Chip
+              key={label}
+              on={single(filter.cost, value)}
+              onClick={() => onChange({ ...filter, cost: value ? [value] : [] })}
+            >
+              {label}
+            </Chip>
+          ))}
+        </div>
         <h3>Art</h3>
         <div className="wrap">
           {CATEGORIES.map((c) => (
@@ -386,38 +406,30 @@ export function FilterSheet({
             </Chip>
           ))}
         </div>
-        <h3>Kosten</h3>
-        <div className="wrap">
-          {COST_CHIPS.map(([value, label]) => (
-            <Chip
-              key={label}
-              on={single(filter.cost, value)}
-              onClick={() => onChange({ ...filter, cost: value ? [value] : [] })}
-            >
-              {label}
-            </Chip>
-          ))}
-        </div>
-        <h3>Anmeldung</h3>
-        <div className="wrap">
-          {REGISTRATION_CHIPS.map(([value, label]) => (
-            <Chip
-              key={label}
-              on={single(filter.registration, value)}
-              onClick={() => onChange({ ...filter, registration: value ? [value] : [] })}
-            >
-              {label}
-            </Chip>
-          ))}
-        </div>
-        <h3>Format</h3>
-        <div className="wrap">
-          {FORMATS.map((f) => (
-            <Chip key={f} on={filter.formats.includes(f)} onClick={() => onChange(toggleIn(filter, "formats", f))}>
-              {FORMAT_CHIPS[f]}
-            </Chip>
-          ))}
-        </div>
+        {age && (
+          <>
+            <h3>Alter</h3>
+            <div className="swrow">
+              <span className="swtext">
+                <b id={ageLabelId}>Nur passend für {age.label}</b>
+                <small id={ageNoteId}>{ageOnlyNote(age.unfitCount, age.on)}</small>
+              </span>
+              <button
+                type="button"
+                className="switch"
+                role="switch"
+                aria-checked={age.on}
+                aria-labelledby={ageLabelId}
+                aria-describedby={ageNoteId}
+                onClick={() => age.onChange(!age.on)}
+              >
+                <span className="track">
+                  <span className="knob" />
+                </span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
       <div className="sheetfoot">
         <button type="button" className="linkbtn" onClick={onReset}>

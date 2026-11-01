@@ -44,7 +44,7 @@ test.describe("Filter der Merkliste (E5)", () => {
     // mit Geburtsdatum: Auf der Startseite hätte das Sheet den Alter-Abschnitt
     await preset(page, FIVE, { "zwergenplan.geburtsdatum": "2025-06-01" });
     await openList(page, 5);
-    await expect(chip(page, "Nur fest eingeplant")).toBeVisible();
+    await expect(chip(page, "Fest eingeplant")).toBeVisible();
     // Tageszeit in der Liste nur im Sheet (Plan 0058, E1)
     await expect(chip(page, "Vormittags")).toHaveCount(0);
     await expect(page.getByRole("group", { name: "Kategorien" })).toHaveCount(0);
@@ -56,13 +56,13 @@ test.describe("Filter der Merkliste (E5)", () => {
     await expect(sheet(page).getByRole("switch")).toHaveCount(0);
     await expect(sheet(page).getByRole("heading", { level: 3 })).toHaveText([
       "Merkliste",
+      "Format",
+      "Anmeldung",
       "Wegzeit",
       "Zeitraum",
       "Tageszeit",
-      "Art",
       "Kosten",
-      "Anmeldung",
-      "Format",
+      "Art",
     ]);
     await expect(sheet(page).getByRole("button", { name: "5 gemerkte zeigen" })).toBeVisible();
     await sheet(page).getByRole("button", { name: "Musik & Singen" }).click();
@@ -91,10 +91,10 @@ test.describe("Filter der Merkliste (E5)", () => {
     await expect(filterButton(page)).toHaveAccessibleName("Alle Filter, 0 aktiv");
   });
 
-  test("Chip „Nur fest eingeplant“, Tageszeit im Sheet; Zeitraum im Sheet mit Schnellwahl", async ({ page }) => {
+  test("Chip „Fest eingeplant“, Tageszeit im Sheet; Zeitraum im Sheet mit Schnellwahl", async ({ page }) => {
     await preset(page, FIVE, { "zwergenplan.merkliste-vorgemerkt": JSON.stringify([TREFF]) });
     await openList(page, 5);
-    await chip(page, "Nur fest eingeplant").click();
+    await chip(page, "Fest eingeplant").click();
     await expect(page.getByTestId("offer")).toHaveCount(4);
     await expect(page.getByTestId("offer").filter({ hasText: "Offener Krabbeltreff" })).toHaveCount(0);
     await filterButton(page).click();
@@ -103,7 +103,7 @@ test.describe("Filter der Merkliste (E5)", () => {
     // ohne Musikgarten (nachmittags)
     await expect(page.getByTestId("offer")).toHaveCount(3);
     await expect(filterButton(page)).toHaveAccessibleName("Alle Filter, 2 aktiv");
-    await chip(page, "Nur fest eingeplant").click();
+    await chip(page, "Fest eingeplant").click();
     await filterButton(page).click();
     await sheet(page).getByRole("button", { name: "Vormittags", exact: true }).click();
     await page.keyboard.press("Escape");
@@ -293,7 +293,7 @@ test.describe("Schnellfilter der Liste (Plan 0058)", () => {
   // dazu der Schnupper-Workshop (einmalig, Sa 17.10.), die Bewegungslandschaft (regelmäßig mit Anmeldung, ab Di 20.10.)
   // und das Babykonzert (einmalig ohne Anmeldung, 6.12.)
   const ALL = [...FIVE, "fnp2g3xh", "rv61suun", "kovtez0z"];
-  const LIST_CHIPS = ["Demnächst", "Anmelden", "Spontan", "Endet bald", "Kurse", "Einmalig", "Nur fest eingeplant"];
+  const LIST_CHIPS = ["Demnächst", "Anmelden", "Spontan", "Endet bald", "Kurse", "Einmalig", "Fest eingeplant"];
   const chipNames = (page: Page) => filters(page).getByRole("button").filter({ hasNotText: "Filter" });
   const status = (page: Page) => page.getByRole("status");
 
@@ -332,10 +332,11 @@ test.describe("Schnellfilter der Liste (Plan 0058)", () => {
     await expect(sheet(page).getByRole("button", { name: "1 gemerkte zeigen" })).toBeVisible();
     await page.keyboard.press("Escape");
 
-    // Kalender: andere Chips, „Kurse“ wirkt dort nicht; zurück in der Liste ist die Wahl noch da
+    // Kalender: eigene Chips (Nutzer, 2026-11-01), „Kurse“ und „Demnächst“ stehen dort nicht und wirken nicht; zurück in
+    // der Liste ist die Wahl noch da
     const views = page.getByRole("group", { name: "Darstellung der Merkliste" });
     await views.getByRole("button", { name: "Kalender", exact: true }).click();
-    await expect(chipNames(page)).toHaveText(["Nur fest eingeplant", "Vormittags", "Nachmittags"]);
+    await expect(chipNames(page)).toHaveText(["Fest eingeplant", "Einmalig", "Spontan"]);
     await expect(status(page)).toContainText("8 Angebote gemerkt");
     await views.getByRole("button", { name: "Liste", exact: true }).click();
     await expect(chip(page, "Kurse")).toHaveAttribute("aria-pressed", "true");

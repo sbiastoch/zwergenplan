@@ -7,23 +7,17 @@ import { startPwa } from "../data/pwa-start.ts";
 import { type LoadFailure, loadSiteData, SiteLoadError } from "../data/site.ts";
 import { ageInMonths } from "../domain/age.ts";
 import { ruleActive } from "../domain/date-range.ts";
-import {
-  activeFilterCount,
-  EMPTY_FILTER,
-  type FilterState,
-  providerFilter,
-  toggleIn,
-  withDateRange,
-} from "../domain/filter.ts";
+import { activeFilterCount, EMPTY_FILTER, type FilterState, providerFilter, withDateRange } from "../domain/filter.ts";
 import { type MapExtent, viewNarrows } from "../domain/map-view.ts";
 import { onboardingGate } from "../domain/onboarding-gate.ts";
 import { placeKey } from "../domain/place-key.ts";
 import { countProviders } from "../domain/provider-count.ts";
 import { hasMap, isSavedTab, type SavedTab, type Sort, type Tab, tabSection } from "../domain/route.ts";
 import {
+  activeChips,
+  chipsForView,
   EMPTY_SAVED_FILTER,
   followUpFilter,
-  SAVED_LIST_CHIPS,
   type SavedFilter,
   type SavedListChip,
   type SavedSort,
@@ -53,7 +47,6 @@ import {
   ageChipLabel,
   ageWarnText,
   bigMapStatusParts,
-  DAYTIME_LABELS,
   inViewStatusParts,
   LIST_CHIP_LABELS,
   limitHint,
@@ -92,7 +85,7 @@ import {
   useTheme,
   useToast,
 } from "./use-app-state.ts";
-import { useOfferViews } from "./use-offer-views.ts";
+import { savedChipView, useOfferViews } from "./use-offer-views.ts";
 import { ANNOUNCE_DELAY_MS, useSettled } from "./use-settled.ts";
 import { limitActive, useTransit } from "./use-transit.ts";
 
@@ -623,34 +616,22 @@ export function App() {
     setListChips([]);
   };
   const onlyFixedChip: QuickChip = {
-    label: "Nur fest eingeplant",
+    label: "Fest eingeplant",
     on: savedFilter.onlyFixed,
     toggle: () => setSavedFilter({ ...savedFilter, onlyFixed: !savedFilter.onlyFixed }),
   };
-  // Liste: Schnellfilter statt Abschnitten (Plan 0058, E1); Karte und Kalender: Tageszeit wie bisher
-  const savedChips: QuickChip[] =
-    route.tab === "merkliste"
-      ? [
-          ...SAVED_LIST_CHIPS.map(
-            (chip): QuickChip => ({
-              label: LIST_CHIP_LABELS[chip],
-              on: listChips.includes(chip),
-              toggle: () => setListChips(toggleId(listChips, chip)),
-            }),
-          ),
-          onlyFixedChip,
-        ]
-      : [
-          onlyFixedChip,
-          ...(["vormittags", "nachmittags"] as const).map(
-            (daytime): QuickChip => ({
-              label: DAYTIME_LABELS[daytime],
-              on: savedFilter.filter.daytimes.includes(daytime),
-              toggle: () =>
-                setSavedFilter({ ...savedFilter, filter: toggleIn(savedFilter.filter, "daytimes", daytime) }),
-            }),
-          ),
-        ];
+  // Schnellfilter je Darstellung (Plan 0058, E1; Nutzer, 2026-11-01): Liste mit „Fest eingeplant“ am Ende, Kalender
+  // und Karte mit „Fest eingeplant“ vorn. Die Tageszeit steht nur noch im Filter-Sheet.
+  const chipView = savedChipView(route.tab) ?? "liste";
+  const viewChips = chipsForView(chipView).map(
+    (chip): QuickChip => ({
+      label: LIST_CHIP_LABELS[chip],
+      on: listChips.includes(chip),
+      toggle: () => setListChips(toggleId(listChips, chip)),
+    }),
+  );
+  const tabChips = activeChips(listChips, chipView);
+  const savedChips: QuickChip[] = chipView === "liste" ? [...viewChips, onlyFixedChip] : [onlyFixedChip, ...viewChips];
   const savedSortOptions: readonly SortOption<SavedSort>[] = [
     { value: "termine", title: SORT_TITLES.termine, sub: "was als Nächstes stattfindet" },
     { value: "nah", title: SORT_TITLES.nah, sub: nearSortSub(reachMode, origin) },
@@ -1001,11 +982,7 @@ export function App() {
             bigMap={big}
             onShowAll={showAll}
             filtered={views.savedFiltered}
-            statusChip={
-              route.tab === "merkliste" && listChips.length === 1 && views.savedFilterCount === 0
-                ? listChips[0]
-                : undefined
-            }
+            statusChip={tabChips.length === 1 && views.savedFilterCount === 0 ? tabChips[0] : undefined}
             onResetFilter={resetSavedFilter}
             filters={
               <QuickFilters

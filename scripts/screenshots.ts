@@ -106,6 +106,13 @@ const VIEWS: Record<string, (page: Page) => Promise<void>> = {
     for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 2)) await heart.click();
     await savedList(page);
   },
+  // Karte der Merkliste mit eigenen Schnellfiltern und Liste darunter (Nutzer, 2026-11-01)
+  "merkliste-karte": async (page) => {
+    for (const heart of (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 4)) await heart.click();
+    await page.getByRole("button", { name: /^Merkliste/ }).click();
+    await page.getByRole("button", { name: "Karte", exact: true }).click();
+    await page.locator(".map-box").waitFor();
+  },
   // Herz mit Stufen (Plan 0057, E2, E3): erstes Herz vorgemerkt, zweites fest, Toast mit „Rückgängig“
   herz: async (page) => {
     const hearts = (await page.getByRole("button", { name: / merken$/ }).all()).slice(0, 2);

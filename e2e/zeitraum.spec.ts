@@ -71,6 +71,29 @@ test("vertauschte Daten aus der URL werden still getauscht, „Zeitraum entferne
   await expect(offers(page)).toHaveCount(8);
 });
 
+test("„Zeitraum entfernen“: ein spätes change des Pickers bringt das Enddatum nicht zurück (Nutzer, 2026-11-01)", async ({
+  page,
+}) => {
+  const sheet = await openFilter(page);
+  const to = sheet.getByLabel("bis");
+  await sheet.getByLabel("von").fill("2026-10-20");
+  await to.fill("2026-10-31");
+  await expect(page).toHaveURL(/\?von=2026-10-20&bis=2026-10-31$/);
+  await sheet.getByRole("button", { name: "Zeitraum entfernen" }).click();
+  await expect(page).toHaveURL((url) => url.search === "");
+  // wie iOS beim Schließen des Pickers: change mit dem alten Wert, nachdem der Fokus das Feld verlassen hat
+  await to.evaluate((el: HTMLInputElement) => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(el, "2026-10-31");
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await expect(to).toHaveValue("");
+  await expect(page).toHaveURL((url) => url.search === "");
+  // Wer dasselbe Datum bewusst wieder wählt (Fokus im Feld), bekommt es
+  await to.fill("2026-10-31");
+  await expect(page).toHaveURL(/\?bis=2026-10-31$/);
+});
+
 test("eine Eingabe außerhalb der Grenzen wird nicht übernommen und begründet", async ({ page }) => {
   const sheet = await openFilter(page);
   const from = sheet.getByLabel("von");

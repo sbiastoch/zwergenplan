@@ -584,6 +584,35 @@ test.describe("Kopf der Merkliste (Plan 0025, E3a, E9)", () => {
 test.describe("Umschalter und Route der Merkliste (Plan 0025, E4, Test 11)", () => {
   test.use({ tiles: "mock" });
 
+  test("Karte der Merkliste: eigene Chips, „Kurse“ filtert Liste und Zahl, Abstand zur ersten Kachel (Nutzer, 2026-11-01)", async ({
+    page,
+  }) => {
+    await preset(page, FIVE);
+    await page.goto("./?ansicht=merkliste-karte");
+    const chips = page.getByRole("group", { name: "Merkliste filtern" });
+    await expect(chips.getByRole("button").filter({ hasNotText: "Filter" })).toHaveText([
+      "Fest eingeplant",
+      "Regelmäßig",
+      "Kurse",
+      "Einmalig",
+    ]);
+    const cards = page.getByTestId("offer");
+    await expect(cards).toHaveCount(5);
+    // die erste Kachel klebte an der Karte
+    const gap = await page.evaluate(() => {
+      const map = document.querySelector(".map-box")?.getBoundingClientRect();
+      const first = document.querySelector("[data-testid=offer]")?.getBoundingClientRect();
+      return map && first ? first.top - map.bottom : Number.NaN;
+    });
+    expect(gap, "Abstand Karte → erste Kachel").toBeGreaterThanOrEqual(12);
+    await chips.getByRole("button", { name: "Kurse", exact: true }).click();
+    await expect(chips.getByRole("button", { name: "Kurse", exact: true })).toHaveAttribute("aria-pressed", "true");
+    const shown = await cards.count();
+    expect(shown).toBeGreaterThan(0);
+    expect(shown).toBeLessThan(5);
+    await expect(page.getByRole("status")).toHaveText(`${shown} von 5 gemerkten Angeboten`);
+  });
+
   test("Liste | Karte | Kalender setzt die Ansicht, der Fokus bleibt auf dem Segment, Export in Liste und Kalender", async ({
     page,
   }) => {

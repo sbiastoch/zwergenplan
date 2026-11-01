@@ -21,6 +21,10 @@
   .status b {
     color: var(--ink);
   }
+  /* Liste unter der Karte der Merkliste: ohne Tageskopf klebte die erste Kachel an der Karte (Nutzer, 2026-11-01) */
+  .map-list {
+    margin-top: 18px;
+  }
   /* Filterzeile der Merkliste (Plan 0025, E6): scrollt wie die Schnellfilter bis an den Rand des Inhalts */
   .saved-filters .chips {
     margin-inline: calc(-1 * var(--body-pad));

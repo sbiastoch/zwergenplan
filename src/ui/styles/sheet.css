@@ -119,7 +119,9 @@
     -webkit-appearance: none;
     appearance: none;
     display: block;
-    line-height: 52px;
+    /* niedriger als die übrigen Felder (56 px), wirkte im Sheet zu hoch (Nutzer, 2026-11-01); 44 px + Rand = 48 px */
+    min-height: 48px;
+    line-height: 44px;
     font-size: 1.0625rem;
     letter-spacing: 0;
   }

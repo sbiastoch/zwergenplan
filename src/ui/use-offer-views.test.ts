@@ -687,7 +687,7 @@ describe("useOfferViews", () => {
       ]);
     });
 
-    it("Schnellfilter der Liste: in allen Sortierungen, nicht auf Karte und Kalender; Badge bleibt (Plan 0058, E3)", () => {
+    it("Schnellfilter: in allen Sortierungen, „Kurse“ auch auf der Karte, nicht im Kalender; Badge bleibt (Plan 0058, E3; Nutzer, 2026-11-01)", () => {
       const course = offer("kurs", "2026-10-08", undefined, "kurs");
       const all = { ...input, offers: [early, late, course], savedIds: [...input.savedIds, course.id] };
       const listChips = ["kurse"] as const;
@@ -701,12 +701,32 @@ describe("useOfferViews", () => {
         expect(views.savedFiltered).toBe(true);
         expect(views.savedFilterCount).toBe(0);
       }
-      for (const tab of ["merkliste-karte", "merkliste-kalender"] as const) {
-        const views = render({ ...all, route: { tab, filter: EMPTY_FILTER }, listChips });
-        expect(views.savedListVisible).toHaveLength(3);
-        expect(views.savedFiltered).toBe(false);
-      }
+      const map = render({ ...all, route: { tab: "merkliste-karte", filter: EMPTY_FILTER }, listChips });
+      expect(ids(map.savedListVisible.map((i) => i.offer))).toEqual(["kurs"]);
+      expect(ids(map.savedInView.map((i) => i.offer))).toEqual(["kurs"]);
+      expect(map.savedFiltered).toBe(true);
+      // „Kurse“ steht im Kalender nicht in der Chipzeile und wirkt dort nicht
+      const calendar = render({ ...all, route: { tab: "merkliste-kalender", filter: EMPTY_FILTER }, listChips });
+      expect(calendar.savedListVisible).toHaveLength(3);
+      expect(calendar.savedFiltered).toBe(false);
       expect(render(all).savedFiltered).toBe(false);
+    });
+
+    it("„Einmalig“ im Kalender filtert die Tage (Nutzer, 2026-11-01)", () => {
+      // `early` und `late` sind einmalig (Standard), der Treff fällt heraus
+      const weekly = offer("treff", "2026-10-08", undefined, "regelmaessig");
+      const all = { ...input, offers: [early, late, weekly], savedIds: [...input.savedIds, weekly.id] };
+      const calendar = render({
+        ...all,
+        route: { tab: "merkliste-kalender", filter: EMPTY_FILTER },
+        listChips: ["einmalig"],
+      });
+      expect(calendar.savedFiltered).toBe(true);
+      const inIndex = [...(calendar.savedCalendar?.index.values() ?? [])].flat().map((s) => s.offer.id);
+      expect(new Set(inIndex)).toEqual(new Set([early.id, late.id]));
+      const unfiltered = render({ ...all, route: { tab: "merkliste-kalender", filter: EMPTY_FILTER } });
+      const allInIndex = [...(unfiltered.savedCalendar?.index.values() ?? [])].flat().map((s) => s.offer.id);
+      expect(allInIndex).toContain(weekly.id);
     });
 
     it("„Nächste Termine“ nach Tagen; ohne Wegzeit auch bei „Nächstgelegen“", () => {

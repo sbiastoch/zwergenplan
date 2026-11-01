@@ -264,8 +264,11 @@ export type SavedSort = "termine" | "nah" | "gemerkt";
 /** „Demnächst“ reicht bis einschließlich zum 14. Berliner Kalendertag nach heute (Plan 0057, E8) */
 export const SOON_DAYS = 14;
 
-/** Schnellfilter der Liste der Merkliste (Plan 0058, E1); nie in der URL, ohne Wirkung in Karte und Kalender */
-export type SavedListChip = "demnaechst" | "anmelden" | "spontan" | "laeuft" | "kurse" | "einmalig";
+/**
+ * Schnellfilter der Merkliste (Plan 0058, E1); nie in der URL. Jede Darstellung zeigt ihre eigene Auswahl
+ * (`chipsForView`), und es wirken nur die dort gezeigten (Nutzer, 2026-11-01).
+ */
+export type SavedListChip = "demnaechst" | "anmelden" | "spontan" | "laeuft" | "kurse" | "regelmaessig" | "einmalig";
 
 /** Reihenfolge der Chipzeile (Plan 0058, E1) */
 export const SAVED_LIST_CHIPS: readonly SavedListChip[] = [
@@ -276,6 +279,26 @@ export const SAVED_LIST_CHIPS: readonly SavedListChip[] = [
   "kurse",
   "einmalig",
 ];
+
+/** Chips von Kalender und Karte der Merkliste, in dieser Reihenfolge nach „Fest eingeplant“ (Nutzer, 2026-11-01) */
+const SAVED_VIEW_CHIPS = {
+  liste: SAVED_LIST_CHIPS,
+  kalender: ["einmalig", "spontan"],
+  karte: ["regelmaessig", "kurse", "einmalig"],
+} as const satisfies Record<string, readonly SavedListChip[]>;
+
+export type SavedChipView = keyof typeof SAVED_VIEW_CHIPS;
+
+/** Die Chips einer Darstellung der Merkliste */
+export function chipsForView(view: SavedChipView): readonly SavedListChip[] {
+  return SAVED_VIEW_CHIPS[view];
+}
+
+/** Die gewählten Chips, die in dieser Darstellung zu sehen sind und deshalb wirken */
+export function activeChips(chips: readonly SavedListChip[], view: SavedChipView): readonly SavedListChip[] {
+  const shown = chipsForView(view);
+  return chips.filter((chip) => shown.includes(chip));
+}
 
 /**
  * „Demnächst“ (Plan 0058, E1; Regel aus Plan 0057, E8): gezeigter Termin bis einschließlich zum 14. Berliner Kalendertag,
@@ -292,7 +315,7 @@ export function isSoon({ offer, session }: Occurrence, now: Date): boolean {
 const CHIP_GROUPS: readonly (readonly SavedListChip[])[] = [
   ["demnaechst", "laeuft"],
   ["anmelden", "spontan"],
-  ["kurse", "einmalig"],
+  ["kurse", "regelmaessig", "einmalig"],
 ];
 
 function chipMatches(chip: SavedListChip, item: Occurrence, now: Date): boolean {
@@ -309,6 +332,8 @@ function chipMatches(chip: SavedListChip, item: Occurrence, now: Date): boolean 
       return courseRunning(offer, now);
     case "kurse":
       return offer.format === "kurs";
+    case "regelmaessig":
+      return offer.format === "regelmaessig";
     case "einmalig":
       return offer.format === "einmalig";
   }
@@ -320,6 +345,15 @@ export function matchesListChips(item: Occurrence, chips: readonly SavedListChip
     const chosen = group.filter((chip) => chips.includes(chip));
     return chosen.length === 0 || chosen.some((chip) => chipMatches(chip, item, now));
   });
+}
+
+/**
+ * Chips ohne gezeigten Termin, etwa für „heute schon vorbei“ im Kalender: Dessen Chips (Einmalig, Spontan) hängen nur am
+ * Angebot, der erste Termin steht deshalb für alle. Ohne Termin passt das Angebot.
+ */
+export function matchesOfferChips(offer: Offer, chips: readonly SavedListChip[], now: Date): boolean {
+  const session = offer.sessions[0];
+  return chips.length === 0 || session === undefined || matchesListChips({ offer, session }, chips, now);
 }
 
 /**

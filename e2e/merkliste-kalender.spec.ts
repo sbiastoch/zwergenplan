@@ -324,12 +324,30 @@ test.describe("mit Fixture-Uhr", () => {
   test("Tageszeit je Termin: „Nachmittags“ blendet die Vormittagstermine aus und sagt es (Plan 0057, E7)", async ({
     page,
   }) => {
-    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Nachmittags" }).click();
+    // Tageszeit seit 2026-11-01 nur im Sheet, die Chipzeile hat Fest eingeplant, Einmalig, Spontan
+    await savedFilter(page, "Nachmittags");
     // Treff (Mi 10 Uhr) und PEKiP (Di 9:30) beginnen vormittags
     await expectAgenda(page, "Diese Woche", "0 Termine");
     await expect(page.getByText("Ausgeblendet durch Filter")).toHaveCount(1);
-    await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Vormittags" }).click();
+    await savedFilter(page, "Nachmittags", "Vormittags");
     await expectAgenda(page, "Diese Woche", "1 Termin");
+  });
+
+  test("Chips des Kalenders: „Einmalig“ und „Spontan“ filtern die Tage, die Statuszeile erklärt es (Nutzer, 2026-11-01)", async ({
+    page,
+  }) => {
+    const chips = page.getByRole("group", { name: "Merkliste filtern" });
+    // Treff (regelmäßig ohne Anmeldung) und PEKiP (Kurs mit Anmeldung): nichts ist einmalig
+    await chips.getByRole("button", { name: "Einmalig", exact: true }).click();
+    await expect(page.getByRole("status")).toHaveText("0 von 2 gemerkten Angeboten sind einmalig");
+    await chips.getByRole("button", { name: "Einmalig", exact: true }).click();
+    await chips.getByRole("button", { name: "Spontan", exact: true }).click();
+    await expect(page.getByRole("status")).toHaveText(
+      "1 von 2 gemerkten Angeboten ist spontan ohne Anmeldung besuchbar",
+    );
+    // Woche 5.–11.: der Treff am Mittwoch bleibt
+    await expectAgenda(page, "Diese Woche", "1 Termin");
+    await expect(page.getByRole("button", { name: "Alle Filter, 0 aktiv" })).toBeVisible();
   });
 
   test("Zeitraum: im Kalender ausgeblendet und ohne Wirkung, in der Liste gilt er wieder (E5, E7)", async ({
@@ -506,11 +524,8 @@ test("vorgemerkt: Form der Woche als Umriss, Karte ohne Schatten mit Etikett „
   await expect(page.locator(".week .dots > span")).toHaveCount(2);
   await expect(offers(page).filter({ hasText: "PEKiP" }).locator(".tentative-tag")).toHaveCount(0);
 
-  // „Nur fest eingeplant“ blendet den vorgemerkten Treff aus; sein Tag sagt es (Plan 0057, E9)
-  await page
-    .getByRole("group", { name: "Merkliste filtern" })
-    .getByRole("button", { name: "Nur fest eingeplant" })
-    .click();
+  // „Fest eingeplant“ blendet den vorgemerkten Treff aus; sein Tag sagt es (Plan 0057, E9)
+  await page.getByRole("group", { name: "Merkliste filtern" }).getByRole("button", { name: "Fest eingeplant" }).click();
   await expect(offers(page)).toHaveCount(1);
   await expect(offers(page)).toContainText("PEKiP");
   await expect(page.locator(".week .dots .tentative")).toHaveCount(0);

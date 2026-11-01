@@ -242,7 +242,11 @@ export function SavedView({
                       </button>
                     </EmptyState>
                   ) : (
-                    inView.map((item) => <OfferCard key={item.offer.id} item={item} ctx={ctx} dated numbered />)
+                    <div className="map-list">
+                      {inView.map((item) => (
+                        <OfferCard key={item.offer.id} item={item} ctx={ctx} dated numbered />
+                      ))}
+                    </div>
                   )}
                 </>
               )}

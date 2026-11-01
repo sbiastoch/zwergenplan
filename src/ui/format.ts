@@ -142,6 +142,7 @@ export const LIST_CHIP_LABELS: Record<SavedListChip, string> = {
   // laufende Kurse: Es geht vor allem um den Anschluss (Plan 0058, Nachtrag)
   laeuft: "Endet bald",
   kurse: "Kurse",
+  regelmaessig: "Regelmäßig",
   einmalig: "Einmalig",
 };
 
@@ -646,6 +647,7 @@ const LIST_CHIP_STATUS: Record<SavedListChip, [string, string]> = {
   spontan: ["ist spontan ohne Anmeldung besuchbar", "sind spontan ohne Anmeldung besuchbar"],
   laeuft: ["endet bald", "enden bald"],
   kurse: ["ist ein Kurs", "sind Kurse"],
+  regelmaessig: ["ist regelmäßig", "sind regelmäßig"],
   einmalig: ["ist einmalig", "sind einmalig"],
 };
 
