@@ -177,7 +177,7 @@
    "inputHash": "b00bbbcdbe1b56bdf556eaa4698c0b8eab6fa3ca3bdb1ea9e2fbe6e2e094d894",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "af30022381f70d519ba33965e65b3cf352e86a32734bb09c23c093e407046922"
   },
@@ -255,7 +255,7 @@
    "inputHash": "4b272b9eaead18371541ec0a8528c747a4178c651359807a544567a590f3ac46",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a84bb2ed546ae4814a96439cd5b0b540a11301612e87220b19845c91708fd1a7"
   },
@@ -264,8 +264,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Maxis ab 2 Jahre, Sa 11:00 – Block ab 14.11.2026",
-     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags um 11 Uhr in den Kliniken Dr. Erler, Laufzeit 14.11.2026 bis 16.01.2027. Der Kurs ist ausgebucht.",
+     "title": "Kleinkinderschwimmen Maxis ab 2 Jahre – Start 14.11.2026",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags 11:00 Uhr in den Kliniken Dr. Erler (Kontumazgarten). Zehn Termine; der Kurs ist ausgebucht.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -282,7 +282,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs laut Buchungsseite ausgebucht"
+      "note": "Kurs ausgebucht (SoldOut laut Buchungsseite)"
      },
      "schedule": {
       "kind": "weekly",
@@ -291,15 +291,15 @@
       ],
       "start": "11:00",
       "from": "2026-11-14",
-      "until": "2027-01-16",
+      "count": 10,
       "skipHolidays": false
      }
     },
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Maxis ab 2 Jahre, Sa 11:00 – Block ab 23.01.2027",
-     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags um 11 Uhr in den Kliniken Dr. Erler, Laufzeit 23.01.2027 bis 13.03.2027. Der Kurs ist ausgebucht.",
+     "title": "Kleinkinderschwimmen Maxis ab 2 Jahre – Start 23.01.2027",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags 11:00 Uhr in den Kliniken Dr. Erler (Kontumazgarten). Acht Termine; der Kurs ist ausgebucht.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -316,7 +316,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs laut Buchungsseite ausgebucht"
+      "note": "Kurs ausgebucht (SoldOut laut Buchungsseite)"
      },
      "schedule": {
       "kind": "weekly",
@@ -325,15 +325,15 @@
       ],
       "start": "11:00",
       "from": "2027-01-23",
-      "until": "2027-03-13",
+      "count": 8,
       "skipHolidays": false
      }
     },
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Maxis ab 2 Jahre, Sa 11:00 – Block ab 20.03.2027",
-     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags um 11 Uhr in den Kliniken Dr. Erler, Laufzeit 20.03.2027 bis 22.05.2027. Plätze sind laut Buchungsseite noch frei.",
+     "title": "Kleinkinderschwimmen Maxis ab 2 Jahre – Start 20.03.2027",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags 11:00 Uhr in den Kliniken Dr. Erler (Kontumazgarten). Zehn Termine; Plätze laut Buchungsseite noch frei.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -350,7 +350,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Online buchbar über die Buchungsseite"
+      "note": "Plätze frei laut Buchungsseite (InStock); Anmeldung über die Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -359,16 +359,16 @@
       ],
       "start": "11:00",
       "from": "2027-03-20",
-      "until": "2027-05-22",
+      "count": 10,
       "skipHolidays": false
      }
     }
    ],
-   "inputHash": "1e745c914aa95f733fc193ea8020807ca3c56973c43804f4abdc9ea49e85ae17",
+   "inputHash": "c623ccd06c4946dec3c73d1d09448e679b614ce8e48c54964d3540f70d92b80b",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "changedAt": "2026-11-02T09:03:46+01:00",
    "partsHash": "2dbca5b3382f77e652ff85c49279a49db4118d6b0d169dda8535979136d77bff"
   }
  }

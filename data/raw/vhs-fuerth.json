@@ -6,77 +6,37 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 1½–2½ Jahre (mittwochs 17:00)",
-     "summary": "Wöchentlich neu aufgebauter Parcours zum freien Turnen, Eltern machen aktiv mit. Der Kurs läuft seit Ende September; das Kursende ist auf der Seite nicht angegeben.",
+     "title": "NAMASTE Familien-Wohlfühl-Yoga (Fr. 22.01.2027)",
+     "summary": "Spielerisches Yoga für Familien mit bewusstem Atmen, Dehnen und Entspannen. Das Alter der Kinder ist nicht angegeben; vor der Buchung in den Kursdetails prüfen (Kursnummer 16311).",
      "topics": [
-      "eltern-kind-turnen",
       "bewegung"
      ],
-     "format": "kurs",
+     "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "82,50 €",
+     "price": "10,00 €",
      "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
      "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
      "category": "bewegung",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 30
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über die vhs-Kursseite, Kursnummer 16301"
+      "note": "Anmeldung über die Kursdetails (Kursnummer 16311)"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "start": "17:00",
-      "from": "2026-11-04",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "vhs-fuerth",
-     "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 2–3 Jahre (donnerstags 17:00)",
-     "summary": "Wöchentlich neu aufgebauter Parcours zum freien Turnen, Eltern machen aktiv mit. Der Kurs läuft seit Ende September; das Kursende ist auf der Seite nicht angegeben.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "82,50 €",
-     "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
-     "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über die vhs-Kursseite, Kursnummer 16303"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "17:00",
-      "from": "2026-11-05",
-      "skipHolidays": true
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-22T17:00"
+       }
+      ]
      }
     }
    ],
-   "inputHash": "09219048d2782491c431aa36a891f6ee263def83d14f3813ae0f90ad884f1e3c",
+   "inputHash": "bf72bf30134cdebffb392200aa5e6a828a6dc7213833a97b7b32fbdfb563a76d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
-   "changedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "changedAt": "2026-11-02T09:03:46+01:00",
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }

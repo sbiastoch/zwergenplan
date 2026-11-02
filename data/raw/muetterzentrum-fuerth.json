@@ -6,10 +6,11 @@
     {
      "providerId": "muetterzentrum-fuerth",
      "venueId": "muetterzentrum-fuerth",
-     "title": "Nachhaltigkeitstreff: Info-Nachmittage mit Stoffwindeln (Kinder willkommen)",
-     "summary": "Kostenloser Info-Nachmittag ohne Voranmeldung zu nachhaltigem Familienleben, mit Stoffwindeln und wechselnden Schwerpunkten für Baby/Kleinkind, Frauen oder die ganze Familie. Kinder sind willkommen.",
+     "title": "Nachhaltigkeitstreff: Info-Nachmittage für Familien mit Kleinkind",
+     "summary": "Kostenlose Info-Nachmittage (14–16 Uhr) mit Stoffwindeln und wechselnden Schwerpunkten, abwechselnd für Baby und Kleinkind, Frauen oder die ganze Familie. Kinder sind willkommen, keine Voranmeldung nötig.",
      "topics": [
-      "elterntreff"
+      "elterntreff",
+      "beratung"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -19,7 +20,7 @@
      "category": "babykurse",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Kostenlos, ohne Voranmeldung, Erdgeschoss Mütterzentrum"
+      "note": "Keine Voranmeldung nötig"
      },
      "schedule": {
       "kind": "dates",
@@ -55,7 +56,7 @@
      "providerId": "muetterzentrum-fuerth",
      "venueId": "muetterzentrum-fuerth",
      "title": "Einführung von Beikost für Babys (ab ca. 4 Monaten)",
-     "summary": "Kurs für Mütter mit Babys ab etwa 4 Monaten zu Fragen rund um den Beikoststart, mit praktischem Teil zum Selbermachen von Breien. Das Baby darf mitgebracht werden. Anmeldung ist verpflichtend.",
+     "summary": "Praxisnachmittag zur Beikost: was man anbieten kann, worauf zu achten ist, und Breie selbst zubereiten. Das Baby darf mitkommen; Anmeldung ist verpflichtend. Im Horizont bleibt der Termin am 14.12.2026.",
      "topics": [
       "beikost"
      ],
@@ -72,7 +73,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung verpflichtend unter Telefon 0911/77 27 99 (Mütterzentrum)"
+      "note": "Anmeldung und Information im Mütterzentrum, Telefon 0911/77 27 99"
      },
      "schedule": {
       "kind": "dates",
@@ -85,11 +86,11 @@
      }
     }
    ],
-   "inputHash": "263bb350d9cabad511d830b2f2d254b90dfd354f796bf47f93d868000603eb8c",
+   "inputHash": "e715789b845428d0f7bd57a8128389c6ad32db4928588286eef685153b086c70",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "changedAt": "2026-11-02T09:03:46+01:00",
    "partsHash": "4931ecef9e2fb9aa7c07b2fdafd616783679a6259b5aeae4fc2db97c260300b2"
   },
   "seite:https://www.muetterzentrum-fuerth.de/kurse-kopie.html": {
@@ -97,11 +98,12 @@
     {
      "providerId": "muetterzentrum-fuerth",
      "venueId": "muetterzentrum-fuerth",
-     "title": "Offene Krabbelgruppe (Mittwoch 15–17 Uhr)",
-     "summary": "Offener Treff für Eltern (auch Großeltern) mit ihren Kindern; laut Seite gilt Geburtsjahr 2022. Während die Kinder spielen, wird über einen umweltfreundlichen Alltag gesprochen, dazu kommen Ausflüge und Bastelaktionen. Einstieg jederzeit, keine Anmeldung nötig.",
+     "title": "Offene Krabbelgruppe (grüne Spielgruppe, mittwochs)",
+     "summary": "Offene Spielgruppe für Kinder mit Eltern oder Großeltern, mit Austausch über umweltfreundlichen Alltag, Spielen und Basteln. Keine Anmeldung nötig. Die Quelle nennt Geburtsjahr 2022; das Alter bitte prüfen.",
      "topics": [
       "krabbelgruppe",
-      "elterntreff"
+      "spielgruppe",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -126,11 +128,11 @@
      }
     }
    ],
-   "inputHash": "dfcad94f5924816d2326e3fed572aca3b9bf300d10443674a108dcbe59a0fb87",
+   "inputHash": "aa2442464d75e1af811529c4a4c46960fa4bb56cf3a4fd067e545ae9c6839a00",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "changedAt": "2026-11-02T09:03:46+01:00",
    "partsHash": "4931ecef9e2fb9aa7c07b2fdafd616783679a6259b5aeae4fc2db97c260300b2"
   }
  }

@@ -6,10 +6,11 @@
     {
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
-     "title": "Baby & Museum: Führung für Erwachsene mit Babys",
-     "summary": "Monatlich wechselnde Kurzführung durch das Neue Museum für Erwachsene mit Babys, Kinderwagen und Trage sind erlaubt. Pausen zum Füttern und Wickeln sind eingeplant, danach Austausch bei Kaffee. Zusätzlich zum Eintritt.",
+     "title": "Baby & Museum: Kunstführung für Eltern mit Babys",
+     "summary": "Kurzführung (60 Min.) zu monatlich wechselnden Themen für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln und anschließendem Kaffee zum Austausch. Kinderwagen und Trage sind erlaubt. Zusätzlich zum Führungsticket fällt der Museumseintritt an.",
      "topics": [
-      "museum"
+      "museum",
+      "elterntreff"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -24,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Kontingent dort nicht auf der Programmseite sichtbar"
+      "note": "Tickets über den Ticket-Button je Termin im go~mus-Shop (nmn-tickets.de); freie Plätze sind auf der Programmseite nicht sichtbar."
      },
      "schedule": {
       "kind": "dates",
@@ -49,11 +50,11 @@
      }
     }
    ],
-   "inputHash": "4fb0f305831a8afceb478f14c5b3addb511b49068dc89d2e9f265beb5e520b4a",
+   "inputHash": "c0815267de34a193a2e06da1840b70edaad95f570a401f28effece4fc1eeb693",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
-   "changedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "changedAt": "2026-11-02T09:03:46+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
@@ -62,7 +63,7 @@
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
      "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-     "summary": "Eine Schauspielerin liest und spielt Geschichten rund um Kunst und Design im Ausstellungsraum „Double Up!“, die Kinder machen aktiv mit. Erwachsene zahlen Eintritt; Tickets nur über den Museumsshop.",
+     "summary": "Eine Schauspielerin liest in der Ausstellung „Double Up!“ aus einem Kinderbuch, und Kinder ab zwei Jahren machen dabei mit. Familie, Bekannte und Gäste sind willkommen. Tickets gibt es im Museumsshop, für Erwachsene 3 € zzgl. Eintritt.",
      "topics": [
       "vorlesen",
       "museum"
@@ -80,7 +81,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Ticket über den go~mus-Shop; Restplätze sind auf der Programmseite nicht sichtbar"
+      "note": "Tickets über den Ticket-Button im go~mus-Shop (nmn-tickets.de); Restkontingent ist nur dort sichtbar."
      },
      "schedule": {
       "kind": "dates",
@@ -92,11 +93,11 @@
      }
     }
    ],
-   "inputHash": "8058997767362d57278084ef4c3aaece143e318920c683df31f838bc7ab70600",
+   "inputHash": "543291a2c2cb3b3809c4ccc4bdc3b0abfda6da2e4f962771cdf3a0f1f2307d4c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
-   "changedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "changedAt": "2026-11-02T09:03:46+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "kandidaten": {
@@ -150,7 +151,6 @@
    ],
    "inputHash": "32a2f01bb91b2709ebe8d2dbf6dac25456924409c81593cc4a8dfa86ddadc905",
    "dated": {
-    "2026-11-01": "c8ca09aed12e1d046be94c835c71c57771550ac46a7a91b68c5b4848ab35c564",
     "2026-11-13": "02758077c4f295a349671c42fd4810985342d83bb86afa633e9bac9349a6d8d6",
     "2026-11-27": "708428860f7ba415fa818653b16b68d576c6c9fe9ec4e0b27ca6a3df1d3b1d32",
     "2026-12-04": "62b6512fa0520a45636925c6594b2c50ae087c7d2774473d1a8e880447c75567",
@@ -159,7 +159,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-02T09:03:46+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"
