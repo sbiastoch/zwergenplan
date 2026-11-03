@@ -37,6 +37,11 @@
    "status": "ok",
    "checkedAt": "2026-11-02T09:03:46+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
+   "pending": {
+    "inputHash": "8ddc9812b60c98a812b132ecfd8df1329486b7fc83458598053e71e16f583c6d",
+    "model": "haiku",
+    "events": []
+   },
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }

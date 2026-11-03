@@ -7,15 +7,15 @@
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
      "title": "Schneeflocken, wippediwapp (Lucia Ruf, ab 2 Jahren)",
-     "summary": "Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitsingen und Mittanzen, etwa 45 Minuten. Drei Vorstellungen im Dezember-Vorlauf; Tickets im Webshop, die Termine am 30.11. waren bei der Abfrage ausverkauft.",
+     "summary": "Die Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitsingen und Tanzen für Kinder ab 2 Jahren. Am 30.11. sind die Vorstellungen teils schon ausverkauft, am 29.11. um 14 Uhr nicht.",
      "topics": [
       "konzert",
-      "musik"
+      "singen"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
+     "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
      "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
      "category": "buehne",
      "age": {
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "30.11. 09:30 und 10:45 ausverkauft; 29.11. 14:00 nicht als ausverkauft markiert. Tickets im Eventim-Webshop des Sternenhauses."
+      "note": "30.11. 09:30 und 10:45 ausverkauft; 29.11. 14:00 nicht ausverkauft. Tickets im Eventim-Webshop des Sternenhauses."
      },
      "schedule": {
       "kind": "dates",
@@ -47,8 +47,8 @@
     {
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
-     "title": "WiWaWaldtraum – Mitmachtheater ab 2 Jahren",
-     "summary": "Trolli Tolpatsch muss im Zauberwald Baumbolino eine Waldprüfung bestehen, Fee Fiofina stellt knifflige Aufgaben. Die Kinder machen beim Mitmachtheater mit. Tickets gibt es im Webshop.",
+     "title": "WiWaWaldtraum – Mitmachtheater ab 2 Jahren (Purzeltraumtheater)",
+     "summary": "Mitmachtheater: Trolli Tolpatsch legt im Zauberwald Baumbolino seine Waldprüfung ab, und die Fee Fiofina stellt ihm knifflige Aufgaben. Vorstellungen im Dezember im Sternenhaus; Tickets im Webshop, im Kalender nicht als ausverkauft markiert.",
      "topics": [
       "theater"
      ],
@@ -64,7 +64,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Nicht als ausverkauft markiert; Tickets im Eventim-Webshop"
+      "note": "Nicht als ausverkauft markiert; Tickets im Eventim-Webshop des Sternenhauses"
      },
      "schedule": {
       "kind": "dates",
@@ -85,11 +85,11 @@
      }
     }
    ],
-   "inputHash": "7ef25929861a977b6e211a248a50d05a9a5a93c87c555409256c5ea2f1f6d648",
+   "inputHash": "48446fdd488a60de0c07994ea481621b933afd370fa8652c0372a80017cb6187",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
-   "changedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "changedAt": "2026-11-03T09:27:26+01:00",
    "partsHash": "1773169258ff9b94e692feaa4cb6c79f6de49ce0e4ff6630b0de1afcb56cb389"
   },
   "kandidaten": {
@@ -144,7 +144,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

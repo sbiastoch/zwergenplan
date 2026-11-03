@@ -41,7 +41,7 @@
    "inputHash": "4a186bc1fae5c375b8e1192157a03608e9e83545993dfdd997a5d4cf8dbe555f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "f1ffeccaeeb1caca965d9eb8005c30dba92183ec292df8bacd70319e29fbd01c"
   },
@@ -314,7 +314,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "c25088f3bc444367c5ff4fef08df8eb68bdc3b19e8c10e56c7f87453ed56cbb2"
   },
@@ -323,17 +323,17 @@
     {
      "providerId": "cvjm-gostenhof-miniclub",
      "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club – Kniereiter, Bewegungslieder (18 Monate bis 3 Jahre)",
-     "summary": "Dienstags Kniereiter, Fingerspiele und Bewegungslieder mit Freispielzeit und Kaffee für Eltern. In den Schulferien finden keine Treffen statt. Anfrage bei Alexandra Gußner.",
+     "title": "Mini-Club dienstags (18 Monate bis 3 Jahre)",
+     "summary": "Dienstags 10–11:30 Uhr für Eltern mit Kindern: Kniereiter, Fingerspiele und Bewegungslieder, Freispiel, eine gemeinsame Einheit und Kaffeerunde. Preis und Anmeldung bitte beim Veranstalter erfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/mini-club-kniereiter-bewegungslieder-3/2026-11-10/",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.cvjm-nuernberg-gostenhof.de/",
+     "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 18,
@@ -341,7 +341,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anfrage per Telefon 0151/56071708 oder bei Alexandra Gußner (alexandra.gussner@cvjm-nuernberg-gostenhof.de)."
+      "note": "Keine Platzanzeige. Fragen an Alexandra Gußner, 0151/56071708"
      },
      "schedule": {
       "kind": "dates",
@@ -456,7 +456,7 @@
        }
       ]
      },
-     "via": "frankenkids"
+     "via": "evtermine"
     }
    ],
    "inputHash": "b2f015530a27b6680925b396c4fac3c2860637aec1c82ce6b3cd7040f08c71ea",
@@ -468,19 +468,19 @@
     "2026-11-23": "631eb430531d1e59564088a18d40c3f0433f7f48cd517c59c78e93dcd0f7544b",
     "2026-11-24": "d367512ba9a26a12992f4d31f4954f89137b19072f519c2cde980d57bfbd9fdf",
     "2026-11-30": "ded8ff1223f89ffbb0e3c889ef6366c31c66f4e1cfc5a38218b0d3eb7cacaa91",
-    "2026-12-01": "4e43ba15689838e6700132ca194162d94e7087ecb7c93b7fcf8b2d0c6ace0e31",
-    "2026-12-07": "67651e9a76ea629adfc19ac5d38927f0ae8f9ca0c1c3beded07926b268d85501",
+    "2026-12-01": "9de1cc334fcac0bbf6607df8ac84c933e211e85cb7439d48ee606836acbba1a5",
+    "2026-12-07": "acdc25140857839593903e8a4e4ee13ea572641b4b57aba8dc6b4fafc58cd4cc",
     "2026-12-08": "512f55483fb47769daa5cecc447a6253743e760466cd14171a44677a49778901",
-    "2026-12-14": "82abc33d571fda3f7888658bf35bf41cbb332e729ee4d5ca25195560bac0c070",
+    "2026-12-14": "7bc5618effef799b75c87f1dc7794dff80accaa6227bc35166819bcda80738a7",
     "2026-12-15": "9930e1a2cd105b96206c6ab522a574838365c155b7e37b6edfa46bbbd215312b",
-    "2026-12-21": "a0bc6f0a46b102910b1b65c5d479dba32a9be056f1faa36c7460174171ee979e",
+    "2026-12-21": "834e58f535beec886d3303a916ad496f4486b1fd10cb406b33ec03b1c477ab63",
     "2026-12-22": "9c506a15e6d2c5b95a9c7608e34cac72426ed29f9685ba6bd07fa225a30119f4",
-    "2027-01-11": "1e7ca2c4609cfc76fe63b84c6e9b1a0e3f1d446468b361a6cd65d3af273c8ece",
-    "2027-01-12": "8fe3089db90c12651dd3d57ea967ffadf250ab8ffcee1406f74fc5471c3bdbe2",
-    "2027-01-18": "9fecd863331e2166eaf67968b9d405bea704b16b39f3cc5ffb86640a0437b4b6",
-    "2027-01-19": "6872502d6e5c1aa4f23d52e49a2649d4527e4e917d68d9b617ab9459a7b6db41",
-    "2027-01-25": "ebf736e961717b40e098e27e026cc2e0aa1b6658883f3a578b4df27019f519ea",
-    "2027-01-26": "041a04c9c3e1b67d70ae28506e1e6f1a12a58f05b1c540a1af226e708effa87a",
+    "2027-01-11": "9c2593146b4ef9116f52848735e8f007b918d9e465c048f9bfeacb5825156c5b",
+    "2027-01-12": "179d396ea9ee65511f8286c0cce7d8d6617f39afdd2209b0920f5d26dd4e0fd8",
+    "2027-01-18": "5c6716437f61ec10c7c27190812b00d522c313e232d7c5560ba91bd39da84a32",
+    "2027-01-19": "f5119758f2fa1df178b64f5259e082fd8b86de7b1164468790eda2bb6efa206a",
+    "2027-01-25": "b604ac601f2d2f0955fa4ae5602276c95f871d44f65fb4b7114d3de925008bed",
+    "2027-01-26": "df21262bc43d5182ace3a4705cc97942636c3f12b01f7ee5c1c0d9fe8d0a4432",
     "2027-02-01": "1a035c6f6ef76bfda9271a3c7b11b2eb32bd5753e4fb001cd95955e42d11ccad",
     "2027-02-02": "842b8bc6d7b861c8ff54dc5d47ec6b7a5b13ac4b20922bda77844c216d877890",
     "2027-02-15": "29e5dbd27fa3459464d73fd74c5f0870fe7a1c91e533bc17a4055dd48e793846",
@@ -511,8 +511,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
-   "changedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "changedAt": "2026-11-03T09:27:26+01:00",
    "sources": [
     "evtermine",
     "frankenkids"

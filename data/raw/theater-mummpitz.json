@@ -6,11 +6,10 @@
     {
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
-     "title": "Jazz für Kinder",
-     "summary": "Jazz-Konzert für Kinder ohne Altersgrenze im Theater Mummpitz. Laut Spielplan sind alle Vorstellungen bis Mai 2027 ausverkauft.",
+     "title": "Jazz für Kinder (ohne Altersgrenze)",
+     "summary": "Jazz-Konzert zum Zuhören, ohne Altersgrenze, sonntags um 11 Uhr. Stand 03.11.2026 sind alle sieben Vorstellungen im Horizont ausverkauft; Karten über Reservix.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -20,7 +19,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Alle Termine laut Spielplan ausverkauft"
+      "note": "Stand 03.11.2026 alle Termine ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -53,10 +52,9 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: SAX.O.PHON",
-     "summary": "Klassik-Konzert für Kinder ohne Altersgrenze aus der Reihe „Klassik für Kinder“ im Theater Mummpitz. Die Vorstellung ist ausverkauft.",
+     "summary": "Klassisches Konzert zum Zuhören, ohne Altersgrenze, sonntags um 11 Uhr. Stand 03.11.2026 ausverkauft; Karten über Reservix.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -66,7 +64,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Spielplan ausverkauft"
+      "note": "Stand 03.11.2026 ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -81,10 +79,9 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Brummen und Summen mit dem Kontrabass",
-     "summary": "Klassik-Konzert für Kinder ohne Altersgrenze aus der Reihe „Klassik für Kinder“ im Theater Mummpitz. Die Vorstellung ist ausverkauft.",
+     "summary": "Klassisches Konzert zum Zuhören, ohne Altersgrenze, sonntags um 11 Uhr. Stand 03.11.2026 ausverkauft; Karten über Reservix.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -94,7 +91,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Spielplan ausverkauft"
+      "note": "Stand 03.11.2026 ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -109,10 +106,9 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Die Oboe auf Reisen",
-     "summary": "Klassik-Konzert für Kinder ohne Altersgrenze aus der Reihe „Klassik für Kinder“ im Theater Mummpitz. Die Vorstellung ist ausverkauft.",
+     "summary": "Klassisches Konzert zum Zuhören, ohne Altersgrenze, sonntags um 11 Uhr. Stand 03.11.2026 ausverkauft; Karten über Reservix.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -122,7 +118,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Spielplan ausverkauft"
+      "note": "Stand 03.11.2026 ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -137,10 +133,9 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Pfeif drauf! Die Blockflötenfamilie stellt sich vor",
-     "summary": "Klassik-Konzert für Kinder ohne Altersgrenze aus der Reihe „Klassik für Kinder“ im Theater Mummpitz. Die Vorstellung ist ausverkauft.",
+     "summary": "Klassisches Konzert zum Zuhören, ohne Altersgrenze, sonntags um 11 Uhr. Stand 03.11.2026 ausverkauft; Karten über Reservix.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -150,7 +145,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Spielplan ausverkauft"
+      "note": "Stand 03.11.2026 ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -165,10 +160,9 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Klingende und singende Violine",
-     "summary": "Klassik-Konzert für Kinder ohne Altersgrenze aus der Reihe „Klassik für Kinder“ im Theater Mummpitz. Die Vorstellung ist ausverkauft.",
+     "summary": "Klassisches Konzert zum Zuhören, ohne Altersgrenze, sonntags um 11 Uhr. Stand 03.11.2026 ausverkauft; Karten über Reservix.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -178,7 +172,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Spielplan ausverkauft"
+      "note": "Stand 03.11.2026 ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -193,10 +187,9 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Vorhang auf für die Überraschung",
-     "summary": "Klassik-Konzert für Kinder ohne Altersgrenze aus der Reihe „Klassik für Kinder“ im Theater Mummpitz. Die Vorstellung ist ausverkauft.",
+     "summary": "Klassisches Konzert zum Zuhören, ohne Altersgrenze, sonntags um 11 Uhr. Stand 03.11.2026 ausverkauft; Karten über Reservix.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -206,7 +199,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Spielplan ausverkauft"
+      "note": "Stand 03.11.2026 ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -218,11 +211,11 @@
      }
     }
    ],
-   "inputHash": "f0ff8a1add3c8ffe524dafadc082211a7a9549c3834d796257b6dc39d3afc7cd",
+   "inputHash": "337d0055ffc158c2858b9e6dfb9791d392d9fcf6b3340a5e940e22980f412b7e",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
-   "changedAt": "2026-11-01T08:58:52+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "changedAt": "2026-11-03T09:27:26+01:00",
    "partsHash": "35534a05e45ec78c75433e4af4b6d7dfa3f5816cd79353a2c1c234fa0573313c"
   },
   "seite:https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/": {
@@ -278,7 +271,7 @@
    "inputHash": "59352b8bf40f71007dd2a3c1398106b01f0f872d82a4189fbd7f876f66271ce9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -338,7 +331,7 @@
    "inputHash": "8858f7a5a4afb7e61a764647f548accc0c06fc9ed932c7fafbc933f8a30fc3c9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -359,7 +352,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-03T09:27:26+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "frankenkids",
