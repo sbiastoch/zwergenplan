@@ -6,8 +6,8 @@
     {
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
-     "title": "Baby & Museum: Kunstführung für Eltern mit Babys",
-     "summary": "Kurzführung (60 Min.) zu monatlich wechselnden Themen für Erwachsene mit Babys, mit Pausen zum Füttern und Wickeln und anschließendem Kaffee zum Austausch. Kinderwagen und Trage sind erlaubt. Zusätzlich zum Führungsticket fällt der Museumseintritt an.",
+     "title": "Baby & Museum: Kunst-Führung für Eltern mit Babys",
+     "summary": "Rund 60-minütige Führung für Erwachsene mit Babys durchs Neue Museum, mit Pausen zum Füttern und Wickeln. Danach Kaffee und Austausch. Kinderwagen und Trage sind erlaubt.",
      "topics": [
       "museum",
       "elterntreff"
@@ -19,13 +19,9 @@
      "url": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
      "sourceUrl": "https://www.nmn.de/de/programm/veranstaltungen/fuehrungen/kinder-und-familien/baby-museum.htm",
      "category": "buehne",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 12
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets über den Ticket-Button je Termin im go~mus-Shop (nmn-tickets.de); freie Plätze sind auf der Programmseite nicht sichtbar."
+      "note": "Buchung je Termin über den Ticket-Button im go~mus-Shop; freie Plätze sind auf der Programmseite nicht sichtbar"
      },
      "schedule": {
       "kind": "dates",
@@ -50,11 +46,11 @@
      }
     }
    ],
-   "inputHash": "c0815267de34a193a2e06da1840b70edaad95f570a401f28effece4fc1eeb693",
+   "inputHash": "2561582acb010cb6b27157349c61fa7977314c34b499f020a76d56302e1e0454",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
@@ -63,7 +59,7 @@
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
      "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-     "summary": "Eine Schauspielerin liest in der Ausstellung „Double Up!“ aus einem Kinderbuch, und Kinder ab zwei Jahren machen dabei mit. Familie, Bekannte und Gäste sind willkommen. Tickets gibt es im Museumsshop, für Erwachsene 3 € zzgl. Eintritt.",
+     "summary": "Eine Schauspielerin liest im Ausstellungsraum „Double Up!“ Kinderbuchgeschichten vor, Kinder machen aktiv mit. Eintritt für Erwachsene kommt zum Ticketpreis dazu.",
      "topics": [
       "vorlesen",
       "museum"
@@ -81,7 +77,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets über den Ticket-Button im go~mus-Shop (nmn-tickets.de); Restkontingent ist nur dort sichtbar."
+      "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Restkontingent dort nicht sichtbar"
      },
      "schedule": {
       "kind": "dates",
@@ -93,11 +89,11 @@
      }
     }
    ],
-   "inputHash": "543291a2c2cb3b3809c4ccc4bdc3b0abfda6da2e4f962771cdf3a0f1f2307d4c",
+   "inputHash": "13f3883509d05888a33816a806a18d12b2f04a923166d989792eae939f9ed2f7",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "kandidaten": {
@@ -159,7 +155,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

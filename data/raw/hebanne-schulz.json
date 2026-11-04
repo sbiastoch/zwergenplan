@@ -89,7 +89,7 @@
    "inputHash": "0228b297e5eaf13a70456cad1e7698cc6a74d8064ac6d70c18056e8e5b49fff1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "b4b0a862fe96b93dd924928258b6e93282a3a51a7e54c0e92704be9626cb4922"
   },
@@ -98,8 +98,8 @@
     {
      "providerId": "hebanne-schulz",
      "venueId": "hebanne-schulz",
-     "title": "Bindung durch Berührung – Babymassage ab 09.11.2026",
-     "summary": "Achtsame Babymassage für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: Körperbotschaften des Babys verstehen, sanfte Berührungen üben, Fragen zu Schreien, Schlafen oder Füttern. Maximal 6 Eltern-Kind-Paare. Dieser Durchgang ist ausgebucht.",
+     "title": "Bindung durch Berührung (Babymassage), ab Mo 09.11.2026",
+     "summary": "Achtsame Babymassage für Eltern mit Babys bis etwa 5 Monate: Berührungen lernen, Signale des Babys deuten, Bindung stärken. Kleine Gruppen mit höchstens 6 Paaren. Der Kurs ist laut Seite ausgebucht.",
      "topics": [
       "babymassage"
      ],
@@ -116,7 +116,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "8 von 8 Plätzen belegt"
+      "note": "Kurs laut Seite ausgebucht (9 von 8 Plätzen belegt)"
      },
      "schedule": {
       "kind": "weekly",
@@ -127,14 +127,15 @@
       "end": "12:15",
       "from": "2026-11-09",
       "until": "2026-12-21",
+      "count": 7,
       "skipHolidays": false
      }
     },
     {
      "providerId": "hebanne-schulz",
      "venueId": "hebanne-schulz",
-     "title": "Bindung durch Berührung – Babymassage ab 11.01.2027",
-     "summary": "Achtsame Babymassage für Eltern mit Babys von etwa 6 Wochen bis 5 Monaten: Körperbotschaften des Babys verstehen, sanfte Berührungen üben, Fragen zu Schreien, Schlafen oder Füttern. Maximal 6 Eltern-Kind-Paare. Anmeldung über die Kursseite.",
+     "title": "Bindung durch Berührung (Babymassage), ab Mo 11.01.2027",
+     "summary": "Achtsame Babymassage für Eltern mit Babys bis etwa 5 Monate: Berührungen lernen, Signale des Babys deuten, Bindung stärken. Kleine Gruppen mit höchstens 6 Paaren. Anmeldung über die Seite möglich.",
      "topics": [
       "babymassage"
      ],
@@ -151,7 +152,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "0 von 8 Plätzen belegt; Anmeldung über „Hier Anmelden“"
+      "note": "0 von 8 Plätzen belegt; Anmeldung über die Seite"
      },
      "schedule": {
       "kind": "weekly",
@@ -162,15 +163,16 @@
       "end": "12:15",
       "from": "2027-01-11",
       "until": "2027-02-15",
+      "count": 6,
       "skipHolidays": false
      }
     }
    ],
-   "inputHash": "dce2bb9c7904df12210eac39eb9e75b20a04bb0b85072be94a9370b601535c49",
+   "inputHash": "d3077a614c97f931ec825101761b736926300dec646ef2103d265521087ab2a3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "d8717483da7d0e7e9e62d902115f896177698f46075b90c70c6c08baa18fd088"
   }
  }

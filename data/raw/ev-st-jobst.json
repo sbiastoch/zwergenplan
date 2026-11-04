@@ -6,17 +6,17 @@
     {
      "providerId": "ev-st-jobst",
      "venueId": "ev-st-jobst",
-     "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre)",
-     "summary": "Spielen und erste Gruppenerfahrung für Kinder von etwa 1 bis 2 Jahren, dazu Austausch unter Eltern im Miniclubraum. Die Termine sind bis Ende Dezember 2026 eingetragen; danach ist mit weiteren Treffen zu rechnen.",
+     "title": "Miniclub Eltern-Kind-Gruppe (Kinder etwa 1–2 Jahre)",
+     "summary": "Spielen und Gruppenerfahrung für Kinder ab etwa einem Jahr, dazu Austausch für die Eltern. Dienstags 15–16:30 Uhr im Miniclubraum. Anmeldung und Kosten stehen nicht in der Quelle, bitte beim Veranstalter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=7984030",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984030",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=7984031",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984031",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 12,
@@ -24,15 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung ist nicht genannt. Rückfragen über die Gemeinde St. Jobst Erlenstegen."
+      "note": "Keine Platzangabe in der Quelle; Anfrage beim Veranstalter (St. Jobst) nötig."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-03T15:00",
-        "end": "2026-11-03T16:30"
-       },
        {
         "start": "2026-11-10T15:00",
         "end": "2026-11-10T16:30"
@@ -72,19 +68,18 @@
    ],
    "inputHash": "886b17f2f27bfa229a70d4b6082cfb9ba42cddb66b3b8f70af3a17e81d6a3e73",
    "dated": {
-    "2026-11-03": "9bb92d3972b1811394cb17ec3d3d10bc20e0932e3508f0558e81928b4145d0e2",
-    "2026-11-10": "971ed413a6d563dce183a06df9a837b6b2617bc57933df55d2f929c5ddfac3c0",
+    "2026-11-10": "8fe4d07b98473a392582b8ce981c549b715cb22af5bd31dd4f8c202b0b4ca8d5",
     "2026-11-11": "2fcd2f14a31e2c37a459fe2d17252d1355ea438347d074fb79be85941493e91c",
-    "2026-11-17": "1f9295edeb7fb076dfef0518f74f2753e3cc2bce15a9fb993be497e14643c62b",
-    "2026-11-24": "734b713baf455b7145a7dc9812c1a99925ef8f39ffc7f9c8536f3d660c0437b9",
+    "2026-11-17": "547832b7979690524c2882fa3e8f2c7c975f6708561b76418cf784c41fba68ed",
+    "2026-11-24": "2dcd68c33c907154ab67428c8362ae6687e7544bb1c21bc214c9dc5d8aab3a65",
     "2026-11-25": "d0479e7e1b51d5f8575bcf4a1433493952d0ef26bb0c076c860309e33f66eb22",
-    "2026-12-01": "1a9078af1ff1f3ddd609e34686f02d482ebda39eac343b1fc04a80a709d75238",
+    "2026-12-01": "05281e4eae464389d265888a52f99d1f3ad86a5a6ba65b370d2f8ec75dcbdca6",
     "2026-12-02": "ff049ec3c10b73e24ee3c6eed958f6960c520350c48efb353c37bb101f591d73",
-    "2026-12-08": "404ec08c2dc7e07517cc45b75b6b2fe10bee9ed9281a8b20bbf0c8182143c751",
-    "2026-12-15": "a9cdfb20ab36f188c22900c4f57f3ee7a37d48b3e5f204e5ed9c1e584d09d7d2",
+    "2026-12-08": "edc594d655a84292276e01a148fd9f9c222f6971233e2559c8110d0a3d2cab61",
+    "2026-12-15": "632062ecb7c8d8b23064f77d0ee4de5d021d1283068b5ab4f0b5ce3968ee092f",
     "2026-12-16": "b6590b6ed723b0e96f052190d7ac092d38a56aff5f2ec47dc12b3a833fec18ff",
-    "2026-12-22": "bab377cb5e888c55ac8d252caab33d92c0a811c91ccfd08c4e0e565013e62a61",
-    "2026-12-29": "a569cdc68ce7126401e9752d1714339017fd5045991981d1b0b6ee2335507b70",
+    "2026-12-22": "a98e6d47bd75f55f7eb38d7271f3ee8b71f2319f3ef4b10c8f41ba1ebe9e0f70",
+    "2026-12-29": "91d526ff369672f426f0d3f4b8090ff2b70ae8facc04087edcf525ae84f534c5",
     "2027-01-13": "652232231129626496328eff1dad3fca667c4b85a3d40c8d76840c844af3b69f",
     "2027-01-27": "9fd92df3950d144cebeeec1d75075cb66bfca83599f561318e219d8ece651f51",
     "2027-02-03": "cec34775b33fb389ef3caebb183cd029cf3c6626e85e4310b7c786106e52a463",
@@ -94,8 +89,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "sources": [
     "evtermine"
    ],

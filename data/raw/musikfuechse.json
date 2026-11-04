@@ -6,450 +6,15 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse",
-     "title": "Musikzwerge Baby I, Mo 10:30 (ab 23.11.2026)",
-     "summary": "Singen, Musizieren und Spielen mit Babys von ca. 4 bis 12 Monaten und ihren Eltern, 45 Minuten. Acht Termine von 23.11.2026 bis 25.01.2027.",
+     "title": "Musikfüchse Baby I, Mo 10:30 (laufend bis 16.11.)",
+     "summary": "Laufender Kurs für Babys ca. 4–12 Monate mit Eltern, 45 Minuten. Der Kurs endet am 16.11.2026.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
-     "url": "https://musikfuechse.com/musikfuechse-babys/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-     "category": "musik",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Keine Ausgebucht-Markierung; Anmeldung über 'Kurs buchen'"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-23T10:30",
-        "end": "2026-11-23T11:15"
-       },
-       {
-        "start": "2026-11-30T10:30",
-        "end": "2026-11-30T11:15"
-       },
-       {
-        "start": "2026-12-07T10:30",
-        "end": "2026-12-07T11:15"
-       },
-       {
-        "start": "2026-12-14T10:30",
-        "end": "2026-12-14T11:15"
-       },
-       {
-        "start": "2026-12-21T10:30",
-        "end": "2026-12-21T11:15"
-       },
-       {
-        "start": "2027-01-11T10:30",
-        "end": "2027-01-11T11:15"
-       },
-       {
-        "start": "2027-01-18T10:30",
-        "end": "2027-01-18T11:15"
-       },
-       {
-        "start": "2027-01-25T10:30",
-        "end": "2027-01-25T11:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse",
-     "title": "Musikzwerge Baby II, Mo 9:30 (ab 23.11.2026)",
-     "summary": "Musikspiele mit Rasseln, Trommeln und Tüchern für Kinder von ca. 10 bis 18 Monaten mit ihren Eltern, 45 Minuten. Acht Termine von 23.11.2026 bis 25.01.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
-     "url": "https://musikfuechse.com/musikfuechse-babys/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-     "category": "musik",
-     "age": {
-      "minMonths": 10,
-      "maxMonths": 18
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Keine Ausgebucht-Markierung; Anmeldung über 'Kurs buchen'"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-23T09:30",
-        "end": "2026-11-23T10:15"
-       },
-       {
-        "start": "2026-11-30T09:30",
-        "end": "2026-11-30T10:15"
-       },
-       {
-        "start": "2026-12-07T09:30",
-        "end": "2026-12-07T10:15"
-       },
-       {
-        "start": "2026-12-14T09:30",
-        "end": "2026-12-14T10:15"
-       },
-       {
-        "start": "2026-12-21T09:30",
-        "end": "2026-12-21T10:15"
-       },
-       {
-        "start": "2027-01-11T09:30",
-        "end": "2027-01-11T10:15"
-       },
-       {
-        "start": "2027-01-18T09:30",
-        "end": "2027-01-18T10:15"
-       },
-       {
-        "start": "2027-01-25T09:30",
-        "end": "2027-01-25T10:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse",
-     "title": "Musikzwerge Baby I, Di 10:30 (ab 24.11.2026)",
-     "summary": "Singen, Musizieren und Spielen mit Babys von ca. 4 bis 12 Monaten und ihren Eltern, 45 Minuten. Acht Termine von 24.11.2026 bis 26.01.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
-     "url": "https://musikfuechse.com/musikfuechse-babys/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-     "category": "musik",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Keine Ausgebucht-Markierung; Anmeldung über 'Kurs buchen'"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-24T10:30",
-        "end": "2026-11-24T11:15"
-       },
-       {
-        "start": "2026-12-01T10:30",
-        "end": "2026-12-01T11:15"
-       },
-       {
-        "start": "2026-12-08T10:30",
-        "end": "2026-12-08T11:15"
-       },
-       {
-        "start": "2026-12-15T10:30",
-        "end": "2026-12-15T11:15"
-       },
-       {
-        "start": "2026-12-22T10:30",
-        "end": "2026-12-22T11:15"
-       },
-       {
-        "start": "2027-01-12T10:30",
-        "end": "2027-01-12T11:15"
-       },
-       {
-        "start": "2027-01-19T10:30",
-        "end": "2027-01-19T11:15"
-       },
-       {
-        "start": "2027-01-26T10:30",
-        "end": "2027-01-26T11:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse",
-     "title": "Musikzwerge Baby II, Di 9:30 (ab 24.11.2026)",
-     "summary": "Musikspiele mit Rasseln, Trommeln und Tüchern für Kinder von ca. 10 bis 18 Monaten mit ihren Eltern, 45 Minuten. Acht Termine von 24.11.2026 bis 26.01.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
-     "url": "https://musikfuechse.com/musikfuechse-babys/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-     "category": "musik",
-     "age": {
-      "minMonths": 10,
-      "maxMonths": 18
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Keine Ausgebucht-Markierung; Anmeldung über 'Kurs buchen'"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-24T09:30",
-        "end": "2026-11-24T10:15"
-       },
-       {
-        "start": "2026-12-01T09:30",
-        "end": "2026-12-01T10:15"
-       },
-       {
-        "start": "2026-12-08T09:30",
-        "end": "2026-12-08T10:15"
-       },
-       {
-        "start": "2026-12-15T09:30",
-        "end": "2026-12-15T10:15"
-       },
-       {
-        "start": "2026-12-22T09:30",
-        "end": "2026-12-22T10:15"
-       },
-       {
-        "start": "2027-01-12T09:30",
-        "end": "2027-01-12T10:15"
-       },
-       {
-        "start": "2027-01-19T09:30",
-        "end": "2027-01-19T10:15"
-       },
-       {
-        "start": "2027-01-26T09:30",
-        "end": "2027-01-26T10:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse Baby I, Do 10:30 (ab 26.11.2026)",
-     "summary": "Musizieren, Singen und Spielen mit Babys von ca. 4 bis 12 Monaten und ihren Eltern, 45 Minuten. Acht Termine von 26.11.2026 bis 04.02.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
-     "url": "https://musikfuechse.com/musikfuechse-babys/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-     "category": "musik",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Keine Ausgebucht-Markierung; Anmeldung über 'Kurs buchen'"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-26T10:30",
-        "end": "2026-11-26T11:15"
-       },
-       {
-        "start": "2026-12-03T10:30",
-        "end": "2026-12-03T11:15"
-       },
-       {
-        "start": "2026-12-10T10:30",
-        "end": "2026-12-10T11:15"
-       },
-       {
-        "start": "2026-12-17T10:30",
-        "end": "2026-12-17T11:15"
-       },
-       {
-        "start": "2027-01-14T10:30",
-        "end": "2027-01-14T11:15"
-       },
-       {
-        "start": "2027-01-21T10:30",
-        "end": "2027-01-21T11:15"
-       },
-       {
-        "start": "2027-01-28T10:30",
-        "end": "2027-01-28T11:15"
-       },
-       {
-        "start": "2027-02-04T10:30",
-        "end": "2027-02-04T11:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse Baby II, Do 9:30 (ab 26.11.2026)",
-     "summary": "Musikspiele mit Rasseln, Trommeln und Tüchern für Kinder von ca. 10 bis 18 Monaten mit ihren Eltern, 45 Minuten. Acht Termine von 26.11.2026 bis 04.02.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
-     "url": "https://musikfuechse.com/musikfuechse-babys/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-     "category": "musik",
-     "age": {
-      "minMonths": 10,
-      "maxMonths": 18
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Keine Ausgebucht-Markierung; Anmeldung über 'Kurs buchen'"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-26T09:30",
-        "end": "2026-11-26T10:15"
-       },
-       {
-        "start": "2026-12-03T09:30",
-        "end": "2026-12-03T10:15"
-       },
-       {
-        "start": "2026-12-10T09:30",
-        "end": "2026-12-10T10:15"
-       },
-       {
-        "start": "2026-12-17T09:30",
-        "end": "2026-12-17T10:15"
-       },
-       {
-        "start": "2027-01-14T09:30",
-        "end": "2027-01-14T10:15"
-       },
-       {
-        "start": "2027-01-21T09:30",
-        "end": "2027-01-21T10:15"
-       },
-       {
-        "start": "2027-01-28T09:30",
-        "end": "2027-01-28T10:15"
-       },
-       {
-        "start": "2027-02-04T09:30",
-        "end": "2027-02-04T10:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse Baby I+II, Do 15:30 (ab 26.11.2026)",
-     "summary": "Nachmittagskurs mit Musik und Bewegung für Babys von ca. 4 bis 18 Monaten mit ihren Eltern, 45 Minuten. Acht Termine von 26.11.2026 bis 04.02.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
-     "url": "https://musikfuechse.com/musikfuechse-babys/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
-     "category": "musik",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 18
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Keine Ausgebucht-Markierung; Anmeldung über 'Kurs buchen'"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-26T15:30",
-        "end": "2026-11-26T16:15"
-       },
-       {
-        "start": "2026-12-03T15:30",
-        "end": "2026-12-03T16:15"
-       },
-       {
-        "start": "2026-12-10T15:30",
-        "end": "2026-12-10T16:15"
-       },
-       {
-        "start": "2026-12-17T15:30",
-        "end": "2026-12-17T16:15"
-       },
-       {
-        "start": "2027-01-14T15:30",
-        "end": "2027-01-14T16:15"
-       },
-       {
-        "start": "2027-01-21T15:30",
-        "end": "2027-01-21T16:15"
-       },
-       {
-        "start": "2027-01-28T15:30",
-        "end": "2027-01-28T16:15"
-       },
-       {
-        "start": "2027-02-04T15:30",
-        "end": "2027-02-04T16:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse",
-     "title": "Musikfüchse Baby I, Mo 10:30 (ab 14.09.2026)",
-     "summary": "Laufender Musikgarten für Babys von ca. 4 bis 12 Monaten mit ihren Eltern, 45 Minuten. Die Termine ab 09.11.2026 liegen im Horizont.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 €",
      "url": "https://musikfuechse.com/musikfuechse-babys/",
      "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
      "category": "musik",
@@ -459,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Platzstand nicht ausgewiesen, Anfrage über den Anbieter"
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -502,16 +67,15 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse",
-     "title": "Musikfüchse Baby II, Mo 9:30 (ab 14.09.2026)",
-     "summary": "Laufender Musikgarten für Kinder von ca. 10 bis 18 Monaten mit ihren Eltern, 45 Minuten. Die Termine ab 09.11.2026 liegen im Horizont.",
+     "title": "Musikfüchse Baby II, Mo 9:30 (laufend bis 16.11.)",
+     "summary": "Laufender Kurs für Babys ca. 10–18 Monate mit Eltern, 45 Minuten. Der Kurs endet am 16.11.2026.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 €",
      "url": "https://musikfuechse.com/musikfuechse-babys/",
      "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
      "category": "musik",
@@ -521,7 +85,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Platzstand nicht ausgewiesen, Anfrage über den Anbieter"
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -564,16 +128,15 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse",
-     "title": "Musikfüchse Baby I, Di 10:30 (ab 15.09.2026)",
-     "summary": "Laufender Musikgarten für Babys von ca. 4 bis 12 Monaten mit ihren Eltern, 45 Minuten. Die Termine ab 10.11.2026 liegen im Horizont.",
+     "title": "Musikfüchse Baby I, Di 10:30 (laufend bis 17.11.)",
+     "summary": "Laufender Kurs für Babys ca. 4–12 Monate mit Eltern, 45 Minuten. Der Kurs endet am 17.11.2026.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 €",
      "url": "https://musikfuechse.com/musikfuechse-babys/",
      "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
      "category": "musik",
@@ -583,7 +146,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Platzstand nicht ausgewiesen, Anfrage über den Anbieter"
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -626,16 +189,15 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse",
-     "title": "Musikfüchse Baby II, Di 9:30 (ab 15.09.2026)",
-     "summary": "Laufender Musikgarten für Kinder von ca. 10 bis 18 Monaten mit ihren Eltern, 45 Minuten. Die Termine ab 10.11.2026 liegen im Horizont.",
+     "title": "Musikfüchse Baby II, Di 9:30 (laufend bis 17.11.)",
+     "summary": "Laufender Kurs für Babys ca. 10–18 Monate mit Eltern, 45 Minuten. Der Kurs endet am 17.11.2026.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 €",
      "url": "https://musikfuechse.com/musikfuechse-babys/",
      "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
      "category": "musik",
@@ -645,7 +207,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Platzstand nicht ausgewiesen, Anfrage über den Anbieter"
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -687,17 +249,16 @@
     },
     {
      "providerId": "musikfuechse",
-     "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse Baby I, Do 10:30 (ab 17.09.2026)",
-     "summary": "Laufender Musikgarten für Babys von ca. 4 bis 12 Monaten mit ihren Eltern, 45 Minuten. Die Termine ab 12.11.2026 liegen im Horizont.",
+     "venueId": "musikfuechse",
+     "title": "Musikfüchse Baby I, Mo 10:30 (ab 23.11.26)",
+     "summary": "Musikspiel für Babys ca. 4–12 Monate mit Eltern, 45 Minuten, 8 Termine bis 25.01.2027. Anmeldung über das Buchungsformular.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 €",
      "url": "https://musikfuechse.com/musikfuechse-babys/",
      "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
      "category": "musik",
@@ -707,7 +268,251 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Platzstand nicht ausgewiesen, Anfrage über den Anbieter"
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-23T10:30",
+        "end": "2026-11-23T11:15"
+       },
+       {
+        "start": "2026-11-30T10:30",
+        "end": "2026-11-30T11:15"
+       },
+       {
+        "start": "2026-12-07T10:30",
+        "end": "2026-12-07T11:15"
+       },
+       {
+        "start": "2026-12-14T10:30",
+        "end": "2026-12-14T11:15"
+       },
+       {
+        "start": "2026-12-21T10:30",
+        "end": "2026-12-21T11:15"
+       },
+       {
+        "start": "2027-01-11T10:30",
+        "end": "2027-01-11T11:15"
+       },
+       {
+        "start": "2027-01-18T10:30",
+        "end": "2027-01-18T11:15"
+       },
+       {
+        "start": "2027-01-25T10:30",
+        "end": "2027-01-25T11:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "musikfuechse",
+     "venueId": "musikfuechse",
+     "title": "Musikfüchse Baby II, Mo 9:30 (ab 23.11.26)",
+     "summary": "Musikspiel für Babys ca. 10–18 Monate mit Eltern, 45 Minuten, 8 Termine bis 25.01.2027. Anmeldung über das Buchungsformular.",
+     "topics": [
+      "musik"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "120 €",
+     "url": "https://musikfuechse.com/musikfuechse-babys/",
+     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+     "category": "musik",
+     "age": {
+      "minMonths": 10,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-23T09:30",
+        "end": "2026-11-23T10:15"
+       },
+       {
+        "start": "2026-11-30T09:30",
+        "end": "2026-11-30T10:15"
+       },
+       {
+        "start": "2026-12-07T09:30",
+        "end": "2026-12-07T10:15"
+       },
+       {
+        "start": "2026-12-14T09:30",
+        "end": "2026-12-14T10:15"
+       },
+       {
+        "start": "2026-12-21T09:30",
+        "end": "2026-12-21T10:15"
+       },
+       {
+        "start": "2027-01-11T09:30",
+        "end": "2027-01-11T10:15"
+       },
+       {
+        "start": "2027-01-18T09:30",
+        "end": "2027-01-18T10:15"
+       },
+       {
+        "start": "2027-01-25T09:30",
+        "end": "2027-01-25T10:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "musikfuechse",
+     "venueId": "musikfuechse",
+     "title": "Musikfüchse Baby I, Di 10:30 (ab 24.11.26)",
+     "summary": "Musikspiel für Babys ca. 4–12 Monate mit Eltern, 45 Minuten, 8 Termine bis 26.01.2027. Anmeldung über das Buchungsformular.",
+     "topics": [
+      "musik"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "120 €",
+     "url": "https://musikfuechse.com/musikfuechse-babys/",
+     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+     "category": "musik",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-24T10:30",
+        "end": "2026-11-24T11:15"
+       },
+       {
+        "start": "2026-12-01T10:30",
+        "end": "2026-12-01T11:15"
+       },
+       {
+        "start": "2026-12-08T10:30",
+        "end": "2026-12-08T11:15"
+       },
+       {
+        "start": "2026-12-15T10:30",
+        "end": "2026-12-15T11:15"
+       },
+       {
+        "start": "2026-12-22T10:30",
+        "end": "2026-12-22T11:15"
+       },
+       {
+        "start": "2027-01-12T10:30",
+        "end": "2027-01-12T11:15"
+       },
+       {
+        "start": "2027-01-19T10:30",
+        "end": "2027-01-19T11:15"
+       },
+       {
+        "start": "2027-01-26T10:30",
+        "end": "2027-01-26T11:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "musikfuechse",
+     "venueId": "musikfuechse",
+     "title": "Musikfüchse Baby II, Di 9:30 (ab 24.11.26)",
+     "summary": "Musikspiel für Babys ca. 10–18 Monate mit Eltern, 45 Minuten, 8 Termine bis 26.01.2027. Anmeldung über das Buchungsformular.",
+     "topics": [
+      "musik"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "120 €",
+     "url": "https://musikfuechse.com/musikfuechse-babys/",
+     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+     "category": "musik",
+     "age": {
+      "minMonths": 10,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-24T09:30",
+        "end": "2026-11-24T10:15"
+       },
+       {
+        "start": "2026-12-01T09:30",
+        "end": "2026-12-01T10:15"
+       },
+       {
+        "start": "2026-12-08T09:30",
+        "end": "2026-12-08T10:15"
+       },
+       {
+        "start": "2026-12-15T09:30",
+        "end": "2026-12-15T10:15"
+       },
+       {
+        "start": "2026-12-22T09:30",
+        "end": "2026-12-22T10:15"
+       },
+       {
+        "start": "2027-01-12T09:30",
+        "end": "2027-01-12T10:15"
+       },
+       {
+        "start": "2027-01-19T09:30",
+        "end": "2027-01-19T10:15"
+       },
+       {
+        "start": "2027-01-26T09:30",
+        "end": "2027-01-26T10:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "musikfuechse",
+     "venueId": "musikfuechse-poppenreuth",
+     "title": "Musikfüchse Baby I, Do 10:30 (laufend bis 19.11.)",
+     "summary": "Laufender Kurs für Babys ca. 4–12 Monate mit Eltern, 45 Minuten. Der Kurs endet am 19.11.2026.",
+     "topics": [
+      "musik"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "120 €",
+     "url": "https://musikfuechse.com/musikfuechse-babys/",
+     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+     "category": "musik",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -750,16 +555,15 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse Baby II, Do 9:30 (ab 17.09.2026)",
-     "summary": "Laufender Musikgarten für Kinder von ca. 10 bis 18 Monaten mit ihren Eltern, 45 Minuten. Die Termine ab 12.11.2026 liegen im Horizont.",
+     "title": "Musikfüchse Baby II, Do 9:30 (laufend bis 19.11.)",
+     "summary": "Laufender Kurs für Babys ca. 10–18 Monate mit Eltern, 45 Minuten. Der Kurs endet am 19.11.2026.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 €",
      "url": "https://musikfuechse.com/musikfuechse-babys/",
      "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
      "category": "musik",
@@ -769,7 +573,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Platzstand nicht ausgewiesen, Anfrage über den Anbieter"
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -812,16 +616,15 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse Baby I+II, Do 15:30 (ab 17.09.2026)",
-     "summary": "Laufender Nachmittagskurs für Babys von ca. 4 bis 18 Monaten mit ihren Eltern, 45 Minuten. Die Termine ab 12.11.2026 liegen im Horizont.",
+     "title": "Musikfüchse Baby I+II, Do 15:30 (laufend bis 19.11.)",
+     "summary": "Laufender Kurs für Babys ca. 4–18 Monate mit Eltern, 45 Minuten. Der Kurs endet am 19.11.2026.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "120 € (8 Termine)",
+     "price": "120 €",
      "url": "https://musikfuechse.com/musikfuechse-babys/",
      "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
      "category": "musik",
@@ -831,7 +634,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Platzstand nicht ausgewiesen, Anfrage über den Anbieter"
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -870,13 +673,196 @@
        }
       ]
      }
+    },
+    {
+     "providerId": "musikfuechse",
+     "venueId": "musikfuechse-poppenreuth",
+     "title": "Musikfüchse Baby I, Do 10:30 (ab 26.11.26)",
+     "summary": "Musikspiel für Babys ca. 4–12 Monate mit Eltern, 45 Minuten, 8 Termine bis 04.02.2027. Anmeldung über das Buchungsformular.",
+     "topics": [
+      "musik"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "120 €",
+     "url": "https://musikfuechse.com/musikfuechse-babys/",
+     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+     "category": "musik",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-26T10:30",
+        "end": "2026-11-26T11:15"
+       },
+       {
+        "start": "2026-12-03T10:30",
+        "end": "2026-12-03T11:15"
+       },
+       {
+        "start": "2026-12-10T10:30",
+        "end": "2026-12-10T11:15"
+       },
+       {
+        "start": "2026-12-17T10:30",
+        "end": "2026-12-17T11:15"
+       },
+       {
+        "start": "2027-01-14T10:30",
+        "end": "2027-01-14T11:15"
+       },
+       {
+        "start": "2027-01-21T10:30",
+        "end": "2027-01-21T11:15"
+       },
+       {
+        "start": "2027-01-28T10:30",
+        "end": "2027-01-28T11:15"
+       },
+       {
+        "start": "2027-02-04T10:30",
+        "end": "2027-02-04T11:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "musikfuechse",
+     "venueId": "musikfuechse-poppenreuth",
+     "title": "Musikfüchse Baby II, Do 9:30 (ab 26.11.26)",
+     "summary": "Musikspiel für Babys ca. 10–18 Monate mit Eltern, 45 Minuten, 8 Termine bis 04.02.2027. Anmeldung über das Buchungsformular.",
+     "topics": [
+      "musik"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "120 €",
+     "url": "https://musikfuechse.com/musikfuechse-babys/",
+     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+     "category": "musik",
+     "age": {
+      "minMonths": 10,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-26T09:30",
+        "end": "2026-11-26T10:15"
+       },
+       {
+        "start": "2026-12-03T09:30",
+        "end": "2026-12-03T10:15"
+       },
+       {
+        "start": "2026-12-10T09:30",
+        "end": "2026-12-10T10:15"
+       },
+       {
+        "start": "2026-12-17T09:30",
+        "end": "2026-12-17T10:15"
+       },
+       {
+        "start": "2027-01-14T09:30",
+        "end": "2027-01-14T10:15"
+       },
+       {
+        "start": "2027-01-21T09:30",
+        "end": "2027-01-21T10:15"
+       },
+       {
+        "start": "2027-01-28T09:30",
+        "end": "2027-01-28T10:15"
+       },
+       {
+        "start": "2027-02-04T09:30",
+        "end": "2027-02-04T10:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "musikfuechse",
+     "venueId": "musikfuechse-poppenreuth",
+     "title": "Musikfüchse Baby I+II, Do 15:30 (ab 26.11.26)",
+     "summary": "Musikspiel für Babys ca. 4–18 Monate mit Eltern, 45 Minuten, 8 Termine bis 04.02.2027. Anmeldung über das Buchungsformular.",
+     "topics": [
+      "musik"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "120 €",
+     "url": "https://musikfuechse.com/musikfuechse-babys/",
+     "sourceUrl": "https://musikfuechse.com/musikfuechse-babys/",
+     "category": "musik",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über den Button 'Kurs buchen' (Formular); Verfügbarkeit nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-26T15:30",
+        "end": "2026-11-26T16:15"
+       },
+       {
+        "start": "2026-12-03T15:30",
+        "end": "2026-12-03T16:15"
+       },
+       {
+        "start": "2026-12-10T15:30",
+        "end": "2026-12-10T16:15"
+       },
+       {
+        "start": "2026-12-17T15:30",
+        "end": "2026-12-17T16:15"
+       },
+       {
+        "start": "2027-01-14T15:30",
+        "end": "2027-01-14T16:15"
+       },
+       {
+        "start": "2027-01-21T15:30",
+        "end": "2027-01-21T16:15"
+       },
+       {
+        "start": "2027-01-28T15:30",
+        "end": "2027-01-28T16:15"
+       },
+       {
+        "start": "2027-02-04T15:30",
+        "end": "2027-02-04T16:15"
+       }
+      ]
+     }
     }
    ],
-   "inputHash": "bbcc82e31b99b231c881777c754881c4708bf1e77d90756caf893e6c0681bdef",
+   "inputHash": "53bcaf3510c76745af1dd466e4bc4e7875089ccae56517c4a4b5e69bae0ef14c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "934c3dd4db5beb92773e1e4b19222db4464586cc4e901262f24f1cbc915a47e3"
   },
   "seite:https://musikfuechse.com/musikfuechse-fuer-kleinkinder/": {
@@ -1317,7 +1303,7 @@
    "inputHash": "ae3dd5ec537162a3ed3fffe9eca251fbe3fa2aee176fded60a85a9065d1738ef",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "partsHash": "a421d1863f17b57b26765135d9398706a483182ee29173eaf1b1c4cfbae5c5a5"
   },
@@ -1326,7 +1312,7 @@
    "inputHash": "4c498328f03f4de5035acf3ef6791d26e003cb7003609ef262ac4b2749deb878",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "73ff7c6dd89368375a1bb91128658250c43613d8d77b62b2ab845b8798eb97d6"
   }

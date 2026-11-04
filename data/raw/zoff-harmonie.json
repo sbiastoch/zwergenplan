@@ -6,8 +6,8 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP (Babys geb. April–Juni 2026)",
-     "summary": "Entwicklungsbegleitung für Babys mit Bewegungs- und Spielanregungen sowie Austausch für Eltern. Dienstags 9:30 Uhr bis Mitte Dezember; die freien Plätze stehen auf der Detailseite.",
+     "title": "PEKiP-Gruppe Babys geb. April–Juni 2026 (Di 9:30)",
+     "summary": "Entwicklungsbegleitung mit Bewegungs- und Spielanregungen für Babys, dazu Austausch für Eltern. Die laufende Gruppe trifft sich dienstags bis 15.12. Ein Neueinstieg ist aus der Liste nicht ersichtlich.",
      "topics": [
       "pekip"
      ],
@@ -19,7 +19,7 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Freie Plätze auf der Detailseite prüfen; Anmeldung über das Online-Formular"
+      "note": "Platzstand in der Liste nicht angegeben; Anmeldung über die Detailseite bzw. das Kursbüro (0911/ 24449-493)."
      },
      "schedule": {
       "kind": "weekly",
@@ -27,16 +27,17 @@
        "TU"
       ],
       "start": "09:30",
-      "from": "2026-09-22",
+      "end": "11:00",
+      "from": "2026-11-10",
       "until": "2026-12-15",
-      "skipHolidays": false
+      "skipHolidays": true
      }
     },
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP (Babys geb. Dez. 2025–Feb. 2026)",
-     "summary": "Entwicklungsbegleitung für Babys mit Bewegungs- und Spielanregungen sowie Austausch für Eltern. Dienstags 11:30 Uhr bis Mitte Dezember; der Kurs ist ausgebucht.",
+     "title": "PEKiP-Gruppe Babys geb. Dez. 2025–Feb. 2026 (Di 11:30)",
+     "summary": "Entwicklungsbegleitung mit Bewegungs- und Spielanregungen für Babys, dazu Austausch für Eltern. Die Gruppe trifft sich dienstags bis 15.12. und ist laut Angebot ausgebucht.",
      "topics": [
       "pekip"
      ],
@@ -48,7 +49,7 @@
      "category": "babykurse",
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausgebucht laut Kursliste"
+      "note": "Im Listentitel als „Ausgebucht!“ markiert."
      },
      "schedule": {
       "kind": "weekly",
@@ -56,17 +57,18 @@
        "TU"
       ],
       "start": "11:30",
-      "from": "2026-09-22",
+      "end": "13:00",
+      "from": "2026-11-10",
       "until": "2026-12-15",
-      "skipHolidays": false
+      "skipHolidays": true
      }
     }
    ],
-   "inputHash": "6f6e8ea5ce483efec0fd5ccbe2b7e2af90ba1dec10790aec1863ef17383776ac",
+   "inputHash": "767a0e04ee75751e696df37b7876be88f693cbbdcdc2acf5f9003eccaa72be88",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip": {
@@ -209,7 +211,7 @@
    "inputHash": "2e9e3032d3784bb82a21fd4f37f356233b84bb07e3badbc3c97b2f91635e7803",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -218,7 +220,7 @@
    "inputHash": "7dec4a0dda160e9dd229b8a2361e586180d08acd994edf0c3ea5e8c3f8fe8c17",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -328,7 +330,7 @@
    "inputHash": "1191e7196a3b6d4af8ab9a0f9d6cdfc15119b6f201655c5dd6d12031522867be",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -407,7 +409,7 @@
    "inputHash": "e8f2b51135bc88c3162a9c7c607e9b8d8048f3f63ab5c72eebf820c0e2835097",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -450,7 +452,7 @@
    "inputHash": "b0f0cd537b118e472fefb53a675945ba581145c8531f1282738d875754fa2e11",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -459,7 +461,7 @@
    "inputHash": "ca8d576aca4cf2f5ddc5c73d50f7fb631fb5f68b5e689b786fa8f1242654ee51",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
@@ -469,7 +471,7 @@
    "inputHash": "352bcaa7d1bf11f0bebbd21b99006b92499187da1d2f418e0fcfdda8daf2a5af",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -481,7 +483,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "stadt-vk"

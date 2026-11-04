@@ -6,11 +6,10 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby (Babys 3–12 Monate), donnerstags",
-     "summary": "Kräftigende, fließende Übungen nach Schwangerschaft und Geburt, das Baby ist dabei. Ein Block hat 6 Donnerstage; Einstieg nur zu den Blockstarts. Der Block ab 22.10. ist derzeit nicht buchbar.",
+     "title": "Yoga mit Baby (3–12 Monate), donnerstags 9:30",
+     "summary": "Kräftigende, fließende Yogastunden nach der Rückbildung, Babys von etwa 3 bis 12 Monaten sind dabei. Donnerstags 9:30–10:30, Kurse mit 6 Terminen. Der laufende Kurs ist geschlossen; neue Kurse starten am 10.12.26, 11.02.27, 01.04.27 und 03.06.27 (24.12. und 31.12. entfallen).",
      "topics": [
-      "yoga-mit-baby",
-      "bewegung"
+      "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -25,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Block ab 22.10. laut Eversports „Nicht buchbar“; spätere Blöcke über „hier buchen“ auf wolfpack.yoga"
+      "note": "Anmeldung über „Jetzt buchen“ bei Eversports; Restplätze sind im abgerufenen Text nicht angegeben."
      },
      "schedule": {
       "kind": "dates",
@@ -51,113 +50,33 @@
         "end": "2026-12-10T10:30"
        },
        {
-        "start": "2026-12-17T09:30",
-        "end": "2026-12-17T10:30"
-       },
-       {
-        "start": "2027-01-07T09:30",
-        "end": "2027-01-07T10:30"
-       },
-       {
-        "start": "2027-01-14T09:30",
-        "end": "2027-01-14T10:30"
-       },
-       {
-        "start": "2027-01-21T09:30",
-        "end": "2027-01-21T10:30"
-       },
-       {
-        "start": "2027-01-28T09:30",
-        "end": "2027-01-28T10:30"
-       },
-       {
         "start": "2027-02-11T09:30",
         "end": "2027-02-11T10:30"
-       },
-       {
-        "start": "2027-02-18T09:30",
-        "end": "2027-02-18T10:30"
-       },
-       {
-        "start": "2027-02-25T09:30",
-        "end": "2027-02-25T10:30"
-       },
-       {
-        "start": "2027-03-04T09:30",
-        "end": "2027-03-04T10:30"
-       },
-       {
-        "start": "2027-03-11T09:30",
-        "end": "2027-03-11T10:30"
-       },
-       {
-        "start": "2027-03-18T09:30",
-        "end": "2027-03-18T10:30"
        },
        {
         "start": "2027-04-01T09:30",
         "end": "2027-04-01T10:30"
        },
        {
-        "start": "2027-04-08T09:30",
-        "end": "2027-04-08T10:30"
-       },
-       {
-        "start": "2027-04-15T09:30",
-        "end": "2027-04-15T10:30"
-       },
-       {
-        "start": "2027-04-22T09:30",
-        "end": "2027-04-22T10:30"
-       },
-       {
-        "start": "2027-04-29T09:30",
-        "end": "2027-04-29T10:30"
-       },
-       {
-        "start": "2027-05-06T09:30",
-        "end": "2027-05-06T10:30"
-       },
-       {
         "start": "2027-06-03T09:30",
         "end": "2027-06-03T10:30"
-       },
-       {
-        "start": "2027-06-10T09:30",
-        "end": "2027-06-10T10:30"
-       },
-       {
-        "start": "2027-06-17T09:30",
-        "end": "2027-06-17T10:30"
-       },
-       {
-        "start": "2027-06-24T09:30",
-        "end": "2027-06-24T10:30"
-       },
-       {
-        "start": "2027-07-01T09:30",
-        "end": "2027-07-01T10:30"
-       },
-       {
-        "start": "2027-07-08T09:30",
-        "end": "2027-07-08T10:30"
        }
       ]
      }
     }
    ],
-   "inputHash": "ae4e81d4b68be937fd58f43a7a3f1ac4055882fa957c26187b6201ab49fbea8a",
+   "inputHash": "ef57fe0f136c1c4f5496bb55bac59bda8d1cda9bf5f066f2c7d5cecf889ab0aa",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "766e03d83a107d8c166739ed26c23c79486547433de07097e17bb784a4f8c7f9"
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00"
+   "checkedAt": "2026-11-04T08:55:04+01:00"
   }
  }
 }

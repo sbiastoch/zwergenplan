@@ -74,13 +74,9 @@
    ],
    "inputHash": "b4f8666250751c3ce6a4bb064f50dd67ad6959794b8fbe30cc38f3520b00393a",
    "model": "haiku",
-   "status": "fehler",
-   "reason": "https://www.evangelischimsueden-nuernberg.de/krabbelgruppen: robots.txt nicht erreichbar (fetch failed)",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
-   "failingSince": "2026-11-03T09:27:26+01:00",
-   "klasse": "voruebergehend",
-   "klasseSince": "2026-11-03T09:27:26+01:00",
    "partsHash": "8fdc3a8a582919153c413399f039f64479ccfa6fed10791255713e99ba7f3951"
   },
   "seite:https://www.evangelische-termine.de/ical?vid=590": {
@@ -215,7 +211,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8fdc3a8a582919153c413399f039f64479ccfa6fed10791255713e99ba7f3951"
   },
@@ -233,7 +229,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-11-03T09:27:26+01:00",
    "sources": [
     "evtermine"

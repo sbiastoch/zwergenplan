@@ -6,15 +6,15 @@
     {
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
-     "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren (dienstags)",
-     "summary": "Offene Gruppe für Eltern mit ihren Kleinkindern im Gemeindehaus, dienstags 9:30–11:00 Uhr. Kosten und Anmeldung stehen im Kalender nicht; bitte vorher beim Gemeindebüro nachfragen.",
+     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags, Gemeindehaus)",
+     "summary": "Offene Eltern-Kind-Gruppe der Melanchthonkirche im Gemeindehaus für Eltern mit Kindern von 0 bis 3 Jahren. Die Quelle nennt weder Preis noch Anmeldung; bekannte Termine reichen bis 22.12.2026, weitere bitte bei der Gemeinde erfragen.",
      "topics": [
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/ical?vid=574",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109712.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=574",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -23,7 +23,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angaben im Kalender; bei der Gemeinde nachfragen."
+      "note": "Keine Angabe in der Quelle; bei der Gemeinde Melanchthonkirche Ziegelstein nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -62,7 +62,6 @@
    ],
    "inputHash": "e7e200d6e8a22eb245aeae6783534cf554ac015a072d78fc5f8e45aa693359d3",
    "dated": {
-    "2026-11-03": "01a9090dfc8bd9dbcb457f41740d133c5eb1adc018d00f8debf0a46115797659",
     "2026-11-08": "01a682533a8c9002a3d78d7c5b799b7eb58d255daa9ecec66df94b82b1f82346",
     "2026-11-09": "e5769a04b3d044a360166f514ad70365213fb967cd12c846384250de36d44d8d",
     "2026-11-10": "e275ea4d6f15618c5b3688afadf1df7f131423b70ddca05e81978e051bbd3e52",
@@ -89,12 +88,15 @@
     "2026-12-14": "d3ed87e0178f3dbc78ee19ceb3dc6853cf98ca32a9901970bd2f3d3632935aec",
     "2026-12-15": "1bf45fcf38c84066f29d675677986197e10d7ee9d70b3609be54d536576b5526",
     "2026-12-21": "c3e75f5bc234139c060fc9fa529c072260e10ebf68a13e0bb7e3b2d5a914c233",
-    "2026-12-22": "291953b75ac5c11d34fb8c80986629b92944251aa8e22377ab50375b40110c05"
+    "2026-12-22": "291953b75ac5c11d34fb8c80986629b92944251aa8e22377ab50375b40110c05",
+    "2027-02-06": "2cb613014f7b4cd8e578c9401b8e4f942ffedc525a5eb9c7fff282977757aa8c",
+    "2027-04-03": "e20db12175066744e7895384ba82c1c5a23179662a610b8377fee875764d0c7e",
+    "2027-05-30": "ba045e7800b4b47924c951c52f1c67e6d7ac2d2b377456f5089cbc003c90679d"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "7a588f5684743d34f43b434b2b4bca9b975902153d2249675e9a712e6c1c9142"
   },
   "kandidaten": {
@@ -170,7 +172,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-04T08:55:04+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine"
