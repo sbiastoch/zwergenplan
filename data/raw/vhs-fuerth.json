@@ -34,14 +34,18 @@
    ],
    "inputHash": "bf72bf30134cdebffb392200aa5e6a828a6dc7213833a97b7b32fbdfb563a76d",
    "model": "haiku",
-   "status": "ok",
+   "status": "fehler",
+   "reason": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26: Vorab-Auflösung: mehr als 5 Weiterleitungen (mehr als 5 Weiterleitungen)",
    "checkedAt": "2026-11-02T09:03:46+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
+   "failingSince": "2026-11-05T09:21:47+01:00",
    "pending": {
     "inputHash": "7c2d64a41f6b8a472ea4d06c5f6556bd567745ff610daa74301da0178c4be4b2",
     "model": "haiku",
     "events": []
    },
+   "klasse": "voruebergehend",
+   "klasseSince": "2026-11-05T09:21:47+01:00",
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }

@@ -41,7 +41,7 @@
    "inputHash": "4a186bc1fae5c375b8e1192157a03608e9e83545993dfdd997a5d4cf8dbe555f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "f1ffeccaeeb1caca965d9eb8005c30dba92183ec292df8bacd70319e29fbd01c"
   },
@@ -314,7 +314,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "c25088f3bc444367c5ff4fef08df8eb68bdc3b19e8c10e56c7f87453ed56cbb2"
   },
@@ -323,17 +323,17 @@
     {
      "providerId": "cvjm-gostenhof-miniclub",
      "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club: Kniereiter und Bewegungslieder (18 Monate bis 3 Jahre)",
-     "summary": "Dienstags 10:00–11:30 Uhr: Eltern machen mit ihren Kleinkindern Kniereiter, Fingerspiele und Bewegungslieder, dazu Freispielzeit und Kaffee. In den Schulferien keine Treffen; Infos und Anfragen bei Alexandra Gußner.",
+     "title": "Mini-Club – Kniereiter, Bewegungslieder (Dienstag)",
+     "summary": "Dienstags 10:00–11:30 Uhr, nicht in den Schulferien: Mütter und Väter mit Kindern lernen Kniereiter, Fingerspiele und Bewegungslieder, dazu Freispielzeit und Kaffee. Infos bei Alexandra Gußner, 0151/56071708.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "singen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/mini-club-kniereiter-bewegungslieder-3/2026-11-10/",
+     "url": "https://www.evangelische-termine.de/ical?vid=1496",
+     "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 18,
@@ -341,19 +341,122 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anfrage bei Alexandra Gußner, Telefon 0151/56071708"
+      "note": "keine Platzanzeige; Infos und Anmeldung bei Alexandra Gußner, 0151/56071708"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:00",
-      "end": "11:30",
-      "from": "2026-11-10",
-      "skipHolidays": true
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-10T10:00",
+        "end": "2026-11-10T11:30"
+       },
+       {
+        "start": "2026-11-17T10:00",
+        "end": "2026-11-17T11:30"
+       },
+       {
+        "start": "2026-11-24T10:00",
+        "end": "2026-11-24T11:30"
+       },
+       {
+        "start": "2026-12-01T10:00",
+        "end": "2026-12-01T11:30"
+       },
+       {
+        "start": "2026-12-08T10:00",
+        "end": "2026-12-08T11:30"
+       },
+       {
+        "start": "2026-12-15T10:00",
+        "end": "2026-12-15T11:30"
+       },
+       {
+        "start": "2026-12-22T10:00",
+        "end": "2026-12-22T11:30"
+       },
+       {
+        "start": "2027-01-12T10:00",
+        "end": "2027-01-12T11:30"
+       },
+       {
+        "start": "2027-01-19T10:00",
+        "end": "2027-01-19T11:30"
+       },
+       {
+        "start": "2027-01-26T10:00",
+        "end": "2027-01-26T11:30"
+       },
+       {
+        "start": "2027-02-02T10:00",
+        "end": "2027-02-02T11:30"
+       },
+       {
+        "start": "2027-02-16T10:00",
+        "end": "2027-02-16T11:30"
+       },
+       {
+        "start": "2027-02-23T10:00",
+        "end": "2027-02-23T11:30"
+       },
+       {
+        "start": "2027-03-02T10:00",
+        "end": "2027-03-02T11:30"
+       },
+       {
+        "start": "2027-03-09T10:00",
+        "end": "2027-03-09T11:30"
+       },
+       {
+        "start": "2027-03-16T10:00",
+        "end": "2027-03-16T11:30"
+       },
+       {
+        "start": "2027-04-06T10:00",
+        "end": "2027-04-06T11:30"
+       },
+       {
+        "start": "2027-04-13T10:00",
+        "end": "2027-04-13T11:30"
+       },
+       {
+        "start": "2027-04-20T10:00",
+        "end": "2027-04-20T11:30"
+       },
+       {
+        "start": "2027-04-27T10:00",
+        "end": "2027-04-27T11:30"
+       },
+       {
+        "start": "2027-05-04T10:00",
+        "end": "2027-05-04T11:30"
+       },
+       {
+        "start": "2027-05-11T10:00",
+        "end": "2027-05-11T11:30"
+       },
+       {
+        "start": "2027-06-01T10:00",
+        "end": "2027-06-01T11:30"
+       },
+       {
+        "start": "2027-06-08T10:00",
+        "end": "2027-06-08T11:30"
+       },
+       {
+        "start": "2027-06-15T10:00",
+        "end": "2027-06-15T11:30"
+       },
+       {
+        "start": "2027-06-22T10:00",
+        "end": "2027-06-22T11:30"
+       },
+       {
+        "start": "2027-06-29T10:00",
+        "end": "2027-06-29T11:30"
+       }
+      ]
      },
-     "via": "frankenkids"
+     "via": "evtermine"
     }
    ],
    "inputHash": "b2f015530a27b6680925b396c4fac3c2860637aec1c82ce6b3cd7040f08c71ea",
@@ -396,6 +499,7 @@
     "2027-04-13": "779b5fb86a078ca7c39325da051c983fcda3cbe74843f6db075aa7549318c434",
     "2027-04-19": "44733a4de8a241c8dfffbb226a23b107db0516992c2b6f65f9cb4800f87d5946",
     "2027-04-20": "23739e9e3b02213161cac69193430a958010004f79c1ecad21d5efd15426ee5f",
+    "2027-04-26": "1b1ffa01806ec0ec6e57f10749cb36ce7d533b31ad9877c849ce2aa9e7ef09be",
     "2027-04-27": "3f3b17e3e1f0b516459043786429bc685a6c497a38a5a863cf2717205972d002",
     "2027-05-04": "4dab2838e76a8be021db8c1de741d4345b60a15b91fbd56c43b7df0c8fe5d2e9",
     "2027-05-11": "950c3f9a29d6578514cc948526bd2341a4668f432166464c95dd57fba7c02951",
@@ -407,8 +511,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
-   "changedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "changedAt": "2026-11-05T09:21:47+01:00",
    "sources": [
     "evtermine",
     "frankenkids"

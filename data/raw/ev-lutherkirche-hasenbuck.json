@@ -114,7 +114,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
    "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "4997115d57eea8441ea456e2b3761ec206a77bdc46a1b3ec23688c24be8d9b27"
   },
@@ -184,7 +184,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "sources": [
     "evtermine"

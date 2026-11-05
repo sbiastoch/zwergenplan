@@ -70,7 +70,7 @@
    "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "pending": {
-    "inputHash": "b56a093ffda3b36d0fc6f51d3dd3b15636a2e3286d45f51b02375551ba9b8ebc",
+    "inputHash": "b213d07c9922b533e7098d1fde76a41bd0c99bdbe120ddadf3562965cbce2dd8",
     "model": "haiku",
     "events": []
    },
@@ -92,7 +92,7 @@
    "inputHash": "7dcc184d1f1ccb0b91366c74e36f25c629d9ebc5806d33601a10c4342b1da14f",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "0f480c78bfd0dba598297cfacf6fb3e4c58ad7d92531c1e477facc8971bdc162"
   }

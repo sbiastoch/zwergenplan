@@ -6,8 +6,8 @@
     {
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
-     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags, Gemeindehaus)",
-     "summary": "Offene Eltern-Kind-Gruppe der Melanchthonkirche im Gemeindehaus für Eltern mit Kindern von 0 bis 3 Jahren. Die Quelle nennt weder Preis noch Anmeldung; bekannte Termine reichen bis 22.12.2026, weitere bitte bei der Gemeinde erfragen.",
+     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags)",
+     "summary": "Offene Gruppe für Eltern mit Kindern von 0 bis 3 Jahren im Gemeindehaus der Melanchthonkirche. Die Termine im Kalender reichen bis 22.12.2026; spätere Termine bitte beim Anbieter erfragen.",
      "topics": [
       "eltern-kind-gruppe"
      ],
@@ -23,7 +23,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe in der Quelle; bei der Gemeinde Melanchthonkirche Ziegelstein nachfragen."
+      "note": "Keine Angaben zur Anmeldung in der Quelle; Nachfrage bei der Gemeinde (Gumbinner Straße 12)."
      },
      "schedule": {
       "kind": "dates",
@@ -80,7 +80,7 @@
     "2026-11-29": "fb5c035133b9e6961607dbc1423ab4c8ca64708b0a9f0e707db37a8f91e9f1fd",
     "2026-11-30": "ecf4e220659af668e916d0bcfc0e02e02434a08b3c72cf5364343915b5b8a918",
     "2026-12-01": "056737d12e95df8ff3305a0be2813f2f39d33661102adda556d8962d1ce9c444",
-    "2026-12-05": "966d0e7a38e56425a7b24057c6ad95fa0bcd87546fd430a82e3b27134d39ce6e",
+    "2026-12-05": "d6781ed4d4d8c67407dc06582e63927d787d3ab358fe9c85d389e11b59ce9102",
     "2026-12-06": "e1ecd051c5a381773424c01b551a65746e38c4ac6e01bceb00a8911bb69e92ea",
     "2026-12-07": "d7fd2b6289c8322200eecd1b0451f029721e43a3b747af067fc07575442efb23",
     "2026-12-08": "b152a7acf62d3604d60010959172e1b96e0d8022ff9f1029cc26ec37f962523a",
@@ -95,8 +95,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
-   "changedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "changedAt": "2026-11-05T09:21:47+01:00",
    "partsHash": "7a588f5684743d34f43b434b2b4bca9b975902153d2249675e9a712e6c1c9142"
   },
   "kandidaten": {
@@ -172,7 +172,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-05T09:21:47+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "evtermine"
