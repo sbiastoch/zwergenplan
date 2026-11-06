@@ -6,8 +6,8 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby, Do 9:30 (Start 22.10.2026, laufend)",
-     "summary": "Postnatales Yoga mit Baby nach der Rückbildung, für Mütter und Väter mit Babys von etwa 3 bis 12 Monaten. Die geschlossene Gruppe läuft bereits; eine Teilnahme ist laut Eversports derzeit nicht buchbar.",
+     "title": "Yoga mit Baby ab 22.10.2026 (Do 9:30–10:30)",
+     "summary": "Postnatales Yoga für Mamas und interessierte Papas mit Babys von 3–12 Monaten: Kräftigung, Beckenboden und Atemübungen, das Baby darf dabei sein. Läuft seit 22.10.; Eversports führt den Kurs als geschlossen.",
      "topics": [
       "yoga-mit-baby"
      ],
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Geschlossener Kurs, auf Eversports „Nicht buchbar“; bei Interesse beim Anbieter anfragen"
+      "note": "Buchung über Eversports; Platzstand nicht angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -59,8 +59,8 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby, Do 9:30 (Start 10.12.2026)",
-     "summary": "Postnatales Yoga mit Baby zur Kräftigung nach Schwangerschaft und Geburt, mit Fokus auf Körpermitte, Beckenboden und Atmung. Babys ca. 3–12 Monate; 6 Termine donnerstags 9:30–10:30 Uhr. Am 24.12. und 31.12. fällt eine Stunde aus.",
+     "title": "Yoga mit Baby ab 10.12.2026 (Do 9:30–10:30)",
+     "summary": "Postnatales Yoga mit Baby von 3–12 Monaten bei den Hebammen in Johannis: Körpermitte, Beckenboden, Atmung und Entspannung. Sechs Donnerstage; 24.12. und 31.12. entfallen.",
      "topics": [
       "yoga-mit-baby"
      ],
@@ -77,29 +77,43 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht bekannt"
+      "note": "Anmeldung über „hier buchen“ auf der Seite; Platzangabe nicht angegeben"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "10:30",
-      "from": "2026-12-10",
-      "count": 6,
-      "skipHolidays": false,
-      "except": [
-       "2026-12-24",
-       "2026-12-31"
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-10T09:30",
+        "end": "2026-12-10T10:30"
+       },
+       {
+        "start": "2026-12-17T09:30",
+        "end": "2026-12-17T10:30"
+       },
+       {
+        "start": "2027-01-07T09:30",
+        "end": "2027-01-07T10:30"
+       },
+       {
+        "start": "2027-01-14T09:30",
+        "end": "2027-01-14T10:30"
+       },
+       {
+        "start": "2027-01-21T09:30",
+        "end": "2027-01-21T10:30"
+       },
+       {
+        "start": "2027-01-28T09:30",
+        "end": "2027-01-28T10:30"
+       }
       ]
      }
     },
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby, Do 9:30 (Start 11.02.2027)",
-     "summary": "Postnatales Yoga mit Baby zur Kräftigung nach Schwangerschaft und Geburt, mit Fokus auf Körpermitte, Beckenboden und Atmung. Babys ca. 3–12 Monate; 6 Termine donnerstags 9:30–10:30 Uhr.",
+     "title": "Yoga mit Baby ab 11.02.2027 (Do 9:30–10:30)",
+     "summary": "Postnatales Yoga mit Baby von 3–12 Monaten bei den Hebammen in Johannis: Körpermitte, Beckenboden, Atmung und Entspannung. Sechs Donnerstagstermine im Block.",
      "topics": [
       "yoga-mit-baby"
      ],
@@ -116,25 +130,43 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht bekannt"
+      "note": "Anmeldung über „hier buchen“ auf der Seite; Platzangabe nicht angegeben"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "10:30",
-      "from": "2027-02-11",
-      "count": 6,
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-02-11T09:30",
+        "end": "2027-02-11T10:30"
+       },
+       {
+        "start": "2027-02-18T09:30",
+        "end": "2027-02-18T10:30"
+       },
+       {
+        "start": "2027-02-25T09:30",
+        "end": "2027-02-25T10:30"
+       },
+       {
+        "start": "2027-03-04T09:30",
+        "end": "2027-03-04T10:30"
+       },
+       {
+        "start": "2027-03-11T09:30",
+        "end": "2027-03-11T10:30"
+       },
+       {
+        "start": "2027-03-18T09:30",
+        "end": "2027-03-18T10:30"
+       }
+      ]
      }
     },
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby, Do 9:30 (Start 01.04.2027)",
-     "summary": "Postnatales Yoga mit Baby zur Kräftigung nach Schwangerschaft und Geburt, mit Fokus auf Körpermitte, Beckenboden und Atmung. Babys ca. 3–12 Monate; 6 Termine donnerstags 9:30–10:30 Uhr.",
+     "title": "Yoga mit Baby ab 01.04.2027 (Do 9:30–10:30)",
+     "summary": "Postnatales Yoga mit Baby von 3–12 Monaten bei den Hebammen in Johannis: Körpermitte, Beckenboden, Atmung und Entspannung. Sechs Donnerstagstermine im Block.",
      "topics": [
       "yoga-mit-baby"
      ],
@@ -151,25 +183,43 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht bekannt"
+      "note": "Anmeldung über „hier buchen“ auf der Seite; Platzangabe nicht angegeben"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "10:30",
-      "from": "2027-04-01",
-      "count": 6,
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-04-01T09:30",
+        "end": "2027-04-01T10:30"
+       },
+       {
+        "start": "2027-04-08T09:30",
+        "end": "2027-04-08T10:30"
+       },
+       {
+        "start": "2027-04-15T09:30",
+        "end": "2027-04-15T10:30"
+       },
+       {
+        "start": "2027-04-22T09:30",
+        "end": "2027-04-22T10:30"
+       },
+       {
+        "start": "2027-04-29T09:30",
+        "end": "2027-04-29T10:30"
+       },
+       {
+        "start": "2027-05-06T09:30",
+        "end": "2027-05-06T10:30"
+       }
+      ]
      }
     },
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby, Do 9:30 (Start 03.06.2027)",
-     "summary": "Postnatales Yoga mit Baby zur Kräftigung nach Schwangerschaft und Geburt, mit Fokus auf Körpermitte, Beckenboden und Atmung. Babys ca. 3–12 Monate; 6 Termine donnerstags 9:30–10:30 Uhr.",
+     "title": "Yoga mit Baby ab 03.06.2027 (Do 9:30–10:30)",
+     "summary": "Postnatales Yoga mit Baby von 3–12 Monaten bei den Hebammen in Johannis: Körpermitte, Beckenboden, Atmung und Entspannung. Sechs Donnerstagstermine im Block.",
      "topics": [
       "yoga-mit-baby"
      ],
@@ -186,33 +236,51 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht bekannt"
+      "note": "Anmeldung über „hier buchen“ auf der Seite; Platzangabe nicht angegeben"
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "10:30",
-      "from": "2027-06-03",
-      "count": 6,
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-06-03T09:30",
+        "end": "2027-06-03T10:30"
+       },
+       {
+        "start": "2027-06-10T09:30",
+        "end": "2027-06-10T10:30"
+       },
+       {
+        "start": "2027-06-17T09:30",
+        "end": "2027-06-17T10:30"
+       },
+       {
+        "start": "2027-06-24T09:30",
+        "end": "2027-06-24T10:30"
+       },
+       {
+        "start": "2027-07-01T09:30",
+        "end": "2027-07-01T10:30"
+       },
+       {
+        "start": "2027-07-08T09:30",
+        "end": "2027-07-08T10:30"
+       }
+      ]
      }
     }
    ],
-   "inputHash": "ae4e81d4b68be937fd58f43a7a3f1ac4055882fa957c26187b6201ab49fbea8a",
+   "inputHash": "28ec10a23a064744774bf30a4f5e4093094afcd000082a40c155cfe422965b43",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
-   "changedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "766e03d83a107d8c166739ed26c23c79486547433de07097e17bb784a4f8c7f9"
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00"
+   "checkedAt": "2026-11-06T09:24:07+01:00"
   }
  }
 }

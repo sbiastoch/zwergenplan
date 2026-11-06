@@ -74,14 +74,13 @@
    ],
    "inputHash": "068a15470d4200c9422ee37b36a0cd2d6b155ed2aa7d3854bf599bf50507e5fc",
    "dated": {
-    "2026-11-05": "10a97beda4540be4c5d23a3ffbbfd19bd6a1c2de437dc051cfd5be61a57fc689",
     "2026-11-11": "ea806b0f807493153355f3ff5c3e074009f42971a5bd06ce8eec7aed14ef2f5d",
     "2026-11-19": "ad3dd2300d41a1b4098196246b0a0bc3dfe49b1325733ab994dcfdd13ff51bad",
     "2026-11-25": "3852811df235293cd4e8abf3ab2fa66c2e3bac2bda1bbe77b8865e6cf24245d6"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-11-01T08:58:52+01:00",
    "sources": [
     "frankenkids"

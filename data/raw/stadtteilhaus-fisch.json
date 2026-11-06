@@ -212,7 +212,7 @@
    "inputHash": "83b362f729d1c36e89328ea318737e03c1e4cf72a2bf9f3c3e7ef154acf13a2a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "8b8e42d23b5cf9d82f9bdc2ab3d7202bd704e69a782d29cf8856ea8c6fc1608b"
   },
@@ -221,8 +221,8 @@
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Familiencafé mit Kindern, montags 15.30–17 Uhr",
-     "summary": "Offener Familientreff für Eltern und Großeltern mit Kindern. Einfach vorbeikommen; laut Programm ohne Anmeldung und ohne Teilnahmekosten, Spende für den Kaffee willkommen.",
+     "title": "Familiencafé für Familien (montags 15.30–17 Uhr)",
+     "summary": "Offener Treff für Familien mit Kindern im Stadtteilhaus FiSch, montags 15.30–17 Uhr. Altersangabe und Anmeldung stehen im Heft nicht ausdrücklich.",
      "topics": [
       "elterncafe",
       "elterntreff"
@@ -230,13 +230,11 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "Keine Teilnahmekosten, Spende für den Kaffee erwünscht",
-     "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+     "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "category": "treffs-cafes",
      "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Einfach vorbeikommen"
+      "status": "ohne-anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -245,53 +243,28 @@
       ],
       "start": "15:30",
       "end": "17:00",
-      "from": "2026-11-02",
-      "skipHolidays": true
+      "from": "2026-11-09",
+      "skipHolidays": true,
+      "except": [
+       "2026-12-28",
+       "2027-01-04"
+      ]
      }
     },
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Mini-FiSche, dienstags 9–11 Uhr",
-     "summary": "Vormittagsgruppe für kleine Kinder im Stadtteilhaus. Freie Plätze bitte vorher im Haus erfragen; das Alter ist im Programm nicht angegeben.",
+     "title": "Mini-FiSche, Eltern-Kind-Gruppe mittwochs 9–11 Uhr",
+     "summary": "Eltern-Kind-Gruppe im Stadtteilhaus FiSch, mittwochs 9–11 Uhr. Freie Plätze nur auf Anfrage im Stadtteilhaus erfragen. Gebühr ab 2027 laut Heft.",
      "topics": [
-      "spielgruppe",
+      "krabbelgruppe",
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
-     "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
-     "category": "krabbel-spielgruppen",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "09:00",
-      "end": "11:00",
-      "from": "2026-11-03",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "stadtteilhaus-fisch",
-     "venueId": "stadtteilhaus-fisch",
-     "title": "Mini-FiSche, mittwochs 9–11 Uhr",
-     "summary": "Vormittagsgruppe für kleine Kinder im Stadtteilhaus. Freie Plätze bitte vorher im Haus erfragen; das Alter ist im Programm nicht angegeben.",
-     "topics": [
-      "spielgruppe",
-      "eltern-kind-gruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+     "cost": "kostenpflichtig",
+     "price": "12 Euro (Gebühr ab 2027)",
+     "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "category": "krabbel-spielgruppen",
      "availability": {
@@ -305,23 +278,28 @@
       ],
       "start": "09:00",
       "end": "11:00",
-      "from": "2026-11-04",
-      "skipHolidays": true
+      "from": "2026-11-11",
+      "skipHolidays": true,
+      "except": [
+       "2026-12-30",
+       "2027-01-06"
+      ]
      }
     },
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Mini-FiSche, freitags 9–11 Uhr",
-     "summary": "Vormittagsgruppe für kleine Kinder im Stadtteilhaus. Freie Plätze bitte vorher im Haus erfragen; das Alter ist im Programm nicht angegeben.",
+     "title": "Mini-FiSche, Eltern-Kind-Gruppe freitags 9–11 Uhr",
+     "summary": "Eltern-Kind-Gruppe im Stadtteilhaus FiSch, freitags 9–11 Uhr. Freie Plätze nur auf Anfrage im Stadtteilhaus erfragen. Gebühr ab 2027 laut Heft.",
      "topics": [
-      "spielgruppe",
+      "krabbelgruppe",
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+     "cost": "kostenpflichtig",
+     "price": "12 Euro (Gebühr ab 2027)",
+     "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "category": "krabbel-spielgruppen",
      "availability": {
@@ -335,24 +313,92 @@
       ],
       "start": "09:00",
       "end": "11:00",
-      "from": "2026-10-30",
-      "skipHolidays": true
+      "from": "2026-11-06",
+      "skipHolidays": true,
+      "except": [
+       "2026-12-25",
+       "2027-01-01"
+      ]
      }
     },
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Vater-Kind-Frühstück am Samstag, 31.10.",
-     "summary": "Samstag 9–12 Uhr in der Turnhalle der Wahlerschule: Kennenlernen, Spielen und gemeinsames Frühstück für Väter mit Kindern. Hallenturnschuhe mitbringen; Anmeldung im Stadtteilhaus FiSch.",
+     "title": "Eltern-Kind-Töpfern (mittwochs 14.30–16 Uhr)",
+     "summary": "Gemeinsam mit dem Kind töpfern im Stadtteilhaus FiSch, mittwochs 14.30–16 Uhr. Anmeldung erforderlich; Altersangabe steht nicht im Heft.",
+     "topics": [
+      "kreativ",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "10 Euro pro Kilo Ton (Gebühr ab 2027)",
+     "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+     "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+     "category": "buehne",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung im Stadtteilhaus FiSch erforderlich"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "14:30",
+      "end": "16:00",
+      "from": "2026-11-11",
+      "skipHolidays": true,
+      "except": [
+       "2026-12-30",
+       "2027-01-06"
+      ]
+     }
+    },
+    {
+     "providerId": "stadtteilhaus-fisch",
+     "venueId": "stadtteilhaus-fisch-turnhalle-wahlerschule",
+     "title": "Vater-Kind-Turnen (Freitagabend, Turnhalle Wahlerschule)",
+     "summary": "Offener Treff für Väter mit ihren Kindern zum gemeinsamen Turnen, Freitag 18–20 Uhr in der Turnhalle der Wahlerschule (Eingang über den Pausenhof). Einfach vorbeikommen; Altersangabe fehlt im Heft.",
+     "topics": [
+      "vaeter",
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+     "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+     "category": "bewegung",
+     "availability": {
+      "status": "ohne-anmeldung"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-13T18:00",
+        "end": "2026-11-13T20:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "stadtteilhaus-fisch",
+     "venueId": "stadtteilhaus-fisch",
+     "title": "Vater-Kind-Frühstück (Samstag 21.11. und 19.12., 9–12 Uhr)",
+     "summary": "Kennenlernen, Spielen und gemeinsames Frühstück für Väter mit Kindern im Stadtteilhaus FiSch. Anmeldung im Stadtteilhaus erforderlich.",
      "topics": [
       "elterntreff",
       "vaeter"
      ],
-     "format": "einmalig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "10 Euro",
-     "url": "https://www.nuernberg.de/internet/asd_fisch/elterntreffs.html",
+     "price": "8 € pro Vater, 4 € pro Kind ab 5 Jahre",
+     "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
      "category": "treffs-cafes",
      "availability": {
@@ -363,18 +409,49 @@
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-10-31T09:00",
-        "end": "2026-10-31T12:00"
+        "start": "2026-11-21T09:00",
+        "end": "2026-11-21T12:00"
+       },
+       {
+        "start": "2026-12-19T09:00",
+        "end": "2026-12-19T12:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "stadtteilhaus-fisch",
+     "venueId": "stadtteilhaus-fisch",
+     "title": "Laternenfest für Familien (Freitag, 4. Dezember 2026)",
+     "summary": "Laternenabend für Familien am Lagerfeuer auf dem Spielplatz gegenüber vom FiSch, mit Laternenliedern und Nikolausgeschichte. Keine Anmeldung nötig; Spende für den Kaffee erwünscht.",
+     "topics": [
+      "elterntreff"
+     ],
+     "format": "einmalig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "price": "Keine Teilnahmekosten, Spende für Kaffee erbeten",
+     "url": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+     "sourceUrl": "https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf",
+     "category": "treffs-cafes",
+     "availability": {
+      "status": "ohne-anmeldung"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-04T17:00"
        }
       ]
      }
     }
    ],
-   "inputHash": "dc23f2a4074f3c940958732fe84df0eba74b7ee3b06835742d93358e39fac294",
+   "inputHash": "0145b1c0f06a3e71483a50ccef88189526c4b687610c24d27526a92fd696c1b3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "8b8e42d23b5cf9d82f9bdc2ab3d7202bd704e69a782d29cf8856ea8c6fc1608b"
   }
  }

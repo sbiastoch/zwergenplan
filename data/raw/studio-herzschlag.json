@@ -6,19 +6,267 @@
    "inputHash": "33a1a769fe507f3d3f37a7d5168fc2bf452922a67c50001c0f77d130427f9b37",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-11-04T08:55:04+01:00",
    "emptySince": "2026-11-04T08:55:04+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/musikzauber/": {
-   "events": [],
-   "inputHash": "a1fa71eb9260662f33f29ebf0cafcc3b6b7854d4eae13a47ca2fa3b3e63c040b",
+   "events": [
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "Musikzauber Frühlingszauber, 6–15 Monate, Mi 10:00",
+     "summary": "Singen, Bewegung und Fingerspiele unter dem Frühlingsmotto, 8 Termine von Ende Februar bis Mitte April 2027. Dauer 45 Minuten, Anmeldung über die Seite.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "130 € (8 Einheiten)",
+     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "category": "musik",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 15
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über „Jetzt anmelden“ auf der Seite; keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-02-24T10:00",
+        "end": "2027-02-24T10:45"
+       },
+       {
+        "start": "2027-03-03T10:00",
+        "end": "2027-03-03T10:45"
+       },
+       {
+        "start": "2027-03-10T10:00",
+        "end": "2027-03-10T10:45"
+       },
+       {
+        "start": "2027-03-17T10:00",
+        "end": "2027-03-17T10:45"
+       },
+       {
+        "start": "2027-03-31T10:00",
+        "end": "2027-03-31T10:45"
+       },
+       {
+        "start": "2027-04-07T10:00",
+        "end": "2027-04-07T10:45"
+       },
+       {
+        "start": "2027-04-14T10:00",
+        "end": "2027-04-14T10:45"
+       },
+       {
+        "start": "2027-04-21T10:00",
+        "end": "2027-04-21T10:45"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "Musikzauber Frühlingszauber, 1–2 Jahre, Mi 9:00",
+     "summary": "Singen, Bewegung und Fingerspiele unter dem Frühlingsmotto, 8 Termine von Ende Februar bis Mitte April 2027. Dauer 45 Minuten, Anmeldung über die Seite.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "130 € (8 Einheiten)",
+     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 24
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über „Jetzt anmelden“ auf der Seite; keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-02-24T09:00",
+        "end": "2027-02-24T09:45"
+       },
+       {
+        "start": "2027-03-03T09:00",
+        "end": "2027-03-03T09:45"
+       },
+       {
+        "start": "2027-03-10T09:00",
+        "end": "2027-03-10T09:45"
+       },
+       {
+        "start": "2027-03-17T09:00",
+        "end": "2027-03-17T09:45"
+       },
+       {
+        "start": "2027-03-31T09:00",
+        "end": "2027-03-31T09:45"
+       },
+       {
+        "start": "2027-04-07T09:00",
+        "end": "2027-04-07T09:45"
+       },
+       {
+        "start": "2027-04-14T09:00",
+        "end": "2027-04-14T09:45"
+       },
+       {
+        "start": "2027-04-21T09:00",
+        "end": "2027-04-21T09:45"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "Musikzauber Frühlingszauber, 1–2 Jahre, Mi 15:00",
+     "summary": "Singen, Bewegung und Fingerspiele unter dem Frühlingsmotto, 8 Termine von Ende Februar bis Mitte April 2027. Dauer 45 Minuten, Anmeldung über die Seite.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "130 € (8 Einheiten)",
+     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 24
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über „Jetzt anmelden“ auf der Seite; keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-02-24T15:00",
+        "end": "2027-02-24T15:45"
+       },
+       {
+        "start": "2027-03-03T15:00",
+        "end": "2027-03-03T15:45"
+       },
+       {
+        "start": "2027-03-10T15:00",
+        "end": "2027-03-10T15:45"
+       },
+       {
+        "start": "2027-03-17T15:00",
+        "end": "2027-03-17T15:45"
+       },
+       {
+        "start": "2027-03-31T15:00",
+        "end": "2027-03-31T15:45"
+       },
+       {
+        "start": "2027-04-07T15:00",
+        "end": "2027-04-07T15:45"
+       },
+       {
+        "start": "2027-04-14T15:00",
+        "end": "2027-04-14T15:45"
+       },
+       {
+        "start": "2027-04-21T15:00",
+        "end": "2027-04-21T15:45"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "Musikzauber Frühlingszauber, 2–3 Jahre, Mi 16:00",
+     "summary": "Singen, Bewegung und Fingerspiele unter dem Frühlingsmotto, 8 Termine von Ende Februar bis Mitte April 2027. Dauer 45 Minuten, Anmeldung über die Seite.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "130 € (8 Einheiten)",
+     "url": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "sourceUrl": "https://mamalea-familienbegleitung.de/musikzauber/",
+     "category": "musik",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über „Jetzt anmelden“ auf der Seite; keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-02-24T16:00",
+        "end": "2027-02-24T16:45"
+       },
+       {
+        "start": "2027-03-03T16:00",
+        "end": "2027-03-03T16:45"
+       },
+       {
+        "start": "2027-03-10T16:00",
+        "end": "2027-03-10T16:45"
+       },
+       {
+        "start": "2027-03-17T16:00",
+        "end": "2027-03-17T16:45"
+       },
+       {
+        "start": "2027-03-31T16:00",
+        "end": "2027-03-31T16:45"
+       },
+       {
+        "start": "2027-04-07T16:00",
+        "end": "2027-04-07T16:45"
+       },
+       {
+        "start": "2027-04-14T16:00",
+        "end": "2027-04-14T16:45"
+       },
+       {
+        "start": "2027-04-21T16:00",
+        "end": "2027-04-21T16:45"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
-   "changedAt": "2026-10-31T08:26:00+01:00",
-   "emptySince": "2026-10-31T08:26:00+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/sinneszauber/": {
@@ -26,7 +274,7 @@
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -35,7 +283,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -45,7 +293,7 @@
    "inputHash": "900df567d71314e1bacff9a6a5c555c59cce1159e7a25bf4db63c5676e0063a2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1071,7 +1319,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1173,7 +1421,7 @@
    "inputHash": "182f5e8c92924c0f3f891a99af8832afeb5bbdb10d67d4c4c2897e8a51a14d06",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-11-03T09:27:26+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1368,13 +1616,9 @@
    ],
    "inputHash": "8a304dc74387c52391db6fb24b95881145968883cf75d8789008f271a9122a29",
    "model": "haiku",
-   "status": "fehler",
-   "reason": "https://studioherzschlag.de/angebot/bewegungsnest/: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
-   "checkedAt": "2026-11-04T08:55:04+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
-   "failingSince": "2026-11-05T09:21:47+01:00",
-   "klasse": "voruebergehend",
-   "klasseSince": "2026-11-05T09:21:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/herzzeit/": {
@@ -1382,7 +1626,7 @@
    "inputHash": "ddc2ff0c9e1b06f4820937152dca1a5122118ad5614ec2c5d79b8adfdd2b27b2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1391,7 +1635,7 @@
    "inputHash": "f11960d934dbc9141e6371897c7dd9e5cf6594a83b7ce0f351f22058ad41630c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1400,7 +1644,7 @@
    "inputHash": "80b39740a310825f35df2a7fe77091811cd2a98f0c9aa32e45bdd7ea767bfdb7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1470,7 +1714,7 @@
    "inputHash": "7bcf82b9d01a8b7d3ef4c7337b1162fe6ee3ccfde74094c32c83744434accab2",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1479,7 +1723,7 @@
    "inputHash": "e999bd760da1da0c8e72c75a7b4adc065ff5aa9954cbc9dd5fbb293c613446c2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1488,7 +1732,7 @@
    "inputHash": "cbaa9cd43ca446c411dfae3a96fc07ce634c7160347d0094047fc9d5e5f6b62d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1535,7 +1779,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"

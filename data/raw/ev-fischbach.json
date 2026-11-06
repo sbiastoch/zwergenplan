@@ -122,7 +122,6 @@
    ],
    "inputHash": "0d786924c6f71bec5dc879f39c8ed104c247624126309ab6770b95fd7b007770",
    "dated": {
-    "2026-11-05": "c03b433beebb270d2a67f5cb805ff5ba62de4faeda70e5c4f873b90fc0f09014",
     "2026-11-08": "a15f37dca9891b131a9d333cb898833efbb37fb8f3c6898c691422977091fdfd",
     "2026-11-09": "b04bd979930566403dae285f34bebd975663bc88409c766c98ef9e9cd2655aec",
     "2026-11-10": "871d2ad80a46a4681583b4d948e2d4a1e2a2fa76691bb2774323e1b6d69029e1",
@@ -158,7 +157,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "d7bdfa5dfc673ef24ea44d79155ceb596d1cdbc06557d29dc3f2f911053987ba"
   },
@@ -167,21 +166,21 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (Montag, 14:30–16:30)",
-     "summary": "Treffen für Mütter und Väter mit kleinen Kindern: Austausch, praktische Anregungen für den Alltag und erste Gruppenerfahrungen für die Kinder. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+     "title": "Mutter-Kind-Gruppe montags 14:30–16:30",
+     "summary": "Eltern mit Kindern singen und bewegen sich zur Musik, dazu Austausch über Erziehungsfragen und Spielanregungen. Anmeldung und Kosten sind im Kalender nicht angegeben, bitte beim Veranstalter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8121949",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8121949",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8135836",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8135836",
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; Details auf der Detailseite prüfen."
+      "note": "Im Kalender keine Angabe zur Anmeldung; beim Veranstalter nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -221,21 +220,21 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (Dienstag, 9:30–11:30)",
-     "summary": "Treffen für Mütter und Väter mit kleinen Kindern: Austausch, praktische Anregungen für den Alltag und erste Gruppenerfahrungen für die Kinder. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+     "title": "Mutter-Kind-Gruppe dienstags 9:30–11:30",
+     "summary": "Eltern mit Kindern singen und bewegen sich zur Musik, dazu Austausch über Erziehungsfragen und Spielanregungen. Anmeldung und Kosten sind im Kalender nicht angegeben, bitte beim Veranstalter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8121949",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8121949",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8135836",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8135836",
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; Details auf der Detailseite prüfen."
+      "note": "Im Kalender keine Angabe zur Anmeldung; beim Veranstalter nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -271,29 +270,25 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (Donnerstag, 9:30–10:30)",
-     "summary": "Treffen für Mütter und Väter mit kleinen Kindern: Austausch, praktische Anregungen für den Alltag und erste Gruppenerfahrungen für die Kinder. Anmeldung und Kosten sind in der Quelle nicht angegeben.",
+     "title": "Mutter-Kind-Gruppe donnerstags 9:30–10:30",
+     "summary": "Eltern mit Kindern singen und bewegen sich zur Musik, dazu Austausch über Erziehungsfragen und Spielanregungen. Anmeldung und Kosten sind im Kalender nicht angegeben, bitte beim Veranstalter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8121949",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8121949",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8135836",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8135836",
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; Details auf der Detailseite prüfen."
+      "note": "Im Kalender keine Angabe zur Anmeldung; beim Veranstalter nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-05T09:30",
-        "end": "2026-11-05T10:30"
-       },
        {
         "start": "2026-11-12T09:30",
         "end": "2026-11-12T10:30"
@@ -325,31 +320,30 @@
    ],
    "inputHash": "9d7eb439e80d9d3b7b3080f4f0c7704342c974b22af5176356a82c2b6b215b0f",
    "dated": {
-    "2026-11-05": "2485a77b0b2cea7c23406e0e3020bd61b334ad87eef81afe87696d0a4fcba3e1",
-    "2026-11-09": "b11fc5d6d736a0b4866156d5313c091d1ea991d666a8d54a9be1e81e38df1692",
-    "2026-11-10": "a147ecc2250b50fb15fca75371781e6c761c9c62dc2ec7d98a47e8649e28cdb5",
-    "2026-11-12": "765ddbcd0b467a891adab91de64d3e6dfe1d68c519794cd8daccf996f1cc889b",
-    "2026-11-16": "44975cf84ff1fe35c870369c1cbaf4d82784916a0e04a345b660169f66aafc6d",
-    "2026-11-17": "fee2c876eace9ccaf18d6db5960c5e8dfefdf7b2cb9ad07a165027105b7c95ab",
-    "2026-11-19": "94752a70cec03b26cba05eb80c2345b9e1d9a305b23d061f7d2f4ab2417df515",
-    "2026-11-23": "a9b1f4b919bd00fec3c66b3695c96a5164b97edac38fd331ce619e0f999e0fa3",
-    "2026-11-24": "101f89e0c4c3ca0791e4105f202c453457902c5f784bdf5aea2be8afbf68c7eb",
-    "2026-11-26": "db783ce060a6d5e2867d23d934df3a1beb785a61db45e5b1a4aec4b92f430764",
-    "2026-11-30": "da86350bc4b90ce8f33369393fbcec414071309e33da7d7f2175b8dd30058868",
-    "2026-12-01": "e2dfe8220759513a9f97e1ada4deb5a138573cff9d95501efbed5ff654a05dc4",
-    "2026-12-03": "88140031c058503eb32b969c97d9eaef6a581dc3cd81c8507223067699bf1871",
-    "2026-12-07": "1f5396e3c18b1ffa333f4360c50c460d84cf29dbcb71046e62d3bcdb930ad9fb",
-    "2026-12-08": "217465973fa7f72a72bdab24b16b1b232951c50be7b4b90536672406b73d1adf",
-    "2026-12-10": "f3587a3c18abcf6625106dde5e2247dc1f65243a71e4ce8803775ef05478040f",
-    "2026-12-14": "b3f7e1a301d991ef53166cb980a244578dc15c8b4f31965bb9f2fe3f32291bdf",
-    "2026-12-15": "b3f85542dbce37218fa91e560f4d2d50668c46fe0a56e20c9969f7398f163b44",
-    "2026-12-17": "a6a84a2f8ce7eff95aa9703ba1c426b761a96ca2d762329c4fd5da7b29a5f998",
-    "2026-12-21": "8c4316c4153fa52f99c860b13074d7f056b3c7dfc3e587b73f0c14ae214f3d1e"
+    "2026-11-09": "471b3b83f1c96bf471e9d6fb9f78d707094852faa5340e8ecec8bd78ab220cea",
+    "2026-11-10": "04785a7b04d047f19af25341c5bed9a1146aa4369f81a24d575cf1f9391b128a",
+    "2026-11-12": "798a6f0b4fa59afbab5da8fd9e6f561ffe69377ba83776d1304bda89a29dc948",
+    "2026-11-16": "d836ca6843dfb2e057afac523912f4be95a2a827fc75c07eda6eac66e0fafc38",
+    "2026-11-17": "5a3c52039641fa8b3a0b21f7ba3aa9cfe8a91693d34e6f0969c2326c5be50362",
+    "2026-11-19": "4abe00dd0f69c0a93d71824a1f8e59b94932c7823d37852e6a60806e4f0c41c4",
+    "2026-11-23": "c130a16f66fbb3970a3e84b58be5e9a84d545baf50857f8fb210a08f987f1d0f",
+    "2026-11-24": "5fc1e9bb65ace9b3ff94d620de6cb5f503a614e65309ef6aa7e1f43937f025d4",
+    "2026-11-26": "26ddfe934d079ee803177505acbab62ec99adff07f25c8b9dc655109c846a0aa",
+    "2026-11-30": "b80299debf37c2abde0f91c3233a849f70cbdbd9eed3e9cd7ef800915fe63bca",
+    "2026-12-01": "162891f4d11a4f450d1af25b01aede99a354562171cb09f434bed375e069f087",
+    "2026-12-03": "f0787149aab2f1054517f9f289891f57fec72ec7ac6349a5dd3bd3ff2d426b6e",
+    "2026-12-07": "c1b65ee51e814583a84c8b462d727322584f9c3bc922d4e0fd3765df120ed630",
+    "2026-12-08": "b5ba02fa03feef3a42c28708939e5667e923a4829b3671bfa823c3d1489882ed",
+    "2026-12-10": "7662f950c1ba49742f92c1056182c763447056d48040cefcb112b76cb587a517",
+    "2026-12-14": "1afabbee2d97476af44ec612e94fd9c56a821d7b7ceca8a719c2c95c9b6b025d",
+    "2026-12-15": "7dba9b6bf9135e509dc1e94a4699a7464b920f766d8efe32f6f2931bf09c6789",
+    "2026-12-17": "6530706e0da3b404a1ce4b9a70eb0ecf2cea87396ec5b9a882606742c9312299",
+    "2026-12-21": "d7e9b5f52e54f77133f27262f632a4892b67a04cbc34c718ea8fe56beb89fca2"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
-   "changedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "changedAt": "2026-11-06T09:24:07+01:00",
    "sources": [
     "evtermine"
    ],

@@ -7,7 +7,7 @@
      "providerId": "nachbarschaftshaus-gostenhof",
      "venueId": "nachbarschaftshaus-gostenhof",
      "title": "Offenes Kinderzimmer (Dienstag 9–12 Uhr)",
-     "summary": "Offener Treff für Eltern mit Kindern von 0 bis 3 Jahren im Kinderzimmer, ohne festes Programm zum Spielen und Austauschen. Kostenfrei, ohne Anmeldung, nicht in den Ferien; ohne pädagogische Betreuung, es gibt eine Ansprechpartnerin vor Ort.",
+     "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre zum Spielen, Treffen und Austauschen, ohne festes Programm und ohne pädagogische Betreuung. Einfach vorbeikommen; nicht in den Ferien.",
      "topics": [
       "elterntreff",
       "spielgruppe"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offener Treff ohne Buchung"
+      "note": "Offener Treff, keine Anmeldung oder Plätze"
      },
      "schedule": {
       "kind": "weekly",
@@ -34,7 +34,7 @@
       ],
       "start": "09:00",
       "end": "12:00",
-      "from": "2026-11-03",
+      "from": "2026-11-10",
       "skipHolidays": true
      }
     },
@@ -42,7 +42,7 @@
      "providerId": "nachbarschaftshaus-gostenhof",
      "venueId": "nachbarschaftshaus-gostenhof",
      "title": "Offenes Kinderzimmer (Donnerstag 14–17 Uhr)",
-     "summary": "Offener Treff für Eltern mit Kindern von 0 bis 3 Jahren im Kinderzimmer, ohne festes Programm zum Spielen und Austauschen. Kostenfrei, ohne Anmeldung, nicht in den Ferien; ohne pädagogische Betreuung, es gibt eine Ansprechpartnerin vor Ort.",
+     "summary": "Offener Treff für Eltern mit Kindern bis 3 Jahre zum Spielen, Treffen und Austauschen, ohne festes Programm und ohne pädagogische Betreuung. Einfach vorbeikommen; nicht in den Ferien.",
      "topics": [
       "elterntreff",
       "spielgruppe"
@@ -60,7 +60,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offener Treff ohne Buchung"
+      "note": "Offener Treff, keine Anmeldung oder Plätze"
      },
      "schedule": {
       "kind": "weekly",
@@ -69,24 +69,24 @@
       ],
       "start": "14:00",
       "end": "17:00",
-      "from": "2026-10-29",
+      "from": "2026-11-12",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "9e4966c1d35ffca761567d17e503c08d456b30a10a31882a670121119aff3ef9",
+   "inputHash": "d5cd555aa081511b8f29041dc6a802b6e81d913526158dd19ff85a1cfb2441a0",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "159ed93d0c00e8cf48580e9e3ed297a9c837e7328224ec8a037d9ce33b01c06b"
   },
   "seite:https://www.nuernberg.de/internet/nh_gostenhof/veranstaltungen.html": {
    "events": [],
-   "inputHash": "a122b86b936057c6407db659c6668463ab02742538b87e46a8bef9f850daaa0d",
+   "inputHash": "2e5cfe3c0d8427d07e3a8c39d4fb88e914dbb747d7ea03efb359611426232526",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   },
@@ -95,7 +95,7 @@
    "inputHash": "466da684928379a4b57615834b143a5bd851f36397ce60360de323db458183de",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   }

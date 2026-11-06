@@ -6,7 +6,7 @@
    "inputHash": "bf49e53e8c65f94cdecaa623e1e7c594ba2b8f58e353dc94feda055c03307aa7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "1c3aa02b352a530eb76ac28d9a74f4c53f56b36d84a4bc30b22859bb2ffc9d23"
   },
@@ -15,8 +15,8 @@
     {
      "providerId": "happy-bellies",
      "venueId": "happy-bellies",
-     "title": "Rückbildung mit Baby – Basiskurs Mittwoch 9:15 (Start 16.09.)",
-     "summary": "Präventionskurs Rückbildung mit Baby, nach § 20 SGB zertifiziert; bei regelmäßiger Teilnahme gibt es einen Zuschuss der Krankenkasse. Anmeldung per E-Mail an die Kursleitung, Plätze werden nicht online angezeigt.",
+     "title": "Rückbildung-Basiskurs Montag 11:30 (laufend)",
+     "summary": "Rückbildungskurs mit Baby als Präventionskurs nach § 20 SGB. Bei regelmäßiger Teilnahme bezuschusst die Krankenkasse. Laufender Kurs, Anmeldung und Fragen per E-Mail.",
      "topics": [
       "rueckbildung"
      ],
@@ -28,99 +28,11 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung und Fragen per E-Mail an die Kursleitung; keine Platzanzeige"
+      "note": "Anmeldung per E-Mail, keine Platzangabe"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-09-16T09:15",
-        "end": "2026-09-16T10:15"
-       },
-       {
-        "start": "2026-09-23T09:15",
-        "end": "2026-09-23T10:15"
-       },
-       {
-        "start": "2026-09-30T09:15",
-        "end": "2026-09-30T10:15"
-       },
-       {
-        "start": "2026-10-07T09:15",
-        "end": "2026-10-07T10:15"
-       },
-       {
-        "start": "2026-10-14T09:15",
-        "end": "2026-10-14T10:15"
-       },
-       {
-        "start": "2026-10-21T09:15",
-        "end": "2026-10-21T10:15"
-       },
-       {
-        "start": "2026-10-28T09:15",
-        "end": "2026-10-28T10:15"
-       },
-       {
-        "start": "2026-11-11T09:15",
-        "end": "2026-11-11T10:15"
-       },
-       {
-        "start": "2026-11-19T09:15",
-        "end": "2026-11-19T10:15"
-       },
-       {
-        "start": "2026-11-25T09:15",
-        "end": "2026-11-25T10:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "happy-bellies",
-     "venueId": "happy-bellies",
-     "title": "Rückbildung mit Baby – Basiskurs Montag 11:30 (Start 21.09.)",
-     "summary": "Präventionskurs Rückbildung mit Baby, nach § 20 SGB zertifiziert; bei regelmäßiger Teilnahme gibt es einen Zuschuss der Krankenkasse. Anmeldung per E-Mail an die Kursleitung, Plätze werden nicht online angezeigt.",
-     "topics": [
-      "rueckbildung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.happy-bellies.de/kopie-von-laufamholz",
-     "sourceUrl": "https://www.happy-bellies.de/kopie-von-laufamholz",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung und Fragen per E-Mail an die Kursleitung; keine Platzanzeige"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-09-21T11:30",
-        "end": "2026-09-21T12:30"
-       },
-       {
-        "start": "2026-09-28T11:30",
-        "end": "2026-09-28T12:30"
-       },
-       {
-        "start": "2026-10-05T11:30",
-        "end": "2026-10-05T12:30"
-       },
-       {
-        "start": "2026-10-12T11:30",
-        "end": "2026-10-12T12:30"
-       },
-       {
-        "start": "2026-10-19T11:30",
-        "end": "2026-10-19T12:30"
-       },
-       {
-        "start": "2026-10-26T11:30",
-        "end": "2026-10-26T12:30"
-       },
        {
         "start": "2026-11-09T11:30",
         "end": "2026-11-09T12:30"
@@ -139,13 +51,133 @@
        }
       ]
      }
+    },
+    {
+     "providerId": "happy-bellies",
+     "venueId": "happy-bellies",
+     "title": "Rückbildung-Basiskurs Di/Fr 10:30",
+     "summary": "Rückbildungskurs mit Baby als Präventionskurs nach § 20 SGB, bei regelmäßiger Teilnahme bezuschusst von der Krankenkasse. Kurs läuft; Anmeldung per E-Mail.",
+     "topics": [
+      "rueckbildung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.happy-bellies.de/kopie-von-laufamholz",
+     "sourceUrl": "https://www.happy-bellies.de/kopie-von-laufamholz",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per E-Mail, keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-10T10:30",
+        "end": "2026-11-10T11:30"
+       },
+       {
+        "start": "2026-11-17T10:30",
+        "end": "2026-11-17T11:30"
+       },
+       {
+        "start": "2026-11-24T10:30",
+        "end": "2026-11-24T11:30"
+       },
+       {
+        "start": "2026-11-27T10:30",
+        "end": "2026-11-27T11:30"
+       },
+       {
+        "start": "2026-12-01T10:30",
+        "end": "2026-12-01T11:30"
+       },
+       {
+        "start": "2026-12-08T10:30",
+        "end": "2026-12-08T11:30"
+       },
+       {
+        "start": "2026-12-11T10:30",
+        "end": "2026-12-11T11:30"
+       },
+       {
+        "start": "2026-12-15T10:30",
+        "end": "2026-12-15T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "happy-bellies",
+     "venueId": "happy-bellies",
+     "title": "Rückbildung-Basiskurs Mo/Mi (ab 30.11.)",
+     "summary": "Rückbildungskurs mit Baby als Präventionskurs nach § 20 SGB, bei regelmäßiger Teilnahme bezuschusst von der Krankenkasse. Montags 10–11 Uhr, mittwochs 9:15–10:15 Uhr. Anmeldung per E-Mail.",
+     "topics": [
+      "rueckbildung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.happy-bellies.de/kopie-von-laufamholz",
+     "sourceUrl": "https://www.happy-bellies.de/kopie-von-laufamholz",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per E-Mail, keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-30T10:00",
+        "end": "2026-11-30T11:00"
+       },
+       {
+        "start": "2026-12-07T10:00",
+        "end": "2026-12-07T11:00"
+       },
+       {
+        "start": "2026-12-09T09:15",
+        "end": "2026-12-09T10:15"
+       },
+       {
+        "start": "2026-12-14T10:00",
+        "end": "2026-12-14T11:00"
+       },
+       {
+        "start": "2026-12-16T09:15",
+        "end": "2026-12-16T10:15"
+       },
+       {
+        "start": "2027-01-13T09:15",
+        "end": "2027-01-13T10:15"
+       },
+       {
+        "start": "2027-01-18T10:00",
+        "end": "2027-01-18T11:00"
+       },
+       {
+        "start": "2027-01-20T09:15",
+        "end": "2027-01-20T10:15"
+       },
+       {
+        "start": "2027-01-27T09:15",
+        "end": "2027-01-27T10:15"
+       },
+       {
+        "start": "2027-02-03T09:15",
+        "end": "2027-02-03T10:15"
+       }
+      ]
+     }
     }
    ],
-   "inputHash": "17fb5bd757069aad6f118111a55f28639022124e16734106aa8d54358008aaf7",
+   "inputHash": "8e1a7b017bd5847d0ff6e33e658eedfbbdc1d44bcce49b8e6dd2de55dc3a38f6",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "1c3aa02b352a530eb76ac28d9a74f4c53f56b36d84a4bc30b22859bb2ffc9d23"
   },
   "seite:https://www.happy-bellies.de/kopie-von-m%C3%B6geldorf": {
@@ -219,7 +251,7 @@
    "inputHash": "37460ff062db21358a6b5c3a4047288ca5d14a3b343edfb0cecbe2d73ceb2c05",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-05T09:21:47+01:00",
+   "checkedAt": "2026-11-06T09:24:07+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "1c3aa02b352a530eb76ac28d9a74f4c53f56b36d84a4bc30b22859bb2ffc9d23"
   }
