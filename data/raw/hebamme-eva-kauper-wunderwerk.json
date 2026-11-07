@@ -172,7 +172,7 @@
    "inputHash": "f08257d995fb9ae8cbdbecd2fa969cc98baa2354f03bb58e4d6a62437c15da00",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "85b83803638599f70e0ea67191b45a048ef09f1716389a62bda26175b169d08a"
   },
@@ -284,7 +284,7 @@
    "inputHash": "e49fa05d02a63d3ea5d7f6550ef59acc48d545d8b562fa82818f5344e567912b",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "85b83803638599f70e0ea67191b45a048ef09f1716389a62bda26175b169d08a"
   },
@@ -588,7 +588,7 @@
    "inputHash": "8964ebe583a61c512a89c3aebe7bb7364a87e623f6b5fe248a3ea11737cc12ff",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "85b83803638599f70e0ea67191b45a048ef09f1716389a62bda26175b169d08a"
   }
@@ -596,7 +596,7 @@
  "beilagen": {
   "seite:https://hebammeeva.mymiya.de/courses/": {
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00"
+   "checkedAt": "2026-11-07T08:41:42+01:00"
   }
  }
 }

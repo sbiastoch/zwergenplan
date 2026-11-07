@@ -6,29 +6,67 @@
     {
      "providerId": "ev-laufamholz-miniclub",
      "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub Freitagvormittag (9:00–10:30 Uhr)",
-     "summary": "Eltern-Kind-Gruppe der Gemeinde mit Liedern, Geschichten und Spielzeit für die Kleinen sowie Austausch für Mütter und Väter. Anmeldung, Kosten und Platzzahl stehen im Kalendereintrag nicht; bitte beim Gemeindehaus nachfragen.",
+     "title": "Miniclub Donnerstag 15–16:30 Uhr (Eltern-Kind-Gruppe)",
+     "summary": "Eltern-Kind-Gruppe mit Liedern, Geschichten und Spielzeit für die Kinder, dazu Austausch unter Eltern. Termine bekannt bis 19.11.2026; Kosten und Anmeldung sind in der Quelle nicht angegeben, bitte beim Veranstalter erfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109124",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109124",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109115",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109115",
      "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe im Eintrag; Anfrage über das Gemeindehaus Laufamholz"
+      "note": "Keine Angabe zu Plätzen; Rückfrage beim Veranstalter (Heilig-Geist-Kirche Laufamholz)."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-06T09:00",
-        "end": "2026-11-06T10:30"
+        "start": "2026-11-12T15:00",
+        "end": "2026-11-12T16:30"
        },
+       {
+        "start": "2026-11-19T15:00",
+        "end": "2026-11-19T16:30"
+       }
+      ]
+     },
+     "via": "evtermine"
+    },
+    {
+     "providerId": "ev-laufamholz-miniclub",
+     "venueId": "ev-laufamholz-miniclub",
+     "title": "Miniclub Freitag 9–10:30 Uhr (Eltern-Kind-Gruppe)",
+     "summary": "Eltern-Kind-Gruppe mit Liedern, Geschichten und Spielzeit für die Kinder, dazu Austausch unter Eltern. Termine bekannt bis 18.12.2026; Kosten und Anmeldung sind in der Quelle nicht angegeben, bitte beim Veranstalter erfragen.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109115",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109115",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Angabe zu Plätzen; Rückfrage beim Veranstalter (Heilig-Geist-Kirche Laufamholz)."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
        {
         "start": "2026-11-13T09:00",
         "end": "2026-11-13T10:30"
@@ -56,58 +94,23 @@
       ]
      },
      "via": "evtermine"
-    },
-    {
-     "providerId": "ev-laufamholz-miniclub",
-     "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub Donnerstagnachmittag (15:00–16:30 Uhr)",
-     "summary": "Eltern-Kind-Gruppe der Gemeinde mit Liedern, Geschichten und Spielzeit für die Kleinen sowie Austausch für Mütter und Väter. Anmeldung, Kosten und Platzzahl stehen im Kalendereintrag nicht; bitte beim Gemeindehaus nachfragen.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "spielgruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109124",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109124",
-     "category": "krabbel-spielgruppen",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe im Eintrag; Anfrage über das Gemeindehaus Laufamholz"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-12T15:00",
-        "end": "2026-11-12T16:30"
-       },
-       {
-        "start": "2026-11-19T15:00",
-        "end": "2026-11-19T16:30"
-       }
-      ]
-     },
-     "via": "evtermine"
     }
    ],
    "inputHash": "6f5fb68c166723310b6ad8a626bfd0ecb8c132cd8fa92e84115670af1641a160",
    "dated": {
-    "2026-11-06": "00225aa58257b690f74f3b6e44da7db3e344bf7ae49e5b2e59ef9f8a2e46f3d9",
-    "2026-11-12": "9b64adb14937d78ed6349a17d1275d4024f68d2d0d8be947b1c43a8a8dce3231",
-    "2026-11-13": "3e7c4a0863c6be359e55575a9fe693666225cc16281e48777bf66dbe8c67eeed",
-    "2026-11-19": "5c2e23903493d6297e7f9ca3d1dcc4d64d8626c393ee77e4e61183ac2a737fb7",
-    "2026-11-20": "5d32bc4407f0c8b19dc5e757ffcdd19ee4146030aa6bfd186f8eb9062372b6f1",
-    "2026-11-27": "96b1424f76c6df1463a2798737d270087ecc9052b5e8ed64b7ca601a5b0eae66",
-    "2026-12-04": "82589fe40296e1c1c7bba8148ae8d44222b9e1dd6475084f19b426e7332258da",
-    "2026-12-11": "d7dc46b76217e26be8ba547f734deaf5fbc00d66bda1c75d58143c793d226bf0",
-    "2026-12-18": "71c0516bb7baaefd76adbee7cfc21967c61f16e207b1f89e149a12802c1966c7"
+    "2026-11-12": "40ee620b86d174cc82023bedf25bcbcd836a45ed9edcc1faf42da48b4f49693f",
+    "2026-11-13": "9b943b28e955550dd7fbf2c555486278c080a24698836c971bd1f611c387453c",
+    "2026-11-19": "7cecb3ba7e09af974e85f3aa85b9a0ce681497ce50d376246aae3354aa82a84e",
+    "2026-11-20": "fa7a1561187523cd9f044137b30e2f84374c9ce7aa7790aec218e85f660d6501",
+    "2026-11-27": "8f28fe572791ad3db5731f9fd9e579fd2d933f7ab8f6ae7d9c1fbaa1210ffcfe",
+    "2026-12-04": "c995bc8776ea1fe181f72905840021053489cb8f534662586e623459cf907926",
+    "2026-12-11": "9eb12da466b5012b2d40ac91fb5701ab6988af78fc67ff0e3e8b918c9893cfa8",
+    "2026-12-18": "fa3d56bb1e40f9160346e869434aa6fc15dc8f4af14db23d76fa48705f345bdc"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
-   "changedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "changedAt": "2026-11-07T08:41:42+01:00",
    "sources": [
     "evtermine"
    ],

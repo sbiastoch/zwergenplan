@@ -6,8 +6,8 @@
     {
      "providerId": "kath-st-georg-ziegelstein",
      "venueId": "kath-st-georg-ziegelstein",
-     "title": "Kleinkindergottesdienst im Pfarrsaal St. Georg",
-     "summary": "Gottesdienst für Kleinkinder im Pfarrsaal St. Georg, Bierweg 33. Die Seite nennt die Termine 15.11. und 20.12.2026, jeweils 10.30 Uhr; weitere Termine sind nicht gemeldet.",
+     "title": "Kleinkindergottesdienst St. Georg (Sonntag 10:30 Uhr)",
+     "summary": "Kurzer Gottesdienst für Kleinkinder im Pfarrsaal St. Georg, Bierweg 33. Im Horizont an zwei Sonntagen: 15.11. und 20.12.2026, jeweils 10:30 Uhr. Keine Anmeldung angegeben.",
      "topics": [
       "krabbelgottesdienst"
      ],
@@ -19,7 +19,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Gottesdienst im Pfarrsaal St. Georg; auf der Seite ist keine Anmeldung genannt"
+      "note": "Gottesdienst ohne Anmeldung; keine Platzangabe auf der Seite"
      },
      "schedule": {
       "kind": "dates",
@@ -34,11 +34,11 @@
      }
     }
    ],
-   "inputHash": "32a36a0844967e44d04d4d9d7c86058cedfd9e06260b69e411483bc619918379",
+   "inputHash": "6e13c78dcd3130c126e9bf3f01c135cfebb6d5f9ed70b73b6787305fe52de409",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "changedAt": "2026-11-07T08:41:42+01:00",
    "partsHash": "3f9123c1f7cc42a865ffba25d851e443c0148030b844b8b413892c2233278c0f"
   }
  }

@@ -177,7 +177,7 @@
    "inputHash": "b00bbbcdbe1b56bdf556eaa4698c0b8eab6fa3ca3bdb1ea9e2fbe6e2e094d894",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "af30022381f70d519ba33965e65b3cf352e86a32734bb09c23c093e407046922"
   },
@@ -255,7 +255,7 @@
    "inputHash": "4b272b9eaead18371541ec0a8528c747a4178c651359807a544567a590f3ac46",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a84bb2ed546ae4814a96439cd5b0b540a11301612e87220b19845c91708fd1a7"
   },
@@ -264,76 +264,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Kleinkinderschwimmen Maxis ab 2 Jahre – Start 14.11.2026",
-     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags 11:00 Uhr in den Kliniken Dr. Erler (Kontumazgarten). Zehn Termine; der Kurs ist ausgebucht.",
-     "topics": [
-      "kleinkindschwimmen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "189 €",
-     "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
-     "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
-     "category": "wasser",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Kurs ausgebucht (SoldOut laut Buchungsseite)"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "SA"
-      ],
-      "start": "11:00",
-      "from": "2026-11-14",
-      "count": 10,
-      "skipHolidays": false
-     }
-    },
-    {
-     "providerId": "schwimmschule-ohana-nuernberg",
-     "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Kleinkinderschwimmen Maxis ab 2 Jahre – Start 23.01.2027",
-     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags 11:00 Uhr in den Kliniken Dr. Erler (Kontumazgarten). Acht Termine; der Kurs ist ausgebucht.",
-     "topics": [
-      "kleinkindschwimmen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "189 €",
-     "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
-     "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
-     "category": "wasser",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Kurs ausgebucht (SoldOut laut Buchungsseite)"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "SA"
-      ],
-      "start": "11:00",
-      "from": "2027-01-23",
-      "count": 8,
-      "skipHolidays": false
-     }
-    },
-    {
-     "providerId": "schwimmschule-ohana-nuernberg",
-     "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Kleinkinderschwimmen Maxis ab 2 Jahre – Start 20.03.2027",
-     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags 11:00 Uhr in den Kliniken Dr. Erler (Kontumazgarten). Zehn Termine; Plätze laut Buchungsseite noch frei.",
+     "title": "Start 14.11.2026: Kleinkindschwimmen Maxis (ab 2 J.), Sa 11:00",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren samstags um 11 Uhr in den Kliniken Dr. Erler, Kontumazgarten 4–19. Laufzeit bis 16.01.2027.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -350,7 +282,75 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Plätze frei laut Buchungsseite (InStock); Anmeldung über die Buchungsseite"
+      "note": "Online buchbar (Kursolino: InStock)"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "SA"
+      ],
+      "start": "11:00",
+      "from": "2026-11-14",
+      "until": "2027-01-16",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "schwimmschule-ohana-nuernberg",
+     "venueId": "schwimmschule-ohana-nuernberg",
+     "title": "Start 23.01.2027: Kleinkindschwimmen Maxis (ab 2 J.), Sa 11:00",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren samstags um 11 Uhr in den Kliniken Dr. Erler, Kontumazgarten 4–19. Laufzeit bis 13.03.2027. Der Kurs ist ausgebucht.",
+     "topics": [
+      "kleinkindschwimmen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "189 €",
+     "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+     "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+     "category": "wasser",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Kursolino: SoldOut"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "SA"
+      ],
+      "start": "11:00",
+      "from": "2027-01-23",
+      "until": "2027-03-13",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "schwimmschule-ohana-nuernberg",
+     "venueId": "schwimmschule-ohana-nuernberg",
+     "title": "Start 20.03.2027: Kleinkindschwimmen Maxis (ab 2 J.), Sa 11:00",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren samstags um 11 Uhr in den Kliniken Dr. Erler, Kontumazgarten 4–19. Laufzeit bis 22.05.2027.",
+     "topics": [
+      "kleinkindschwimmen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "189 €",
+     "url": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+     "sourceUrl": "https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292",
+     "category": "wasser",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Online buchbar (Kursolino: InStock)"
      },
      "schedule": {
       "kind": "weekly",
@@ -359,16 +359,16 @@
       ],
       "start": "11:00",
       "from": "2027-03-20",
-      "count": 10,
+      "until": "2027-05-22",
       "skipHolidays": false
      }
     }
    ],
-   "inputHash": "c623ccd06c4946dec3c73d1d09448e679b614ce8e48c54964d3540f70d92b80b",
+   "inputHash": "7e4d81dba6601e5813081d861d931c8fbfd10c1d3e8de02e238357b83dbabb6a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-06T09:24:07+01:00",
-   "changedAt": "2026-11-02T09:03:46+01:00",
+   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "changedAt": "2026-11-07T08:41:42+01:00",
    "partsHash": "2dbca5b3382f77e652ff85c49279a49db4118d6b0d169dda8535979136d77bff"
   }
  }
