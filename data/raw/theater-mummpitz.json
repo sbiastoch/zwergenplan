@@ -6,11 +6,10 @@
     {
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
-     "title": "Jazz für Kinder (o.A.)",
-     "summary": "Jazz-Konzert für Kinder ohne Altersgrenze, Vorstellungen sonntags um 11 Uhr. Alle angezeigten Termine sind derzeit ausverkauft.",
+     "title": "Jazz für Kinder (ohne Altersgrenze)",
+     "summary": "Jazz-Konzert für Kinder ohne Altersgrenze laut Spielplan, sonntags um 11 Uhr. Alle gelisteten Termine bis Mai 2027 sind ausverkauft.",
      "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -20,7 +19,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Alle angezeigten Termine ausverkauft; Tickets über Reservix"
+      "note": "Alle gelisteten Termine ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -52,70 +51,10 @@
     {
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
-     "title": "Jazz für Räuber oder Gretels großer Auftritt (3+)",
-     "summary": "Jazz-Stück für Kinder ab 3 Jahren mit mehreren Vorstellungen im Februar 2027. Alle angezeigten Termine sind derzeit buchbar.",
+     "title": "Klassik für Kinder (ohne Altersgrenze)",
+     "summary": "Klassik-Konzerte für Kinder ohne Altersgrenze laut Spielplan, sonntags um 11 Uhr mit wechselnden Programmen zu einzelnen Instrumenten. Alle gelisteten Termine bis April 2027 sind ausverkauft.",
      "topics": [
-      "theater",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/spielplan/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "age": {
-      "minMonths": 36,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Karten verfügbar; Tickets über Reservix"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-02-17T10:00"
-       },
-       {
-        "start": "2027-02-18T10:00"
-       },
-       {
-        "start": "2027-02-19T10:00"
-       },
-       {
-        "start": "2027-02-19T15:00"
-       },
-       {
-        "start": "2027-02-20T11:00"
-       },
-       {
-        "start": "2027-02-24T10:00"
-       },
-       {
-        "start": "2027-02-25T10:00"
-       },
-       {
-        "start": "2027-02-26T10:00"
-       },
-       {
-        "start": "2027-02-27T11:00"
-       },
-       {
-        "start": "2027-02-28T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder (o.A.)",
-     "summary": "Konzertreihe für Kinder ohne Altersgrenze mit wechselnden Programmen, jeweils sonntags um 11 Uhr. Alle angezeigten Termine sind derzeit ausverkauft.",
-     "topics": [
-      "konzert",
-      "musik"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -125,7 +64,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Alle angezeigten Termine ausverkauft; Tickets über Reservix"
+      "note": "Alle gelisteten Termine ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -152,11 +91,11 @@
      }
     }
    ],
-   "inputHash": "49a63f9ab06f0f372bf9ca9ccac8045c0a17fbe1c2a84e916ec658b17a61e7b5",
+   "inputHash": "c242cd6e28b9b97fa7e176002c9c392fea19ed636c61a902f061ed84b4bc59f0",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
-   "changedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "changedAt": "2026-11-08T08:50:59+01:00",
    "partsHash": "35534a05e45ec78c75433e4af4b6d7dfa3f5816cd79353a2c1c234fa0573313c"
   },
   "seite:https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/": {
@@ -212,7 +151,7 @@
    "inputHash": "59352b8bf40f71007dd2a3c1398106b01f0f872d82a4189fbd7f876f66271ce9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -272,7 +211,7 @@
    "inputHash": "8858f7a5a4afb7e61a764647f548accc0c06fc9ed932c7fafbc933f8a30fc3c9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -280,7 +219,6 @@
    "events": [],
    "inputHash": "dcabe89f4aeb5f39bb0d3485635961026f30b174a1e205db37e171aef7b17b0e",
    "dated": {
-    "2026-11-07": "109546c0d9c80a7e33aaa950c1482b39f2cfddd18cbf3b79873a1b0770dcd713",
     "2026-11-08": "bd6333a31912e2d021749ac2d16a06d46ad1cfea5b50e80e92c8ef33653ecb8f",
     "2026-12-05": "db408e03de6385e74a77e64a82f8837e1012de187917e5b985739949fe573f8b",
     "2026-12-06": "facded7e601c873cc140e8021760332e4c4ad4e69c597217a25ffded6368b588",
@@ -293,7 +231,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "frankenkids",

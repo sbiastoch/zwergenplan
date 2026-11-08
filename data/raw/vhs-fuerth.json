@@ -6,46 +6,77 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "NAMASTE Familien-Wohlfühl-Yoga (Fr. 22.01.2027)",
-     "summary": "Spielerisches Yoga für Familien mit bewusstem Atmen, Dehnen und Entspannen. Das Alter der Kinder ist nicht angegeben; vor der Buchung in den Kursdetails prüfen (Kursnummer 16311).",
+     "title": "Eltern-Kind-Turnen 1½–2½ Jahre (mittwochs)",
+     "summary": "Wöchentlich wechselnder Bewegungsparcours zum gemeinsamen Turnen, Eltern machen aktiv mit. Der Kurs startete am 23.09.2026; Restlaufzeit und Einstieg bitte in den Kursdetails prüfen.",
      "topics": [
+      "eltern-kind-turnen",
       "bewegung"
      ],
-     "format": "einmalig",
+     "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "10,00 €",
+     "price": "82,50 €",
      "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
      "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
      "category": "bewegung",
+     "age": {
+      "minMonths": 18,
+      "maxMonths": 30
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über die Kursdetails (Kursnummer 16311)"
+      "note": "Anmeldung über die Kursdetails der vhs (Kursnummer 16301)"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-22T17:00"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "17:00",
+      "from": "2026-11-11",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "vhs-fuerth",
+     "venueId": "vhs-fuerth",
+     "title": "Eltern-Kind-Turnen 2–3 Jahre (donnerstags)",
+     "summary": "Wöchentlich wechselnder Bewegungsparcours zum gemeinsamen Turnen, Eltern machen aktiv mit. Der Kurs startete am 24.09.2026; Restlaufzeit und Einstieg bitte in den Kursdetails prüfen.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "82,50 €",
+     "url": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+     "sourceUrl": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über die Kursdetails der vhs (Kursnummer 16303)"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "17:00",
+      "from": "2026-11-12",
+      "skipHolidays": true
      }
     }
    ],
-   "inputHash": "bf72bf30134cdebffb392200aa5e6a828a6dc7213833a97b7b32fbdfb563a76d",
+   "inputHash": "4d458a225275d5ce1f0dde6bad6fbfeeee6d51627da9e9bc7c2dd49a53eb68c5",
    "model": "haiku",
-   "status": "fehler",
-   "reason": "https://www.vhs-fuerth.de/p/gesellschaft-junge-vhs/junge-vhs-477-CAT-KAT26: Vorab-Auflösung: mehr als 5 Weiterleitungen (mehr als 5 Weiterleitungen)",
-   "checkedAt": "2026-11-02T09:03:46+01:00",
-   "changedAt": "2026-11-02T09:03:46+01:00",
-   "failingSince": "2026-11-05T09:21:47+01:00",
-   "pending": {
-    "inputHash": "4927d9a27761ff5ae78a8cb5301afd21add7d67ff17367f3928aa6d2e1e5e887",
-    "model": "haiku",
-    "events": []
-   },
-   "klasse": "voruebergehend",
-   "klasseSince": "2026-11-05T09:21:47+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "changedAt": "2026-11-08T08:50:59+01:00",
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }

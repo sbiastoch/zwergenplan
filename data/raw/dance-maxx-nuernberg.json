@@ -95,7 +95,7 @@
    "inputHash": "503f0940b68a52b31d9ad0ab5a629a48a047d49fe0177f59ab63483b8637a35d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-11-07T08:41:42+01:00",
    "partsHash": "9d2800d214b9998935e14f6a73d2371d941436cdc15d5c149e5d202a9154b5d5"
   },
@@ -104,7 +104,7 @@
    "inputHash": "539e7f2bc44a9c17913e1d8caf05a9e7c799734b8954bafaa5daa998e1cba53a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "9d2800d214b9998935e14f6a73d2371d941436cdc15d5c149e5d202a9154b5d5"
   },
@@ -113,7 +113,7 @@
    "inputHash": "9fae59c1a05ea68c473875cee9ec245aeb3f63c113fae3631ae9299feb7e8568",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "9d2800d214b9998935e14f6a73d2371d941436cdc15d5c149e5d202a9154b5d5"
   },
@@ -122,7 +122,7 @@
    "inputHash": "4bb87ccab6d518c6d392c855f61c67343e83a2b12a949b234a1b77bd9608503f",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "9d2800d214b9998935e14f6a73d2371d941436cdc15d5c149e5d202a9154b5d5"
   }
@@ -130,7 +130,7 @@
  "beilagen": {
   "seite:https://calendly.com/dance-maxx-info/kostenlose-probestunde-fitdankbaby-in-nurnberg": {
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00"
+   "checkedAt": "2026-11-08T08:50:59+01:00"
   }
  }
 }

@@ -5,9 +5,39 @@
    "events": [
     {
      "providerId": "ev-eibach",
+     "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
+     "title": "Waldkrabbelgruppe (Eltern-Kind, donnerstags 10–11 Uhr)",
+     "summary": "Eltern-Kind-Gruppe im Wald des Faberparks, Treffpunkt laut Beschreibung. Donnerstags 10–11 Uhr, nicht in den Schulferien, bei fast jedem Wetter.",
+     "topics": [
+      "waldgruppe",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107133.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Anmeldeangabe in den Terminen; Treffpunkt laut Beschreibung."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2026-11-12",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "ev-eibach",
      "venueId": "ev-eibach",
-     "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre), freitags",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Gemeindehaus Eibach. Die Quelle nennt keine Anmeldung und keinen Preis.",
+     "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre, freitags)",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach.",
      "topics": [
       "musik",
       "singen",
@@ -25,7 +55,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung in der Quelle; bitte beim Veranstalter nachfragen."
+      "note": "Keine Anmeldeangabe in den Terminen; bei Interesse bei der Gemeinde nachfragen."
      },
      "schedule": {
       "kind": "weekly",
@@ -41,50 +71,14 @@
     {
      "providerId": "ev-eibach",
      "venueId": "ev-eibach",
-     "title": "Waldkrabbelgruppe Faberpark (donnerstags)",
-     "summary": "Eltern-Kind-Gruppe im Wald am Faberpark, donnerstags 10–11 Uhr. Sie findet außer in den Schulferien und fast bei jedem Wetter statt; Treffpunkt ist der Bogen an der Weiherbrücke.",
-     "topics": [
-      "waldgruppe",
-      "krabbelgruppe",
-      "eltern-kind-gruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107133.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung in der Quelle; bitte beim Veranstalter nachfragen."
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2026-11-12",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "ev-eibach",
-     "venueId": "ev-eibach",
      "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils im Gemeindehaus Eibach. Im Kalender stehen 18.12.2026 und 15.01.2027, jeweils 9:30–10:30 Uhr. Zur Anmeldung macht die Quelle keine Angaben.",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils im Kleinen Saal des Gemeindehauses Eibach. Im Kalender stehen bisher nur der 18.12.2026 und der 15.01.2027; weitere Termine sind nicht angegeben.",
      "topics": [
       "musik",
-      "singen",
-      "eltern-kind-gruppe"
+      "singen"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107101.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
@@ -95,7 +89,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platz- oder Anmeldeangabe im Kalender; Nachfrage beim Veranstalter (Ev.-Luth. Johanneskirche Eibach)."
+      "note": "Anmeldung und Platzangebot nicht angegeben; beim Veranstalter (Gemeindehaus Eibach) nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -131,26 +125,26 @@
     "2026-11-22": "91a1226b03e5fe9acaf6f667bf4fa7731c80ccbdf874532241cc1d523c63234b",
     "2026-11-23": "db09f9e49a501773b5c43a8524ceac915f61c782d2ea67f59fedae81e606ee17",
     "2026-11-24": "d7858288e74b39529bf6aa942ddbe5f64fe218dcfa023584a3672ca85d7b11e1",
-    "2026-11-25": "9c577fe681264fb4fee663e127ac9e6cdcae3290343d36bc8cfda55047b89551",
+    "2026-11-25": "54456e284440c849069b1f95f44ee34ea0c627171ddfa432e1b1344e27dce2f1",
     "2026-11-26": "7c589e7c860f6f14fef7c36ca29bb4b507faaf4e707f3a0d6c8069384fa0e56d",
     "2026-11-27": "dc0e22886d303a247580510db35d9024c2b3bc67d64e2f35b176aca4e382e7e3",
     "2026-11-28": "d03a3a920e664f993ac09089b134329d10ee47c4070093d6b5a8c6a9b09e8926",
     "2026-11-29": "a7c6a5ca58257a46d02792bb9d596279f4f3c48a8f74d217ef65ccf52042b273",
     "2026-11-30": "e068985acace188364c5b5b00fcf316d6703fdde9a6cb1303ba8e13d399b8128",
     "2026-12-01": "08b6ea7e631e50e3adcdc1171c02ef60b0171e1dd09e3d23f55e9337c9896254",
-    "2026-12-02": "1d79e91bfdb32386269482d6f95dec4f3b46ac943ae2d007882cdcb9d514635a",
+    "2026-12-02": "16b0434a9719440db381b30bfb6265ab28983055a04eaf021a3398cce9512e4f",
     "2026-12-03": "474a020b3a52671feb684f2a014537f2989f1b4ccc34675be322c03a9392f40c",
     "2026-12-04": "edc85741292c86feb98a784882be8c5132f3abc3289a1e2e73cf8ec2b5de38de",
     "2026-12-06": "943f4044c419a0a0df8da2f2b22b62a2bb062eca43c6827461d08355eebf5205",
     "2026-12-07": "932ec1b6a9875b9ff16dc3f1470d6031a9be2f0bbf9ff8da54cb7bfe5b9e5006",
     "2026-12-08": "20161e25f120681403dbc11417524d067647a8354252a8b8f914d2411983b874",
-    "2026-12-09": "c179db8dd796d7ae38253f4a83da651bb3b1bcf2007ace732299e82dd05f4c1e",
+    "2026-12-09": "05dad402716016ea5bae539bc4105daa085c131b79fdaf6c570054b09d374fa7",
     "2026-12-10": "9157b6677f34574651e2aa3c37e6463997de6e93aeafc8c0469cd36230016acb",
     "2026-12-11": "cdc26970cebaf3af88f8b8be27c1498eaa99172b6b390781733613eba0562c40",
     "2026-12-13": "1b57444b53360498213acd72c437b865bbb547717f10d7fd30cba22e01ca8c24",
     "2026-12-14": "cf6f1d803a6a606e7b49849b0aceb3ae3109e50e1aae9d02967469717950a7a4",
     "2026-12-15": "4434bb8adc827b3f880d704c263db18a039b64ddc0616e81a87ff365f4d50f13",
-    "2026-12-16": "6f108b9eec925ed7a2af143f09defcc335737317986514c8f03b6ee0ab6942f2",
+    "2026-12-16": "586da4dafeca1c44b5345eb4ac9b00ca92b9352fea8c5d8a5f83956c6c00e892",
     "2026-12-17": "f2894b223d528dac84accc0e80e2b05119cc343470227b3c031d4cba4eacdad1",
     "2026-12-18": "30858836a4ffe7d17598c2cfd126d8b3d41ee60a372c8ed89433128ea69e6ece",
     "2026-12-19": "895fca5908df2458c4924955c8b18317996114d51ef74fc7315e41aef8a763bd",
@@ -223,8 +217,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
-   "changedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "changedAt": "2026-11-08T08:50:59+01:00",
    "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
   }
  }

@@ -6,10 +6,11 @@
     {
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
-     "title": "Baby & Museum: Kurzführung mit Babys zu wechselnden Themen",
-     "summary": "Kurzführung für Erwachsene mit Babys durch die Ausstellung, zu monatlich wechselnden Themen, mit Pausen zum Füttern und Wickeln. Kinderwagen und Trage sind erlaubt; danach Austausch bei Kaffee. Tickets je Termin im Shop; der Termin am 13.11. ist ausverkauft.",
+     "title": "Baby & Museum: Kunst-Kurzführung für Eltern mit Babys",
+     "summary": "Kurzführung zu monatlich wechselnden Themen, Pausen zum Füttern und Wickeln sind eingeplant, danach Kaffee zum Austausch. Der Eintritt kommt zusätzlich zur Führungsgebühr dazu; die Führung richtet sich an Erwachsene mit Babys.",
      "topics": [
-      "museum"
+      "museum",
+      "elterntreff"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -24,7 +25,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Tickets je Termin im go~mus-Shop; 13.11.2026 ausverkauft, die übrigen Termine sind buchbar"
+      "note": "Termin 13.11. ausverkauft; die übrigen Termine sind über den Ticket-Button im go~mus-Shop buchbar"
      },
      "schedule": {
       "kind": "dates",
@@ -49,11 +50,11 @@
      }
     }
    ],
-   "inputHash": "04f8f53238ef2fe191c08ef76d44b53e01c638c3698067b0ad3246e927eaa6f7",
+   "inputHash": "6f72c455f36f20935f81d65f2d12976d252818791d1f37801d98eab0820b46f9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
-   "changedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "changedAt": "2026-11-08T08:50:59+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
@@ -62,7 +63,7 @@
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
      "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-     "summary": "Schauspielerin Mara Wengel liest und spielt Geschichten rund um Kunst und Design im Wonderland-Raum der Ausstellung „Double Up!“. Kinder ab zwei Jahren machen aktiv mit. Tickets laufen über den Museumsshop.",
+     "summary": "Eine Schauspielerin liest und spielt Geschichten rund um Kunst und Design im Museum, und die Kinder machen aktiv mit. Einzeltermin am 27.11.; Tickets über den Ticket-Button, Erwachsene zahlen 3 €.",
      "topics": [
       "vorlesen",
       "museum"
@@ -80,7 +81,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Platzangaben sind auf der Programmseite nicht zu sehen."
+      "note": "Ticket über den Button auf der Programmseite (go~mus-Shop); Platzangabe nicht sichtbar"
      },
      "schedule": {
       "kind": "dates",
@@ -92,11 +93,11 @@
      }
     }
    ],
-   "inputHash": "19a286ad3a483e34f9e698397105029c5c796c1b3f8a714d12d20b6348174dce",
+   "inputHash": "006a6ab70cf414877afb4e35ed7b803d3132c37ce77b9cb259e26a0eac1dcc25",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
-   "changedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "changedAt": "2026-11-08T08:50:59+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "kandidaten": {
@@ -158,7 +159,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-08T08:50:59+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"
