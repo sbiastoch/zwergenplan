@@ -39,18 +39,50 @@
    "inputHash": "7bbe49055391106f61ef39bab34929a32e88ad5d2a16343c8ed635f0f2279dec",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "626cdf4007a3c4e8fe4aae351b146175841c8cce06c0836cccbcfa6b528685e9"
   },
   "seite:https://st-martin-nuernberg.de/aktuelles/termine": {
-   "events": [],
-   "inputHash": "5f2bfd33051786efe7879443cec810d1a0b2f7258e29582bcae5a48ec399244b",
+   "events": [
+    {
+     "providerId": "kath-st-martin-nordstadt",
+     "venueId": "kath-st-martin-nordstadt",
+     "title": "Kleinkindergottesdienst (0 bis 8 Jahre)",
+     "summary": "Gottesdienst für die Kleinsten bis 8 Jahre im Pfarrzentrum St. Martin, etwa eine halbe Stunde. Auf der Seite ist keine Anmeldung genannt; bei Fragen hilft das Pfarrbüro.",
+     "topics": [
+      "krabbelgottesdienst"
+     ],
+     "format": "einmalig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://st-martin-nuernberg.de/aktuelles/termine",
+     "sourceUrl": "https://st-martin-nuernberg.de/aktuelles/termine",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 96
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe auf der Seite; Rückfragen beim Pfarrbüro St. Martin."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-13T10:30",
+        "end": "2026-12-13T11:00"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "7b86e074557331f28521042b1195057cc8d4fc92d5cdd5ec8239b63f78c62c0d",
    "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-11-05T09:21:47+01:00",
-   "emptySince": "2026-11-05T09:21:47+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "626cdf4007a3c4e8fe4aae351b146175841c8cce06c0836cccbcfa6b528685e9"
   }
  }

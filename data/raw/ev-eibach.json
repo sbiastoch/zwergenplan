@@ -6,10 +6,11 @@
     {
      "providerId": "ev-eibach",
      "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
-     "title": "Waldkrabbelgruppe (Eltern-Kind, donnerstags 10–11 Uhr)",
-     "summary": "Eltern-Kind-Gruppe im Wald des Faberparks, Treffpunkt laut Beschreibung. Donnerstags 10–11 Uhr, nicht in den Schulferien, bei fast jedem Wetter.",
+     "title": "Waldkrabbelgruppe im Faberpark (Donnerstag)",
+     "summary": "Eltern-Kind-Gruppe im Wald, donnerstags 10–11 Uhr. Findet außer in den Schulferien und fast bei jedem Wetter statt. Treffpunkt steht in der Kalenderbeschreibung.",
      "topics": [
       "waldgruppe",
+      "krabbelgruppe",
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
@@ -20,7 +21,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Anmeldeangabe in den Terminen; Treffpunkt laut Beschreibung."
+      "note": "Keine Anmeldeangabe in der Quelle; bei der Gemeinde nachfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -37,11 +38,10 @@
      "providerId": "ev-eibach",
      "venueId": "ev-eibach",
      "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre, freitags)",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach.",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils. Freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach.",
      "topics": [
       "musik",
-      "singen",
-      "eltern-kind-gruppe"
+      "singen"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -55,7 +55,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Anmeldeangabe in den Terminen; bei Interesse bei der Gemeinde nachfragen."
+      "note": "Keine Anmeldeangabe in der Quelle; bei der Gemeinde nachfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -65,20 +65,21 @@
       "start": "09:30",
       "end": "10:30",
       "from": "2026-11-13",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "ev-eibach",
      "venueId": "ev-eibach",
      "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils im Kleinen Saal des Gemeindehauses Eibach. Im Kalender stehen bisher nur der 18.12.2026 und der 15.01.2027; weitere Termine sind nicht angegeben.",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags im Gemeindehaus Eibach. Der Kalender nennt nur die Termine 18.12.2026 und 15.01.2027; Anmeldung, Preis und weitere Termine bitte bei der Gemeinde erfragen.",
      "topics": [
       "musik",
-      "singen"
+      "singen",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107101.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
@@ -89,7 +90,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung und Platzangebot nicht angegeben; beim Veranstalter (Gemeindehaus Eibach) nachfragen."
+      "note": "Keine Angabe zur Verfügbarkeit in der Quelle; Auskunft über die Gemeinde Eibach."
      },
      "schedule": {
       "kind": "dates",
@@ -108,10 +109,9 @@
    ],
    "inputHash": "0e82dc602ad5f902758163a29689aad3a66dcd1920d7ba797a7ba71d5f956701",
    "dated": {
-    "2026-11-08": "eea018292112b4509dcbef2b75e10206547caf422795fac54655164e2574b5ee",
     "2026-11-09": "d426a419fcc0254712f5e28655f0317570460b8140bb4434b395dd4b01ea173b",
     "2026-11-10": "39757bb2c5c3b6f9604b8d534fecfb662544a7084b63a71f6c5f2d318192578a",
-    "2026-11-11": "08aedb9765406e9a5bb0d50d42163478f0a3449a9abf6450466816fa1ecc4227",
+    "2026-11-11": "b09a5b5f45038872abe42ceb21e4f2aed2755ad46c6940091a111a60e151fc85",
     "2026-11-12": "1d7b9d5892ae149c91478007fda6611b06ea98e71e2841e46f7ea26e938f89fa",
     "2026-11-13": "dd1b04a14dd397f38380d39befc8f85ca68377c4646c8c5190550624c1008866",
     "2026-11-14": "04cb265aeeea6618cf2b7b8a083d59dc2b630a25aac2c8e3399989aad038013d",
@@ -150,7 +150,7 @@
     "2026-12-19": "895fca5908df2458c4924955c8b18317996114d51ef74fc7315e41aef8a763bd",
     "2026-12-20": "754b83c68ba3ae38b09755b0508d23719b3b1761b2739cc5e9095a555cd0f86a",
     "2026-12-21": "f3725d3980e396847fd42ec9d5f2e1d829e4b2ee8514ab4a197f39e7532e2ad8",
-    "2026-12-22": "7b187b3aa38d91e9bab462ace515d043b466218d06eb262d6b2380ddf77916ab",
+    "2026-12-22": "bf73dbbbd86f697475db416d4f749eeb0a7937236d6a3975954e8ce5b643763b",
     "2026-12-23": "64b6bbe65a134bb837b3c983c5708844c3334f56c98aa0ef89eb22995aa9a1ee",
     "2026-12-24": "5bb49424e35aecd25750d91e83616db795861eaeb0c8dbf214ea8f0ae040a7cd",
     "2026-12-25": "a8ecad13fde16f5bac41b070f0827c413e76ec9c2a87a14caa498d6a27a37865",
@@ -162,7 +162,7 @@
     "2027-01-06": "99019070be304b75452c8751b49aede94d1b7ecf47db12e307fae99daf70ffd2",
     "2027-01-10": "5bc920c88edba0995918e3069f01c569f0e456fdd45ebb18c96d0743e0deed9e",
     "2027-01-11": "a2bcd5778fae3dc8ddfdfc4ab533a386b2988de131b1dcd51857a6625c8dcd03",
-    "2027-01-13": "3a05d2986305590ca5f6ebd4d9cf2f0fcd563ed6c74b7608411c329e88a52133",
+    "2027-01-13": "7490f9ce92b9f4e2be8b0b807f8bc1b6fe8705b6b6eea6b17903aa8d79c6cfcf",
     "2027-01-15": "0459985f38f611640f295a3741b01eadfad1ac27950654678eb32b0c5b7774e9",
     "2027-01-17": "c4976d76ae1ff8b8bb2902131bec4d5a5a0e66d06ccf000625d1adcb1e7e4874",
     "2027-01-18": "ba9632b9b99403fc742012d0d770dbeeb3a5701a2f8fa671b699f2bb8d1e31c5",
@@ -217,8 +217,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
   }
  }

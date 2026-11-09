@@ -7,7 +7,7 @@
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
      "title": "MilchZeit – Offener Treff für Schwangere und Eltern mit Baby",
-     "summary": "Offener Treff rund um Stillen, Abpumpen und Flaschennahrung, geleitet von einer Stillbegleiterin. Keine Anmeldung nötig; Unkostenbeitrag 3 € vor Ort.",
+     "summary": "Offener Treff rund um Stillen, Abpumpen, Zufüttern und Flaschennahrung, geleitet von einer Stillbegleiterin. Keine Anmeldung nötig; der Unkostenbeitrag von 3 € wird vor Ort bezahlt.",
      "topics": [
       "stillcafe",
       "elterntreff"
@@ -15,33 +15,17 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "3 € Unkostenbeitrag vor Ort (Kursgebühr 0,00 €)",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "price": "3 € Unkostenbeitrag vor Ort",
+     "url": "https://www.fbs-nuernberg.de/begegnung/milchzeit/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Eine Anmeldung ist nicht erforderlich."
+      "note": "Keine Anmeldung erforderlich, Online-Anmeldung nicht möglich"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-09-16T09:00",
-        "end": "2026-09-16T10:00"
-       },
-       {
-        "start": "2026-09-30T09:00",
-        "end": "2026-09-30T10:00"
-       },
-       {
-        "start": "2026-10-14T09:00",
-        "end": "2026-10-14T10:00"
-       },
-       {
-        "start": "2026-10-28T09:00",
-        "end": "2026-10-28T10:00"
-       },
        {
         "start": "2026-11-11T09:00",
         "end": "2026-11-11T10:00"
@@ -60,8 +44,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Tanzen und Turnen mit Musik (ca. 1,5–2,5 Jahre, Dienstag)",
-     "summary": "Musik, Tanz und Bewegungsspiele mit Tüchern und Bällen für Kinder von ca. 1,5 bis 2,5 Jahren mit einem Elternteil. Der Kurs ist belegt, Anmeldung nur auf die Warteliste; Einstieg im laufenden Kurs ist jederzeit möglich (Gebühr anteilig).",
+     "title": "Tanzen und Turnen mit Musik (Di 15:30, 1,5–2,5 Jahre)",
+     "summary": "Gemeinsames Tanzen, Klatschen und Spielen mit Tüchern und Bällen für Kinder von ca. 1,5 bis 2,5 Jahren. Einstieg in den laufenden Kurs ist jederzeit möglich, die Gebühr wird anteilig berechnet.",
      "topics": [
       "tanz",
       "bewegung"
@@ -69,7 +53,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "74,00 € (8 Termine)",
+     "price": "74,00 € (Kursgebühr)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
@@ -79,31 +63,11 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Veranstaltung belegt – Anmeldung auf Warteliste"
+      "note": "Kurs belegt, Anmeldung auf Warteliste möglich"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-09-29T15:30",
-        "end": "2026-09-29T16:30"
-       },
-       {
-        "start": "2026-10-06T15:30",
-        "end": "2026-10-06T16:30"
-       },
-       {
-        "start": "2026-10-13T15:30",
-        "end": "2026-10-13T16:30"
-       },
-       {
-        "start": "2026-10-20T15:30",
-        "end": "2026-10-20T16:30"
-       },
-       {
-        "start": "2026-10-27T15:30",
-        "end": "2026-10-27T16:30"
-       },
        {
         "start": "2026-11-10T15:30",
         "end": "2026-11-10T16:30"
@@ -122,22 +86,68 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP (Dienstag, Babys geb. Juni–Aug. 2026)",
-     "summary": "Bewegungsanregungen und Elternaustausch für Babys im ersten Lebensjahr im warm beheizten Raum, die Babys sind dabei unbekleidet. Einstieg im laufenden Kurs möglich, solange Plätze frei sind; Gebühr anteilig.",
+     "title": "Kinderturnen für 1,5–3 Jahre (Do 14:45)",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1,5 bis 3 Jahren mit Begleitperson, zur Förderung von Koordination und Grobmotorik. 6 Termine im Kurs; derzeit Warteliste.",
      "topics": [
-      "pekip"
+      "eltern-kind-turnen",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "130,50 € (9 Termine), 2,00 € Materialgeld bei Bedarf",
+     "price": "54,00 € (Kursgebühr)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "babykurse",
+     "category": "bewegung",
      "age": {
-      "minMonths": 0,
-      "maxMonths": 12
+      "minMonths": 18,
+      "maxMonths": 36
      },
+     "availability": {
+      "status": "warteliste",
+      "note": "Kurs belegt, Anmeldung auf Warteliste möglich"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-12T14:45",
+        "end": "2026-11-12T15:45"
+       },
+       {
+        "start": "2026-11-19T14:45",
+        "end": "2026-11-19T15:45"
+       },
+       {
+        "start": "2026-11-26T14:45",
+        "end": "2026-11-26T15:45"
+       },
+       {
+        "start": "2026-12-03T14:45",
+        "end": "2026-12-03T15:45"
+       },
+       {
+        "start": "2026-12-10T14:45",
+        "end": "2026-12-10T15:45"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Zitronenblau und Erdbeergrün – Malen für Eltern und Babys (Sa 13:00)",
+     "summary": "Gemeinsames Malen und Drucken für Eltern mit ihren Babys; die Kleinen erkunden Farben und Materialien mit Händen und Füßen. Der Kurs läuft bereits, im Horizont ist noch der Termin am 14.11. übrig.",
+     "topics": [
+      "kreativ"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "46,50 € (Kursgebühr)",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "buehne",
      "availability": {
       "status": "wenige",
       "note": "Restplätze frei"
@@ -146,40 +156,8 @@
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-10-06T09:00",
-        "end": "2026-10-06T10:30"
-       },
-       {
-        "start": "2026-10-13T09:00",
-        "end": "2026-10-13T10:30"
-       },
-       {
-        "start": "2026-10-20T09:00",
-        "end": "2026-10-20T10:30"
-       },
-       {
-        "start": "2026-11-10T09:00",
-        "end": "2026-11-10T10:30"
-       },
-       {
-        "start": "2026-11-17T09:00",
-        "end": "2026-11-17T10:30"
-       },
-       {
-        "start": "2026-11-24T09:00",
-        "end": "2026-11-24T10:30"
-       },
-       {
-        "start": "2026-12-01T09:00",
-        "end": "2026-12-01T10:30"
-       },
-       {
-        "start": "2026-12-08T09:00",
-        "end": "2026-12-08T10:30"
-       },
-       {
-        "start": "2026-12-15T09:00",
-        "end": "2026-12-15T10:30"
+        "start": "2026-11-14T13:00",
+        "end": "2026-11-14T14:00"
        }
       ]
      }
@@ -187,65 +165,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP (Montag, Babys geb. Mai–Juli 2026)",
-     "summary": "Bewegungsanregungen und Elternaustausch für Babys im ersten Lebensjahr im warm beheizten Raum, die Babys sind dabei unbekleidet. Der Kurs ist belegt; Anmeldung ist nur auf die Warteliste möglich.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "101,00 € (7 Termine), 2,00 € Materialgeld bei Bedarf",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "warteliste",
-      "note": "Veranstaltung belegt – Anmeldung auf Warteliste"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-09T11:30",
-        "end": "2026-11-09T13:00"
-       },
-       {
-        "start": "2026-11-16T11:30",
-        "end": "2026-11-16T13:00"
-       },
-       {
-        "start": "2026-11-23T11:30",
-        "end": "2026-11-23T13:00"
-       },
-       {
-        "start": "2026-11-30T11:30",
-        "end": "2026-11-30T13:00"
-       },
-       {
-        "start": "2026-12-07T11:30",
-        "end": "2026-12-07T13:00"
-       },
-       {
-        "start": "2026-12-14T11:30",
-        "end": "2026-12-14T13:00"
-       },
-       {
-        "start": "2026-12-21T11:30",
-        "end": "2026-12-21T13:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung für Babys (6–12 Monate)",
-     "summary": "Gemeinsames Singen, Sprechverse, Fingerspiele und Tanz zur Musik für Babys von 6 bis 12 Monaten mit einem Elternteil. Wenige Plätze frei.",
+     "title": "Musikalische Früherziehung für Babys (6–12 Monate, Mo 14:30)",
+     "summary": "Gemeinsames Singen, Fingerspiele, Tänze und Musizieren mit Rasseln, Klanghölzern und Tüchern für Babys mit einem Elternteil. Kursstart am 09.11., 6 Termine bis 14.12.",
      "topics": [
       "musik",
       "singen"
@@ -253,7 +174,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "64,00 € (6 Termine)",
+     "price": "64,00 € (Kursgebühr)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "musik",
@@ -298,220 +219,74 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen für 1,5–3 Jahre (Donnerstag 14:45)",
-     "summary": "Spielerisches Bewegen in einer Bewegungslandschaft für Kinder von 1,5 bis 3 Jahren, die Eltern begleiten das Bewegen. Der Kurs ist belegt; Anmeldung nur auf die Warteliste.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "54,00 € (6 Termine)",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "warteliste",
-      "note": "Veranstaltung belegt – Anmeldung auf Warteliste"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-29T14:45",
-        "end": "2026-10-29T15:45"
-       },
-       {
-        "start": "2026-11-12T14:45",
-        "end": "2026-11-12T15:45"
-       },
-       {
-        "start": "2026-11-19T14:45",
-        "end": "2026-11-19T15:45"
-       },
-       {
-        "start": "2026-11-26T14:45",
-        "end": "2026-11-26T15:45"
-       },
-       {
-        "start": "2026-12-03T14:45",
-        "end": "2026-12-03T15:45"
-       },
-       {
-        "start": "2026-12-10T14:45",
-        "end": "2026-12-10T15:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Kreatives Malen für Eltern und Babys (Samstag 13 Uhr)",
-     "summary": "Gemeinsames Malen, Drucken und Gestalten für Eltern und Babys; die Babys erkunden Farben, Formen und Materialien. Wenige Plätze frei.",
-     "topics": [
-      "kreativ"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "46,50 € (3 Termine)",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "buehne",
-     "availability": {
-      "status": "wenige",
-      "note": "Restplätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-31T13:00",
-        "end": "2026-10-31T14:00"
-       },
-       {
-        "start": "2026-11-07T13:00",
-        "end": "2026-11-07T14:00"
-       },
-       {
-        "start": "2026-11-14T13:00",
-        "end": "2026-11-14T14:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung (1–3 J.), Montag 15:30",
-     "summary": "Musikkurs mit Singen, Sprechversen, Fingerspielen und Tanz für Kinder mit Eltern, die aktiv mitmachen. 6 Termine vom 9.11. bis 14.12.2026.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "wenige",
-      "note": "Restplätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-09T15:30",
-        "end": "2026-11-09T16:15"
-       },
-       {
-        "start": "2026-11-16T15:30",
-        "end": "2026-11-16T16:15"
-       },
-       {
-        "start": "2026-11-23T15:30",
-        "end": "2026-11-23T16:15"
-       },
-       {
-        "start": "2026-11-30T15:30",
-        "end": "2026-11-30T16:15"
-       },
-       {
-        "start": "2026-12-07T15:30",
-        "end": "2026-12-07T16:15"
-       },
-       {
-        "start": "2026-12-14T15:30",
-        "end": "2026-12-14T16:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung (1–3 J.), Montag 16:30",
-     "summary": "Gleicher Musikkurs für Kinder und Eltern wie der Termin um 15:30, hier um 16:30 Uhr. 6 Termine vom 9.11. bis 14.12.2026; derzeit nur Anmeldung auf der Warteliste.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "warteliste",
-      "note": "Kurs belegt, Anmeldung auf Warteliste"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-09T16:30",
-        "end": "2026-11-09T17:15"
-       },
-       {
-        "start": "2026-11-16T16:30",
-        "end": "2026-11-16T17:15"
-       },
-       {
-        "start": "2026-11-23T16:30",
-        "end": "2026-11-23T17:15"
-       },
-       {
-        "start": "2026-11-30T16:30",
-        "end": "2026-11-30T17:15"
-       },
-       {
-        "start": "2026-12-07T16:30",
-        "end": "2026-12-07T17:15"
-       },
-       {
-        "start": "2026-12-14T16:30",
-        "end": "2026-12-14T17:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe (Babys geb. April–Juni 2026)",
-     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr in einem warm beheizten Raum, dazu Austausch für Mütter und Väter. 7 Termine montags 9:30–11:00 bis 21.12.2026; viele Krankenkassen bezuschussen den Kurs.",
+     "title": "PEKiP-Gruppe Di 9:00 (Babys geb. Juni–Aug. 2026)",
+     "summary": "Bewegungsanregungen und Austausch für Eltern mit Babys im ersten Lebensjahr; die Babys sind im warmen Raum oft unbekleidet. Einstieg in den laufenden Kurs bei freien Plätzen möglich, die Gebühr wird anteilig berechnet.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "101,00 €",
+     "price": "130,50 € (Kursgebühr)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "babykurse",
      "age": {
-      "minMonths": 0,
-      "maxMonths": 12
+      "minMonths": 2,
+      "maxMonths": 5
+     },
+     "availability": {
+      "status": "wenige",
+      "note": "Restplätze frei"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-10T09:00",
+        "end": "2026-11-10T10:30"
+       },
+       {
+        "start": "2026-11-17T09:00",
+        "end": "2026-11-17T10:30"
+       },
+       {
+        "start": "2026-11-24T09:00",
+        "end": "2026-11-24T10:30"
+       },
+       {
+        "start": "2026-12-01T09:00",
+        "end": "2026-12-01T10:30"
+       },
+       {
+        "start": "2026-12-08T09:00",
+        "end": "2026-12-08T10:30"
+       },
+       {
+        "start": "2026-12-15T09:00",
+        "end": "2026-12-15T10:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "PEKiP-Gruppe Mo 9:30 (Babys geb. April–Juni 2026)",
+     "summary": "Bewegungsanregungen und Austausch für Eltern mit Babys im ersten Lebensjahr, mit Raum für Austausch über den Alltag. Kursstart am 09.11., 7 Termine bis 21.12.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "101,00 € (Kursgebühr)",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 7
      },
      "availability": {
       "status": "wenige",
@@ -553,98 +328,54 @@
     },
     {
      "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg-waldracker",
-     "title": "Waldracker: Komm wir spielen im Wald (2,5–6 J.), Di 15:30",
-     "summary": "Naturerkundung und Waldspiele für Kinder ab 2,5 Jahren mit ihren Eltern, Treffpunkt auf dem Parkplatz an der Schiestlstraße in Kraftshof. 5 Termine bis 15.12.2026; derzeit nur Warteliste.",
+     "venueId": "fbs-nuernberg",
+     "title": "Musikalische Früherziehung (1–3 J.), Mo 15:30",
+     "summary": "Singen, Sprechverse, Fingerspiele und Tanz zur Musik, die Eltern machen aktiv mit. 6 Termine, Restplätze frei. BuT-Gutscheine können verrechnet werden.",
      "topics": [
-      "waldgruppe"
+      "musik",
+      "singen"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "58,00 €",
+     "price": "64,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
+     "category": "musik",
      "age": {
-      "minMonths": 30,
-      "maxMonths": 72
+      "minMonths": 12,
+      "maxMonths": 36
      },
      "availability": {
-      "status": "warteliste",
-      "note": "Kurs belegt, Anmeldung auf Warteliste"
+      "status": "wenige",
+      "note": "Restplätze frei (Kurs-Nr. EKMU 0501 c)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-10T15:30",
-        "end": "2026-11-10T16:30"
+        "start": "2026-11-09T15:30",
+        "end": "2026-11-09T16:15"
        },
        {
-        "start": "2026-11-24T15:30",
-        "end": "2026-11-24T16:30"
+        "start": "2026-11-16T15:30",
+        "end": "2026-11-16T16:15"
        },
        {
-        "start": "2026-12-01T15:30",
-        "end": "2026-12-01T16:30"
+        "start": "2026-11-23T15:30",
+        "end": "2026-11-23T16:15"
        },
        {
-        "start": "2026-12-08T15:30",
-        "end": "2026-12-08T16:30"
+        "start": "2026-11-30T15:30",
+        "end": "2026-11-30T16:15"
        },
        {
-        "start": "2026-12-15T15:30",
-        "end": "2026-12-15T16:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg-waldracker",
-     "title": "Waldracker: Komm wir spielen im Wald (2,5–6 J.), Di 14:30",
-     "summary": "Naturerkundung und Waldspiele für Kinder ab 2,5 Jahren mit ihren Eltern, Treffpunkt auf dem Parkplatz an der Schiestlstraße in Kraftshof. 5 Termine bis 15.12.2026.",
-     "topics": [
-      "waldgruppe"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "58,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 30,
-      "maxMonths": 72
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmelden (frei)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-10T14:30",
-        "end": "2026-11-10T15:30"
+        "start": "2026-12-07T15:30",
+        "end": "2026-12-07T16:15"
        },
        {
-        "start": "2026-11-24T14:30",
-        "end": "2026-11-24T15:30"
-       },
-       {
-        "start": "2026-12-01T14:30",
-        "end": "2026-12-01T15:30"
-       },
-       {
-        "start": "2026-12-08T14:30",
-        "end": "2026-12-08T15:30"
-       },
-       {
-        "start": "2026-12-15T14:30",
-        "end": "2026-12-15T15:30"
+        "start": "2026-12-14T15:30",
+        "end": "2026-12-14T16:15"
        }
       ]
      }
@@ -652,8 +383,119 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen (1–3 J.), Dienstag 09:30",
-     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1 bis 3 Jahren, Eltern begleiten das Bewegen. 6 Termine vom 10.11. bis 15.12.2026.",
+     "title": "Musikalische Früherziehung (1–3 J.), Mo 16:30",
+     "summary": "Singen, Sprechverse, Fingerspiele und Tanz zur Musik für Kinder von 1 bis 3 Jahren mit Begleitung. 6 Termine; der Kurs ist belegt, Anmeldung nur auf die Warteliste.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "warteliste",
+      "note": "Kurs belegt; Anmeldung nur auf Warteliste (Kurs-Nr. EKMU 0502 c)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-09T16:30",
+        "end": "2026-11-09T17:15"
+       },
+       {
+        "start": "2026-11-16T16:30",
+        "end": "2026-11-16T17:15"
+       },
+       {
+        "start": "2026-11-23T16:30",
+        "end": "2026-11-23T17:15"
+       },
+       {
+        "start": "2026-11-30T16:30",
+        "end": "2026-11-30T17:15"
+       },
+       {
+        "start": "2026-12-07T16:30",
+        "end": "2026-12-07T17:15"
+       },
+       {
+        "start": "2026-12-14T16:30",
+        "end": "2026-12-14T17:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "PEKiP-Kurs (Babys geb. Mai–Juli 2026), Mo 11:30",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr in der Gruppe, dazu Austausch für Mütter und Väter. 7 Termine; der Kurs ist belegt, Anmeldung nur auf die Warteliste. Krankenkassen bezuschussen oft.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "101,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 6
+     },
+     "availability": {
+      "status": "warteliste",
+      "note": "Kurs belegt; Anmeldung nur auf Warteliste (Kurs-Nr. EKP 0830 c)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-09T11:30",
+        "end": "2026-11-09T13:00"
+       },
+       {
+        "start": "2026-11-16T11:30",
+        "end": "2026-11-16T13:00"
+       },
+       {
+        "start": "2026-11-23T11:30",
+        "end": "2026-11-23T13:00"
+       },
+       {
+        "start": "2026-11-30T11:30",
+        "end": "2026-11-30T13:00"
+       },
+       {
+        "start": "2026-12-07T11:30",
+        "end": "2026-12-07T13:00"
+       },
+       {
+        "start": "2026-12-14T11:30",
+        "end": "2026-12-14T13:00"
+       },
+       {
+        "start": "2026-12-21T11:30",
+        "end": "2026-12-21T13:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Kinderturnen (1–3 J.), Di 9:30",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder mit Begleitperson, gefördert werden Koordination und Grobmotorik. 6 Termine, Restplätze frei. BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -671,7 +513,7 @@
      },
      "availability": {
       "status": "wenige",
-      "note": "Restplätze frei"
+      "note": "Restplätze frei (Kurs-Nr. EKBE 0874 c)"
      },
      "schedule": {
       "kind": "dates",
@@ -706,8 +548,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen (1–3 J.), Dienstag 10:30",
-     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1 bis 3 Jahren, Eltern begleiten das Bewegen. 6 Termine vom 10.11. bis 15.12.2026.",
+     "title": "Kinderturnen (1–3 J.), Di 10:30",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder mit Begleitperson, gefördert werden Koordination und Grobmotorik. 6 Termine, Restplätze frei. BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -725,7 +567,7 @@
      },
      "availability": {
       "status": "wenige",
-      "note": "Restplätze frei"
+      "note": "Restplätze frei (Kurs-Nr. EKBE 0875 c)"
      },
      "schedule": {
       "kind": "dates",
@@ -759,80 +601,49 @@
     },
     {
      "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "MAWIBA Baby – Tanzen für Mama & Baby in der Trage",
-     "summary": "Mütter tanzen mit dem Baby in der Tragehilfe und lernen beckenbodenaktivierende Choreografien; Stillen und Wickeln sind im Kurs möglich. Voraussetzung: passende Tragehilfe und gynäkologischer Check frühestens 6 Wochen nach der Geburt. 5 Termine bis 16.12.2026.",
+     "venueId": "fbs-nuernberg-waldracker",
+     "title": "Waldgruppe „Komm wir spielen im Wald“ (2,5–6 J.), Di 15:30",
+     "summary": "Naturerkundung im Wald mit Bauen, Lauschen und Entdecken für Kinder ab 2,5 Jahren. Treffpunkt ist der Parkplatz nach dem Spielplatz an der Schiestlstraße. Der Kurs ist belegt, Anmeldung nur auf die Warteliste.",
      "topics": [
-      "tanz",
-      "fitness-mit-baby"
+      "waldgruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "89,00 €",
+     "price": "58,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
-     "availability": {
-      "status": "wenige",
-      "note": "Restplätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-11T09:30",
-        "end": "2026-11-11T10:45"
-       },
-       {
-        "start": "2026-11-25T09:30",
-        "end": "2026-11-25T10:45"
-       },
-       {
-        "start": "2026-12-02T09:30",
-        "end": "2026-12-02T10:45"
-       },
-       {
-        "start": "2026-12-09T09:30",
-        "end": "2026-12-09T10:45"
-       },
-       {
-        "start": "2026-12-16T09:30",
-        "end": "2026-12-16T10:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Martinsfest „Laterne, Laterne“ im Offenen Treff FamilienOase",
-     "summary": "Martinslieder, die Geschichte vom heiligen Martin und ein kleiner Laternenumzug für Familien mit Kindern von 0 bis 4 Jahren; eigene Laterne mitbringen. Einmaliger Termin am 11.11.2026; derzeit nur Warteliste.",
-     "topics": [
-      "elterntreff",
-      "singen"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "10,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "treffs-cafes",
      "age": {
-      "minMonths": 0,
-      "maxMonths": 48
+      "minMonths": 30,
+      "maxMonths": 72
      },
      "availability": {
       "status": "warteliste",
-      "note": "Veranstaltung belegt, Anmeldung auf Warteliste"
+      "note": "Kurs belegt; Anmeldung nur auf Warteliste (Kurs-Nr. EKBE 8004 c)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-11T15:30",
-        "end": "2026-11-11T17:30"
+        "start": "2026-11-10T15:30",
+        "end": "2026-11-10T16:30"
+       },
+       {
+        "start": "2026-11-24T15:30",
+        "end": "2026-11-24T16:30"
+       },
+       {
+        "start": "2026-12-01T15:30",
+        "end": "2026-12-01T16:30"
+       },
+       {
+        "start": "2026-12-08T15:30",
+        "end": "2026-12-08T16:30"
+       },
+       {
+        "start": "2026-12-15T15:30",
+        "end": "2026-12-15T16:30"
        }
       ]
      }
@@ -840,8 +651,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen (1–3 J.), Mittwoch 14:45",
-     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1 bis 3 Jahren, Eltern begleiten das Bewegen. 6 Termine vom 11.11. bis 16.12.2026.",
+     "title": "Kinderturnen (1–3 J.), Mi 14:45",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder mit Begleitperson, gefördert werden Koordination und Grobmotorik. 6 Termine, Restplätze frei. BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -859,7 +670,7 @@
      },
      "availability": {
       "status": "wenige",
-      "note": "Restplätze frei"
+      "note": "Restplätze frei (Kurs-Nr. EKBE 0876 c)"
      },
      "schedule": {
       "kind": "dates",
@@ -894,8 +705,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen (2–4 J.), Mittwoch 15:45",
-     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 2 bis 4 Jahren mit ihren Eltern. 6 Termine vom 11.11. bis 16.12.2026; derzeit nur Warteliste.",
+     "title": "Kinderturnen (2–4 J.), Mi 15:45",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 2 bis 4 Jahren mit Begleitperson. 6 Termine; der Kurs ist belegt, Anmeldung nur auf die Warteliste.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -913,7 +724,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Kurs belegt, Anmeldung auf Warteliste"
+      "note": "Kurs belegt; Anmeldung nur auf Warteliste (Kurs-Nr. EKBE 0877 c)"
      },
      "schedule": {
       "kind": "dates",
@@ -947,108 +758,46 @@
     },
     {
      "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg-gemeindehaus-thomaskirche",
-     "title": "Musikalische Früherziehung (1–3 J.), Donnerstag 15:30",
-     "summary": "Musikkurs mit Singen, Sprechversen, Fingerspielen und Tanz für Kinder von 1 bis 3 Jahren mit ihren Eltern. 6 Termine vom 12.11. bis 17.12.2026.",
+     "venueId": "fbs-nuernberg",
+     "title": "MAWIBA® Baby: Tanzen mit Baby in der Trage, Mi 9:30",
+     "summary": "Tanzen mit dem Baby in der Tragehilfe; Stillen, Wickeln und Fläschchen sind jederzeit möglich. Voraussetzung sind ein gynäkologischer Check nach der Geburt und eine geeignete Tragehilfe.",
      "topics": [
-      "musik",
-      "singen"
+      "fitness-mit-baby",
+      "tanz"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "82,00 €",
+     "price": "89,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
+     "category": "bewegung",
      "availability": {
-      "status": "frei",
-      "note": "Anmelden (frei)"
+      "status": "wenige",
+      "note": "Restplätze frei (Kurs-Nr. EKMU 0511 c)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-12T15:30",
-        "end": "2026-11-12T16:15"
+        "start": "2026-11-11T09:30",
+        "end": "2026-11-11T10:45"
        },
        {
-        "start": "2026-11-19T15:30",
-        "end": "2026-11-19T16:15"
+        "start": "2026-11-25T09:30",
+        "end": "2026-11-25T10:45"
        },
        {
-        "start": "2026-11-26T15:30",
-        "end": "2026-11-26T16:15"
+        "start": "2026-12-02T09:30",
+        "end": "2026-12-02T10:45"
        },
        {
-        "start": "2026-12-03T15:30",
-        "end": "2026-12-03T16:15"
+        "start": "2026-12-09T09:30",
+        "end": "2026-12-09T10:45"
        },
        {
-        "start": "2026-12-10T15:30",
-        "end": "2026-12-10T16:15"
-       },
-       {
-        "start": "2026-12-17T15:30",
-        "end": "2026-12-17T16:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg-gemeindehaus-thomaskirche",
-     "title": "Musikalische Früherziehung für Babys (6–12 Mon.), Donnerstag 14:30",
-     "summary": "Musikkurs für Babys von 6 bis 12 Monaten mit ihren Eltern: Singen, Fingerspiele und freie Bewegung zur Musik. 6 Termine vom 12.11. bis 17.12.2026.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "82,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmelden (frei)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-12T14:30",
-        "end": "2026-11-12T15:15"
-       },
-       {
-        "start": "2026-11-19T14:30",
-        "end": "2026-11-19T15:15"
-       },
-       {
-        "start": "2026-11-26T14:30",
-        "end": "2026-11-26T15:15"
-       },
-       {
-        "start": "2026-12-03T14:30",
-        "end": "2026-12-03T15:15"
-       },
-       {
-        "start": "2026-12-10T14:30",
-        "end": "2026-12-10T15:15"
-       },
-       {
-        "start": "2026-12-17T14:30",
-        "end": "2026-12-17T15:15"
+        "start": "2026-12-16T09:30",
+        "end": "2026-12-16T10:45"
        }
       ]
      }
@@ -1056,8 +805,42 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "nappydancers® – Tanzen für Kinder von 20–40 Monaten (Do 15:00)",
-     "summary": "Tanzkurs für Kinder von 20 bis 40 Monaten, Mama oder Papa tanzen mit. 6 Termine ab 12.11.; der erste Termin beginnt um 14:45, die übrigen um 15:00. Die nappydancers-Socken kosten 8 € und werden bei der Kursleitung verkauft.",
+     "title": "Laterne, Laterne – Martinsfest im Offenen Treff (0–4 J.)",
+     "summary": "Martinsfest im Offenen Treff FamilienOase mit Martinsliedern, einer Geschichte und einem Laternenumzug; eigene Laterne mitbringen. Der Termin ist belegt, Anmeldung nur auf die Warteliste.",
+     "topics": [
+      "singen",
+      "elterntreff"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "10,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 48
+     },
+     "availability": {
+      "status": "warteliste",
+      "note": "Veranstaltung belegt; Anmeldung nur auf Warteliste (Kurs-Nr. EKFB 0067 c)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-11T15:30",
+        "end": "2026-11-11T17:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "nappydancers® Tanzen (20–40 Monate), Do 15:00",
+     "summary": "Tanzen für Kinder von 20 bis 40 Monaten gemeinsam mit Mama oder Papa. Die Tanzsocken gibt es vor der ersten Stunde für 8 €; der erste Termin am 12.11. beginnt um 14:45 Uhr, danach um 15:00 Uhr.",
      "topics": [
       "tanz",
       "bewegung"
@@ -1065,7 +848,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "63,00 € (zzgl. 8 € für die Tanzsocken)",
+     "price": "63,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
@@ -1075,7 +858,7 @@
      },
      "availability": {
       "status": "wenige",
-      "note": "Restplätze frei"
+      "note": "Restplätze frei (Kurs-Nr. EKBE 0803 c)"
      },
      "schedule": {
       "kind": "dates",
@@ -1110,11 +893,10 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "EntdeckerZeit für Kinder von 1–2 Jahren (Do 9:00)",
-     "summary": "Eltern-Kind-Gruppe mit Bewegungslandschaften, freiem Spiel und Sinneserfahrungen; dazu Impulse zu Entwicklung und Austausch mit anderen Eltern. 6 Termine donnerstags von 9:00 bis 10:00 Uhr.",
+     "title": "EntdeckerZeit Eltern-Kind-Gruppe (1–2 J.), Do 9:00",
+     "summary": "Gemeinsam mit dem Kind Bewegungslandschaften, Materialien und Sinneserfahrungen entdecken, dazu Impulse und Austausch für Eltern. Keine Vorkenntnisse nötig. BuT-Gutscheine können verrechnet werden.",
      "topics": [
-      "eltern-kind-gruppe",
-      "spielgruppe"
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -1128,7 +910,8 @@
       "maxMonths": 24
      },
      "availability": {
-      "status": "frei"
+      "status": "frei",
+      "note": "Plätze frei (Kurs-Nr. EKMI 0803 c)"
      },
      "schedule": {
       "kind": "dates",
@@ -1163,11 +946,10 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "EntdeckerZeit für Kinder im 1. Lebensjahr (Do 10:30)",
-     "summary": "Eltern-Kind-Gruppe für Familien mit Babys im ersten Lebensjahr: Bewegung, freies Spiel und Sinneserfahrungen, dazu Austausch mit anderen Eltern. 6 Termine donnerstags von 10:30 bis 11:30 Uhr.",
+     "title": "EntdeckerZeit Eltern-Kind-Gruppe (1. Lebensjahr), Do 10:30",
+     "summary": "Gemeinsam mit dem Kind Bewegungslandschaften, Materialien und Sinneserfahrungen entdecken, dazu Impulse und Austausch für Eltern. Für Familien mit Kindern im ersten Lebensjahr; keine Vorkenntnisse nötig.",
      "topics": [
-      "eltern-kind-gruppe",
-      "spielgruppe"
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -1181,7 +963,8 @@
       "maxMonths": 12
      },
      "availability": {
-      "status": "frei"
+      "status": "frei",
+      "note": "Plätze frei (Kurs-Nr. EKMI 0804 c)"
      },
      "schedule": {
       "kind": "dates",
@@ -1216,24 +999,59 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe (Babys geb. Jan.–März 2026, Fr 9:30)",
-     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr in einem warm beheizten Raum, Babys werden dabei unbekleidet bewegt; Eltern tauschen sich aus. 6 Termine freitags von 9:30 bis 11:00 Uhr. Bei Bedarf 2 € Materialgeld.",
+     "title": "Abenteuerturnen 1 (1–3 J.), Fr 15:00",
+     "summary": "Spielerische Sportstunde mit Bewegungslandschaft für Kinder von 1 bis 3 Jahren mit Begleitperson; kostenlos, vorherige Anmeldung nötig. Angegeben ist nur der Termin am 13.11.; der Kurs ist belegt, Anmeldung nur auf die Warteliste.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "price": "0,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "warteliste",
+      "note": "Kurs belegt; Anmeldung nur auf Warteliste (Kurs-Nr. EKSO 8004 c)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-13T15:00",
+        "end": "2026-11-13T16:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "PEKiP-Gruppe (Babys geb. Jan.–März 2026)",
+     "summary": "Bewegungs- und Spielanregungen für Babys im ersten Lebensjahr in einem warm beheizten Raum, dazu Austausch für Mütter und Väter. 6 Termine freitags, Kursgebühr 87 €.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "87,00 €",
+     "price": "87,00 € (Kursgebühr; 2,00 € Materialgeld bei Bedarf)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "babykurse",
      "age": {
-      "minMonths": 7,
-      "maxMonths": 11
+      "minMonths": 0,
+      "maxMonths": 12
      },
      "availability": {
-      "status": "frei"
+      "status": "frei",
+      "note": "Plätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -1268,21 +1086,121 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe (Babys geb. Juli–Sept. 2026, Fr 11:30)",
-     "summary": "Bewegungsanregungen und Austausch für Eltern mit Babys im ersten Lebensjahr, in einem warm beheizten Raum; Baby wird dabei unbekleidet bewegt. 6 Termine freitags von 11:30 bis 13:00 Uhr. Bei Bedarf 2 € Materialgeld.",
+     "title": "ZwergenTanz 1 (Kinder, die schon selbst laufen)",
+     "summary": "Musikalische Bewegungs-, Finger- und Sprechspiele mit Liedern und Reimen für Kinder, die schon selbst laufen können. Eltern machen alle Aktivitäten mit; 6 Termine freitags.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "80,00 € (BuT-Gutscheine werden verrechnet)",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "musik",
+     "availability": {
+      "status": "frei",
+      "note": "Plätze frei"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-13T09:15",
+        "end": "2026-11-13T10:30"
+       },
+       {
+        "start": "2026-11-20T09:15",
+        "end": "2026-11-20T10:30"
+       },
+       {
+        "start": "2026-11-27T09:15",
+        "end": "2026-11-27T10:30"
+       },
+       {
+        "start": "2026-12-04T09:15",
+        "end": "2026-12-04T10:30"
+       },
+       {
+        "start": "2026-12-11T09:15",
+        "end": "2026-12-11T10:30"
+       },
+       {
+        "start": "2026-12-18T09:15",
+        "end": "2026-12-18T10:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "ZwergenTanz 2 (Babys, die noch nicht selbst laufen)",
+     "summary": "Lieder, Rhythmus- und Bewegungsspiele für die Allerkleinsten, bei denen die Eltern einbezogen sind. 6 Termine freitags; BuT-Gutscheine werden verrechnet.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 € (BuT-Gutscheine werden verrechnet)",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "musik",
+     "availability": {
+      "status": "frei",
+      "note": "Plätze frei"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-13T10:30",
+        "end": "2026-11-13T11:30"
+       },
+       {
+        "start": "2026-11-20T10:30",
+        "end": "2026-11-20T11:30"
+       },
+       {
+        "start": "2026-11-27T10:30",
+        "end": "2026-11-27T11:30"
+       },
+       {
+        "start": "2026-12-04T10:30",
+        "end": "2026-12-04T11:30"
+       },
+       {
+        "start": "2026-12-11T10:30",
+        "end": "2026-12-11T11:30"
+       },
+       {
+        "start": "2026-12-18T10:30",
+        "end": "2026-12-18T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "PEKiP-Gruppe (Babys geb. Juli–Sept. 2026)",
+     "summary": "Bewegungs- und Spielanregungen für Babys im ersten Lebensjahr im warmen Raum, mit Erfahrungsaustausch unter den Eltern. 6 Termine freitags, nur noch wenige Plätze.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "87,00 €",
+     "price": "87,00 € (Kursgebühr; 2,00 € Materialgeld bei Bedarf)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "babykurse",
      "age": {
-      "minMonths": 1,
-      "maxMonths": 5
+      "minMonths": 0,
+      "maxMonths": 12
      },
      "availability": {
       "status": "wenige",
@@ -1321,114 +1239,16 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "ZwergenTanz 1 (Kinder, die schon laufen, Fr 9:15)",
-     "summary": "Lieder, Reime, Finger- und Bewegungsspiele für Kinder, die schon selbst laufen können; Eltern machen überall mit. 6 Termine freitags von 9:15 bis 10:30 Uhr.",
+     "title": "Abenteuerturnen 1 (Kinder 1–3 Jahre mit Eltern)",
+     "summary": "Spielerische Bewegungsstunde in einer Bewegungslandschaft für 1- bis 3-Jährige mit Begleitperson, kostenlos. Drei Termine (20.11., 04.12., 11.12.); alle derzeit belegt, Anmeldung nur auf die Warteliste.",
      "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "80,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "availability": {
-      "status": "frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-13T09:15",
-        "end": "2026-11-13T10:30"
-       },
-       {
-        "start": "2026-11-20T09:15",
-        "end": "2026-11-20T10:30"
-       },
-       {
-        "start": "2026-11-27T09:15",
-        "end": "2026-11-27T10:30"
-       },
-       {
-        "start": "2026-12-04T09:15",
-        "end": "2026-12-04T10:30"
-       },
-       {
-        "start": "2026-12-11T09:15",
-        "end": "2026-12-11T10:30"
-       },
-       {
-        "start": "2026-12-18T09:15",
-        "end": "2026-12-18T10:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "ZwergenTanz 2 (Babys, die noch nicht laufen, Fr 10:30)",
-     "summary": "Lieder, Reime, Finger- und Bewegungsspiele für Babys, die noch nicht selbst laufen; Eltern sind in alle Aktivitäten einbezogen. 6 Termine freitags von 10:30 bis 11:30 Uhr.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "availability": {
-      "status": "frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-13T10:30",
-        "end": "2026-11-13T11:30"
-       },
-       {
-        "start": "2026-11-20T10:30",
-        "end": "2026-11-20T11:30"
-       },
-       {
-        "start": "2026-11-27T10:30",
-        "end": "2026-11-27T11:30"
-       },
-       {
-        "start": "2026-12-04T10:30",
-        "end": "2026-12-04T11:30"
-       },
-       {
-        "start": "2026-12-11T10:30",
-        "end": "2026-12-11T11:30"
-       },
-       {
-        "start": "2026-12-18T10:30",
-        "end": "2026-12-18T11:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Abenteuerturnen 1 (1–3 Jahre, Fr 15:00)",
-     "summary": "Spielerische Sportstunde mit Bewegungslandschaft für Kinder von 1 bis 3 Jahren und ihre Begleitperson. Der Kurs ist kostenlos, jeder Termin braucht eine eigene Anmeldung; aktuell alle Termine belegt, Anmeldung nur auf Warteliste.",
-     "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
+      "eltern-kind-turnen",
+      "bewegung"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "price": "kostenlos",
+     "price": "0,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
@@ -1438,15 +1258,11 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Kurs belegt – Anmeldung auf Warteliste möglich"
+      "note": "Kurs belegt, Anmeldung auf Warteliste möglich (alle drei Termine)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-13T15:00",
-        "end": "2026-11-13T16:00"
-       },
        {
         "start": "2026-11-20T15:00",
         "end": "2026-11-20T16:00"
@@ -1454,6 +1270,10 @@
        {
         "start": "2026-12-04T15:00",
         "end": "2026-12-04T16:00"
+       },
+       {
+        "start": "2026-12-11T15:00",
+        "end": "2026-12-11T16:00"
        }
       ]
      }
@@ -1461,8 +1281,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PapaZeit erleben – Väter und Kinder (Sa 21.11.)",
-     "summary": "Samstagvormittag für Väter und Kinder: gemeinsames Frühstück, Spielmöglichkeiten für die Kinder und Austausch unter Vätern. Anmeldung erforderlich; die Teilnahme ist kostenfrei, nur das Frühstück kostet.",
+     "title": "PapaZeit erleben – Räume für Väter und Kinder",
+     "summary": "Samstagvormittag für Väter und Kinder mit gemeinsamem Frühstück, Spielmöglichkeiten für die Kleinen und Austausch unter Vätern. Einmalig, Anmeldung erforderlich; Kosten nur fürs Frühstück.",
      "topics": [
       "elterntreff",
       "vaeter"
@@ -1470,12 +1290,13 @@
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "10,00 €",
+     "price": "10,00 € (gemeinsames Frühstück; Teilnahme sonst kostenfrei)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "treffs-cafes",
      "availability": {
-      "status": "frei"
+      "status": "frei",
+      "note": "Plätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -1490,21 +1311,21 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "BauchBeutelPo – Fitness mit dem Baby (Mo 10:45)",
-     "summary": "Fitness und Pilates nach der Rückbildung, das Baby ist dabei: es spielt in der Mitte oder liegt in der Tragehilfe. 8 Termine montags von 10:45 bis 11:45 Uhr bis 01.02.2027; die Krankenkassen beteiligen sich oft an der Gebühr.",
+     "title": "BauchBeutelPo – Fitness mit dem Baby (ab Ende Nov.)",
+     "summary": "Fitness- und Pilatesstunden nach der Rückbildung, das Baby spielt in der Mitte oder ist in der Tragehilfe dabei. 8 Termine montags; aktuell belegt, Anmeldung auf die Warteliste möglich.",
      "topics": [
       "fitness-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "89,00 €",
+     "price": "89,00 € (Präventionskurs; Krankenkassen erstatten teils)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs belegt – Anmeldung auf Warteliste möglich"
+      "note": "Kurs belegt, Anmeldung auf Warteliste möglich"
      },
      "schedule": {
       "kind": "dates",
@@ -1547,20 +1368,19 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Adventszeit für Familien (Kinder 2–6 Jahre, Sa 5.12.)",
-     "summary": "Familienvormittag im Advent mit Geschichte im Kamishibai-Erzähltheater, einer kleinen Bastelei und Punsch. Gedacht für Kinder von 2 bis 6 Jahren mit Mama, Papa oder einer anderen Begleitperson; ein einmaliger Termin.",
+     "title": "Adventszeit für Familien (Kinder 2–6 Jahre)",
+     "summary": "Adventsvormittag für Familien mit Kindern von 2 bis 6 Jahren: Kamishibai-Geschichte, weihnachtliche Bastelei, Punsch und Kekse. Anmeldung erforderlich; BuT-Gutscheine werden verrechnet.",
      "topics": [
-      "elterntreff",
       "kreativ",
       "vorlesen"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "15,00 €",
+     "price": "15,00 € (BuT-Gutscheine werden verrechnet)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "treffs-cafes",
+     "category": "buehne",
      "age": {
       "minMonths": 24,
       "maxMonths": 72
@@ -1582,8 +1402,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Adventszeit mit Oma und/oder Opa (Kinder 2–6 Jahre, Sa 5.12.)",
-     "summary": "Adventsnachmittag für Kinder von 2 bis 6 Jahren mit Oma, Opa oder einer anderen erwachsenen Begleitperson: Geschichte im Kamishibai-Erzähltheater, eine Bastelei und Punsch. Ein einmaliger Termin.",
+     "title": "Adventszeit mit Oma und/oder Opa (Kinder 2–6 Jahre)",
+     "summary": "Adventsnachmittag für Kinder von 2 bis 6 Jahren mit Großeltern oder einer anderen erwachsenen Begleitperson: Geschichte, Bastelei, Punsch und Kekse. Anmeldung erforderlich.",
      "topics": [
       "kreativ",
       "vorlesen"
@@ -1591,16 +1411,17 @@
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "15,00 €",
+     "price": "15,00 € (BuT-Gutscheine werden verrechnet)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "treffs-cafes",
+     "category": "buehne",
      "age": {
       "minMonths": 24,
       "maxMonths": 72
      },
      "availability": {
-      "status": "frei"
+      "status": "frei",
+      "note": "Plätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -1614,43 +1435,9 @@
     },
     {
      "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Abenteuerturnen 1 (1–3 Jahre)",
-     "summary": "Spielerische Bewegungsstunde mit Eltern für Kinder von 1–3 Jahren: Klettern, Balancieren, Bewegungsspiele. Kostenlos, Anmeldung nötig; der Kurs ist derzeit belegt, Anmeldung nur auf der Warteliste.",
-     "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "price": "0,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "warteliste",
-      "note": "Veranstaltung belegt – Anmeldung auf Warteliste"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-11T15:00",
-        "end": "2026-12-11T16:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "PapaZeit Spezial: Waldweihnacht (ab 2 J., mit Vater)",
-     "summary": "Papa-Kind-Vormittag im winterlichen Wald: Wintertiere entdecken, Futterplätze für Vögel anlegen, zum Abschluss Geschichte und warme Getränke. Wetterfeste Kleidung mitbringen.",
+     "venueId": "fbs-nuernberg-wald-angebot-steinbruechlein",
+     "title": "PapaZeit Spezial: Waldweihnacht (Väter mit Kindern ab 2)",
+     "summary": "Winter-Waldnachmittag für Väter mit Kindern ab 2 Jahren: Tiere im Winter entdecken, Vogelfutterplätze anlegen, Geschichte und warme Getränke. Treffpunkt Parkplatz Steinbrüchlein; Anmeldung erforderlich.",
      "topics": [
       "tiere-natur",
       "vaeter"
@@ -1658,7 +1445,7 @@
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "15,00 €",
+     "price": "15,00 € (BuT-Gutscheine können verrechnet werden)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
@@ -1668,7 +1455,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Plätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -1683,74 +1470,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Mit Waldwichtel Knorke durch den Advent (Sa 10:00)",
-     "summary": "Waldgeschichte mit dem Waldwichtel Knorke und Naturentdeckungen für Familien mit Kindern von 2,5–6 Jahren. Treffpunkt Parkplatz Schiestlstraße in Kraftshof.",
-     "topics": [
-      "waldgruppe"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "23,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 30,
-      "maxMonths": 72
-     },
-     "availability": {
-      "status": "wenige",
-      "note": "Restplätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-12T10:00",
-        "end": "2026-12-12T12:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Mit Waldwichtel Knorke durch den Advent (Sa 12:30)",
-     "summary": "Waldgeschichte mit dem Waldwichtel Knorke und Naturentdeckungen für Familien mit Kindern von 2,5–6 Jahren. Treffpunkt Parkplatz Schiestlstraße in Kraftshof.",
-     "topics": [
-      "waldgruppe"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "23,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 30,
-      "maxMonths": 72
-     },
-     "availability": {
-      "status": "wenige",
-      "note": "Restplätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-12T12:30",
-        "end": "2026-12-12T14:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "PapaZeit Spezial: Weihnachtswerkstatt (ab 2 J., mit Vater)",
-     "summary": "Gemeinsames Basteln für Papas und Kinder ab 2 Jahren: Weihnachtsdekoration und kleine Geschenke zum Mitnehmen. Kleidung, die Farbe verträgt, mitbringen.",
+     "title": "PapaZeit Spezial: Weihnachtswerkstatt (Väter mit Kindern ab 2)",
+     "summary": "Basteln an mehreren Stationen für Väter mit Kindern ab 2 Jahren: weihnachtliche Dekoration und kleine Geschenke zum Mitnehmen. Anmeldung erforderlich; BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "kreativ",
       "vaeter"
@@ -1758,7 +1479,7 @@
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "15,00 €",
+     "price": "15,00 € (BuT-Gutscheine können verrechnet werden)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "buehne",
@@ -1768,7 +1489,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Plätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -1783,15 +1504,15 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Weihnachtswerkstatt für Familien (ab 2 Jahren)",
-     "summary": "Gemeinsames Basteln, Kleben und Gestalten für Kinder ab 2 Jahren mit einer Begleitperson. Weihnachtsdekoration und kleine Geschenke zum Mitnehmen; Kleidung, die Farbe verträgt, mitbringen.",
+     "title": "Weihnachtswerkstatt für Familien (Kinder ab 2 Jahren)",
+     "summary": "Kreative Weihnachtswerkstatt an Mitmachstationen für Kinder ab 2 Jahren mit Begleitperson; Dekorationen und kleine Geschenke zum Mitnehmen. Anmeldung erforderlich, nur noch wenige Plätze.",
      "topics": [
       "kreativ"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "15,00 €",
+     "price": "15,00 € (BuT-Gutscheine können verrechnet werden)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "buehne",
@@ -1815,12 +1536,48 @@
     },
     {
      "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg-waldracker",
+     "title": "Mit Waldwichtel Knorke durch den Advent (Kinder 2,5–6 Jahre)",
+     "summary": "Geschichte mit dem Waldwichtel Knorke und Naturentdeckungen im Wald für Familien mit Kindern von 2,5 bis 6 Jahren. Treffpunkt Parkplatz Schiestlstraße in Kraftshof; zwei Durchgänge am 12.12., nur noch wenige Plätze.",
+     "topics": [
+      "waldgruppe"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "23,00 € (BuT-Gutscheine können verrechnet werden)",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 30,
+      "maxMonths": 72
+     },
+     "availability": {
+      "status": "wenige",
+      "note": "Restplätze frei"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-12T10:00",
+        "end": "2026-12-12T12:00"
+       },
+       {
+        "start": "2026-12-12T12:30",
+        "end": "2026-12-12T14:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PapaZeit-Erlebnisreihe für Väter mit Kindern 1–3 Jahre",
-     "summary": "Vierteilige Reihe für Väter mit Kindern von 1–3 Jahren: jeder Termin ein anderes Erlebnis (Bewegungsparcours, Experimente, Matschen, Werkeln). Kleidung, die schmutzig werden darf.",
+     "title": "PapaZeit – Erlebnisreihe für Väter mit Kindern 1–3 Jahre",
+     "summary": "Vierteilige Erlebnisreihe für Väter mit Kind: Bewegungsparcours, Forscherideen, Matschen und gemeinsames Werkeln. Kleidung darf schmutzig werden; BuT-Gutscheine werden verrechnet.",
      "topics": [
       "kreativ",
-      "bewegung",
       "vaeter"
      ],
      "format": "kurs",
@@ -1836,7 +1593,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -1863,8 +1620,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Geschwisterkurs – Hurra, ein Baby kommt! (ab 2,5 J.)",
-     "summary": "Spielerischer Vormittag für Familien mit älterem Kind rund um das kommende Geschwisterkind: Puppe mitbringen, Wickeln und Füttern üben, Geschwisterdiplom zum Abschluss.",
+     "title": "Geschwisterkurs „Hurra, ein Baby kommt!“ ab 2,5 Jahren",
+     "summary": "Einmaliger Workshop für Familien mit Kindern ab 2,5 Jahren: spielerische Vorbereitung auf das Geschwisterkind mit Üben an Puppe oder Kuscheltier (bitte mitbringen). BuT-Gutscheine werden verrechnet.",
      "topics": [
       "beratung"
      ],
@@ -1881,7 +1638,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -1896,8 +1653,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung (1–3 Jahre, Mo 15:30)",
-     "summary": "Gemeinsames Singen, Sprechverse, Fingerspiele und Tanz mit Eltern und Kindern von 1–3 Jahren, mit Klanghölzern und Tüchern. Sechs Termine ab 11.01.2027.",
+     "title": "Musikalische Früherziehung 1–3 Jahre (Mo 15:30–16:15)",
+     "summary": "Gemeinsames Singen, Fingerspiele, Tanz und Klanginstrumente für Kinder von 1–3 Jahren mit ihren Eltern. Sechs Termine ab 11.01.2027.",
      "topics": [
       "musik",
       "singen"
@@ -1915,7 +1672,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -1950,8 +1707,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung für Babys (6–12 Monate, Mo 14:30)",
-     "summary": "Singen, Fingerspiele und Bewegung zur Musik für Babys von 6–12 Monaten zusammen mit Eltern. Sechs Termine ab 11.01.2027.",
+     "title": "Musikalische Früherziehung Babys 6–12 Monate (Mo 14:30–15:15)",
+     "summary": "Singen, Fingerspiele und Bewegung zur Musik für Babys von 6–12 Monaten mit ihren Eltern. Sechs Termine ab 11.01.2027.",
      "topics": [
       "musik",
       "singen"
@@ -1969,7 +1726,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -2004,8 +1761,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung (1–3 Jahre, Mo 16:30)",
-     "summary": "Gemeinsames Singen, Sprechverse, Fingerspiele und Tanz mit Eltern und Kindern von 1–3 Jahren, mit Klanghölzern und Tüchern. Sechs Termine ab 11.01.2027.",
+     "title": "Musikalische Früherziehung 1–3 Jahre (Mo 16:30–17:15)",
+     "summary": "Gemeinsames Singen, Fingerspiele, Tanz und Klanginstrumente für Kinder von 1–3 Jahren mit ihren Eltern. Sechs Termine ab 11.01.2027.",
      "topics": [
       "musik",
       "singen"
@@ -2023,7 +1780,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -2058,8 +1815,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP (Babys geb. Sept.–Nov. 2026)",
-     "summary": "Bewegungsanregungen für Babys im 1. Lebensjahr mit Austausch für Eltern; die Kinder bewegen sich im warm beheizten Raum. Wickelunterlage und Handtuch mitbringen. Neun Termine.",
+     "title": "PEKiP-Gruppe (Babys geb. Sept.–Nov. 2026)",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr in warm beheiztem Raum, dazu Austausch für Mütter und Väter. Wickelunterlage und Handtuch mitbringen; 2 € Materialgeld bei Bedarf.",
      "topics": [
       "pekip"
      ],
@@ -2076,7 +1833,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -2123,223 +1880,10 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Tanzen und Turnen mit Musik (2,5–4 Jahre, Di 16:45)",
-     "summary": "Klatschen, Tanzen und Spiele mit Chiffontüchern für Kinder von 2,5–4 Jahren mit Eltern. Bequeme Kleidung, Turnschläppchen oder Stoppersocken mitbringen.",
-     "topics": [
-      "tanz",
-      "bewegung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "84,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 30,
-      "maxMonths": 48
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-12T16:45",
-        "end": "2027-01-12T17:45"
-       },
-       {
-        "start": "2027-01-19T16:45",
-        "end": "2027-01-19T17:45"
-       },
-       {
-        "start": "2027-01-26T16:45",
-        "end": "2027-01-26T17:45"
-       },
-       {
-        "start": "2027-02-02T16:45",
-        "end": "2027-02-02T17:45"
-       },
-       {
-        "start": "2027-02-16T16:45",
-        "end": "2027-02-16T17:45"
-       },
-       {
-        "start": "2027-02-23T16:45",
-        "end": "2027-02-23T17:45"
-       },
-       {
-        "start": "2027-03-02T16:45",
-        "end": "2027-03-02T17:45"
-       },
-       {
-        "start": "2027-03-09T16:45",
-        "end": "2027-03-09T17:45"
-       },
-       {
-        "start": "2027-03-16T16:45",
-        "end": "2027-03-16T17:45"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen (1–3 Jahre, Di 09:30)",
-     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1–3 Jahren mit Eltern: Koordination, Gleichgewicht und Kontakt zu anderen Kindern. Vier Termine ab 12.01.2027.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "36,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-12T09:30",
-        "end": "2027-01-12T10:30"
-       },
-       {
-        "start": "2027-01-19T09:30",
-        "end": "2027-01-19T10:30"
-       },
-       {
-        "start": "2027-01-26T09:30",
-        "end": "2027-01-26T10:30"
-       },
-       {
-        "start": "2027-02-02T09:30",
-        "end": "2027-02-02T10:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen (1–3 Jahre, Di 10:30)",
-     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1–3 Jahren mit Eltern: Koordination, Gleichgewicht und Kontakt zu anderen Kindern. Vier Termine ab 12.01.2027.",
-     "topics": [
-      "eltern-kind-turnen",
-      "bewegung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "36,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung über den Button auf der Kursseite"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-12T10:30",
-        "end": "2027-01-12T11:30"
-       },
-       {
-        "start": "2027-01-19T10:30",
-        "end": "2027-01-19T11:30"
-       },
-       {
-        "start": "2027-01-26T10:30",
-        "end": "2027-01-26T11:30"
-       },
-       {
-        "start": "2027-02-02T10:30",
-        "end": "2027-02-02T11:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "nappydancers® Tanzen für Kinder 20–40 Monate mit Mama/Papa",
-     "summary": "Tanzkurs für Kinder von 20 bis 40 Monaten, gemeinsam mit Mama oder Papa. Die Kinder brauchen die nappydancers-Tanzstoppersocken (8 €, direkt bei der Kursleitung erhältlich).",
-     "topics": [
-      "tanz",
-      "bewegung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "63,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 20,
-      "maxMonths": 40
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-12T15:00",
-        "end": "2027-01-12T15:50"
-       },
-       {
-        "start": "2027-01-19T15:00",
-        "end": "2027-01-19T15:50"
-       },
-       {
-        "start": "2027-01-26T15:00",
-        "end": "2027-01-26T15:50"
-       },
-       {
-        "start": "2027-02-02T15:00",
-        "end": "2027-02-02T15:50"
-       },
-       {
-        "start": "2027-02-16T15:00",
-        "end": "2027-02-16T15:50"
-       },
-       {
-        "start": "2027-02-23T15:00",
-        "end": "2027-02-23T15:50"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Tanzen und Turnen mit Musik für Kinder 1,5–2,5 Jahre",
-     "summary": "Bewegung zu Musik für Kleinkinder mit einem Elternteil: klatschen, tanzen und spielen mit Tüchern und weiterem Material. Bequeme Kleidung und Stoppersocken mitbringen; BuT-Gutscheine werden verrechnet.",
+     "title": "Tanzen und Turnen mit Musik, ca. 1,5–2,5 Jahre (Di 15:30)",
+     "summary": "Musik, Tanz und Bewegungsspiele mit Chiffontüchern und Material für Kleinkinder mit Eltern; neun Termine ab 12.01.2027. Bequeme Kleidung, Turnschläppchen oder Stoppersocken mitbringen.",
      "topics": [
       "bewegung",
-      "musik",
       "tanz"
      ],
      "format": "kurs",
@@ -2355,7 +1899,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -2402,8 +1946,74 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen 1–3 Jahre (Mittwoch 14:45)",
-     "summary": "Gemeinsames Bewegungsspiel für Kinder und Eltern in einer abwechslungsreichen Bewegungslandschaft, vier Termine im Januar und Februar 2027. BuT-Gutscheine werden verrechnet.",
+     "title": "Tanzen und Turnen mit Musik, 2,5–4 Jahre (Di 16:45)",
+     "summary": "Musik, Tanz und Bewegungsspiele mit Chiffontüchern und Material für Kinder von 2,5–4 Jahren mit Eltern; neun Termine ab 12.01.2027. Bequeme Kleidung und Stoppersocken mitbringen.",
+     "topics": [
+      "bewegung",
+      "tanz"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "84,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 30,
+      "maxMonths": 48
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Anmelden (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-12T16:45",
+        "end": "2027-01-12T17:45"
+       },
+       {
+        "start": "2027-01-19T16:45",
+        "end": "2027-01-19T17:45"
+       },
+       {
+        "start": "2027-01-26T16:45",
+        "end": "2027-01-26T17:45"
+       },
+       {
+        "start": "2027-02-02T16:45",
+        "end": "2027-02-02T17:45"
+       },
+       {
+        "start": "2027-02-16T16:45",
+        "end": "2027-02-16T17:45"
+       },
+       {
+        "start": "2027-02-23T16:45",
+        "end": "2027-02-23T17:45"
+       },
+       {
+        "start": "2027-03-02T16:45",
+        "end": "2027-03-02T17:45"
+       },
+       {
+        "start": "2027-03-09T16:45",
+        "end": "2027-03-09T17:45"
+       },
+       {
+        "start": "2027-03-16T16:45",
+        "end": "2027-03-16T17:45"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Kinderturnen 1–3 Jahre (Di 09:30–10:30)",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1–3 Jahren mit ihren Eltern; vier Termine ab 12.01.2027. BuT-Gutscheine werden verrechnet.",
      "topics": [
       "bewegung",
       "eltern-kind-turnen"
@@ -2421,26 +2031,26 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2027-01-13T14:45",
-        "end": "2027-01-13T15:45"
+        "start": "2027-01-12T09:30",
+        "end": "2027-01-12T10:30"
        },
        {
-        "start": "2027-01-20T14:45",
-        "end": "2027-01-20T15:45"
+        "start": "2027-01-19T09:30",
+        "end": "2027-01-19T10:30"
        },
        {
-        "start": "2027-01-27T14:45",
-        "end": "2027-01-27T15:45"
+        "start": "2027-01-26T09:30",
+        "end": "2027-01-26T10:30"
        },
        {
-        "start": "2027-02-03T14:45",
-        "end": "2027-02-03T15:45"
+        "start": "2027-02-02T09:30",
+        "end": "2027-02-02T10:30"
        }
       ]
      }
@@ -2448,8 +2058,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen 2–4 Jahre (Mittwoch 15:45)",
-     "summary": "Gemeinsames Bewegungsspiel für Kinder ab zwei Jahren und ihre Eltern, vier Termine im Januar und Februar 2027. BuT-Gutscheine werden verrechnet.",
+     "title": "Kinderturnen 1–3 Jahre (Di 10:30–11:30)",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1–3 Jahren mit ihren Eltern; vier Termine ab 12.01.2027. BuT-Gutscheine werden verrechnet.",
      "topics": [
       "bewegung",
       "eltern-kind-turnen"
@@ -2462,31 +2072,31 @@
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
      "age": {
-      "minMonths": 24,
-      "maxMonths": 48
+      "minMonths": 12,
+      "maxMonths": 36
      },
      "availability": {
       "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2027-01-13T15:45",
-        "end": "2027-01-13T16:45"
+        "start": "2027-01-12T10:30",
+        "end": "2027-01-12T11:30"
        },
        {
-        "start": "2027-01-20T15:45",
-        "end": "2027-01-20T16:45"
+        "start": "2027-01-19T10:30",
+        "end": "2027-01-19T11:30"
        },
        {
-        "start": "2027-01-27T15:45",
-        "end": "2027-01-27T16:45"
+        "start": "2027-01-26T10:30",
+        "end": "2027-01-26T11:30"
        },
        {
-        "start": "2027-02-03T15:45",
-        "end": "2027-02-03T16:45"
+        "start": "2027-02-02T10:30",
+        "end": "2027-02-02T11:30"
        }
       ]
      }
@@ -2494,8 +2104,62 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "MilchZeit – offener Treff für Stillende und Eltern mit Baby",
-     "summary": "Offener Treff für Schwangere und Eltern mit Baby rund um Stillen, Abpumpen und Flaschennahrung, geleitet von einer Stillbegleiterin. Keine Anmeldung nötig; Unkostenbeitrag 3 € vor Ort.",
+     "title": "nappydancers – Tanzen mit Mama oder Papa, 20–40 Monate",
+     "summary": "Tanzkurs für Kinder von 20–40 Monaten gemeinsam mit Mama oder Papa; sechs Termine ab 12.01.2027. Vorab kaufen: zweifarbige Tanzstoppersocken (8 €) bei der Kursleitung, für alle Kinder nötig.",
+     "topics": [
+      "bewegung",
+      "tanz"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "63,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 20,
+      "maxMonths": 40
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Anmelden (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-12T15:00",
+        "end": "2027-01-12T15:50"
+       },
+       {
+        "start": "2027-01-19T15:00",
+        "end": "2027-01-19T15:50"
+       },
+       {
+        "start": "2027-01-26T15:00",
+        "end": "2027-01-26T15:50"
+       },
+       {
+        "start": "2027-02-02T15:00",
+        "end": "2027-02-02T15:50"
+       },
+       {
+        "start": "2027-02-16T15:00",
+        "end": "2027-02-16T15:50"
+       },
+       {
+        "start": "2027-02-23T15:00",
+        "end": "2027-02-23T15:50"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "MilchZeit – offener Treff für Eltern mit Baby (Mi 09:00)",
+     "summary": "Offener Treff für Schwangere und Eltern mit Baby rund um Stillen, Abpumpen und Flaschennahrung, begleitet von einer Stillbegleiterin. Keine Anmeldung nötig; 3 € Unkostenbeitrag vor Ort.",
      "topics": [
       "stillcafe",
       "elterntreff"
@@ -2509,7 +2173,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung erforderlich"
+      "note": "Keine Anmeldung nötig; Online-Anmeldung nicht möglich"
      },
      "schedule": {
       "kind": "dates",
@@ -2540,48 +2204,45 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Mama Flow – Yoga mit Baby",
-     "summary": "Sanftes Yoga für Mütter mit ihrem Baby nach der Geburt, mit Atemübungen und Kräftigung von Körpermitte und Beckenboden. Das Baby ist einbezogen; Stillen und Wickeln sind jederzeit möglich. Decke für das Baby mitbringen.",
+     "title": "Kinderturnen 1–3 Jahre (Mi 14:45–15:45)",
+     "summary": "Bewegungslandschaft und Bewegungsspiele für Kinder von 1–3 Jahren mit ihren Eltern; vier Termine ab 13.01.2027. BuT-Gutscheine werden verrechnet.",
      "topics": [
-      "yoga-mit-baby"
+      "bewegung",
+      "eltern-kind-turnen"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "64,00 €",
+     "price": "36,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2027-01-15T09:30",
-        "end": "2027-01-15T10:30"
+        "start": "2027-01-13T14:45",
+        "end": "2027-01-13T15:45"
        },
        {
-        "start": "2027-01-22T09:30",
-        "end": "2027-01-22T10:30"
+        "start": "2027-01-20T14:45",
+        "end": "2027-01-20T15:45"
        },
        {
-        "start": "2027-01-29T09:30",
-        "end": "2027-01-29T10:30"
+        "start": "2027-01-27T14:45",
+        "end": "2027-01-27T15:45"
        },
        {
-        "start": "2027-02-05T09:30",
-        "end": "2027-02-05T10:30"
-       },
-       {
-        "start": "2027-02-12T09:30",
-        "end": "2027-02-12T10:30"
-       },
-       {
-        "start": "2027-02-19T09:30",
-        "end": "2027-02-19T10:30"
+        "start": "2027-02-03T14:45",
+        "end": "2027-02-03T15:45"
        }
       ]
      }
@@ -2589,15 +2250,16 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Eltern-Kind-Yoga für Kinder 2–4 Jahre (Samstag)",
-     "summary": "Gemeinsame Yogastunde für Eltern und Kinder mit Partnerübungen, Atemspielen und Bewegungsgeschichten. Drei Termine im Januar, Februar und März 2027; BuT-Gutscheine werden verrechnet.",
+     "title": "Kinderturnen 2–4 Jahre (Mi 15:45–16:45)",
+     "summary": "Bewegungsspiele und Bewegungslandschaft für Kinder von 2–4 Jahren mit ihren Eltern; vier Termine ab 13.01.2027. BuT-Gutscheine werden verrechnet.",
      "topics": [
-      "bewegung"
+      "bewegung",
+      "eltern-kind-turnen"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "48,00 €",
+     "price": "36,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "category": "bewegung",
@@ -2607,22 +2269,26 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2027-01-16T10:00",
-        "end": "2027-01-16T11:30"
+        "start": "2027-01-13T15:45",
+        "end": "2027-01-13T16:45"
        },
        {
-        "start": "2027-02-13T10:00",
-        "end": "2027-02-13T11:30"
+        "start": "2027-01-20T15:45",
+        "end": "2027-01-20T16:45"
        },
        {
-        "start": "2027-03-20T10:00",
-        "end": "2027-03-20T11:30"
+        "start": "2027-01-27T15:45",
+        "end": "2027-01-27T16:45"
+       },
+       {
+        "start": "2027-02-03T15:45",
+        "end": "2027-02-03T16:45"
        }
       ]
      }
@@ -2630,11 +2296,10 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung 1–3 Jahre (Montag 15:30)",
-     "summary": "Musikkurs für Kinder bis drei Jahre mit ihren Eltern: Singen, rhythmisches Sprechen, Fingerspiele und Tänze mit Instrumenten. Sechs Termine von März bis April 2027; BuT-Gutscheine werden verrechnet.",
+     "title": "EntdeckerZeit für Kinder von 1 bis 2 Jahren (Do 9:00)",
+     "summary": "Gemeinsames Bewegen und Spielen mit Liedern und Fingerspielen für Kinder von 1 bis 2 Jahren, dazu Impulse und Austausch für die Eltern. Kein Turnkurs; BuT-Gutscheine werden verrechnet.",
      "topics": [
-      "musik",
-      "singen"
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -2642,95 +2307,41 @@
      "price": "64,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
+     "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 12,
-      "maxMonths": 36
+      "maxMonths": 24
      },
      "availability": {
       "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
+      "note": "Ampel grün (frei)"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2027-03-01T15:30",
-        "end": "2027-03-01T16:15"
+        "start": "2027-01-14T09:00",
+        "end": "2027-01-14T10:00"
        },
        {
-        "start": "2027-03-08T15:30",
-        "end": "2027-03-08T16:15"
+        "start": "2027-01-21T09:00",
+        "end": "2027-01-21T10:00"
        },
        {
-        "start": "2027-03-15T15:30",
-        "end": "2027-03-15T16:15"
+        "start": "2027-01-28T09:00",
+        "end": "2027-01-28T10:00"
        },
        {
-        "start": "2027-04-05T15:30",
-        "end": "2027-04-05T16:15"
+        "start": "2027-02-04T09:00",
+        "end": "2027-02-04T10:00"
        },
        {
-        "start": "2027-04-12T15:30",
-        "end": "2027-04-12T16:15"
+        "start": "2027-02-18T09:00",
+        "end": "2027-02-18T10:00"
        },
        {
-        "start": "2027-04-19T15:30",
-        "end": "2027-04-19T16:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg-gemeindehaus-thomaskirche",
-     "title": "Musikalische Früherziehung 1–3 Jahre (Donnerstag, Thomaskirche)",
-     "summary": "Musikkurs für Kinder bis drei Jahre mit Eltern: gemeinsames Singen, Fingerspiele, Tänze und Musizieren mit Klanghölzern und Trommeln. Einstieg in den laufenden Kurs möglich, die Gebühr wird anteilig verrechnet.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "82,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-14T15:30",
-        "end": "2027-01-14T16:15"
-       },
-       {
-        "start": "2027-01-21T15:30",
-        "end": "2027-01-21T16:15"
-       },
-       {
-        "start": "2027-01-28T15:30",
-        "end": "2027-01-28T16:15"
-       },
-       {
-        "start": "2027-02-04T15:30",
-        "end": "2027-02-04T16:15"
-       },
-       {
-        "start": "2027-02-18T15:30",
-        "end": "2027-02-18T16:15"
-       },
-       {
-        "start": "2027-02-25T15:30",
-        "end": "2027-02-25T16:15"
+        "start": "2027-02-25T09:00",
+        "end": "2027-02-25T10:00"
        }
       ]
      }
@@ -2738,11 +2349,64 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen 1,5–3 Jahre (Donnerstag 14:45)",
-     "summary": "Gemeinsames Bewegungsspiel für Kinder und Eltern in einer Bewegungslandschaft mit Koordinations- und Gleichgewichtsspielen, sieben Termine. BuT-Gutscheine werden verrechnet.",
+     "title": "EntdeckerZeit für Babys im ersten Lebensjahr (Do 10:30)",
+     "summary": "Eltern-Kind-Gruppe für Babys im ersten Lebensjahr mit Bewegungslandschaft, Liedern und Zeit für Austausch über Entwicklung und Alltag. 6 Termine donnerstags; BuT-Gutscheine werden verrechnet.",
      "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
+      "eltern-kind-gruppe"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Ampel grün (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-14T10:30",
+        "end": "2027-01-14T11:30"
+       },
+       {
+        "start": "2027-01-21T10:30",
+        "end": "2027-01-21T11:30"
+       },
+       {
+        "start": "2027-01-28T10:30",
+        "end": "2027-01-28T11:30"
+       },
+       {
+        "start": "2027-02-04T10:30",
+        "end": "2027-02-04T11:30"
+       },
+       {
+        "start": "2027-02-18T10:30",
+        "end": "2027-02-18T11:30"
+       },
+       {
+        "start": "2027-02-25T10:30",
+        "end": "2027-02-25T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Kinderturnen für Kinder von 1,5 bis 3 Jahren (Do 14:45)",
+     "summary": "Eltern-Kind-Turnen mit Bewegungslandschaft und Bewegungsspielen für Kinder von 1,5 bis 3 Jahren; die Eltern begleiten das Bewegen. 7 Termine donnerstags; BuT-Gutscheine können verrechnet werden.",
+     "topics": [
+      "eltern-kind-turnen",
+      "bewegung"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -2757,7 +2421,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
+      "note": "Ampel grün (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -2795,223 +2459,9 @@
     },
     {
      "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "EntdeckerZeit – Eltern-Kind-Gruppe, Kinder im 1. Lebensjahr (Do 10:30)",
-     "summary": "Eltern-Kind-Gruppe für Babys im ersten Lebensjahr mit Bewegungs- und Spielanregungen, Liedern und Impulsen zu Entwicklung und Familienalltag. Kein klassischer Turnkurs; sechs Termine.",
-     "topics": [
-      "eltern-kind-gruppe"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-14T10:30",
-        "end": "2027-01-14T11:30"
-       },
-       {
-        "start": "2027-01-21T10:30",
-        "end": "2027-01-21T11:30"
-       },
-       {
-        "start": "2027-01-28T10:30",
-        "end": "2027-01-28T11:30"
-       },
-       {
-        "start": "2027-02-04T10:30",
-        "end": "2027-02-04T11:30"
-       },
-       {
-        "start": "2027-02-18T10:30",
-        "end": "2027-02-18T11:30"
-       },
-       {
-        "start": "2027-02-25T10:30",
-        "end": "2027-02-25T11:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "EntdeckerZeit – Eltern-Kind-Gruppe, Kinder 1–2 Jahre (Do 9:00)",
-     "summary": "Eltern-Kind-Gruppe für Kinder von einem bis zwei Jahren mit Bewegungslandschaft, Liedern und Fingerspielen sowie Austausch für Eltern. Kein klassischer Turnkurs; sechs Termine.",
-     "topics": [
-      "eltern-kind-gruppe"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 24
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Ampel grün: Anmeldung möglich"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-14T09:00",
-        "end": "2027-01-14T10:00"
-       },
-       {
-        "start": "2027-01-21T09:00",
-        "end": "2027-01-21T10:00"
-       },
-       {
-        "start": "2027-01-28T09:00",
-        "end": "2027-01-28T10:00"
-       },
-       {
-        "start": "2027-02-04T09:00",
-        "end": "2027-02-04T10:00"
-       },
-       {
-        "start": "2027-02-18T09:00",
-        "end": "2027-02-18T10:00"
-       },
-       {
-        "start": "2027-02-25T09:00",
-        "end": "2027-02-25T10:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung (1–3 Jahre, montags 16:30)",
-     "summary": "Gemeinsames Singen, Sprechverse, Fingerspiele und Tanz mit Eltern, die aktiv mitmachen. 6 Termine von März bis April 2027, Kursraum im Haupthaus.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmelden (frei)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-03-01T16:30",
-        "end": "2027-03-01T17:15"
-       },
-       {
-        "start": "2027-03-08T16:30",
-        "end": "2027-03-08T17:15"
-       },
-       {
-        "start": "2027-03-15T16:30",
-        "end": "2027-03-15T17:15"
-       },
-       {
-        "start": "2027-04-05T16:30",
-        "end": "2027-04-05T17:15"
-       },
-       {
-        "start": "2027-04-12T16:30",
-        "end": "2027-04-12T17:15"
-       },
-       {
-        "start": "2027-04-19T16:30",
-        "end": "2027-04-19T17:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung für Babys (6–12 Monate, montags 14:30)",
-     "summary": "Singen, Sprechverse und Bewegung zur Musik für Babys zusammen mit ihren Eltern. 6 Termine von März bis April 2027, Kursraum im Haupthaus.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
-     "category": "musik",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmelden (frei)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-03-01T14:30",
-        "end": "2027-03-01T15:15"
-       },
-       {
-        "start": "2027-03-08T14:30",
-        "end": "2027-03-08T15:15"
-       },
-       {
-        "start": "2027-03-15T14:30",
-        "end": "2027-03-15T15:15"
-       },
-       {
-        "start": "2027-04-05T14:30",
-        "end": "2027-04-05T15:15"
-       },
-       {
-        "start": "2027-04-12T14:30",
-        "end": "2027-04-12T15:15"
-       },
-       {
-        "start": "2027-04-19T14:30",
-        "end": "2027-04-19T15:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg-gemeindehaus-thomaskirche",
-     "title": "Musikalische Früherziehung Thomaskirche (1–3 Jahre, donnerstags)",
-     "summary": "Singen, Fingerspiele, Tanz und freie Bewegung zur Musik mit Eltern im Gemeindehaus. 6 Termine von März bis April 2027. Späterer Einstieg in den laufenden Kurs ist möglich, die Gebühr wird anteilig verrechnet.",
+     "title": "Musikalische Früherziehung 1–3 J., Do ab 14.01. (Thomaskirche)",
+     "summary": "Musikkurs mit Eltern: Singen, Sprechen, Fingerspiele und Tänze, dazu Instrumente wie Klanghölzer und Trommeln. Einstieg in den laufenden Kurs ist möglich, die Gebühr wird anteilig verrechnet.",
      "topics": [
       "musik",
       "singen"
@@ -3029,7 +2479,61 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmelden (frei)"
+      "note": "Ampel grün (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-14T15:30",
+        "end": "2027-01-14T16:15"
+       },
+       {
+        "start": "2027-01-21T15:30",
+        "end": "2027-01-21T16:15"
+       },
+       {
+        "start": "2027-01-28T15:30",
+        "end": "2027-01-28T16:15"
+       },
+       {
+        "start": "2027-02-04T15:30",
+        "end": "2027-02-04T16:15"
+       },
+       {
+        "start": "2027-02-18T15:30",
+        "end": "2027-02-18T16:15"
+       },
+       {
+        "start": "2027-02-25T15:30",
+        "end": "2027-02-25T16:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg-gemeindehaus-thomaskirche",
+     "title": "Musikalische Früherziehung 1–3 J., Do ab 04.03. (Thomaskirche)",
+     "summary": "Musikkurs mit Eltern für Kinder von 1 bis 3 Jahren im Gemeindehaus der Thomaskirche: Singen, Fingerspiele und Tanz. Einstieg in den laufenden Kurs ist möglich, die Gebühr wird anteilig verrechnet.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "82,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Ampel grün (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -3064,8 +2568,260 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kinderturnen für 1,5–3-Jährige (donnerstags 14:45)",
-     "summary": "Bewegungslandschaft und Bewegungsspiele, bei denen Eltern das Bewegen ihres Kindes begleiten. 6 Termine von März bis Mai 2027, Kursraum im Haupthaus.",
+     "title": "Mama Flow – Yoga mit Baby (Fr 9:30)",
+     "summary": "Sanfte Yogaübungen, Atem- und Entspannungsmomente nach der Geburt; das Baby wird einbezogen und hat Raum zum Stillen und Kuscheln. Ergänzung zur Rückbildung; eine Decke für das Baby mitbringen.",
+     "topics": [
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "bewegung",
+     "availability": {
+      "status": "frei",
+      "note": "Ampel grün (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-15T09:30",
+        "end": "2027-01-15T10:30"
+       },
+       {
+        "start": "2027-01-22T09:30",
+        "end": "2027-01-22T10:30"
+       },
+       {
+        "start": "2027-01-29T09:30",
+        "end": "2027-01-29T10:30"
+       },
+       {
+        "start": "2027-02-05T09:30",
+        "end": "2027-02-05T10:30"
+       },
+       {
+        "start": "2027-02-12T09:30",
+        "end": "2027-02-12T10:30"
+       },
+       {
+        "start": "2027-02-19T09:30",
+        "end": "2027-02-19T10:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Eltern-Kind-Yoga für Kinder von 2 bis 4 Jahren (Sa 10:00)",
+     "summary": "Gemeinsames Yoga für Eltern und Kinder von 2 bis 4 Jahren mit Posen, Partnerübungen und Entspannungsspielen. 3 Termine samstags; BuT-Gutscheine werden verrechnet.",
+     "topics": [
+      "bewegung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "48,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 48
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Ampel grün (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-16T10:00",
+        "end": "2027-01-16T11:30"
+       },
+       {
+        "start": "2027-02-13T10:00",
+        "end": "2027-02-13T11:30"
+       },
+       {
+        "start": "2027-03-20T10:00",
+        "end": "2027-03-20T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Musikalische Früherziehung 1–3 J., Mo 15:30 (Zimmer 10)",
+     "summary": "Musikkurs mit Eltern für Kinder von 1 bis 3 Jahren: Singen, Sprechen, Fingerspiele und Tänze mit Klanghölzern, Rasseln und Trommeln. 6 Termine montags; BuT-Gutscheine werden verrechnet.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Ampel grün (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-03-01T15:30",
+        "end": "2027-03-01T16:15"
+       },
+       {
+        "start": "2027-03-08T15:30",
+        "end": "2027-03-08T16:15"
+       },
+       {
+        "start": "2027-03-15T15:30",
+        "end": "2027-03-15T16:15"
+       },
+       {
+        "start": "2027-04-05T15:30",
+        "end": "2027-04-05T16:15"
+       },
+       {
+        "start": "2027-04-12T15:30",
+        "end": "2027-04-12T16:15"
+       },
+       {
+        "start": "2027-04-19T15:30",
+        "end": "2027-04-19T16:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Musikalische Früherziehung 1–3 J., Mo 16:30 (Zimmer 10)",
+     "summary": "Musikkurs mit Eltern für Kinder von 1 bis 3 Jahren: Singen, Sprechen, Fingerspiele und Tänze mit Klanghölzern, Rasseln und Trommeln. 6 Termine montags; BuT-Gutscheine werden verrechnet.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Ampel grün (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-03-01T16:30",
+        "end": "2027-03-01T17:15"
+       },
+       {
+        "start": "2027-03-08T16:30",
+        "end": "2027-03-08T17:15"
+       },
+       {
+        "start": "2027-03-15T16:30",
+        "end": "2027-03-15T17:15"
+       },
+       {
+        "start": "2027-04-05T16:30",
+        "end": "2027-04-05T17:15"
+       },
+       {
+        "start": "2027-04-12T16:30",
+        "end": "2027-04-12T17:15"
+       },
+       {
+        "start": "2027-04-19T16:30",
+        "end": "2027-04-19T17:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Musikalische Früherziehung für Babys (6–12 Monate), Mo 14:30",
+     "summary": "Musikkurs mit Eltern für Babys von 6 bis 12 Monaten: Singen, Fingerspiele und Bewegung zur Musik. 6 Termine montags; BuT-Gutscheine werden verrechnet.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/eltern-kind-kurse/",
+     "category": "musik",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Ampel grün (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-03-01T14:30",
+        "end": "2027-03-01T15:15"
+       },
+       {
+        "start": "2027-03-08T14:30",
+        "end": "2027-03-08T15:15"
+       },
+       {
+        "start": "2027-03-15T14:30",
+        "end": "2027-03-15T15:15"
+       },
+       {
+        "start": "2027-04-05T14:30",
+        "end": "2027-04-05T15:15"
+       },
+       {
+        "start": "2027-04-12T14:30",
+        "end": "2027-04-12T15:15"
+       },
+       {
+        "start": "2027-04-19T14:30",
+        "end": "2027-04-19T15:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Kinderturnen für Kinder von 1,5 bis 3 Jahren (donnerstags)",
+     "summary": "Spielerische Bewegungslandschaft und Bewegungsspiele, die Kinder gemeinsam mit einem Elternteil erkunden. Sechs Termine von März bis Mai 2027, donnerstags 14:45–15:45 Uhr. BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "bewegung",
       "eltern-kind-turnen"
@@ -3083,7 +2839,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmelden (frei)"
+      "note": "Anmeldung über die Kursseite (Ampel grün)"
      },
      "schedule": {
       "kind": "dates",
@@ -3116,11 +2872,11 @@
      }
     }
    ],
-   "inputHash": "d5397d8560047bd322a77e878c8cb8f0a7c7a9fb0b6954188c089f5204802900",
+   "inputHash": "3f59e1e6852ad5c73c40d08cf801eb44b18cda27aca2b12c61ecb3bea47637ab",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "1ebf18d5a0d0fd357428fe92e4fa89d6ee2af97deb7d6fc238eb29bb1b912230"
   },
   "seite:https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/": {
@@ -3128,8 +2884,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "MilchZeit – offener Treff für Eltern mit Baby (Stillen & Flasche)",
-     "summary": "Offener Treff rund um Stillen, Abpumpen und Flaschennahrung, geleitet von einer Stillbegleiterin. Keine Anmeldung nötig; Unkostenbeitrag 3 € vor Ort.",
+     "title": "MilchZeit – Offener Treff für Schwangere und Eltern mit Baby",
+     "summary": "Offener Treff für Schwangere und Eltern, die ihr Baby stillen, abpumpen oder mit der Flasche füttern. Austausch rund um die Milchernährung, geleitet von einer Stillbegleiterin. Keine Anmeldung nötig, Unkostenbeitrag 3 € vor Ort.",
      "topics": [
       "stillcafe",
       "elterntreff"
@@ -3137,13 +2893,13 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "3 € Unkostenbeitrag vor Ort",
+     "price": "Unkostenbeitrag 3 € vor Ort",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung erforderlich"
+      "note": "Keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "dates",
@@ -3182,15 +2938,15 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe (Babys geb. Juni–Aug. 2026, Di)",
-     "summary": "Bewegungsanregungen und Spiel für Babys im 1. Lebensjahr in warmem Raum, dazu Austausch für Eltern. Einstieg in den laufenden Kurs ist möglich, solange Plätze frei sind; der Preis wird dann anteilig berechnet.",
+     "title": "PEKiP geb. Juni–August 2026, dienstags 9:00–10:30",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr im warm beheizten Raum, dazu Erfahrungsaustausch für Eltern. Einstieg in den laufenden Kurs ist möglich, solange Plätze frei sind; die Gebühr wird dann anteilig berechnet.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "130,50 € Kursgebühr (2 € Material bei Bedarf)",
+     "price": "130,50 € Kursgebühr (+ 2 € Materialgeld bei Bedarf)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "category": "babykurse",
@@ -3247,72 +3003,15 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe (Babys geb. April–Juni 2026, Mo 9:30)",
-     "summary": "Bewegungsanregungen und Spiel für Babys im 1. Lebensjahr, dazu Austausch für Eltern. Sieben Termine ab 9.11.; 2 € Materialgeld bei Bedarf.",
+     "title": "PEKiP geb. Mai–Juli 2026, montags 11:30–13:00",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr, nackt im warmen Raum, mit Austausch für Eltern. Der Kurs ist belegt; wer sich anmeldet, kommt auf die Warteliste. 7 Termine ab 9.11.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "101,00 € Kursgebühr (2 € Material bei Bedarf)",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "wenige",
-      "note": "Restplätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-09T09:30",
-        "end": "2026-11-09T11:00"
-       },
-       {
-        "start": "2026-11-16T09:30",
-        "end": "2026-11-16T11:00"
-       },
-       {
-        "start": "2026-11-23T09:30",
-        "end": "2026-11-23T11:00"
-       },
-       {
-        "start": "2026-11-30T09:30",
-        "end": "2026-11-30T11:00"
-       },
-       {
-        "start": "2026-12-07T09:30",
-        "end": "2026-12-07T11:00"
-       },
-       {
-        "start": "2026-12-14T09:30",
-        "end": "2026-12-14T11:00"
-       },
-       {
-        "start": "2026-12-21T09:30",
-        "end": "2026-12-21T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe (Babys geb. Mai–Juli 2026, Mo 11:30)",
-     "summary": "Bewegungsanregungen und Spiel für Babys im 1. Lebensjahr, dazu Austausch für Eltern. Die Gruppe ist belegt; eine Anmeldung setzt auf die Warteliste. 2 € Materialgeld bei Bedarf.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "101,00 € Kursgebühr (2 € Material bei Bedarf)",
+     "price": "101,00 € Kursgebühr (+ 2 € Materialgeld bei Bedarf)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "category": "babykurse",
@@ -3322,7 +3021,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Kurs belegt – Anmeldung auf Warteliste möglich"
+      "note": "Kurs belegt, Anmeldung auf Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -3361,8 +3060,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung für Babys (Mo, 6–12 Monate)",
-     "summary": "Gemeinsames Singen, Fingerspiele, Reime und Bewegung zur Musik für Babys mit ihren Eltern. Sechs Termine ab 9.11.; BuT-Gutscheine können verrechnet werden.",
+     "title": "Musikalische Früherziehung für Babys (6–12 Monate), montags 14:30",
+     "summary": "Gemeinsames Singen, Fingerspiele, Tänze und Musizieren mit Klanghölzern und Rasseln für Kinder von 6 bis 12 Monaten mit ihren Eltern. 6 Termine ab 9.11.; BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "musik",
       "singen"
@@ -3414,67 +3113,12 @@
     },
     {
      "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg-gemeindehaus-thomaskirche",
-     "title": "Musikalische Früherziehung für Babys (Do, Großreuth)",
-     "summary": "Gemeinsames Singen, Fingerspiele, Reime und Bewegung zur Musik für Babys mit ihren Eltern im Gemeindehaus Großreuth. Sechs Termine ab 12.11.; BuT-Gutscheine können verrechnet werden.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "82,00 € Kursgebühr",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "category": "musik",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Plätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-12T14:30",
-        "end": "2026-11-12T15:15"
-       },
-       {
-        "start": "2026-11-19T14:30",
-        "end": "2026-11-19T15:15"
-       },
-       {
-        "start": "2026-11-26T14:30",
-        "end": "2026-11-26T15:15"
-       },
-       {
-        "start": "2026-12-03T14:30",
-        "end": "2026-12-03T15:15"
-       },
-       {
-        "start": "2026-12-10T14:30",
-        "end": "2026-12-10T15:15"
-       },
-       {
-        "start": "2026-12-17T14:30",
-        "end": "2026-12-17T15:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Tanzen für Mama & Baby in der Trage (MAWIBA® Baby, Mi)",
-     "summary": "Mütter tanzen mit dem Baby in der Tragehilfe und lernen beckenbodenaktivierende Choreografien; stillen oder wickeln ist jederzeit möglich. Vorkenntnisse nicht nötig; Voraussetzungen sind ein positiver gynäkologischer Check und eine geeignete Tragehilfe.",
+     "title": "MAWIBA Baby – Tanzen für Mama & Baby in der Trage, mittwochs 9:30",
+     "summary": "Mütter tanzen mit beckenbodenaktivierenden Choreografien, das Baby sitzt dabei in einer Tragehilfe; Stillen und Wickeln sind jederzeit möglich. Voraussetzungen: gynäkologischer Check frühestens 6 Wochen nach der Geburt und eine geeignete Tragehilfe. 5 Termine ab 11.11.",
      "topics": [
       "tanz",
-      "fitness-mit-baby",
-      "muetter"
+      "fitness-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -3516,8 +3160,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "EntdeckerZeit – Eltern-Kind-Gruppe für Kinder im 1. Lebensjahr (Do)",
-     "summary": "Gemeinsam Bewegungslandschaften, Sinnesmaterial und Alltagsgegenstände entdecken, dazu Impulse und Austausch mit anderen Eltern. Sechs Termine ab 12.11.; keine Vorkenntnisse nötig.",
+     "title": "EntdeckerZeit – Eltern-Kind-Gruppe für Kinder im 1. Lebensjahr, donnerstags 10:30",
+     "summary": "Gemeinsames Entdecken mit Bewegungslandschaften, Sinnesmaterial und freiem Spiel, dazu Impulse zu Entwicklung und Austausch mit anderen Eltern. Keine Vorkenntnisse nötig. 6 Termine ab 12.11.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
@@ -3570,65 +3214,15 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "ZwergenTanz 2 – Lieder und Spiele für Babys vor dem Laufen (Fr)",
-     "summary": "Lieder, Reime sowie Rhythmus- und Bewegungsspiele mit festem Ablauf, Eltern sind aktiv einbezogen. Sechs Termine ab 13.11.; Kinder mit Förderbedarf sind willkommen.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "64,00 € Kursgebühr",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "category": "musik",
-     "availability": {
-      "status": "frei",
-      "note": "Plätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-13T10:30",
-        "end": "2026-11-13T11:30"
-       },
-       {
-        "start": "2026-11-20T10:30",
-        "end": "2026-11-20T11:30"
-       },
-       {
-        "start": "2026-11-27T10:30",
-        "end": "2026-11-27T11:30"
-       },
-       {
-        "start": "2026-12-04T10:30",
-        "end": "2026-12-04T11:30"
-       },
-       {
-        "start": "2026-12-11T10:30",
-        "end": "2026-12-11T11:30"
-       },
-       {
-        "start": "2026-12-18T10:30",
-        "end": "2026-12-18T11:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe Babys geb. Juli–Sept. 2026 (Fr 11:30)",
-     "summary": "PEKiP für Babys im 1. Lebensjahr mit Bewegungsanregungen im warmen Raum und Austausch für Mütter und Väter. 6 Termine freitags; Wickelunterlage, Handtuch und leichte Kleidung mitbringen. Restplätze frei.",
+     "title": "PEKiP geb. Juli–September 2026, freitags 11:30–13:00",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr im warm beheizten Raum, dazu Erfahrungsaustausch für Eltern. 6 Termine ab 13.11.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "87,00 €",
+     "price": "87,00 € Kursgebühr (+ 2 € Materialgeld bei Bedarf)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "category": "babykurse",
@@ -3638,7 +3232,7 @@
      },
      "availability": {
       "status": "wenige",
-      "note": "Restplätze frei (Anzahl nicht angegeben)"
+      "note": "Restplätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -3673,15 +3267,15 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe Babys geb. Jan.–März 2026 (Fr 9:30)",
-     "summary": "PEKiP für Babys im 1. Lebensjahr mit individuellen Bewegungsanregungen und Elternaustausch. 6 Termine freitags vormittags; Wickelunterlage und Handtuch mitbringen, 2 € Materialgeld im Kurs.",
+     "title": "PEKiP geb. Januar–März 2026, freitags 9:30–11:00",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr im warm beheizten Raum, dazu Erfahrungsaustausch für Eltern. 6 Termine ab 13.11.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "87,00 €",
+     "price": "87,00 € Kursgebühr (+ 2 € Materialgeld bei Bedarf)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "category": "babykurse",
@@ -3691,7 +3285,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung online möglich"
+      "note": "Plätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -3726,15 +3320,15 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PEKiP-Gruppe Babys geb. Sept.–Nov. 2026 (Mo 9:30)",
-     "summary": "PEKiP für Babys im 1. Lebensjahr: Bewegung im warmen Raum und Austausch für Eltern. 9 Termine montags vormittags bis Mitte März 2027; Wickelsachen und Handtuch mitbringen.",
+     "title": "PEKiP geb. April–Juni 2026, montags 9:30–11:00",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr im warm beheizten Raum, dazu Erfahrungsaustausch für Eltern. 7 Termine ab 9.11.",
      "topics": [
       "pekip"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "130,50 €",
+     "price": "101,00 € Kursgebühr (+ 2 € Materialgeld bei Bedarf)",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
      "category": "babykurse",
@@ -3743,47 +3337,39 @@
       "maxMonths": 12
      },
      "availability": {
-      "status": "frei",
-      "note": "Anmeldung online möglich"
+      "status": "wenige",
+      "note": "Restplätze frei"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2027-01-11T09:30",
-        "end": "2027-01-11T11:00"
+        "start": "2026-11-09T09:30",
+        "end": "2026-11-09T11:00"
        },
        {
-        "start": "2027-01-18T09:30",
-        "end": "2027-01-18T11:00"
+        "start": "2026-11-16T09:30",
+        "end": "2026-11-16T11:00"
        },
        {
-        "start": "2027-01-25T09:30",
-        "end": "2027-01-25T11:00"
+        "start": "2026-11-23T09:30",
+        "end": "2026-11-23T11:00"
        },
        {
-        "start": "2027-02-01T09:30",
-        "end": "2027-02-01T11:00"
+        "start": "2026-11-30T09:30",
+        "end": "2026-11-30T11:00"
        },
        {
-        "start": "2027-02-15T09:30",
-        "end": "2027-02-15T11:00"
+        "start": "2026-12-07T09:30",
+        "end": "2026-12-07T11:00"
        },
        {
-        "start": "2027-02-22T09:30",
-        "end": "2027-02-22T11:00"
+        "start": "2026-12-14T09:30",
+        "end": "2026-12-14T11:00"
        },
        {
-        "start": "2027-03-01T09:30",
-        "end": "2027-03-01T11:00"
-       },
-       {
-        "start": "2027-03-08T09:30",
-        "end": "2027-03-08T11:00"
-       },
-       {
-        "start": "2027-03-15T09:30",
-        "end": "2027-03-15T11:00"
+        "start": "2026-12-21T09:30",
+        "end": "2026-12-21T11:00"
        }
       ]
      }
@@ -3791,8 +3377,58 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "BauchBeutelPo – Fitness mit dem Baby (Mo 10:45)",
-     "summary": "Fitness- und Pilateskurs für Mütter nach der Rückbildung; das Baby spielt in der Mitte mit oder ist in der Tragehilfe dabei. 8 Termine montags; Präventionskurs, Kassenzuschuss möglich. Derzeit nur Warteliste.",
+     "title": "ZwergenTanz 2: Lieder und Bewegungsspiele für die Kleinsten",
+     "summary": "Musikalisches Angebot für Babys, die noch nicht selbst laufen, mit Reimen, Fingerspielen und Liedern zu den Jahreszeiten. Die Eltern machen überall mit. 6 Termine, Einstieg nur zum Kursbeginn.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "64,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
+     "category": "musik",
+     "availability": {
+      "status": "frei",
+      "note": "Anmelden (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-13T10:30",
+        "end": "2026-11-13T11:30"
+       },
+       {
+        "start": "2026-11-20T10:30",
+        "end": "2026-11-20T11:30"
+       },
+       {
+        "start": "2026-11-27T10:30",
+        "end": "2026-11-27T11:30"
+       },
+       {
+        "start": "2026-12-04T10:30",
+        "end": "2026-12-04T11:30"
+       },
+       {
+        "start": "2026-12-11T10:30",
+        "end": "2026-12-11T11:30"
+       },
+       {
+        "start": "2026-12-18T10:30",
+        "end": "2026-12-18T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "BauchBeutelPo – Fitness mit dem Baby (ab 30.11.2026)",
+     "summary": "Fitness und Pilates nach der Rückbildung: Du trainierst, das Baby ist dabei, im Tragetuch oder bei den anderen Babys in der Mitte. Präventionskurs, Krankenkassen erstatten oft einen Teil. Aktuell nur Warteliste.",
      "topics": [
       "fitness-mit-baby"
      ],
@@ -3848,8 +3484,42 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung für Babys 6–12 Mon. (ab Jan. 2027)",
-     "summary": "Gemeinsames Singen, Fingerspiele, Tänze und Musizieren mit Instrumenten für Eltern und Babys von 6 bis 12 Monaten. 6 Termine montags 14:30–15:15 Uhr; BuT-Gutscheine werden verrechnet.",
+     "title": "Geschwisterkurs – Hurra, ein Baby kommt! (Kinder ab 2,5 Jahren)",
+     "summary": "Spielerische Vorbereitung großer Geschwister auf das Baby: Puppe versorgen, Wickeln und Füttern üben, basteln und Mamas Bauch bemalen. Eine Puppe oder ein Kuscheltier mitbringen.",
+     "topics": [
+      "kreativ",
+      "eltern-kind-gruppe"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "19,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
+     "category": "buehne",
+     "age": {
+      "minMonths": 30,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Anmelden (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-09T10:30",
+        "end": "2027-01-09T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Musikalische Früherziehung für Babys (Kurs ab 11.01.2027)",
+     "summary": "Gemeinsames Singen, Fingerspiele und Tanzen zur Musik mit einfachen Instrumenten für Kinder von 6 bis 12 Monaten mit ihren Eltern. 6 Termine montags, BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "musik",
       "singen"
@@ -3867,7 +3537,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung online möglich"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -3902,8 +3572,73 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Musikalische Früherziehung für Babys 6–12 Mon. (ab März 2027)",
-     "summary": "Gemeinsames Singen, Fingerspiele, Tänze und Musizieren mit Instrumenten für Eltern und Babys von 6 bis 12 Monaten. 6 Termine montags 14:30–15:15 Uhr; BuT-Gutscheine werden verrechnet.",
+     "title": "PEKiP-Gruppe (Babys geb. Sept.–Nov. 2026, ab 11.01.2027)",
+     "summary": "Bewegungsanregungen für Babys im ersten Lebensjahr, die nackt im warmen Raum spielen, dazu Austausch für die Eltern. Wickelunterlage und Handtuch mitbringen, 2 € Materialgeld vor Ort.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "130,50 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "frei",
+      "note": "Anmelden (frei)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-11T09:30",
+        "end": "2027-01-11T11:00"
+       },
+       {
+        "start": "2027-01-18T09:30",
+        "end": "2027-01-18T11:00"
+       },
+       {
+        "start": "2027-01-25T09:30",
+        "end": "2027-01-25T11:00"
+       },
+       {
+        "start": "2027-02-01T09:30",
+        "end": "2027-02-01T11:00"
+       },
+       {
+        "start": "2027-02-15T09:30",
+        "end": "2027-02-15T11:00"
+       },
+       {
+        "start": "2027-02-22T09:30",
+        "end": "2027-02-22T11:00"
+       },
+       {
+        "start": "2027-03-01T09:30",
+        "end": "2027-03-01T11:00"
+       },
+       {
+        "start": "2027-03-08T09:30",
+        "end": "2027-03-08T11:00"
+       },
+       {
+        "start": "2027-03-15T09:30",
+        "end": "2027-03-15T11:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Musikalische Früherziehung für Babys (Kurs ab 01.03.2027)",
+     "summary": "Gemeinsames Singen, Fingerspiele und Tanzen zur Musik mit einfachen Instrumenten für Kinder von 6 bis 12 Monaten mit ihren Eltern. 6 Termine montags, BuT-Gutscheine können verrechnet werden.",
      "topics": [
       "musik",
       "singen"
@@ -3921,7 +3656,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung online möglich"
+      "note": "Anmelden (frei)"
      },
      "schedule": {
       "kind": "dates",
@@ -3952,93 +3687,13 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "MilchZeit – offener Treff für Eltern mit Baby (Mi 9:00)",
-     "summary": "Offener Treff rund um Stillen, Abpumpen und Flaschennahrung, geleitet von einer Stillbegleiterin; auch Schwangere sind willkommen. Keine Anmeldung nötig, 3 € Unkostenbeitrag vor Ort.",
-     "topics": [
-      "stillcafe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "3 € Unkostenbeitrag (vor Ort)",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "category": "treffs-cafes",
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung erforderlich"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-13T09:00",
-        "end": "2027-01-13T10:00"
-       },
-       {
-        "start": "2027-01-27T09:00",
-        "end": "2027-01-27T10:00"
-       },
-       {
-        "start": "2027-02-17T09:00",
-        "end": "2027-02-17T10:00"
-       },
-       {
-        "start": "2027-03-03T09:00",
-        "end": "2027-03-03T10:00"
-       },
-       {
-        "start": "2027-03-17T09:00",
-        "end": "2027-03-17T10:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "Geschwisterkurs „Hurra, ein Baby kommt!“ (ab 2,5 J.)",
-     "summary": "Spielerischer Vorbereitungskurs für Geschwisterkinder ab 2,5 Jahren auf das kommende Baby, mit Puppe, Üben von Wickeln und Füttern sowie Basteln. Einmaliger Termin am 9.1.2027; Anmeldung erforderlich.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "kreativ"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "19,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/schwangerschaft/",
-     "category": "buehne",
-     "age": {
-      "minMonths": 30,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung online möglich"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-09T10:30",
-        "end": "2027-01-09T11:30"
-       }
-      ]
-     }
     }
    ],
-   "inputHash": "3b052163afa1f37b334667ffa678892e879a3373eb8798ae9552b76e5430edd3",
+   "inputHash": "75409ade63de3ae7bea8d14dd2994b3f86506a433559241114ccc43054086695",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "118d30994ee833377924dab6023add70db17c8a2ba0369799fd75596689957bf"
   },
   "seite:https://www.fbs-nuernberg.de/kursprogramm/kreativ-musik/": {
@@ -4047,11 +3702,10 @@
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
      "title": "Tanzen und Turnen mit Musik (1,5–2,5 Jahre)",
-     "summary": "Klatschen, Tanzen und Spielen mit Tüchern und Material für Eltern mit Kleinkind. Einstieg in die laufende Reihe ist jederzeit möglich, die Gebühr wird anteilig berechnet. Aktuell nur Warteliste.",
+     "summary": "Musik, Tanz und Bewegungsspiele mit Tüchern und Material, gemeinsam mit einer Begleitperson. Der Kurs läuft seit 29.09.; Einstieg in den laufenden Kurs ist jederzeit möglich, die Gebühr wird anteilig berechnet. Aktuell nur noch Warteliste.",
      "topics": [
-      "bewegung",
-      "tanz",
-      "musik"
+      "eltern-kind-turnen",
+      "tanz"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -4066,7 +3720,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Veranstaltung belegt – Anmeldung auf Warteliste möglich"
+      "note": "Kurs belegt – Anmeldung auf Warteliste möglich"
      },
      "schedule": {
       "kind": "dates",
@@ -4109,10 +3763,11 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Kreatives Malen für Eltern und Babys (Zitronenblau und Erdbeergrün)",
-     "summary": "Eltern malen, drucken und gestalten gemeinsam, während die Babys Farben, Formen und Material mit Händen und Füßen erkunden. Drei Samstage im Oktober und November; Restplätze vorhanden.",
+     "title": "Kreatives Malen für Eltern und Babys",
+     "summary": "Eltern malen und gestalten gemeinsam mit ihren Babys, die mit Händen und Füßen drucken und Farben, Formen und Materialien erkunden. Laufende Reihe mit drei Terminen, es sind noch Restplätze frei.",
      "topics": [
-      "kreativ"
+      "kreativ",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -4146,8 +3801,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "nappydancers® – Tanzen für Kinder von 20–40 Monaten",
-     "summary": "Tanzkurs für Kinder von 20 bis 40 Monaten zusammen mit Mama oder Papa. Für alle Kinder sind die zweifarbigen Tanzstoppersocken nötig, die vor der ersten Stunde bei der Kursleitung für 8 € erhältlich sind. Erster Termin 14:45 Uhr, danach 15:00 Uhr.",
+     "title": "nappydancers® Tanzen mit Mama oder Papa (20–40 Monate)",
+     "summary": "Tanzkurs für Kinder von 20 bis 40 Monaten, immer gemeinsam mit Mama oder Papa. Die Tanzstoppersocken (8 €) gibt es vor der ersten Stunde bei der Kursleitung. Der erste Termin beginnt um 14:45 Uhr, die folgenden um 15:00 Uhr.",
      "topics": [
       "tanz",
       "bewegung"
@@ -4200,9 +3855,10 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Adventszeit für Familien (Kinder 2–6 Jahre, mit Eltern)",
-     "summary": "Adventsvormittag mit Kamishibai-Geschichte, kleiner Bastelei sowie Punsch und Keksen für Kinder von 2 bis 6 Jahren mit einer erwachsenen Begleitperson.",
+     "title": "Adventszeit für Familien (2–6 Jahre)",
+     "summary": "Adventsvormittag mit einer Kamishibai-Geschichte, einer kleinen Bastelei sowie Punsch und Keksen für Kinder von 2 bis 6 Jahren mit Begleitperson. Einmaliger Termin am 05.12.2026, es sind noch Restplätze frei.",
      "topics": [
+      "vorlesen",
       "kreativ"
      ],
      "format": "einmalig",
@@ -4233,9 +3889,10 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Adventszeit mit Oma und/oder Opa (Kinder 2–6 Jahre)",
-     "summary": "Adventsnachmittag mit Geschichte, Bastelei und Punsch für Kinder von 2 bis 6 Jahren mit Oma, Opa oder einer anderen erwachsenen Begleitperson.",
+     "title": "Adventszeit mit Oma und/oder Opa (2–6 Jahre)",
+     "summary": "Adventsnachmittag mit Kamishibai-Geschichte und Bastelei für Kinder von 2 bis 6 Jahren mit Oma, Opa oder einer anderen erwachsenen Begleitperson. Einmaliger Termin am 05.12.2026, es sind noch Plätze frei.",
      "topics": [
+      "vorlesen",
       "kreativ"
      ],
      "format": "einmalig",
@@ -4266,8 +3923,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PapaZeit Spezial: Weihnachtswerkstatt (Kinder ab 2 Jahren)",
-     "summary": "Papa und Kind basteln an mehreren Stationen weihnachtliche Dekorationen und kleine Geschenke zum Mitnehmen. Kleidung, die Farbe verträgt, mitbringen.",
+     "title": "PapaZeit Spezial: Weihnachtswerkstatt (ab 2 Jahren)",
+     "summary": "Weihnachtliche Bastelstationen für Väter mit ihren Kindern ab 2 Jahren. Dekorationen und kleine Geschenke dürfen mit nach Hause. Einmaliger Termin am 12.12.2026, es sind Plätze frei.",
      "topics": [
       "kreativ",
       "vaeter"
@@ -4300,8 +3957,8 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Weihnachtswerkstatt für Familien (Kinder ab 2 Jahren)",
-     "summary": "Weihnachtliches Basteln an Mitmachstationen für Kinder ab 2 Jahren mit Mama, Papa, Oma, Opa oder einer anderen Begleitperson; Dekorationen und Geschenke zum Mitnehmen.",
+     "title": "Weihnachtswerkstatt für Familien (ab 2 Jahren)",
+     "summary": "Basteln, Kleben und Malen an Mitmachstationen für Kinder ab 2 Jahren mit Begleitperson. Gebastelt wird Weihnachtsschmuck und kleine Geschenke zum Mitnehmen. Einmaliger Termin am 12.12.2026, es sind noch Restplätze frei.",
      "topics": [
       "kreativ"
      ],
@@ -4333,12 +3990,12 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "PapaZeit – Erlebnisreihe für Väter mit Kindern von 1–3 Jahren",
-     "summary": "Vier Samstage im Januar 2027 für Väter mit Kindern von 1 bis 3 Jahren: Bewegungsparcours, kleine Experimente, Matschen, Kneten und Werkeln. Kleidung, die schmutzig werden darf, mitbringen.",
+     "title": "PapaZeit – Raus aus dem Alltag (1–3 Jahre)",
+     "summary": "Vierteilige Erlebnisreihe für Väter mit Kindern von 1 bis 3 Jahren: Bewegungsparcours, Experimente, Matschen und Werkeln, jeder Termin ist ein anderes Erlebnis. Kleidung, die schmutzig werden darf, mitbringen. Start am 09.01.2027.",
      "topics": [
-      "vaeter",
       "kreativ",
-      "bewegung"
+      "bewegung",
+      "vaeter"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -4381,16 +4038,15 @@
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
      "title": "Tanzen und Turnen mit Musik (1,5–2,5 Jahre, Di 15:30)",
-     "summary": "Musik, Tanz und Bewegungsspiele mit Tüchern für Kinder von etwa 1,5 bis 2,5 Jahren, mit Begleitperson. 9 Dienstagstermine ab 12.01.2027; bequeme Kleidung, Stoppersocken und etwas zu trinken mitbringen.",
+     "summary": "Klatschen, Tanzen und Spielen mit Chiffontüchern für Kinder mit Eltern. 9 Termine ab 12.01.2027, Begleitung durch einen Elternteil. BuT-Gutscheine sind verrechenbar.",
      "topics": [
       "tanz",
-      "bewegung",
-      "musik"
+      "eltern-kind-turnen"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Kursgebühr 84,00 €",
+     "price": "84,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/kreativ-musik/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/kreativ-musik/",
      "category": "bewegung",
@@ -4400,7 +4056,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button ANMELDEN, Kurs laut Ampel frei"
+      "note": "Anmelden (Frei), Kurs-Nr. EKBE 0960 a"
      },
      "schedule": {
       "kind": "dates",
@@ -4448,16 +4104,15 @@
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
      "title": "Tanzen und Turnen mit Musik (2,5–4 Jahre, Di 16:45)",
-     "summary": "Musik- und Bewegungsangebot mit Tanz und Tüchern für Kinder von 2,5 bis 4 Jahren, mit Begleitperson. 9 Dienstagstermine ab 12.01.2027; bequeme Kleidung, Stoppersocken und etwas zu trinken mitbringen.",
+     "summary": "Musik, Bewegung und Spiel mit Chiffontüchern und Kreativmaterial für Kinder mit Eltern. 9 Termine ab 12.01.2027. BuT-Gutscheine sind verrechenbar.",
      "topics": [
       "tanz",
-      "bewegung",
-      "musik"
+      "eltern-kind-turnen"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Kursgebühr 84,00 €",
+     "price": "84,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/kreativ-musik/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/kreativ-musik/",
      "category": "bewegung",
@@ -4467,7 +4122,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button ANMELDEN, Kurs laut Ampel frei"
+      "note": "Anmelden (Frei), Kurs-Nr. EKBE 0961 a"
      },
      "schedule": {
       "kind": "dates",
@@ -4514,16 +4169,16 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "nappydancers® – Tanzen mit Mama oder Papa (20–40 Monate)",
-     "summary": "Tanzkurs für Kleinkinder von 20 bis 40 Monaten, gemeinsam mit Mama oder Papa. 6 Dienstagstermine ab 12.01.2027. Die Kinder brauchen die zweifarbigen Tanzstoppersocken, die es vor der ersten Stunde bei der Kursleitung für 8 € gibt.",
+     "title": "nappydancers® Tanzkurs 20–40 Monate mit Mama/Papa",
+     "summary": "Tanzkurs, bei dem Kinder gemeinsam mit Mama oder Papa zur Musik tanzen. 6 Termine ab 12.01.2027. Die Kinder brauchen die nappydancers-Tanzstoppersocken (8 €, bei der Kursleitung vor der ersten Einheit).",
      "topics": [
       "tanz",
-      "bewegung"
+      "eltern-kind-turnen"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Kursgebühr 63,00 € (zzgl. Tanzsocken 8 €)",
+     "price": "63,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/kreativ-musik/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/kreativ-musik/",
      "category": "bewegung",
@@ -4533,7 +4188,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über den Button ANMELDEN, Kurs laut Ampel frei"
+      "note": "Anmelden (Frei), Kurs-Nr. EKBE 0802 a"
      },
      "schedule": {
       "kind": "dates",
@@ -4566,11 +4221,11 @@
      }
     }
    ],
-   "inputHash": "2dbce0312373fb0c4dfab3b57509609cf2d75549cb017ef30754bfd052a34930",
+   "inputHash": "3a56a8e5a7bc92723b5d4f700914a2983c127877b86c9d439bf338d1bbeeb1d1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "a0ebfd49afc6080d9712a98b550d170dde7ea5063161b140da7c5090311a1eac"
   },
   "seite:https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/": {
@@ -4578,16 +4233,16 @@
     {
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Laterne, Laterne – Martinsfest (Familien mit Kindern 0–4 Jahre)",
-     "summary": "Martinsfest im Offenen Treff FamilienOase mit Liedern, Martinsgeschichte und kleinem Laternenumzug; eigene Laterne mitbringen. Der Termin ist belegt, eine Anmeldung auf die Warteliste ist möglich.",
+     "title": "Laterne, Laterne – Martinsfest im Offenen Treff FamilienOase (Kinder 0–4 Jahre)",
+     "summary": "Martinslieder singen, die Martinsgeschichte hören und mit eigener Laterne einen kleinen Umzug machen. Eine Laterne mitbringen; der Kurs ist belegt, Anmeldung nur über die Warteliste.",
      "topics": [
-      "singen",
-      "elterntreff"
+      "elterntreff",
+      "singen"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Kursgebühr 10,00 €",
+     "price": "10,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "category": "treffs-cafes",
@@ -4597,7 +4252,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Kurs belegt, Anmeldung auf Warteliste möglich"
+      "note": "Kurs belegt – Anmeldung auf Warteliste möglich"
      },
      "schedule": {
       "kind": "dates",
@@ -4613,7 +4268,7 @@
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
      "title": "Abenteuerturnen 1 (Kinder 1–3 Jahre mit Eltern)",
-     "summary": "Spielerische Bewegungsstunde mit Bewegungslandschaft und Bewegungsspielen für Kinder von 1 bis 3 Jahren mit Begleitperson. Kostenlos, vorherige Anmeldung erforderlich; alle genannten Termine sind belegt, Warteliste möglich.",
+     "summary": "Spielerische Bewegungsstunde mit Bewegungslandschaft und Bewegungsspielen für Kinder von 1 bis 3 Jahren mit Begleitperson. Kostenlos, Anmeldung erforderlich; alle genannten Termine sind derzeit belegt, Warteliste möglich.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -4631,7 +4286,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Alle Termine belegt, Anmeldung auf Warteliste möglich"
+      "note": "Alle vier Termine belegt – Anmeldung auf Warteliste möglich"
      },
      "schedule": {
       "kind": "dates",
@@ -4659,7 +4314,7 @@
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
      "title": "Adventszeit für Familien (Kinder 2–6 Jahre)",
-     "summary": "Adventsvormittag mit Kamishibai-Geschichte, kleiner Bastelei, Kinderpunsch und Keksen für Kinder von 2 bis 6 Jahren mit Begleitperson. Anmeldung erforderlich, nur noch wenige Plätze.",
+     "summary": "Adventsvormittag mit Kamishibai-Geschichte, Bastelei, Kinderpunsch und Keksen für Kinder mit Mama, Papa oder einer anderen Begleitperson. Anmeldung erforderlich, noch wenige Restplätze.",
      "topics": [
       "kreativ",
       "vorlesen"
@@ -4667,7 +4322,7 @@
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Kursgebühr 15,00 €",
+     "price": "15,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "category": "buehne",
@@ -4693,7 +4348,7 @@
      "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
      "title": "Adventszeit mit Oma und/oder Opa (Kinder 2–6 Jahre)",
-     "summary": "Adventsnachmittag mit Kamishibai-Geschichte, kleiner Bastelei, Kinderpunsch und Keksen für Kinder von 2 bis 6 Jahren mit Großeltern oder anderer erwachsener Begleitperson. Anmeldung erforderlich, Plätze frei.",
+     "summary": "Adventsnachmittag mit Kamishibai-Geschichte, gemeinsamer Bastelei, Kinderpunsch und Keksen für Kinder mit Großeltern oder einer anderen erwachsenen Begleitperson. Anmeldung erforderlich.",
      "topics": [
       "kreativ",
       "vorlesen"
@@ -4701,7 +4356,7 @@
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Kursgebühr 15,00 €",
+     "price": "15,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "category": "buehne",
@@ -4710,8 +4365,7 @@
       "maxMonths": 72
      },
      "availability": {
-      "status": "frei",
-      "note": "Anmeldung erforderlich, Plätze frei"
+      "status": "frei"
      },
      "schedule": {
       "kind": "dates",
@@ -4725,16 +4379,82 @@
     },
     {
      "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg-wald-angebot-steinbruechlein",
+     "title": "PapaZeit Spezial: Waldweihnacht (ab 2 Jahren mit Papa)",
+     "summary": "Winterlicher Waldvormittag für Papas mit Kindern ab 2 Jahren: Tiere im Winter entdecken, Futterplätze für Vögel anlegen, Geschichte und warme Getränke. Treffpunkt Parkplatz Steinbrüchlein; wetterfeste Kleidung mitbringen.",
+     "topics": [
+      "waldgruppe",
+      "vaeter"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "15,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-11T15:00",
+        "end": "2026-12-11T16:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
      "venueId": "fbs-nuernberg",
-     "title": "Weihnachtswerkstatt für Familien (ab 2 Jahren)",
-     "summary": "Basteln an mehreren Mitmachstationen für Kinder ab 2 Jahren mit Begleitperson; weihnachtliche Dekorationen und kleine Geschenke zum Mitnehmen. Anmeldung erforderlich, nur noch wenige Plätze.",
+     "title": "PapaZeit Spezial: Weihnachtswerkstatt (ab 2 Jahren mit Papa)",
+     "summary": "Gemeinsames Basteln an mehreren Stationen für Papas und Kinder ab 2 Jahren: weihnachtliche Dekoration und kleine Geschenke zum Mitnehmen. Anmeldung erforderlich; Kleidung mitbringen, die auch mal Farbe verträgt.",
+     "topics": [
+      "kreativ",
+      "vaeter"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "15,00 €",
+     "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
+     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
+     "category": "buehne",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "frei"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-12T10:00",
+        "end": "2026-12-12T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "fbs-nuernberg",
+     "venueId": "fbs-nuernberg",
+     "title": "Weihnachtswerkstatt für Familien (ab 2 Jahren mit Begleitperson)",
+     "summary": "Kreative Mitmach-Stationen zum Basteln, Kleben und Gestalten für Kinder ab 2 Jahren mit Begleitperson; es entstehen Weihnachtsdekorationen zum Mitnehmen. Anmeldung erforderlich, noch wenige Restplätze.",
      "topics": [
       "kreativ"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Kursgebühr 15,00 €",
+     "price": "15,00 €",
      "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
      "category": "buehne",
@@ -4755,82 +4475,13 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg-wald-angebot-steinbruechlein",
-     "title": "PapaZeit Spezial: Waldweihnacht (ab 2 Jahren mit Vater)",
-     "summary": "Winterlicher Waldvormittag für Väter mit Kindern ab 2 Jahren: Tiere im Winter entdecken, Futterplätze für Vögel anlegen, warme Getränke. Treffpunkt Parkplatz Steinbrüchlein; wetterfeste Kleidung mitbringen. Plätze frei.",
-     "topics": [
-      "waldgruppe",
-      "tiere-natur",
-      "vaeter"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "Kursgebühr 15,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung erforderlich, Plätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-11T15:00",
-        "end": "2026-12-11T16:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "fbs-nuernberg",
-     "venueId": "fbs-nuernberg",
-     "title": "PapaZeit Spezial: Weihnachtswerkstatt (ab 2 Jahren mit Vater)",
-     "summary": "Basteln an mehreren Stationen für Väter mit Kindern ab 2 Jahren: weihnachtliche Dekorationen, kleine Geschenke und gemeinsame Zeit. Kleidung mitbringen, die auch mal einen Klecks Farbe verträgt. Plätze frei.",
-     "topics": [
-      "kreativ",
-      "vaeter"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "Kursgebühr 15,00 €",
-     "url": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
-     "sourceUrl": "https://www.fbs-nuernberg.de/kursprogramm/einzelveranstaltungen/",
-     "category": "buehne",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung erforderlich, Plätze frei"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-12T10:00",
-        "end": "2026-12-12T11:30"
-       }
-      ]
-     }
     }
    ],
-   "inputHash": "47e9e16d6a74c0607a32c0ddc982800a27681a0f72a278122de88020729e2edc",
+   "inputHash": "e92f3ee4bc046bbdd78bf3b95a9a1913ec3821772f7b5a7d058c85b8da592fd6",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-11-07T08:41:42+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "1ebf18d5a0d0fd357428fe92e4fa89d6ee2af97deb7d6fc238eb29bb1b912230"
   },
   "seite:https://www.fbs-nuernberg.de/begegnung/familienoase/": {
@@ -4874,7 +4525,7 @@
    "inputHash": "e63807b9863867943b642098edf218a4ff9c753efa86f7c255fd4bc69cf3f226",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "26110d5250d0ac56bb644dd0b65e31586f6928a3e1ab10252dd73661a00e50e5"
   },
@@ -4920,7 +4571,7 @@
    "inputHash": "76c2f141dac31e0c56dfca70d0bf28a997ed7d0326399694c52f374f8e669998",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "a6bd9cf843c221c88ce35c564960f783787f86912c02a2b498ecb0d29395be5d"
   },
@@ -4966,7 +4617,7 @@
    "inputHash": "53842e1e2dbd42c19de2210037c2d9d3803b658aa028c15670a7eec4608802eb",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "1435b92433c8bd91a5975d052c19cfcdbffae11ba413908012ec03b162be6601"
   },
@@ -5008,7 +4659,7 @@
    "inputHash": "662c0693731eb89c966cc74707251391502324a13e06c76891104ce0bdb0fdb5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "2da1dd414e3e0bc3bdb31e8abf313a6eb903417ad2dab8bb4bbfc3f4cca536a8"
   },
@@ -5126,7 +4777,7 @@
    "inputHash": "cfdd676e8e8e00073d2c9aafaeb2aa8a0a2dd8d56ea45b53421a75cb0d2247c1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "1ebf18d5a0d0fd357428fe92e4fa89d6ee2af97deb7d6fc238eb29bb1b912230"
   },
@@ -5314,7 +4965,7 @@
    "inputHash": "105c235a7d4799c04e7b861bebeb12b7ce7139cbfcf5484df10ea73577e50812",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "1ebf18d5a0d0fd357428fe92e4fa89d6ee2af97deb7d6fc238eb29bb1b912230"
   },
@@ -5404,7 +5055,7 @@
    "inputHash": "2c1090e0919b4c944f46f5968c60c4c3612598dda715802d4b2e080181a3e32c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "1ebf18d5a0d0fd357428fe92e4fa89d6ee2af97deb7d6fc238eb29bb1b912230"
   },
@@ -5501,7 +5152,7 @@
    "inputHash": "e46249932ce713e29141eb8d2f0c0e4073e84bbe79b6252a9e1e3c8f26a3b7e9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "1ebf18d5a0d0fd357428fe92e4fa89d6ee2af97deb7d6fc238eb29bb1b912230"
   },
@@ -5975,7 +5626,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "sources": [
     "evtermine"

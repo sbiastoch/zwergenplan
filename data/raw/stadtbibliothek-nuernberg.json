@@ -82,7 +82,7 @@
    "inputHash": "340697a2cc931cfe297d1aebda10ef695ad9fc9f914877f7a6f8b11f8c67b271",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "1538a1345b41710bc1066230a7f9c5a9558ac1723ac8ad5efa4afbc498136360"
   },
@@ -92,11 +92,10 @@
      "providerId": "stadtbibliothek-nuernberg",
      "venueId": "stadtbibliothek-nuernberg-stadtbibliothek-langwasser",
      "title": "Bücherzwerge Langwasser (12–36 Monate)",
-     "summary": "Einmal im Monat erkunden Kinder mit Begleitperson die Bibliothek: Singen, Reime, Vorlesen und Bilderbücher, dazu Tipps zum Vorlesen. Anmeldung telefonisch oder per E-Mail.",
+     "summary": "Einmal im Monat Lieder, Reime und Vorlesen in der Bibliothek für Kinder von 12 bis 36 Monaten mit Begleitperson, danach Austausch. Anmeldung erforderlich; keine Platzanzeige.",
      "topics": [
-      "bibliothek",
       "vorlesen",
-      "singen"
+      "bibliothek"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -110,20 +109,15 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anmeldung telefonisch unter 0911/231-4157 oder per E-Mail bei der Stadtbibliothek Langwasser."
+      "note": "Keine Platzangabe; Anmeldung telefonisch oder per E-Mail bei der Stadtbibliothek Langwasser (0911/231-4157)"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-19T10:00",
-        "end": "2026-11-19T11:00"
-       },
-       {
-        "start": "2026-12-17T10:00",
-        "end": "2026-12-17T11:00"
-       }
-      ]
+      "kind": "monthly",
+      "nth": 3,
+      "weekday": "TH",
+      "start": "10:00",
+      "from": "2026-11-19",
+      "skipHolidays": false
      },
      "via": "stadt-vk"
     }
@@ -132,14 +126,14 @@
    "dated": {
     "2026-11-13": "220733e49472bc018079d133e42d1df8b54e24d5ea3cda3437823cfa65e22581",
     "2026-11-19": "e21772940a916b8969f1f258f9a6b325cbb8cd9ceb6e854c863ec7b21ac42107",
-    "2026-11-27": "016af92905712802ddfe0b582cf69616d49f908105a330a645a03ef9bb37b763",
+    "2026-11-27": "7240306ac6e6df0584c5099564c833e471775106de292167db818376c114ee94",
     "2026-12-11": "a81798179ca7a19d3447f387b34da20fea6df8a25e43436296b9b3c218162ec1",
     "2026-12-17": "87a47ff89e56c9a3406d5d569cc7c4c570954cc4f3432a4a70e9bec0a2aa967b"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "sources": [
     "stadt-vk"
    ],

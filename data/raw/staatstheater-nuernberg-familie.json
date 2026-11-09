@@ -70,7 +70,7 @@
    "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "pending": {
-    "inputHash": "a11d4504b81e311dce9d74645f6d13b55a9df4336b3a1c01595cf5d232321f48",
+    "inputHash": "82861a3bd289a0a6caa303f55bcaea3d70df43b6c629f925d313440ded99360f",
     "model": "haiku",
     "events": []
    },
@@ -92,7 +92,7 @@
    "inputHash": "7dcc184d1f1ccb0b91366c74e36f25c629d9ebc5806d33601a10c4342b1da14f",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "0f480c78bfd0dba598297cfacf6fb3e4c58ad7d92531c1e477facc8971bdc162"
   },
@@ -100,13 +100,12 @@
    "events": [],
    "inputHash": "93a046dd1890bf7ca280c6a5f6ad2b08fe803b78091f232d076d4c09f80280ac",
    "dated": {
-    "2026-11-08": "ad3bb2213a2bda61104a48ebca64b4e7fe7c5764986bc5fb5f73b1168f8a4872",
     "2026-11-12": "caafe0995cb97cc084036745ec23c3d255d22559179f9016f589d6b5ceb6dde6",
     "2026-11-14": "df67257b841cbf0a2ff5a619c96501eddd2927fe9606ae41aeb9fbd52b0055de"
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "sources": [
     "stadt-vk"

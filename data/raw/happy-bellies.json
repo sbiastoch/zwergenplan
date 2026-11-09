@@ -6,7 +6,7 @@
    "inputHash": "bf49e53e8c65f94cdecaa623e1e7c594ba2b8f58e353dc94feda055c03307aa7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "1c3aa02b352a530eb76ac28d9a74f4c53f56b36d84a4bc30b22859bb2ffc9d23"
   },
@@ -15,8 +15,8 @@
     {
      "providerId": "happy-bellies",
      "venueId": "happy-bellies",
-     "title": "Rückbildung-Basiskurs Montag 11:30 (laufend)",
-     "summary": "Rückbildungskurs mit Baby als Präventionskurs nach § 20 SGB. Bei regelmäßiger Teilnahme bezuschusst die Krankenkasse. Laufender Kurs, Anmeldung und Fragen per E-Mail.",
+     "title": "Rückbildung mit Baby, Basiskurs Mo 11:30 (Start 21.09.2026)",
+     "summary": "Rückbildungskurs mit Baby, zertifizierter Präventionskurs nach § 20 SGB; die Krankenkasse bezuschusst bei regelmäßiger Teilnahme. Der Kurs läuft bereits, die Termine bis 30.11.2026 stehen fest. Anfragen und Anmeldung per E-Mail.",
      "topics": [
       "rueckbildung"
      ],
@@ -28,11 +28,35 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung per E-Mail, keine Platzangabe"
+      "note": "Keine Platzanzeige; Anmeldung per E-Mail an die Kursleitung"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-21T11:30",
+        "end": "2026-09-21T12:30"
+       },
+       {
+        "start": "2026-09-28T11:30",
+        "end": "2026-09-28T12:30"
+       },
+       {
+        "start": "2026-10-05T11:30",
+        "end": "2026-10-05T12:30"
+       },
+       {
+        "start": "2026-10-12T11:30",
+        "end": "2026-10-12T12:30"
+       },
+       {
+        "start": "2026-10-19T11:30",
+        "end": "2026-10-19T12:30"
+       },
+       {
+        "start": "2026-10-26T11:30",
+        "end": "2026-10-26T12:30"
+       },
        {
         "start": "2026-11-09T11:30",
         "end": "2026-11-09T12:30"
@@ -55,8 +79,8 @@
     {
      "providerId": "happy-bellies",
      "venueId": "happy-bellies",
-     "title": "Rückbildung-Basiskurs Di/Fr 10:30",
-     "summary": "Rückbildungskurs mit Baby als Präventionskurs nach § 20 SGB, bei regelmäßiger Teilnahme bezuschusst von der Krankenkasse. Kurs läuft; Anmeldung per E-Mail.",
+     "title": "Rückbildung mit Baby, Basiskurs Di/Fr 10:30 (Start 30.10.2026)",
+     "summary": "Rückbildungskurs mit Baby, zertifizierter Präventionskurs nach § 20 SGB; die Krankenkasse bezuschusst bei regelmäßiger Teilnahme. Zehn Termine, acht dienstags und zwei freitags. Anfragen und Anmeldung per E-Mail.",
      "topics": [
       "rueckbildung"
      ],
@@ -68,11 +92,19 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung per E-Mail, keine Platzangabe"
+      "note": "Keine Platzanzeige; Anmeldung per E-Mail an die Kursleitung"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-10-20T10:30",
+        "end": "2026-10-20T11:30"
+       },
+       {
+        "start": "2026-10-27T10:30",
+        "end": "2026-10-27T11:30"
+       },
        {
         "start": "2026-11-10T10:30",
         "end": "2026-11-10T11:30"
@@ -111,8 +143,8 @@
     {
      "providerId": "happy-bellies",
      "venueId": "happy-bellies",
-     "title": "Rückbildung-Basiskurs Mo/Mi (ab 30.11.)",
-     "summary": "Rückbildungskurs mit Baby als Präventionskurs nach § 20 SGB, bei regelmäßiger Teilnahme bezuschusst von der Krankenkasse. Montags 10–11 Uhr, mittwochs 9:15–10:15 Uhr. Anmeldung per E-Mail.",
+     "title": "Rückbildung mit Baby, Basiskurs Mo/Mi (Start 30.11.2026)",
+     "summary": "Rückbildungskurs mit Baby, zertifizierter Präventionskurs nach § 20 SGB; die Krankenkasse bezuschusst bei regelmäßiger Teilnahme. Vier Termine montags 10–11 Uhr, sechs mittwochs 9:15–10:15 Uhr. Anfragen und Anmeldung per E-Mail.",
      "topics": [
       "rueckbildung"
      ],
@@ -124,7 +156,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung per E-Mail, keine Platzangabe"
+      "note": "Keine Platzanzeige; Anmeldung per E-Mail an die Kursleitung"
      },
      "schedule": {
       "kind": "dates",
@@ -171,13 +203,73 @@
        }
       ]
      }
+    },
+    {
+     "providerId": "happy-bellies",
+     "venueId": "happy-bellies",
+     "title": "Rückbildung mit Baby, Basiskurs Di/Do 10:30 (Start 12.01.2027)",
+     "summary": "Rückbildungskurs mit Baby, zertifizierter Präventionskurs nach § 20 SGB; die Krankenkasse bezuschusst bei regelmäßiger Teilnahme. Acht dienstags und zwei donnerstags, jeweils 10:30–11:30 Uhr. Anfragen und Anmeldung per E-Mail.",
+     "topics": [
+      "rueckbildung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.happy-bellies.de/kopie-von-laufamholz",
+     "sourceUrl": "https://www.happy-bellies.de/kopie-von-laufamholz",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige; Anmeldung per E-Mail an die Kursleitung"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-12T10:30",
+        "end": "2027-01-12T11:30"
+       },
+       {
+        "start": "2027-01-19T10:30",
+        "end": "2027-01-19T11:30"
+       },
+       {
+        "start": "2027-01-21T10:30",
+        "end": "2027-01-21T11:30"
+       },
+       {
+        "start": "2027-01-26T10:30",
+        "end": "2027-01-26T11:30"
+       },
+       {
+        "start": "2027-02-02T10:30",
+        "end": "2027-02-02T11:30"
+       },
+       {
+        "start": "2027-02-16T10:30",
+        "end": "2027-02-16T11:30"
+       },
+       {
+        "start": "2027-02-18T10:30",
+        "end": "2027-02-18T11:30"
+       },
+       {
+        "start": "2027-02-23T10:30",
+        "end": "2027-02-23T11:30"
+       },
+       {
+        "start": "2027-03-09T10:30",
+        "end": "2027-03-09T11:30"
+       }
+      ]
+     }
     }
    ],
-   "inputHash": "8e1a7b017bd5847d0ff6e33e658eedfbbdc1d44bcce49b8e6dd2de55dc3a38f6",
+   "inputHash": "0ffc5b73b9596af6be41679996cd2a5e7f815acdf7ed6563a9294e7586a78aec",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
-   "changedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "1c3aa02b352a530eb76ac28d9a74f4c53f56b36d84a4bc30b22859bb2ffc9d23"
   },
   "seite:https://www.happy-bellies.de/kopie-von-m%C3%B6geldorf": {
@@ -251,7 +343,7 @@
    "inputHash": "37460ff062db21358a6b5c3a4047288ca5d14a3b343edfb0cecbe2d73ceb2c05",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "1c3aa02b352a530eb76ac28d9a74f4c53f56b36d84a4bc30b22859bb2ffc9d23"
   }
