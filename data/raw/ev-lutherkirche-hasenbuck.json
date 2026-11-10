@@ -63,7 +63,6 @@
    ],
    "inputHash": "a0108ccb4f8fe493aff87dbcab8df70cdbb41277343519898856532532a985f6",
    "dated": {
-    "2026-11-09": "b4bd4c04855669a292c89976738289b98e4a9a2c02e93b52f5a528f03b909dcc",
     "2026-11-10": "ecc745a30b5dd58f67deb32c73f13d24219e0bfc19a6523ae4788fb59d5edcbf",
     "2026-11-11": "afbe9703fa69a436ebcd4139d3598397a5cb8a068b2b3b283ad0f885d57ee11d",
     "2026-11-12": "bac796ae5cf211accc195ff8e32ecc92718d573e6d934db9a342a8e06caae325",
@@ -113,7 +112,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "4997115d57eea8441ea456e2b3761ec206a77bdc46a1b3ec23688c24be8d9b27"
   },
@@ -183,7 +182,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "sources": [
     "evtermine"

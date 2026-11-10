@@ -2,13 +2,118 @@
  "version": 2,
  "units": {
   "seite:https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/": {
-   "events": [],
-   "inputHash": "33a1a769fe507f3d3f37a7d5168fc2bf452922a67c50001c0f77d130427f9b37",
+   "events": [
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "PEKiP Do, Babys geb. Mai–Juli 2026 (6–9 Mon.)",
+     "summary": "PEKiP-Kurs mit 8 Terminen: Bewegungs- und Spielanregungen, Einzelberatung und Austausch unter den Eltern. Anmeldung über das Buchungsformular des Partneranbieters.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "150 €",
+     "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
+     "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 6,
+      "maxMonths": 9
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2027-01-07",
+      "count": 8,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "PEKiP Do, Babys geb. Okt.–Nov. 2026 (3–5 Mon.)",
+     "summary": "PEKiP-Kurs mit 8 Terminen: Bewegungs- und Spielanregungen, Einzelberatung und Austausch unter den Eltern. Anmeldung über das Buchungsformular des Partneranbieters.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "150 €",
+     "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
+     "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 5
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2027-03-04",
+      "count": 8,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "PEKiP Fr, Babys geb. Juli–Aug. 2026 (4–6 Mon.)",
+     "summary": "PEKiP-Kurs mit 8 Terminen: Bewegungs- und Spielanregungen, Einzelberatung und Austausch unter den Eltern. Derzeit ausgebucht.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "150 €",
+     "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
+     "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 4,
+      "maxMonths": 6
+     },
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Als ausgebucht markiert"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2027-01-08",
+      "count": 8,
+      "skipHolidays": false
+     }
+    }
+   ],
+   "inputHash": "5fc27d4cacec380a166c2e5a85489ddbbabc4e646130c321b190f60d45b0abfa",
    "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
-   "changedAt": "2026-11-04T08:55:04+01:00",
-   "emptySince": "2026-11-04T08:55:04+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/musikzauber/": {
@@ -265,7 +370,7 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -274,7 +379,7 @@
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -283,7 +388,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -293,7 +398,7 @@
    "inputHash": "900df567d71314e1bacff9a6a5c555c59cce1159e7a25bf4db63c5676e0063a2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1319,7 +1424,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1328,8 +1433,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "Babymassage + Babyyoga, Di (Nov./Dez. 2026)",
-     "summary": "Sanfte indische Babymassage nach Leboyer, verbunden mit Babyyoga und Achtsamkeit für Eltern, maximal 6 Familien. Externes Partnerangebot; Anmeldung über das Buchungsformular, Platzangabe fehlt.",
+     "title": "Babymassage + Babyyoga (ab 6 Wochen, Do 11:15)",
+     "summary": "Sanfte indische Babymassage mit Babyyoga und Achtsamkeitsübungen für Eltern und Baby, max. 6 Familien. Externer Partner: Buchung über das Formular auf der Seite, Rechnung vom Kursanbieter. Zwei Blöcke à 4 Termine im Februar und März 2027.",
      "topics": [
       "babymassage",
       "yoga-mit-baby"
@@ -1337,7 +1442,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "69 € (4 Termine)",
+     "price": "69 € je Block (4 Termine)",
      "url": "https://studioherzschlag.de/angebot/babymassage/",
      "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
      "category": "babykurse",
@@ -1347,82 +1452,52 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular auf der Seite; keine Platzangabe sichtbar"
+      "note": "Buchung über das Formular auf der Seite; Warteliste oder Einstieg im laufenden Kurs per Anfrage"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-24T09:00",
-        "end": "2026-11-24T10:00"
+        "start": "2027-02-04T11:15",
+        "end": "2027-02-04T12:15"
        },
        {
-        "start": "2026-12-01T09:00",
-        "end": "2026-12-01T10:00"
+        "start": "2027-02-11T11:15",
+        "end": "2027-02-11T12:15"
        },
        {
-        "start": "2026-12-08T09:00",
-        "end": "2026-12-08T10:00"
+        "start": "2027-02-18T11:15",
+        "end": "2027-02-18T12:15"
        },
        {
-        "start": "2026-12-15T09:00",
-        "end": "2026-12-15T10:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "Babymassage + Babyyoga, Do (Jan. 2027)",
-     "summary": "Sanfte indische Babymassage nach Leboyer, verbunden mit Babyyoga und Achtsamkeit für Eltern, maximal 6 Familien. Externes Partnerangebot; Anmeldung über das Buchungsformular, Platzangabe fehlt.",
-     "topics": [
-      "babymassage",
-      "yoga-mit-baby"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "69 € (4 Termine)",
-     "url": "https://studioherzschlag.de/angebot/babymassage/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 1,
-      "maxMonths": 4
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular auf der Seite; keine Platzangabe sichtbar"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-07T11:15",
-        "end": "2027-01-07T12:15"
+        "start": "2027-02-25T11:15",
+        "end": "2027-02-25T12:15"
        },
        {
-        "start": "2027-01-14T11:15",
-        "end": "2027-01-14T12:15"
+        "start": "2027-03-04T11:15",
+        "end": "2027-03-04T12:15"
        },
        {
-        "start": "2027-01-21T11:15",
-        "end": "2027-01-21T12:15"
+        "start": "2027-03-11T11:15",
+        "end": "2027-03-11T12:15"
        },
        {
-        "start": "2027-01-28T11:15",
-        "end": "2027-01-28T12:15"
+        "start": "2027-03-18T11:15",
+        "end": "2027-03-18T12:15"
+       },
+       {
+        "start": "2027-03-25T11:15",
+        "end": "2027-03-25T12:15"
        }
       ]
      }
     }
    ],
-   "inputHash": "182f5e8c92924c0f3f891a99af8832afeb5bbdb10d67d4c4c2897e8a51a14d06",
+   "inputHash": "1c9ab4463d6fa4b5ab00b398006e4a1905c709b3da0e15b4a34fc0885419130e",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
-   "changedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsnest/": {
@@ -1617,16 +1692,16 @@
    "inputHash": "8a304dc74387c52391db6fb24b95881145968883cf75d8789008f271a9122a29",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/herzzeit/": {
    "events": [],
-   "inputHash": "ddc2ff0c9e1b06f4820937152dca1a5122118ad5614ec2c5d79b8adfdd2b27b2",
+   "inputHash": "8ca878b9c4885e79ea62951dfb15b34715fb7ad0d26e54374353e6861ff74b00",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1634,17 +1709,21 @@
    "events": [],
    "inputHash": "f11960d934dbc9141e6371897c7dd9e5cf6594a83b7ce0f351f22058ad41630c",
    "model": "haiku",
-   "status": "keine-termine",
+   "status": "fehler",
+   "reason": "https://studioherzschlag.de/angebot/yoga-mit-baby/: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
    "checkedAt": "2026-11-09T09:33:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
+   "failingSince": "2026-11-10T09:46:47+01:00",
+   "klasse": "voruebergehend",
+   "klasseSince": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/pilates-fitness-mit-baby/": {
    "events": [],
-   "inputHash": "80b39740a310825f35df2a7fe77091811cd2a98f0c9aa32e45bdd7ea767bfdb7",
+   "inputHash": "16ae556dd86abd4877e20bfd313481286b6bbcf2b4ab42e30476e082b5e3a10d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1653,8 +1732,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag-outdoor-fitness-mit-baby",
-     "title": "Outdoor-Fitness mit Baby: Anfänger (Di 10:00)",
-     "summary": "Ausdauer-, Kraft- und Beweglichkeitstraining draußen am Wöhrder See, Baby im Kinderwagen oder in der Trage. Externer Partneranbieter; Einstieg jederzeit möglich, Buchung über das Formular der Seite.",
+     "title": "Outdoor Fitness mit Baby – Anfänger (Di 10:00)",
+     "summary": "Draußen am Wöhrder See: Ausdauer-, Kraft- und Beweglichkeitstraining für Mütter, das Baby kommt im Kinderwagen oder in der Trage mit. Angebot eines externen Partners; Buchung über das Formular, Einstieg jederzeit möglich.",
      "topics": [
       "fitness-mit-baby",
       "bewegung"
@@ -1667,7 +1746,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Buchung über das Formular auf der Seite"
+      "note": "Buchung über das Formular auf der Seite; Einstieg jederzeit möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -1676,15 +1755,15 @@
       ],
       "start": "10:00",
       "end": "11:00",
-      "from": "2026-11-03",
-      "skipHolidays": false
+      "from": "2026-11-10",
+      "skipHolidays": true
      }
     },
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag-outdoor-fitness-mit-baby",
-     "title": "Outdoor-Fitness mit Baby: Fortgeschritten (Di 15:00)",
-     "summary": "Fortgeschrittenengruppe mit Ausdauer- und Krafttraining an der frischen Luft am Wöhrder See, Baby im Kinderwagen oder in der Trage. Externer Partneranbieter; Einstieg jederzeit möglich, Buchung über das Formular der Seite.",
+     "title": "Outdoor Fitness mit Baby – Fortgeschritten (Di 15:00)",
+     "summary": "Draußen am Wöhrder See: Kraft-, Cardio- und Beweglichkeitstraining für Mütter, das Baby kommt im Kinderwagen oder in der Trage mit. Angebot eines externen Partners; Buchung über das Formular, Einstieg jederzeit möglich.",
      "topics": [
       "fitness-mit-baby",
       "bewegung"
@@ -1697,7 +1776,7 @@
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Buchung über das Formular auf der Seite"
+      "note": "Buchung über das Formular auf der Seite; Einstieg jederzeit möglich"
      },
      "schedule": {
       "kind": "weekly",
@@ -1706,16 +1785,16 @@
       ],
       "start": "15:00",
       "end": "16:00",
-      "from": "2026-11-03",
-      "skipHolidays": false
+      "from": "2026-11-10",
+      "skipHolidays": true
      }
     }
    ],
-   "inputHash": "7bcf82b9d01a8b7d3ef4c7337b1162fe6ee3ccfde74094c32c83744434accab2",
+   "inputHash": "773e1817698e64e4ffe0dd78a8030e6199004083d33567e81d00d7ad26e4e744",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/": {
@@ -1723,7 +1802,7 @@
    "inputHash": "e999bd760da1da0c8e72c75a7b4adc065ff5aa9954cbc9dd5fbb293c613446c2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1732,7 +1811,7 @@
    "inputHash": "cbaa9cd43ca446c411dfae3a96fc07ce634c7160347d0094047fc9d5e5f6b62d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1779,7 +1858,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"

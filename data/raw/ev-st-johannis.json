@@ -155,7 +155,7 @@
    "inputHash": "b25733857f81f77d5315cb6c70ff3ea953768aa22b722ad398a64d8818b4eacc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
@@ -164,51 +164,16 @@
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Eltern-Kind-Gruppe Do. Vormittag (Säuglinge & Kleinkinder)",
-     "summary": "Spielen und Austausch für Eltern mit Säuglingen und Kleinkindern, donnerstags 9:30–11:30 Uhr im TabeaHaus. Anmeldung und Kosten laut Kalender nicht angegeben.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8126122.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=583",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe im Kalender; bei der Gemeinde nachfragen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "interval": 1,
-      "start": "09:30",
-      "end": "11:30",
-      "from": "2026-10-29",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "ev-st-johannis",
-     "venueId": "ev-st-johannis",
-     "title": "Mutter-Kind-Gruppe Mi. Nachmittag (Kinder 1–3 Jahre)",
-     "summary": "Krabbelgruppe zum Kennenlernen und Austausch unter Eltern, mittwochs 14:30–17:00 Uhr im TabeaHaus. Anmeldung und Kosten laut Kalender nicht angegeben.",
+     "title": "Mutter-Kind-Gruppe für Kinder von 1 bis 3 Jahren (mittwochs)",
+     "summary": "Krabbelgruppe zum Kennenlernen und Austausch für Mütter und Kinder, mittwochs 14:30–17:00 im TabeaHaus. Keine Platzangabe im Termineintrag, Auskunft bei der Gemeinde.",
      "topics": [
       "krabbelgruppe",
-      "elterntreff"
+      "muetter"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8125920.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8125921.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=583",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -217,42 +182,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe im Kalender; bei der Gemeinde nachfragen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "interval": 1,
-      "start": "14:30",
-      "end": "17:00",
-      "from": "2026-11-04",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "ev-st-johannis",
-     "venueId": "ev-st-johannis",
-     "title": "Mutter-Kind-Gruppe für Kinder von 1–3 Jahren (mittwochs)",
-     "summary": "Treff zum Kennenlernen und Austausch über verschiedene Themen für Eltern mit Kindern von 1 bis 3 Jahren, mittwochs im TabeaHaus. Die Quelle nennt keine Anmeldung und keine Kosten.",
-     "topics": [
-      "krabbelgruppe",
-      "eltern-kind-gruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8125924.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=583",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe in der Terminquelle"
+      "note": "Keine Platzangabe im Termineintrag; Auskunft bei der Gemeinde"
      },
      "schedule": {
       "kind": "weekly",
@@ -261,7 +191,7 @@
       ],
       "start": "14:30",
       "end": "17:00",
-      "from": "2026-12-02",
+      "from": "2026-11-11",
       "skipHolidays": true
      }
     },
@@ -269,24 +199,20 @@
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
      "title": "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder (donnerstags)",
-     "summary": "Spielen und Austausch für Eltern mit Säuglingen und Kleinkindern, donnerstags vormittags im TabeaHaus. Die Quelle nennt keine Anmeldung und keine Kosten.",
+     "summary": "Gemeinsames Spielen und Austausch für Eltern mit Säuglingen und Kleinkindern, donnerstags 09:30–11:30 im TabeaHaus. Keine Platzangabe im Termineintrag, Auskunft bei der Gemeinde.",
      "topics": [
       "eltern-kind-gruppe",
-      "krabbelgruppe"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8126127.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8126124.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=583",
      "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Terminquelle"
+      "note": "Keine Platzangabe im Termineintrag; Auskunft bei der Gemeinde"
      },
      "schedule": {
       "kind": "weekly",
@@ -295,27 +221,72 @@
       ],
       "start": "09:30",
       "end": "11:30",
-      "from": "2026-12-03",
+      "from": "2026-11-12",
       "skipHolidays": true
      }
     },
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Kirche Kunterbunt Mini (Krabbelgottesdienst)",
-     "summary": "Gottesdienst für die Kleinsten im TabeaHaus. Altersangabe und Begleitung durch die Eltern nennt die Quelle nicht.",
+     "title": "Mutter-Kind-Gruppe für Kinder von 1–3 Jahren",
+     "summary": "Offene Krabbelgruppe im TabeaHaus zum Kennenlernen und Austausch unter Eltern, mit wechselnden Themen. Termine im Dezember 2026; im Kalender steht keine Platzangabe.",
+     "topics": [
+      "krabbelgruppe",
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8125925.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=583",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe im Kalender; bei der Gemeinde nachfragen"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-09T14:30",
+        "end": "2026-12-09T17:00"
+       },
+       {
+        "start": "2026-12-16T14:30",
+        "end": "2026-12-16T17:00"
+       },
+       {
+        "start": "2026-12-23T14:30",
+        "end": "2026-12-23T17:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "ev-st-johannis",
+     "venueId": "ev-st-johannis",
+     "title": "Kirche Kunterbunt Mini – Gottesdienst für die Kleinsten",
+     "summary": "Kurzer Gottesdienst für kleine Kinder mit ihren Begleitpersonen im TabeaHaus. Einzeltermin am 20. Dezember 2026; keine Platzangabe im Kalender.",
      "topics": [
       "krabbelgottesdienst"
      ],
-     "format": "regelmaessig",
+     "format": "einmalig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8169166.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=583",
      "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung in der Terminquelle"
+      "note": "Keine Platzangabe im Kalender"
      },
      "schedule": {
       "kind": "dates",
@@ -330,8 +301,7 @@
    ],
    "inputHash": "4db80008ccb6d7489adb771a1cd005a997de3b2c66fce9bbc3b1ffd291e3db4a",
    "dated": {
-    "2026-11-09": "f6266b7190345d7f345f277e867115b0b548c440faf07ed39705164aaaf037c5",
-    "2026-11-10": "673f5e339576dd7199935d1a0045043bf87f3571c44f0c9de3508315921f3d13",
+    "2026-11-10": "ac3bab5f9f4f2d3eb471b3aa5955cd302b71306f5c9a919b53249fff328c8418",
     "2026-11-11": "9076efb7c5c93b538b32fe0dc2c775476c513a1260faec1c45c175ea25f5e3b4",
     "2026-11-12": "1207ed415539f50c76416ddea379bfc09ba64a53111b763f7874916175e8a74c",
     "2026-11-13": "e7a5459e2ecfe4bb50bc713fc0d06190994d5e47aa2dd5373dd4d18669c4602f",
@@ -385,8 +355,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
   "kandidaten": {
@@ -521,7 +491,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "sources": [
     "evtermine"

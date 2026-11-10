@@ -6,41 +6,42 @@
     {
      "providerId": "babykonzert-nuernberg",
      "venueId": "babykonzert-nuernberg",
-     "title": "Babykonzert im Marmorsaal: So 08.11. um 11 und 13 Uhr",
-     "summary": "Klassisches Konzert für Babys und Kleinkinder im Marmorsaal des Presseclubs. Der Termin um 11 Uhr ist ausverkauft, um 13 Uhr gibt es ein Zusatzkonzert. Babys und Kinder zahlen keinen Eintritt; Gutscheingäste reservieren vorab per E-Mail.",
+     "title": "Weihnachts-Babykonzert: Live-Klassik auf der Krabbeldecke",
+     "summary": "Weihnachtliche Live-Klassik mit Musikern, speziell für Babys: Eltern und Kinder hören gemeinsam zu. Babys und Kinder zahlen keinen Eintritt. Gutscheingäste bitte vorher per Mail reservieren.",
      "topics": [
-      "konzert"
+      "konzert",
+      "musik"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "Babys und Kinder frei",
+     "price": "Babys und Kinder frei, Erwachsene zahlen Eintritt (Preis nicht angegeben)",
      "url": "https://babykonzert.de/home/nuernberg/",
      "sourceUrl": "https://babykonzert.de/home/nuernberg/",
      "category": "buehne",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "11 Uhr ausverkauft. Für 13 Uhr Verfügbarkeit auf der Ticketseite (Eventim Light) prüfen. Gutscheingäste bitte vorher per E-Mail an saskia.duerr@babykonzert.de Plätze reservieren."
+      "note": "Tickets über Eventim Light; die Seite zeigt den Stand nicht an. Gutscheingäste per Mail an saskia.duerr@babykonzert.de reservieren."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-08T11:00"
-       },
-       {
-        "start": "2026-11-08T13:00"
+        "start": "2026-12-13T11:00"
        }
       ]
      }
     }
    ],
-   "inputHash": "694573ddf73be28841d12778ede3bd1dcc4674cf77efb09db50e321d7f8e4d7b",
+   "inputHash": "48d066744b012f01238a7316bbc11192c7275af113b85d098a038cec6119d086",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
-   "emptySince": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "8abd2e55503a2b34a97db6ffb15b33b62b86a626e4b1b07e6f24d61ad1794298"
   }
  }

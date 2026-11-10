@@ -6,8 +6,8 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen (1½–2½ Jahre), Mittwoch 17:00",
-     "summary": "Wöchentlich neu aufgebauter Parcours zum freien Turnen mit Ball, Reifen und Seil. Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursnummer 16301.",
+     "title": "Eltern-Kind-Turnen 1½–2½ J. (Mi, 17 Uhr)",
+     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursende steht auf der Seite nicht, Termine ab 11.11.2026 sind angenommen.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite. Anmeldung über die vhs-Kursdetails (Kursnummer 16301)."
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über die vhs-Kursbuchung (Kursnummer 16301)."
      },
      "schedule": {
       "kind": "weekly",
@@ -34,14 +34,14 @@
       ],
       "start": "17:00",
       "from": "2026-11-11",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen (2–3 Jahre), Donnerstag 17:00",
-     "summary": "Wöchentlich neu aufgebauter Parcours zum freien Turnen mit Ball, Reifen und Seil. Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursnummer 16303.",
+     "title": "Eltern-Kind-Turnen 2–3 J. (Do, 17 Uhr)",
+     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursende steht auf der Seite nicht, Termine ab 12.11.2026 sind angenommen.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -59,7 +59,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite. Anmeldung über die vhs-Kursdetails (Kursnummer 16303)."
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über die vhs-Kursbuchung (Kursnummer 16303)."
      },
      "schedule": {
       "kind": "weekly",
@@ -68,15 +68,15 @@
       ],
       "start": "17:00",
       "from": "2026-11-12",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "2d366a0120240b59a330a727a011a5f911c09d43d6f709c074433a97ce2bc722",
+   "inputHash": "e6d8577c92bfc503291a4790021c79519a88beec53fffef0db774f35012393af",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }

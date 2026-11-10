@@ -6,8 +6,8 @@
     {
      "providerId": "schwimmschule-baer-ritterbad",
      "venueId": "schwimmschule-baer-ritterbad",
-     "title": "Babyschwimmen Montag 11:10 Uhr (Ritterbad)",
-     "summary": "Babyschwimmen im Ritterbad, montags 11:10 bis 11:40 Uhr. Anmeldung nur über das Anfrageformular der Website; eine Platzanzeige gibt es nicht, lange Wartezeiten laut Anbieter.",
+     "title": "Babyschwimmen im Ritterbad, montags 11:10–11:40",
+     "summary": "Babyschwimmen mit Eltern im Ritterbad, montags 11:10 bis 11:40 Uhr. Anmeldung nur über das Anfrageformular der Schwimmschule; Plätze werden nicht angezeigt, die Wartezeiten sind laut Anbieter lang.",
      "topics": [
       "babyschwimmen"
      ],
@@ -23,7 +23,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe. Anfrage über den „Anfragen“-Button (Kontaktformular mit vorbelegtem Termin); laut Website sind die Wartelisten lang."
+      "note": "Keine Platzanzeige. Über den Button „Anfragen“ (Kontaktformular mit vorbelegtem Termin) anfragen; Mehrfachanfragen sind laut Anbieter unerwünscht."
      },
      "schedule": {
       "kind": "weekly",
@@ -32,16 +32,16 @@
       ],
       "start": "11:10",
       "end": "11:40",
-      "from": "2026-11-09",
-      "skipHolidays": false
+      "from": "2026-11-16",
+      "skipHolidays": true
      }
     }
    ],
-   "inputHash": "d4af17139ba3a5fd4ee810843664f2885c6972484f9f8a49971b42698ab83e35",
+   "inputHash": "c6a3b70b63723fd1390c3a56dead531c17bba4e86b9baaeafcc252ceb729b1de",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
-   "changedAt": "2026-11-06T09:24:07+01:00",
+   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "1234f35077d7fecde34482cb9db6618c9f1531138f68c66ed5056b806c5c2a8d"
   }
  }
