@@ -6,15 +6,15 @@
     {
      "providerId": "hebamme-elena-paulus",
      "venueId": "hebamme-elena-paulus",
-     "title": "Babymassage (4 Wochen bis 6 Monate)",
-     "summary": "Sanfte Massage für Babys ab etwa 4 Wochen bis 6 Monate, stärkt die Bindung und sorgt für Entspannung. Dienstags 9:00–9:45 Uhr in der Hartstraße 20. Der Kurs 24.11.–22.12.2026 ist ausgebucht; der nächste Kurs ist voraussichtlich ab Februar 2027 geplant.",
+     "title": "Babymassage (4 Wochen bis 6 Monate, dienstags, Nov./Dez. 2026)",
+     "summary": "Sanfte Massage und Bindungsförderung für Babys ab 4 Wochen bis 6 Monate, fünf Dienstagstermine von 9:00 bis 9:45 Uhr in der Hartstraße. Der Kurs ist ausgebucht; der nächste Kurs ist voraussichtlich ab Februar 2027 geplant, ein fester Termin steht noch nicht fest.",
      "topics": [
       "babymassage"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "65 € (inkl. Skript)",
+     "price": "65 Euro (inkl. Skript)",
      "url": "https://www.elena-paulus.de/kurse",
      "sourceUrl": "https://www.elena-paulus.de/kurse",
      "category": "babykurse",
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs 24.11.–22.12.2026 ausgebucht; nächster Kurs voraussichtlich Februar 2027"
+      "note": "Kurs 24.11.–22.12.2026 ausgebucht"
      },
      "schedule": {
       "kind": "dates",
@@ -53,11 +53,11 @@
      }
     }
    ],
-   "inputHash": "7194c0774761c995f2f6459f8e4e615bf3b2b9b05259ee7c3e4b339bae772874",
+   "inputHash": "7f6d5715c30f5688ad21655732fb7148dbc3363e9b9cc74ad99cfd4196d6b807",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "bb9d6fde7e81c173cbc00f829ce7d140fffc7ecaefde6f88961af01e5c6d26bb"
   }
  }

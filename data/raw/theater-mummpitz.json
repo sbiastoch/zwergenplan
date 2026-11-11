@@ -6,8 +6,51 @@
     {
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
-     "title": "Jazz für Kinder",
-     "summary": "Jazzkonzert für Kinder ohne Altersgrenze, jeweils sonntags um 11 Uhr. Alle sechs Termine im Spielplan sind ausverkauft.",
+     "title": "Klassik für Kinder (Konzertreihe, ohne Altersgrenze)",
+     "summary": "Klassische Konzerte für Kinder, die Eltern und Kind gemeinsam anschauen. Die Termine im Horizont sind laut Spielplan alle ausverkauft; Tickets über Reservix.",
+     "topics": [
+      "konzert",
+      "musik"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
+     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
+     "category": "buehne",
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Alle gelisteten Termine ausverkauft (Stand Spielplan)"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-29T11:00"
+       },
+       {
+        "start": "2026-12-20T11:00"
+       },
+       {
+        "start": "2027-01-24T11:00"
+       },
+       {
+        "start": "2027-02-21T11:00"
+       },
+       {
+        "start": "2027-03-14T11:00"
+       },
+       {
+        "start": "2027-04-25T11:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "theater-mummpitz",
+     "venueId": "theater-mummpitz",
+     "title": "Jazz für Kinder (Konzertreihe, ohne Altersgrenze)",
+     "summary": "Jazzkonzerte für Kinder, zuschauen mit Eltern und Kind. Die Termine im Horizont sind laut Spielplan alle ausverkauft; Tickets über Reservix.",
      "topics": [
       "konzert",
       "musik"
@@ -20,7 +63,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "alle Termine ausverkauft"
+      "note": "Alle gelisteten Termine ausverkauft (Stand Spielplan)"
      },
      "schedule": {
       "kind": "dates",
@@ -45,240 +88,13 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder: SAX.O.PHON",
-     "summary": "Klassisches Konzert der Reihe „Klassik für Kinder“ ohne Altersgrenze. Der Termin ist ausverkauft.",
-     "topics": [
-      "konzert",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Termin ausverkauft"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-29T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder: Brummen und Summen mit dem Kontrabass",
-     "summary": "Klassisches Konzert der Reihe „Klassik für Kinder“ ohne Altersgrenze. Der Termin ist ausverkauft.",
-     "topics": [
-      "konzert",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Termin ausverkauft"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-20T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder: Die Oboe auf Reisen",
-     "summary": "Klassisches Konzert der Reihe „Klassik für Kinder“ ohne Altersgrenze. Der Termin ist ausverkauft.",
-     "topics": [
-      "konzert",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Termin ausverkauft"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-24T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder: Pfeif drauf! Die Blockflötenfamilie stellt sich vor",
-     "summary": "Klassisches Konzert der Reihe „Klassik für Kinder“ ohne Altersgrenze. Der Termin ist ausverkauft.",
-     "topics": [
-      "konzert",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Termin ausverkauft"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-02-21T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder: Klingende und singende Violine",
-     "summary": "Klassisches Konzert der Reihe „Klassik für Kinder“ ohne Altersgrenze. Der Termin ist ausverkauft.",
-     "topics": [
-      "konzert",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Termin ausverkauft"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-03-14T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder: Vorhang auf für die Überraschung",
-     "summary": "Klassisches Konzert der Reihe „Klassik für Kinder“ ohne Altersgrenze. Der Termin ist ausverkauft.",
-     "topics": [
-      "konzert",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/stuecke/klassik-fuer-kinder-o-a/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Termin ausverkauft"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-04-25T11:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "theater-mummpitz",
-     "venueId": "theater-mummpitz",
-     "title": "Jazz für Räuber oder Gretels grosser Auftritt",
-     "summary": "Jazz-Theaterstück ab 3 Jahren mit mehreren Vorstellungen Mitte bis Ende Februar 2027. Tickets über Reservix, zum Zeitpunkt des Abrufs sind noch Karten verfügbar.",
-     "topics": [
-      "theater",
-      "musik"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.theater-mummpitz.de/spielplan/",
-     "sourceUrl": "https://www.theater-mummpitz.de/spielplan/",
-     "category": "buehne",
-     "age": {
-      "minMonths": 36,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Karten verfügbar; Tickets über Reservix"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-02-17T10:00"
-       },
-       {
-        "start": "2027-02-18T10:00"
-       },
-       {
-        "start": "2027-02-19T10:00"
-       },
-       {
-        "start": "2027-02-19T15:00"
-       },
-       {
-        "start": "2027-02-20T11:00"
-       },
-       {
-        "start": "2027-02-24T10:00"
-       },
-       {
-        "start": "2027-02-25T10:00"
-       },
-       {
-        "start": "2027-02-26T10:00"
-       },
-       {
-        "start": "2027-02-27T11:00"
-       },
-       {
-        "start": "2027-02-28T11:00"
-       }
-      ]
-     }
     }
    ],
-   "inputHash": "cc2c9e85af3a95f7d2379ff30368bd02627dd0d9bb3145fd97604d0cfa8a9d35",
+   "inputHash": "90aaa1a915d7b493d095e1cffa4d4ae8312ec0c8c79c13ed8acc87d0496595b3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "35534a05e45ec78c75433e4af4b6d7dfa3f5816cd79353a2c1c234fa0573313c"
   },
   "seite:https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/": {
@@ -331,7 +147,7 @@
    "inputHash": "73486eeb0d295c1cb347888c4480908255301c6210b6b7f9ce2416245fa423f5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -391,7 +207,7 @@
    "inputHash": "8858f7a5a4afb7e61a764647f548accc0c06fc9ed932c7fafbc933f8a30fc3c9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -410,7 +226,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "frankenkids",

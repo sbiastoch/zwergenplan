@@ -112,7 +112,7 @@
    "inputHash": "5fc27d4cacec380a166c2e5a85489ddbbabc4e646130c321b190f60d45b0abfa",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -370,7 +370,7 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -379,7 +379,7 @@
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -388,7 +388,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -398,7 +398,7 @@
    "inputHash": "900df567d71314e1bacff9a6a5c555c59cce1159e7a25bf4db63c5676e0063a2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1424,7 +1424,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1496,7 +1496,7 @@
    "inputHash": "1c9ab4463d6fa4b5ab00b398006e4a1905c709b3da0e15b4a34fc0885419130e",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1692,7 +1692,7 @@
    "inputHash": "8a304dc74387c52391db6fb24b95881145968883cf75d8789008f271a9122a29",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1701,21 +1701,17 @@
    "inputHash": "8ca878b9c4885e79ea62951dfb15b34715fb7ad0d26e54374353e6861ff74b00",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/yoga-mit-baby/": {
    "events": [],
-   "inputHash": "f11960d934dbc9141e6371897c7dd9e5cf6594a83b7ce0f351f22058ad41630c",
+   "inputHash": "c927391475d9fa136af71f35f999251f9207cf74e32ba10f0d7bbc6f80f344ce",
    "model": "haiku",
-   "status": "fehler",
-   "reason": "https://studioherzschlag.de/angebot/yoga-mit-baby/: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
-   "checkedAt": "2026-11-09T09:33:21+01:00",
+   "status": "keine-termine",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
-   "failingSince": "2026-11-10T09:46:47+01:00",
-   "klasse": "voruebergehend",
-   "klasseSince": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/pilates-fitness-mit-baby/": {
@@ -1723,7 +1719,7 @@
    "inputHash": "16ae556dd86abd4877e20bfd313481286b6bbcf2b4ab42e30476e082b5e3a10d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1793,7 +1789,7 @@
    "inputHash": "773e1817698e64e4ffe0dd78a8030e6199004083d33567e81d00d7ad26e4e744",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1802,7 +1798,7 @@
    "inputHash": "e999bd760da1da0c8e72c75a7b4adc065ff5aa9954cbc9dd5fbb293c613446c2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1811,7 +1807,7 @@
    "inputHash": "cbaa9cd43ca446c411dfae3a96fc07ce634c7160347d0094047fc9d5e5f6b62d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1858,7 +1854,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"

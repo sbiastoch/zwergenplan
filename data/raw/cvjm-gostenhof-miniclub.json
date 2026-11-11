@@ -41,7 +41,7 @@
    "inputHash": "4a186bc1fae5c375b8e1192157a03608e9e83545993dfdd997a5d4cf8dbe555f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "f1ffeccaeeb1caca965d9eb8005c30dba92183ec292df8bacd70319e29fbd01c"
   },
@@ -179,7 +179,6 @@
    ],
    "inputHash": "fea4d2e45168a93803dd204edfa7a651d799184d3d18d2418917a5a3e676bd55",
    "dated": {
-    "2026-11-10": "8172e90160cc7b23bd6e5fc56712c3e5dbae6ebb0bf9be1f96a4dee5ca3cfd3e",
     "2026-11-12": "b93b2a663111d3959972d5f395f1719e16476e234cd54368766b433d5f6c6208",
     "2026-11-13": "0f242011636f5b3b98cb02e0422123a3ab0d7a144d01969645eab722adb50589",
     "2026-11-14": "96c1c34d1fbc06987b261e5fb93902354c94fffb5df594e43423295eed708f9a",
@@ -312,7 +311,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "c25088f3bc444367c5ff4fef08df8eb68bdc3b19e8c10e56c7f87453ed56cbb2"
   },
@@ -321,18 +320,17 @@
     {
      "providerId": "cvjm-gostenhof-miniclub",
      "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club – Kniereiter, Bewegungslieder (18 Monate bis 3 Jahre)",
-     "summary": "Dienstags von 10 bis 11:30 Uhr lernen Eltern und Kinder ab 18 Monaten Kniereiter, Fingerspiele und Bewegungslieder, dazu Freispiel und Kaffee. Nicht in den Schulferien. Auskunft bei Alexandra Gußner.",
+     "title": "Mini-Club – Kniereiter und Bewegungslieder (18 Monate–3 Jahre)",
+     "summary": "Dienstags treffen sich Eltern mit Kindern ab 18 Monaten zu Kniereitern, Fingerspielen und Bewegungsliedern, dazu Freispiel und Zeit für Austausch. Keine Platzanzeige; Kosten und Anmeldung sind in den Quellen nicht genannt, Info bei Alexandra Gußner (0151/56071708).",
      "topics": [
       "eltern-kind-gruppe",
-      "singen",
-      "bewegung"
+      "spielgruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/mini-club-kniereiter-bewegungslieder-3/2026-11-10/",
+     "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 18,
@@ -340,15 +338,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anfrage bei Alexandra Gußner, Tel. 0151/56071708"
+      "note": "Keine Platzanzeige; Info bei Alexandra Gußner, 0151/56071708 oder alexandra.gussner@cvjm-nuernberg-gostenhof.de"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-10T10:00",
-        "end": "2026-11-10T11:30"
-       },
        {
         "start": "2026-11-17T10:00",
         "end": "2026-11-17T11:30"
@@ -455,63 +449,62 @@
        }
       ]
      },
-     "via": "frankenkids"
+     "via": "evtermine"
     }
    ],
    "inputHash": "b2f015530a27b6680925b396c4fac3c2860637aec1c82ce6b3cd7040f08c71ea",
    "dated": {
-    "2026-11-10": "bde60283c11dee3d0ddb7045a3fd3fa8572e70da6cf78e07769c65583ef0f472",
     "2026-11-16": "fcea291188cc25469807d1ed201ee11b41450ea1e9ee66264807de7af754ea96",
-    "2026-11-17": "5591dd0c944ae6c9fc6deba8aa0832840c393e7730e0b310a06e5aebde4c7bb6",
+    "2026-11-17": "a7e9aa671455f41439f242441ab40f504bd82ad5d2193c9104ac93e9eab1516a",
     "2026-11-23": "bbc6cc9234d9f7047dc08d99382fcb2bc5b3850b79a60b06216563c17cc55f25",
-    "2026-11-24": "d367512ba9a26a12992f4d31f4954f89137b19072f519c2cde980d57bfbd9fdf",
+    "2026-11-24": "ab43a7f7cfd2337da4a82e75adfd950e24d24251b3c8f25dac6655ee0198ff5c",
     "2026-11-30": "24f41f0f63378a44c5763b8a063f6508e32bb97122f9efd53b6ba0842216895f",
-    "2026-12-01": "9de1cc334fcac0bbf6607df8ac84c933e211e85cb7439d48ee606836acbba1a5",
+    "2026-12-01": "6ef5b3509d19e87f9eaaeef771aab02611918c0adbc9142d3b35165d74bf6451",
     "2026-12-07": "2db80e8d4cf184f2b4a168ef2f57588ba453b0e8680e9ac85d946e82e386f29d",
-    "2026-12-08": "512f55483fb47769daa5cecc447a6253743e760466cd14171a44677a49778901",
+    "2026-12-08": "7ac866c43b95a394aef750300448a0f0fa34c71cbc9829cc08eb034b36f57c10",
     "2026-12-14": "45845387866e9c636960b37593cc33f4df18e29feeb8f201f129f384b48f44c0",
-    "2026-12-15": "9930e1a2cd105b96206c6ab522a574838365c155b7e37b6edfa46bbbd215312b",
+    "2026-12-15": "552f21a9dbee6a19be79f873ae6e4908fa568d177570c5f3c472e9f8acd3c805",
     "2026-12-21": "ba8140baed79536858ebab44a7bf1fe0c7dfcc08310147dde57f4d463d33afb4",
-    "2026-12-22": "9c506a15e6d2c5b95a9c7608e34cac72426ed29f9685ba6bd07fa225a30119f4",
+    "2026-12-22": "ce620bb692f055053ee06d6b5cb8e8f08bf844e2928e7163161eef16a15eaa94",
     "2027-01-11": "de52096eca29fb12a62c20e1bb39dfbbf0fb678652bbe139e6e85a34c8e46483",
-    "2027-01-12": "179d396ea9ee65511f8286c0cce7d8d6617f39afdd2209b0920f5d26dd4e0fd8",
+    "2027-01-12": "9d1a3eef295ed4b7b9053d11357afa99d1c60f5a281fa0cb89e85e5a39013c4a",
     "2027-01-18": "f186899194753a26f20d26430e6bdcf23997b8d7be3d7dda6321b0d7db12c4f4",
-    "2027-01-19": "f5119758f2fa1df178b64f5259e082fd8b86de7b1164468790eda2bb6efa206a",
+    "2027-01-19": "1d9a56942af80edd537f54ea9f5bfa37c0d4f50d4e11a0e9d512b9f3b7c5b999",
     "2027-01-25": "fbe4e400f6fad438eccdfaf9983560fbbda4f6fd447bf7c50b50a15f96e25753",
-    "2027-01-26": "df21262bc43d5182ace3a4705cc97942636c3f12b01f7ee5c1c0d9fe8d0a4432",
+    "2027-01-26": "71cc88c176540e1a824cd017e53bcf8278f3e61c38c1eb0b3e451b6eff80fd48",
     "2027-02-01": "b4bf18de72b86fc3ce1f166f72598509bebddbf4205950bac5af949a98a6b542",
-    "2027-02-02": "842b8bc6d7b861c8ff54dc5d47ec6b7a5b13ac4b20922bda77844c216d877890",
+    "2027-02-02": "5bd4ba5c3f90c91cd1b01373e04b2da3558aa09c4a5004a00771b39947f8c227",
     "2027-02-15": "7ca12d88611dfec2c69294bdc51923ad059750014b8be39098d3027721e2064c",
-    "2027-02-16": "ded52857a5f4b45f245c4f77824bf97ac274bbbc1d787863304cf651e88aa50f",
+    "2027-02-16": "e3b8c75d530f1d912d1aa6321db8f07cb1897e4f4f4e6a8265abd5239b0b98b8",
     "2027-02-22": "2adfd315c398fa274b23491a9595c0c9988d63f74e3ba36d02d2d2b6bbc2d51c",
-    "2027-02-23": "df56a61b16cf1c2f7580986aafafdf5cc152567012e0b588f6b94344b1204b53",
+    "2027-02-23": "c9c124a724e0332bf640129eae94e41c89bf6b1360b2ee3ea5b2eb0b2a395de6",
     "2027-03-01": "ad70333ea51f867104cc40b1b776e1e423a6923dfbe0330e074f6708d912405c",
-    "2027-03-02": "813aa59e5ba6b7a165ef6969d64cbf295f31b27d1df7b91761dffdb05a1aacdf",
+    "2027-03-02": "f0747d6d32bf7f9472d968702bf31d6aed81bd186ffeb69a136012c670c8f706",
     "2027-03-08": "b4f640700303e10acfe6939d67721864cd9060f139dcc112f3ef7be9cb84b84d",
-    "2027-03-09": "5e3988c476854d981fb260d5bf901f893b469a6a9ba6948194ef09032e9bfcc9",
+    "2027-03-09": "b23405040b51d438b441e8633c94a7cd51ef7629baefcb70e969c9b217dff20a",
     "2027-03-15": "eb577bae0ffc7ae8848be70b4f2020f47e30cae7b11fea5bf550bda43e784fd6",
-    "2027-03-16": "0dc94504b3753ae88cb50a742d62dc462e2d7d3dbc3e5689b704a145211c8220",
+    "2027-03-16": "24dd94a3accd6f480446fd39954a2ef50042b589df88a8c02abc6543a19e633e",
     "2027-04-05": "f40217159c73e71bbed76393e375fd4682e80a157390888cc6416e9228efdcd3",
-    "2027-04-06": "74480980c86ff191d9ca67699abb12fb4f0a8d126fa508d679fb60852425b4f9",
+    "2027-04-06": "f3479328bed7c2dd61d3c1387dca6388744d0430b3f400159ebdd7a6486db5b7",
     "2027-04-12": "82374735e2be5c6e17b717aa9a99fd59b18f1b999a8fabe07fab1f2890f5f7e3",
-    "2027-04-13": "779b5fb86a078ca7c39325da051c983fcda3cbe74843f6db075aa7549318c434",
+    "2027-04-13": "00feeaed898fe02520606619d0427fd0606aba41b85b0bf47ba14366a2f18ec2",
     "2027-04-19": "a503fee5c3ba086c495cec34917c95cc902ff0b345ae97d06d6e1aefb6efed93",
-    "2027-04-20": "23739e9e3b02213161cac69193430a958010004f79c1ecad21d5efd15426ee5f",
+    "2027-04-20": "e56e572747a48a99a275d024bf9d297c665e24c7c4e5abc3ed0514bf155b1b8d",
     "2027-04-26": "d6ba1d9487017e1a5bd2bf4fa4d4d1d3e7d65b1e686afadcdef4978359782c83",
-    "2027-04-27": "3f3b17e3e1f0b516459043786429bc685a6c497a38a5a863cf2717205972d002",
+    "2027-04-27": "dd719a4b4c2b196abfa16b2dd50770c4d15c1326a84b280f6a7c5f94211a5688",
     "2027-05-03": "d3b52dc1e1ea0fe17a34d9f940f0493864946569be65b6fe63c1807e0e7068a5",
-    "2027-05-04": "4dab2838e76a8be021db8c1de741d4345b60a15b91fbd56c43b7df0c8fe5d2e9",
-    "2027-05-11": "950c3f9a29d6578514cc948526bd2341a4668f432166464c95dd57fba7c02951",
-    "2027-06-01": "ace5e46a6960bfe33b13ce648f36ae3b9cae40062bab1c0d63fb77867bf79794",
-    "2027-06-08": "86af04a0e120805159daf2765b419d5638f69657553e3d78c5e10ebc275009e5",
-    "2027-06-15": "bf6d743a64f3774afb8a5b6e7ee3f5156b4dba25f71e8bebb407e166f318dc41",
-    "2027-06-22": "0cb7735bdd28c1a93ac4544541b12de7d5379cfa70e4dad79b2153f646f93968",
-    "2027-06-29": "9189dd00a7c2eb5dffb948f9351c791778fb944cb94d13ecb597ea6aae99890e"
+    "2027-05-04": "20f3bfded0f60eda4e44167f3079e1f2d4bc5316cb74c21808603739e0b0db52",
+    "2027-05-11": "bc53a06d11b8b47c4da02a618c771184b2b01cca9bafaa8124793f987f03cd91",
+    "2027-06-01": "592be05c99ee2784b1e441437a02fc7c9a42f4ea982a95e55ffa2ee1cb4119fd",
+    "2027-06-08": "8f2aafd0804dce16531813e1387515dcbb34d0a29e2e339b6ee50e85fa8e9b33",
+    "2027-06-15": "2f459ae92f4c3ab554abdc8b5ce584a2f7f22c002c940ef4beaf7009eff2c788",
+    "2027-06-22": "e78731ee8bbbc9c0cbe5d6559455cad7d0dbcf70f7f0186061826e905393032e",
+    "2027-06-29": "3b4036e58de220eb5c796decd85ac5880b127a03136a4c7709b2fe9e033e2e42"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "sources": [
     "evtermine",
     "frankenkids"

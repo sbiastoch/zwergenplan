@@ -6,8 +6,8 @@
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Familien-Café (Montag, 15:30–17 Uhr)",
-     "summary": "Offener Treff für Eltern mit Kindern zum gemeinsamen Spielen und Austausch. Ohne Anmeldung; auch Väter und Großeltern sind willkommen.",
+     "title": "Familien-Café (montags, 15:30–17 Uhr)",
+     "summary": "Offener Treff für Eltern, Großeltern und Väter mit Kleinkindern zum gemeinsamen Spielen und Austausch. Keine Anmeldung nötig, Einstieg jederzeit möglich.",
      "topics": [
       "elterncafe",
       "elterntreff"
@@ -20,7 +20,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Einfach vorbeikommen, keine Anmeldung nötig"
+      "note": "Keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -29,19 +29,18 @@
       ],
       "start": "15:30",
       "end": "17:00",
-      "from": "2026-11-02",
+      "from": "2026-11-16",
       "skipHolidays": true
      }
     },
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Mini-FiSche Krabbelgruppe (Dienstag, 9–11 Uhr)",
-     "summary": "Krabbelgruppe für Eltern oder Großeltern mit noch nicht kitapflichtigen Kleinkindern: Spiel und Austausch im Spielzimmer, bei gutem Wetter im Spielgarten. Freie Plätze bitte im Stadtteilhaus erfragen.",
+     "title": "Mini-FiSche Krabbelgruppe Dienstag (9–11 Uhr)",
+     "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Spielen und Austausch im Spielzimmer, bei gutem Wetter im Spielgarten.",
      "topics": [
       "krabbelgruppe",
-      "spielgruppe",
-      "eltern-kind-gruppe"
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -52,7 +51,7 @@
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
+      "note": "Freie Plätze im Stadtteilhaus FiSch erfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -61,19 +60,18 @@
       ],
       "start": "09:00",
       "end": "11:00",
-      "from": "2026-11-03",
+      "from": "2026-11-17",
       "skipHolidays": true
      }
     },
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Mini-FiSche Krabbelgruppe (Mittwoch, 9–11 Uhr)",
-     "summary": "Krabbelgruppe für Eltern oder Großeltern mit noch nicht kitapflichtigen Kleinkindern: Spiel und Austausch im Spielzimmer, bei gutem Wetter im Spielgarten. Freie Plätze bitte im Stadtteilhaus erfragen.",
+     "title": "Mini-FiSche Krabbelgruppe Mittwoch (9–11 Uhr)",
+     "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Spielen und Austausch im Spielzimmer, bei gutem Wetter im Spielgarten.",
      "topics": [
       "krabbelgruppe",
-      "spielgruppe",
-      "eltern-kind-gruppe"
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -84,7 +82,7 @@
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
+      "note": "Freie Plätze im Stadtteilhaus FiSch erfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -93,19 +91,18 @@
       ],
       "start": "09:00",
       "end": "11:00",
-      "from": "2026-11-04",
+      "from": "2026-11-18",
       "skipHolidays": true
      }
     },
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
-     "title": "Mini-FiSche Krabbelgruppe (Freitag, 9–11 Uhr)",
-     "summary": "Krabbelgruppe für Eltern oder Großeltern mit noch nicht kitapflichtigen Kleinkindern: Spiel und Austausch im Spielzimmer, bei gutem Wetter im Spielgarten. Freie Plätze bitte im Stadtteilhaus erfragen.",
+     "title": "Mini-FiSche Krabbelgruppe Freitag (9–11 Uhr)",
+     "summary": "Krabbelgruppe für Eltern oder Großeltern mit ganz kleinen Kindern, die noch nicht in Krippe oder Kita sind. Spielen und Austausch im Spielzimmer, bei gutem Wetter im Spielgarten.",
      "topics": [
       "krabbelgruppe",
-      "spielgruppe",
-      "eltern-kind-gruppe"
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -116,7 +113,7 @@
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Nach freien Plätzen im Stadtteilhaus FiSch fragen"
+      "note": "Freie Plätze im Stadtteilhaus FiSch erfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -125,7 +122,7 @@
       ],
       "start": "09:00",
       "end": "11:00",
-      "from": "2026-11-06",
+      "from": "2026-11-13",
       "skipHolidays": true
      }
     },
@@ -133,10 +130,10 @@
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch",
      "title": "Vater-Kind-Frühstück (Samstag, 9–12 Uhr)",
-     "summary": "Gemeinsames Frühstück und Spielen für Väter mit ihren Kindern im Stadtteilhaus, im Sommer im Garten, sonst im Toberaum. Anmeldung im Stadtteilhaus FiSch.",
+     "summary": "Gemeinsames Frühstücksbuffet und Spielen für Väter mit ihren Kindern. Im Sommer im FiSchgarten, sonst im Toberaum. Anmeldung im Stadtteilhaus nötig.",
      "topics": [
       "vaeter",
-      "elterncafe"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -153,10 +150,6 @@
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-10-31T09:00",
-        "end": "2026-10-31T12:00"
-       },
-       {
         "start": "2026-11-21T09:00",
         "end": "2026-11-21T12:00"
        },
@@ -170,8 +163,8 @@
     {
      "providerId": "stadtteilhaus-fisch",
      "venueId": "stadtteilhaus-fisch-turnhalle-wahlerschule",
-     "title": "Vater-Kind: offene Turnhalle (Freitag, 18–20 Uhr)",
-     "summary": "Freie Hallenzeit für Väter mit Kindern zum Toben, Ballspielen und Turnen, ohne Übungsleitung; ein Vater übernimmt die Hallenverantwortung. Kostenlos; Hallenturnschuhe mitbringen.",
+     "title": "Vater-Kind: Die offene Turnhalle (Freitag, 18–20 Uhr)",
+     "summary": "Offene Hallenzeit für Väter mit Kindern zum Toben, Ballspielen und Turnen. Es gibt keine Übungsleitung, die Familien gestalten die Zeit selbst. Kostenlos.",
      "topics": [
       "bewegung",
       "vaeter"
@@ -184,7 +177,7 @@
      "category": "bewegung",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung genannt"
+      "note": "Keine Anmeldung angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -209,11 +202,11 @@
      }
     }
    ],
-   "inputHash": "83b362f729d1c36e89328ea318737e03c1e4cf72a2bf9f3c3e7ef154acf13a2a",
+   "inputHash": "cd53c2e84a8ff4df23386258235c2b9bac573d57e868ed1bb763f19f14ea3dde",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "8b8e42d23b5cf9d82f9bdc2ab3d7202bd704e69a782d29cf8856ea8c6fc1608b"
   },
   "seite:https://www.nuernberg.de/imperia/md/fisch/dokumente/programmjanfeb24.pdf": {
@@ -450,7 +443,7 @@
    "inputHash": "0145b1c0f06a3e71483a50ccef88189526c4b687610c24d27526a92fd696c1b3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "8b8e42d23b5cf9d82f9bdc2ab3d7202bd704e69a782d29cf8856ea8c6fc1608b"
   }

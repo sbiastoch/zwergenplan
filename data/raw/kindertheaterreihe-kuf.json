@@ -6,7 +6,7 @@
    "inputHash": "bdca6ac9580b9f81493b056f5573339ee03dd05ee422885fdad37927776bb104",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
@@ -15,16 +15,16 @@
    "inputHash": "4ab0112fa36a2b2dd028c1df359d5e153eba9de611718674908bf383ef9998e9",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_november.html": {
    "events": [],
-   "inputHash": "62ae865f740c913e8c90ee4a84b750f83c1dce43710f62e8ef1f9c4b152e7a99",
+   "inputHash": "a7fce2eb3eeb787fe07f77cc99886bde37001b29d249c60da9e81d40d210162e",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
@@ -33,34 +33,84 @@
    "inputHash": "e7cb40316cb3c0db9e5031227b8a1650f3aafd1c175b8867b3ce0350572928ea",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_februar.html": {
-   "events": [],
-   "inputHash": "cfa3e28d6c6ef0117ac845456a546a8af70176d83e9a34796007d0aa51ee2081",
+   "events": [
+    {
+     "providerId": "kindertheaterreihe-kuf",
+     "venueId": "kindertheaterreihe-kuf",
+     "title": "Theater »Morgen bestimme ich!« ab 3 Jahren (pohyb's und konsorten)",
+     "summary": "Clownesker Theaterstück über einen Streit zwischen Bär, Wiesel und Dachs, wer mitspielen darf. Dauer 40 Min. Die Vorstellungen laufen in mehreren Kulturläden; Reservierung per Mail oder Telefon beim jeweiligen Ort.",
+     "topics": [
+      "theater"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "Kita-Gruppen 3 € pro Kind; Familienvorstellung 5 € pro Kopf; mit Nbg.-Pass 2,50 €",
+     "url": "https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_februar.html",
+     "sourceUrl": "https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_februar.html",
+     "category": "buehne",
+     "age": {
+      "minMonths": 36,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige; Reservierung per Mail oder telefonisch beim jeweiligen Kulturladen"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-02-15T10:00",
+        "end": "2027-02-15T10:40"
+       },
+       {
+        "start": "2027-02-16T10:00",
+        "end": "2027-02-16T10:40"
+       },
+       {
+        "start": "2027-02-17T10:00",
+        "end": "2027-02-17T10:40"
+       },
+       {
+        "start": "2027-02-17T15:00",
+        "end": "2027-02-17T15:40"
+       },
+       {
+        "start": "2027-02-18T14:30",
+        "end": "2027-02-18T15:10"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "78a8e0c69967586e391b44f4582ec355ed9edec1743903589f9997460a2c3c8d",
    "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-10-27T09:00:54+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_maerz.html": {
    "events": [],
-   "inputHash": "96942ee159af75a02d975b67d0315e0c366fad78c14049c7fea6bceedb378052",
+   "inputHash": "8016b3cd77e55c5a0d123cb7de5ce2070f4807f027d7731445a185657337ce7e",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
   "seite:https://www.nuernberg.de/internet/kuf_kultur/kindertheaterreihe_april.html": {
    "events": [],
-   "inputHash": "9ed0aa605383980a7367b02d1eb27441abe8599978965e8c672ef18732c6cfcd",
+   "inputHash": "8660badd5b114d06a165c44ff9a6e28b48c83a4e3ebab4276aad649d45a9760b",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "95612daf4169a04475e8227dabcdc442e3d5fd09d8297d295aea1f926a59ad5a"
   },
@@ -76,7 +126,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "frankenkids",

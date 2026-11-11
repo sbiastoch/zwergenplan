@@ -6,8 +6,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monaten · Sa 09:30 · Start 14.11.2026",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten in den Kliniken Dr. Erler, samstags vormittags bis Mitte Januar 2027. Der Kurs ist laut Buchungsseite ausgebucht.",
+     "title": "Babyschwimmen ab 3 Monaten, Sa 9:30 (Start 14.11.2026)",
+     "summary": "Samstags wöchentlich, rund zehn Termine, Babyschwimmen für Babys ab 3 Monaten. Laut Buchungsseite ausgebucht.",
      "topics": [
       "babyschwimmen"
      ],
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs ausgebucht"
+      "note": "Ausgebucht laut Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -40,8 +40,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monaten · Sa 10:15 · Start 14.11.2026",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten in den Kliniken Dr. Erler, samstags vormittags bis Mitte Januar 2027. Der Kurs ist laut Buchungsseite ausgebucht.",
+     "title": "Babyschwimmen ab 3 Monaten, Sa 10:15 (Start 14.11.2026)",
+     "summary": "Samstags wöchentlich, rund zehn Termine, Babyschwimmen für Babys ab 3 Monaten. Laut Buchungsseite ausgebucht.",
      "topics": [
       "babyschwimmen"
      ],
@@ -58,7 +58,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs ausgebucht"
+      "note": "Ausgebucht laut Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -74,8 +74,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monaten · Sa 09:30 · Start 23.01.2027",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten in den Kliniken Dr. Erler, samstags vormittags bis Mitte März 2027. Laut Buchungsseite sind Plätze frei.",
+     "title": "Babyschwimmen ab 3 Monaten, Sa 9:30 (Start 23.01.2027)",
+     "summary": "Samstags wöchentlich, acht Termine, Babyschwimmen für Babys ab 3 Monaten. Plätze laut Buchungsseite frei.",
      "topics": [
       "babyschwimmen"
      ],
@@ -92,7 +92,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Plätze frei, online buchbar"
+      "note": "Anmeldung über die Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -108,8 +108,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monaten · Sa 10:15 · Start 23.01.2027",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten in den Kliniken Dr. Erler, samstags vormittags bis Mitte März 2027. Laut Buchungsseite sind Plätze frei.",
+     "title": "Babyschwimmen ab 3 Monaten, Sa 10:15 (Start 23.01.2027)",
+     "summary": "Samstags wöchentlich, acht Termine, Babyschwimmen für Babys ab 3 Monaten. Plätze laut Buchungsseite frei.",
      "topics": [
       "babyschwimmen"
      ],
@@ -126,7 +126,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Plätze frei, online buchbar"
+      "note": "Anmeldung über die Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -142,8 +142,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monaten · Sa 10:15 · Start 20.03.2027",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten in den Kliniken Dr. Erler, samstags vormittags bis Ende Mai 2027. Laut Buchungsseite sind Plätze frei.",
+     "title": "Babyschwimmen ab 3 Monaten, Sa 10:15 (Start 20.03.2027)",
+     "summary": "Samstags wöchentlich, zehn Termine, Babyschwimmen für Babys ab 3 Monaten. Plätze laut Buchungsseite frei.",
      "topics": [
       "babyschwimmen"
      ],
@@ -160,7 +160,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Plätze frei, online buchbar"
+      "note": "Anmeldung über die Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -174,11 +174,11 @@
      }
     }
    ],
-   "inputHash": "dd66cd1ac9da259e5c73de36c5c0a9c1dc98bc8aa3e8b4f0f4b4d2295ffecd78",
+   "inputHash": "1dbe402c11faeb300679df9c146ab684fd3209d2bd4e126f354ed972cfe3414a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "af30022381f70d519ba33965e65b3cf352e86a32734bb09c23c093e407046922"
   },
   "seite:https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291": {
@@ -186,8 +186,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Minis ab 1 Jahr – Sa 9:30, Start 14.11.2026",
-     "summary": "Schwimmkurs für Kleinkinder ab 1 Jahr in den Kliniken Dr. Erler, samstags um 9:30 Uhr, 10 Termine bis 16.01.2027. Der Kurs ist laut Buchungsseite ausgebucht.",
+     "title": "Minis ab 1 Jahr, Kurs ab 14.11.2026 (Sa 9:30)",
+     "summary": "Schwimmkurs für Kinder ab 1 Jahr in den Kliniken Dr. Erler, 10 Samstagstermine vom 14.11.2026 bis 16.01.2027. Der Kurs ist derzeit ausgebucht.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -204,7 +204,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Buchungsseite ausgebucht"
+      "note": "Kurs laut Buchungssystem ausgebucht"
      },
      "schedule": {
       "kind": "weekly",
@@ -213,15 +213,15 @@
       ],
       "start": "09:30",
       "from": "2026-11-14",
-      "until": "2027-01-16",
+      "count": 10,
       "skipHolidays": false
      }
     },
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Minis ab 1 Jahr – Sa 9:30, Start 20.03.2027",
-     "summary": "Schwimmkurs für Kleinkinder ab 1 Jahr in den Kliniken Dr. Erler, samstags um 9:30 Uhr, bis 22.05.2027. Plätze laut Buchungsseite frei, Buchung online über Kursolino.",
+     "title": "Minis ab 1 Jahr, Kurs ab 20.03.2027 (Sa 9:30)",
+     "summary": "Schwimmkurs für Kinder ab 1 Jahr in den Kliniken Dr. Erler, 10 Samstagstermine vom 20.03.2027 bis 22.05.2027. Buchbar über das Buchungssystem.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -238,7 +238,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Laut Buchungsseite freie Plätze; Buchung online"
+      "note": "laut Buchungssystem buchbar"
      },
      "schedule": {
       "kind": "weekly",
@@ -247,16 +247,16 @@
       ],
       "start": "09:30",
       "from": "2027-03-20",
-      "until": "2027-05-22",
+      "count": 10,
       "skipHolidays": false
      }
     }
    ],
-   "inputHash": "d2b1256f736e2a29136775a24331a22c2c70ba0a330fd5e6850571a9e7db6b59",
+   "inputHash": "27a98bd22d86049664d629e91e4d2f3a8b1808ee1f00a6277c972596dc9c118d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "a84bb2ed546ae4814a96439cd5b0b540a11301612e87220b19845c91708fd1a7"
   },
   "seite:https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292": {
@@ -264,8 +264,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Schwimmkurs Maxis ab 2 Jahre, Sa 11 Uhr (Start 14.11.2026)",
-     "summary": "Wöchentlicher Schwimmkurs für Kinder ab 2 Jahren in den Kliniken Dr. Erler in Nürnberg, samstags 11 Uhr, 14.11.2026 bis 16.01.2027. Laut Buchungsseite ausgebucht.",
+     "title": "Kleinkindschwimmen Maxis ab 2 Jahre, Sa 11:00 – Start 14.11.2026",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags um 11:00 Uhr im Kontumazgarten (Kliniken Dr. Erler), Kursende 16.01.2027. Derzeit ausgebucht.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -282,7 +282,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Buchungsseite ausgebucht (SoldOut)"
+      "note": "Kurs ausgebucht laut Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -298,8 +298,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Schwimmkurs Maxis ab 2 Jahre, Sa 11 Uhr (Start 23.01.2027)",
-     "summary": "Wöchentlicher Schwimmkurs für Kinder ab 2 Jahren in den Kliniken Dr. Erler in Nürnberg, samstags 11 Uhr, 23.01.2027 bis 13.03.2027. Laut Buchungsseite ausgebucht.",
+     "title": "Kleinkindschwimmen Maxis ab 2 Jahre, Sa 11:00 – Start 23.01.2027",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags um 11:00 Uhr im Kontumazgarten (Kliniken Dr. Erler), Kursende 13.03.2027. Derzeit ausgebucht.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -316,7 +316,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Laut Buchungsseite ausgebucht (SoldOut)"
+      "note": "Kurs ausgebucht laut Buchungsseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -332,8 +332,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Schwimmkurs Maxis ab 2 Jahre, Sa 11 Uhr (Start 20.03.2027)",
-     "summary": "Wöchentlicher Schwimmkurs für Kinder ab 2 Jahren in den Kliniken Dr. Erler in Nürnberg, samstags 11 Uhr, 20.03.2027 bis 22.05.2027. Laut Buchungsseite sind Plätze frei.",
+     "title": "Kleinkindschwimmen Maxis ab 2 Jahre, Sa 11:00 – Start 20.03.2027",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren, samstags um 11:00 Uhr im Kontumazgarten (Kliniken Dr. Erler), Kursende 22.05.2027. Plätze laut Buchungsseite frei.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -350,7 +350,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Laut Buchungsseite buchbar (InStock)"
+      "note": "Plätze laut Buchungsseite frei"
      },
      "schedule": {
       "kind": "weekly",
@@ -364,11 +364,11 @@
      }
     }
    ],
-   "inputHash": "d157780c9f98e70c28aaa95e508d516df32aaac4a8bce63072972cd0cdc0ed4a",
+   "inputHash": "0e33ff581c15eaf7fbe57873f574a3a6d05b44f2635e34f0b843408d916a24aa",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-08T08:50:59+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "2dbca5b3382f77e652ff85c49279a49db4118d6b0d169dda8535979136d77bff"
   }
  }

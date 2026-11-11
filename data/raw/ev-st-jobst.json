@@ -6,17 +6,17 @@
     {
      "providerId": "ev-st-jobst",
      "venueId": "ev-st-jobst",
-     "title": "Miniclub Eltern-Kind-Gruppe (Kinder etwa 1–2 Jahre)",
-     "summary": "Spielen und Gruppenerfahrung für Kinder ab etwa einem Jahr, dazu Austausch für die Eltern. Dienstags 15–16:30 Uhr im Miniclubraum. Anmeldung und Kosten stehen nicht in der Quelle, bitte beim Veranstalter nachfragen.",
+     "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre, dienstags)",
+     "summary": "Spielgruppe für Kinder von etwa 1 bis 2 Jahren mit ihren Eltern im Miniclubraum des Gemeindehauses, Treffen meist wöchentlich dienstags 15–16:30 Uhr. Kosten und Anmeldung sind in der Quelle nicht angegeben, bitte bei der Gemeinde erfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=7984031",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984031",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=7984032",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7984032",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 12,
@@ -24,62 +24,34 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Anfrage beim Veranstalter (St. Jobst) nötig."
+      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; bei der Gemeinde St. Jobst nachfragen."
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-10T15:00",
-        "end": "2026-11-10T16:30"
-       },
-       {
-        "start": "2026-11-17T15:00",
-        "end": "2026-11-17T16:30"
-       },
-       {
-        "start": "2026-11-24T15:00",
-        "end": "2026-11-24T16:30"
-       },
-       {
-        "start": "2026-12-01T15:00",
-        "end": "2026-12-01T16:30"
-       },
-       {
-        "start": "2026-12-08T15:00",
-        "end": "2026-12-08T16:30"
-       },
-       {
-        "start": "2026-12-15T15:00",
-        "end": "2026-12-15T16:30"
-       },
-       {
-        "start": "2026-12-22T15:00",
-        "end": "2026-12-22T16:30"
-       },
-       {
-        "start": "2026-12-29T15:00",
-        "end": "2026-12-29T16:30"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "15:00",
+      "end": "16:30",
+      "from": "2026-11-17",
+      "skipHolidays": false
      },
      "via": "evtermine"
     }
    ],
    "inputHash": "886b17f2f27bfa229a70d4b6082cfb9ba42cddb66b3b8f70af3a17e81d6a3e73",
    "dated": {
-    "2026-11-10": "8fe4d07b98473a392582b8ce981c549b715cb22af5bd31dd4f8c202b0b4ca8d5",
     "2026-11-11": "2fcd2f14a31e2c37a459fe2d17252d1355ea438347d074fb79be85941493e91c",
-    "2026-11-17": "547832b7979690524c2882fa3e8f2c7c975f6708561b76418cf784c41fba68ed",
-    "2026-11-24": "2dcd68c33c907154ab67428c8362ae6687e7544bb1c21bc214c9dc5d8aab3a65",
+    "2026-11-17": "a507c68fd798fc656a59908e05da93bcacafd953050613650781cb60a7ea2263",
+    "2026-11-24": "d3a535c54314c2c7b6bbb74d88d461ebfd774118c72309d88aabd6755161ba8d",
     "2026-11-25": "d0479e7e1b51d5f8575bcf4a1433493952d0ef26bb0c076c860309e33f66eb22",
-    "2026-12-01": "05281e4eae464389d265888a52f99d1f3ad86a5a6ba65b370d2f8ec75dcbdca6",
+    "2026-12-01": "0b9b0d47e7467913fdfdccc0d88291e32a2124879be3e59823ca78d0a1c8616b",
     "2026-12-02": "ff049ec3c10b73e24ee3c6eed958f6960c520350c48efb353c37bb101f591d73",
-    "2026-12-08": "edc594d655a84292276e01a148fd9f9c222f6971233e2559c8110d0a3d2cab61",
-    "2026-12-15": "632062ecb7c8d8b23064f77d0ee4de5d021d1283068b5ab4f0b5ce3968ee092f",
+    "2026-12-08": "0a078babfb41ea3f6d2fccc1877002d750f37ec531813fd09ba9daee870af013",
+    "2026-12-15": "2b5467939a0e41f3c30bf1322522f9a51b4fe037319a672c7f29c41cde553de9",
     "2026-12-16": "b6590b6ed723b0e96f052190d7ac092d38a56aff5f2ec47dc12b3a833fec18ff",
-    "2026-12-22": "a98e6d47bd75f55f7eb38d7271f3ee8b71f2319f3ef4b10c8f41ba1ebe9e0f70",
-    "2026-12-29": "91d526ff369672f426f0d3f4b8090ff2b70ae8facc04087edcf525ae84f534c5",
+    "2026-12-22": "a99d6344577f082ef75f97cfdcebc51c83edc8479a8b1e15f23b06613a74b48c",
+    "2026-12-29": "7c42e4bf531d19ed4cce7b667a1c2ec295ea9a547520aeea36caff102b0ae4b9",
     "2027-01-13": "652232231129626496328eff1dad3fca667c4b85a3d40c8d76840c844af3b69f",
     "2027-01-27": "9fd92df3950d144cebeeec1d75075cb66bfca83599f561318e219d8ece651f51",
     "2027-02-03": "cec34775b33fb389ef3caebb183cd029cf3c6626e85e4310b7c786106e52a463",
@@ -89,8 +61,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "changedAt": "2026-11-11T09:09:51+01:00",
    "sources": [
     "evtermine"
    ],
