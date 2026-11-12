@@ -6,8 +6,8 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 1½–2½ J. (Mi, 17 Uhr)",
-     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursende steht auf der Seite nicht, Termine ab 11.11.2026 sind angenommen.",
+     "title": "Eltern-Kind-Turnen 1½–2½ Jahre (mittwochs 17 Uhr)",
+     "summary": "Wöchentlicher Bewegungsparcours für Kleinkinder mit Eltern, die aktiv mitmachen und den Parcours auf- und abbauen. Kursbeginn war im September 2026; die Termine laufen wöchentlich weiter, Dauer und Ende stehen nicht auf der Seite.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite; Anmeldung über die vhs-Kursbuchung (Kursnummer 16301)."
+      "note": "Platzangabe nicht gelistet; Anmeldung über die vhs (Kursnummer 16301)"
      },
      "schedule": {
       "kind": "weekly",
@@ -33,15 +33,15 @@
        "WE"
       ],
       "start": "17:00",
-      "from": "2026-11-11",
-      "skipHolidays": false
+      "from": "2026-11-18",
+      "skipHolidays": true
      }
     },
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 2–3 J. (Do, 17 Uhr)",
-     "summary": "Wöchentlich neu gestalteter Parcours zum freien Turnen; Eltern machen aktiv mit und helfen beim Auf- und Abbau. Kursende steht auf der Seite nicht, Termine ab 12.11.2026 sind angenommen.",
+     "title": "Eltern-Kind-Turnen 2–3 Jahre (donnerstags 17 Uhr)",
+     "summary": "Wöchentlicher Bewegungsparcours für Kinder ab 2 Jahren mit Eltern, die aktiv mitmachen und den Parcours auf- und abbauen. Kursbeginn war im September 2026; die Termine laufen wöchentlich weiter, Dauer und Ende stehen nicht auf der Seite.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -59,7 +59,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite; Anmeldung über die vhs-Kursbuchung (Kursnummer 16303)."
+      "note": "Platzangabe nicht gelistet; Anmeldung über die vhs (Kursnummer 16303)"
      },
      "schedule": {
       "kind": "weekly",
@@ -68,20 +68,15 @@
       ],
       "start": "17:00",
       "from": "2026-11-12",
-      "skipHolidays": false
+      "skipHolidays": true
      }
     }
    ],
-   "inputHash": "e6d8577c92bfc503291a4790021c79519a88beec53fffef0db774f35012393af",
+   "inputHash": "61e2eb3f7c07d6f557314c3fa297abfc43826541d85c5bc57d70f8243060f6b6",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-10T09:46:47+01:00",
-   "changedAt": "2026-11-10T09:46:47+01:00",
-   "pending": {
-    "inputHash": "165a5cc237953dc8fceaeb71028d7d5dc18655e4172f769202f7115dbb7f0968",
-    "model": "haiku",
-    "events": []
-   },
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }

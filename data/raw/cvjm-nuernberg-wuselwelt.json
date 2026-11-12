@@ -6,8 +6,8 @@
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offenes Freispiel in der Turnhalle für Kinder 0–3 Jahre",
-     "summary": "Offene Bewegungszeit in der Turnhalle im CVJM-Haus, Kinder bis 3 Jahre spielen mit Eltern oder Bezugsperson. Keine Anmeldung nötig; Hallenschuhe oder ABS-Socken mitbringen. Danach Kaffee oder Tee in der Kostbar möglich.",
+     "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 Jahre mit Eltern",
+     "summary": "Freispiel in der Turnhalle im CVJM-Haus mit vorbereiteter Spielumgebung, Eltern oder Bezugspersonen sind dabei. Hallenschuhe oder ABS-Socken mitbringen. Einfach kommen, keine Anmeldung und keine Kosten; in den Ferien findet keine Wuselwelt statt.",
      "topics": [
       "bewegung",
       "spielplatz-indoor"
@@ -15,7 +15,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "keine",
+     "price": "keine Kosten",
      "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
      "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
      "category": "bewegung",
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offenes Angebot ohne Anmeldung"
+      "note": "Offenes Angebot, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -39,11 +39,11 @@
      }
     }
    ],
-   "inputHash": "1302e629fd0fd2ea4bd3d369ec0268c628ae4012832aebba98a1c2f269b15309",
+   "inputHash": "10cd13f38e08f531ae13ea34049a583868836b38036f0b780a163c93e44ea982",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
@@ -88,14 +88,19 @@
    "status": "ok",
    "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-09T09:33:21+01:00",
+   "pending": {
+    "inputHash": "2ed877db9f8cd95425a10b19a6a7963a4f5ea11de6465c14edbc6e0b7c482f1e",
+    "model": "haiku",
+    "events": []
+   },
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
    "events": [],
-   "inputHash": "c0dd8efd7788b9fee9e9e232ec33cbb20dfeb17b0005926913a1c1659a7fe8c6",
+   "inputHash": "292555ec269bf7fd91c76aa137a73476b2e86bfc9133a179d5afbc11b0a05b41",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
@@ -106,15 +111,15 @@
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
      "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre)",
-     "summary": "Freie Bewegungs- und Spielzeit für Kleinkinder bis 3 Jahre in der Turnhalle des CVJM (2. UG). Einfach vorbeikommen, keine Anmeldung nötig. Der Preis steht auf der Seite nicht; vor Ort erfragen.",
+     "summary": "Offene Bewegungs- und Spielzeit in der Turnhalle im CVJM-Haus für Kleinkinder bis 3 Jahre mit Eltern. Ohne Anmeldung einfach vorbeikommen; freitags 9:30–10:15 Uhr.",
      "topics": [
       "bewegung",
       "spielplatz-indoor"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
      "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
      "category": "bewegung",
      "age": {
@@ -137,11 +142,11 @@
      }
     }
    ],
-   "inputHash": "46f3adf66f91790aea10b013e5c17bcccc241d57099c683d540e25299f91f6ab",
+   "inputHash": "7c36009941ba161302120d9a66771261f5d3554a6356b992a54a8a4d2cc30bd0",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "kandidaten": {
@@ -153,59 +158,13 @@
     "2026-12-04": "e53d63f30e3e38d2e9adc2360d2b71b261ddb361431b4527ba8b954a56b252c8",
     "2026-12-11": "27cb4300486343c9d4f3ecc5340ad096b08dea31b2649bb78b09319da8016d87",
     "2026-12-18": "7601cd084460dc3f82b02b0fd515f6dedc1dc723b2f760037cd32453f277dd77",
-    "2026-12-25": "c6bceb5a3aba5e75a8f4f4f5317b5135c2d2595914838a1c343db6271544c9ba",
-    "2027-01-01": "9ece63c1e37295109ee9babb83daf167579e2185134d695debc2cf57c8dfefe3",
-    "2027-01-08": "0f2b630258e6adff1128d06ff72910452188614c9cdf79d6ad8e791022380471",
-    "2027-01-15": "1618acebe6e904e5af7d48afdc428b5857d38151e76f12655797633f936cdd4c",
-    "2027-01-22": "79994f323ed6484b1c3c4a3900214c880e6b2757a5812e3296e56747c7db4fca",
-    "2027-01-29": "36f5f7228b7149ccc0fae2d4f618aa178192f2389ea4499cc8dc99ea2c4e095c",
-    "2027-02-05": "f2c6d760a25be85dab05323f5bec2e8c17fb6422bc9357c99fd4c3eecc92e5f9",
-    "2027-02-12": "98915f6a8ee77af90e174a6e3fcd2e275a815778e7523047ce7a5b65424ce780",
-    "2027-02-19": "e5b87bf757281194d0ab0416103f1c30d64213de7753aa12dc5600fa90a7095b",
-    "2027-02-26": "a811f21940f02bd3fbfcac1be5980f0a825c7a520e1bb6f23e0fcdbeec0b53a8",
-    "2027-03-05": "608248b57b533a78acdf60f7caf9e7e8ade2c4f3fd5661a95bddb322275619d2",
-    "2027-03-12": "5e9f5150617fc48ea27ebd14bde83a24ca0a62770feeee631c5e31714cfb3f9d",
-    "2027-03-19": "d7ff3ff2d34095e6a2ef59df0058cee659017af1e6a26c474d9d386a670b02d2",
-    "2027-03-26": "40cfc9be3f1596381f9ec61d1810dadb5eed79deedb000afdf59fa2577f78a67",
-    "2027-04-02": "48d9a085ffe6d7708969437c84f5b7df23ae818f19561fa38e38b1440807154d",
-    "2027-04-09": "6c09b9f020af6aff250dd0127c8e269ff61ff03a2668dbd78bef7536ec3356ef",
-    "2027-04-16": "7de5539be7a0aa844f62510ee785edd849f3968a0589af695eb3a01230ddaaf2",
-    "2027-04-23": "0e87458f8d141bf17502278695b227b09eec724890cc78d7c8c650c2619fafd6",
-    "2027-04-30": "ec0737b636de98db427a89b373f4c0f2becf2bda1050d899dec1a26049e99843",
-    "2027-05-07": "37a093ef2fd70bac235282706fdee36602d5717224c211d7fe01bac40d395c82",
-    "2027-05-14": "12891221242725c1fec3f7ff8a7b4a1ecfe31d62ac59b0263e2b82357f7db0e7",
-    "2027-05-21": "b21147bf0abc503b6e5b5a9dfdc3b1008c9c380ea8fefa5f0ffac000583a2f00",
-    "2027-05-28": "4b7f059069459900238e4d7b46d9cb1ab277fd999340cafedcc5bd6418e57908",
-    "2027-06-04": "0c709c8b6ef1558b7113d0c8d3a3e7ddb505807ea7154a05b22c09f273d5ed54",
-    "2027-06-11": "571256ef9611dbab54f96ad0cc536ffc8fadc750fb1e9fb8235fdcd90e4a1bad",
-    "2027-06-18": "638896797e6b33366e0e9e1657a4ef9dab432bf51a94a6c3f934145ac076ab87",
-    "2027-06-25": "d472b00e91a5244fa350858aa817122c370836068a56abd2fce0342eed05fc25",
-    "2027-07-02": "2d39c8469ab66417bef000a44644feb2c61d06480cc36d3b7fc9a06511c3ca94",
-    "2027-07-09": "554930b742dbb3de663373a8f94fffe6b8be5794386d5c484b51391e88ef986f",
-    "2027-07-16": "2ed26dbaca6047db805917c01cf6236a05a95f0ff122b69aa43965af5f328002",
-    "2027-07-23": "d9f6637c1214e5b5b6b608d4fe2396b3178aa068ba8669a0541320912bed1bd9",
-    "2027-07-30": "3c8598a12a517a041e3a616304e3d19c70e3bdb167ff5de54a450972239a0ad6",
-    "2027-08-06": "311ae9b93b8296e8aa77b2a02efaf0122db0f84f683759792951e58001561ec7",
-    "2027-08-13": "b61105e185cbdaaaa586be6ec503a52729490622eae00f3696e02612587b00cf",
-    "2027-08-20": "38fe437786fb37ec19b4898e4ad3884c399f5ea15263ebe63dbf2782ab15f2a6",
-    "2027-08-27": "2314c3452cbb5414d0dd88c697fc0c5d7f603cd53ff45889f56b236c7e6db559",
-    "2027-09-03": "e662b620e849e0b3f47bf0aea225bd713b5de2e3d092299f35d4cb58cc73b554",
-    "2027-09-10": "bcc729b06e8ea6fae8ae8a831435afe525b36a05ceaf2ba3e419df90f4bd8c66",
-    "2027-09-17": "45213e497912fb3c7853fdb9d6b268c32e82371421e25f62d8966febbf646be6",
-    "2027-09-24": "3a05a239bf0aad85921f310132a6b54144c3473acdafabe5976222a84c98e23d",
-    "2027-10-01": "d3fd6173317821d98304eb453572efd5f2879cde98f5a545653744422871c224",
-    "2027-10-08": "106d04540f5f272552c1882d3bcd75344df54d94e0e23626cc593f95d6e05835",
-    "2027-10-15": "3f7965c8659479cff163a9dd54377dd4ee13f8f91c1e5e8ef248fd51ff6b1c9c",
-    "2027-10-22": "a04871ac0d85187ff7251221da881a8ca1cb774c857fb32dda93db4ce150e2d4",
-    "2027-10-29": "72944a82ecef47f64a4af5fb9283a112d7f75f91485336c21872f54b6a812ef3",
-    "2027-11-05": "5f3551b2790d471690fb633019808ae2a07e5c9bbaecb887e2a41f632ac85581",
-    "2027-11-12": "351161259ba282cfc5fab32249cd7e3054e4e5f5070abc188bed332334b0b413",
-    "2027-11-19": "f2d05dc94643125e649fcdfc1bd40e55149f90572b988bae5c2faa2eb60a903e",
-    "2027-11-26": "6b65976fc1f9721e41c7b497691d134599c9c6a8d7c17f096107fb134d620cdb"
+    "2027-01-15": "fdfaf2a1282210a0807c4caa1fb1eb7a37b993b6e043fdb0c79bf010b98a326b",
+    "2027-01-22": "d36ee6d1c81cb555f3ab83eca9b1be4ba500e508110be9970de131dd0797e718",
+    "2027-01-29": "09abf318647c685c83ffee3e9932ebf3f21f3d4bba001d0df8676f34cd63d768"
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
    "emptySince": "2026-11-02T09:03:46+01:00",
    "sources": [

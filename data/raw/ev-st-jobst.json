@@ -7,7 +7,7 @@
      "providerId": "ev-st-jobst",
      "venueId": "ev-st-jobst",
      "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre, dienstags)",
-     "summary": "Spielgruppe für Kinder von etwa 1 bis 2 Jahren mit ihren Eltern im Miniclubraum des Gemeindehauses, Treffen meist wöchentlich dienstags 15–16:30 Uhr. Kosten und Anmeldung sind in der Quelle nicht angegeben, bitte bei der Gemeinde erfragen.",
+     "summary": "Spiel- und Austauschgruppe für Kinder von etwa 1 bis 2 Jahren mit ihren Eltern, dienstags 15:00–16:30 Uhr im Miniclubraum. Anmeldung, Kosten und Einstieg bitte bei der Gemeinde erfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
@@ -24,45 +24,67 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; bei der Gemeinde St. Jobst nachfragen."
+      "note": "Keine Platzangabe. Nachfrage bei der Gemeinde St. Jobst, Äußere Sulzbacher Str. 144."
      },
      "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "15:00",
-      "end": "16:30",
-      "from": "2026-11-17",
-      "skipHolidays": false
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-17T15:00",
+        "end": "2026-11-17T16:30"
+       },
+       {
+        "start": "2026-11-24T15:00",
+        "end": "2026-11-24T16:30"
+       },
+       {
+        "start": "2026-12-01T15:00",
+        "end": "2026-12-01T16:30"
+       },
+       {
+        "start": "2026-12-08T15:00",
+        "end": "2026-12-08T16:30"
+       },
+       {
+        "start": "2026-12-15T15:00",
+        "end": "2026-12-15T16:30"
+       },
+       {
+        "start": "2026-12-22T15:00",
+        "end": "2026-12-22T16:30"
+       },
+       {
+        "start": "2026-12-29T15:00",
+        "end": "2026-12-29T16:30"
+       }
+      ]
      },
      "via": "evtermine"
     }
    ],
    "inputHash": "886b17f2f27bfa229a70d4b6082cfb9ba42cddb66b3b8f70af3a17e81d6a3e73",
    "dated": {
-    "2026-11-11": "2fcd2f14a31e2c37a459fe2d17252d1355ea438347d074fb79be85941493e91c",
     "2026-11-17": "a507c68fd798fc656a59908e05da93bcacafd953050613650781cb60a7ea2263",
     "2026-11-24": "d3a535c54314c2c7b6bbb74d88d461ebfd774118c72309d88aabd6755161ba8d",
-    "2026-11-25": "d0479e7e1b51d5f8575bcf4a1433493952d0ef26bb0c076c860309e33f66eb22",
+    "2026-11-25": "24f28c57ac66b3a4aa94df8de92705101ae9e9e0d5ef27f096947796892b104e",
     "2026-12-01": "0b9b0d47e7467913fdfdccc0d88291e32a2124879be3e59823ca78d0a1c8616b",
-    "2026-12-02": "ff049ec3c10b73e24ee3c6eed958f6960c520350c48efb353c37bb101f591d73",
+    "2026-12-02": "d13299184ca16e95cbe7b8424aec4b3a45465fcc20c9e63628cea35b7109ebe1",
     "2026-12-08": "0a078babfb41ea3f6d2fccc1877002d750f37ec531813fd09ba9daee870af013",
     "2026-12-15": "2b5467939a0e41f3c30bf1322522f9a51b4fe037319a672c7f29c41cde553de9",
-    "2026-12-16": "b6590b6ed723b0e96f052190d7ac092d38a56aff5f2ec47dc12b3a833fec18ff",
+    "2026-12-16": "cbc22a7e8a08a03efcfb4f53112cfe43a0a759d559f552e19e5e396ada7f31e1",
     "2026-12-22": "a99d6344577f082ef75f97cfdcebc51c83edc8479a8b1e15f23b06613a74b48c",
     "2026-12-29": "7c42e4bf531d19ed4cce7b667a1c2ec295ea9a547520aeea36caff102b0ae4b9",
-    "2027-01-13": "652232231129626496328eff1dad3fca667c4b85a3d40c8d76840c844af3b69f",
-    "2027-01-27": "9fd92df3950d144cebeeec1d75075cb66bfca83599f561318e219d8ece651f51",
-    "2027-02-03": "cec34775b33fb389ef3caebb183cd029cf3c6626e85e4310b7c786106e52a463",
-    "2027-02-17": "17bc1619ca1e6bee88a36192acd5eecfb4ee2c3a6c611fdef6f36b1a00781da8",
-    "2027-03-03": "bf6555fed488c6ffd1ebb963e7ca502638522dbd2f3342487c3ec16402ad7057",
-    "2027-03-17": "9e9e576d02590d6e6b1b3011bfbe756efa60f45151545ea536fb772e17815da5"
+    "2027-01-13": "de9e4ff6df9070c705343edb8703692516cf9a083bc60ecbf5fd90e6b775d20f",
+    "2027-01-27": "508c19334cc871e552c37bf6c2fe72dc263771fbfe7456862e617e3ef05971fa",
+    "2027-02-03": "2611f2775fdc921f1ee33a979e6df4d52d8b4194f9f559bca9de9b9278994b01",
+    "2027-02-17": "dcefbcdf3985ffa186fd80c3af27afc916e6ca8ad3eeda7ae76db9df73447ccb",
+    "2027-03-03": "fb7ff0c2d282b0ec160a995d9f1d34dfaf589a201f71ec5f39fc3fe9a456ce59",
+    "2027-03-17": "d8c85169e902af9ded3b98a64d92c459fcb9ddcd33c87c09ffac55db6bddd1d6"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "sources": [
     "evtermine"
    ],

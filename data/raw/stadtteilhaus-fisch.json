@@ -205,7 +205,7 @@
    "inputHash": "cd53c2e84a8ff4df23386258235c2b9bac573d57e868ed1bb763f19f14ea3dde",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "8b8e42d23b5cf9d82f9bdc2ab3d7202bd704e69a782d29cf8856ea8c6fc1608b"
   },
@@ -443,7 +443,7 @@
    "inputHash": "0145b1c0f06a3e71483a50ccef88189526c4b687610c24d27526a92fd696c1b3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "8b8e42d23b5cf9d82f9bdc2ab3d7202bd704e69a782d29cf8856ea8c6fc1608b"
   }

@@ -39,7 +39,7 @@
    "inputHash": "7bbe49055391106f61ef39bab34929a32e88ad5d2a16343c8ed635f0f2279dec",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "626cdf4007a3c4e8fe4aae351b146175841c8cce06c0836cccbcfa6b528685e9"
   },
@@ -48,8 +48,8 @@
     {
      "providerId": "kath-st-martin-nordstadt",
      "venueId": "kath-st-martin-nordstadt",
-     "title": "Kleinkindergottesdienst (0 bis 8 Jahre)",
-     "summary": "Gottesdienst für die Kleinsten bis 8 Jahre im Pfarrzentrum St. Martin, etwa eine halbe Stunde. Auf der Seite ist keine Anmeldung genannt; bei Fragen hilft das Pfarrbüro.",
+     "title": "Kleinkindergottesdienst (Kinder 0 bis 8 Jahre)",
+     "summary": "Gottesdienst für kleine Kinder im Pfarrzentrum St. Martin, rund 30 Minuten. Die Termin-Seite nennt keine Anmeldung.",
      "topics": [
       "krabbelgottesdienst"
      ],
@@ -64,8 +64,8 @@
       "maxMonths": 96
      },
      "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite; Rückfragen beim Pfarrbüro St. Martin."
+      "status": "ohne-anmeldung",
+      "note": "Keine Anmeldung auf der Termin-Seite genannt"
      },
      "schedule": {
       "kind": "dates",
@@ -78,11 +78,11 @@
      }
     }
    ],
-   "inputHash": "7b86e074557331f28521042b1195057cc8d4fc92d5cdd5ec8239b63f78c62c0d",
+   "inputHash": "46b90475dc6f38cf2e024131586449e4a5d006336089ca0f0c7fc6354a85a2f4",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "626cdf4007a3c4e8fe4aae351b146175841c8cce06c0836cccbcfa6b528685e9"
   }
  }

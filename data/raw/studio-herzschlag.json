@@ -6,8 +6,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "PEKiP Do, Babys geb. Mai–Juli 2026 (6–9 Mon.)",
-     "summary": "PEKiP-Kurs mit 8 Terminen: Bewegungs- und Spielanregungen, Einzelberatung und Austausch unter den Eltern. Anmeldung über das Buchungsformular des Partneranbieters.",
+     "title": "PEKiP-Gruppe Do, Babys geb. Mai–Juli 2026",
+     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern und Einzelberatung, 8 Termine. Externer Partnerkurs, Buchung über das Formular des Studios.",
      "topics": [
       "pekip"
      ],
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
+      "note": "Anmeldung über das Buchungsformular; Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -41,8 +41,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "PEKiP Do, Babys geb. Okt.–Nov. 2026 (3–5 Mon.)",
-     "summary": "PEKiP-Kurs mit 8 Terminen: Bewegungs- und Spielanregungen, Einzelberatung und Austausch unter den Eltern. Anmeldung über das Buchungsformular des Partneranbieters.",
+     "title": "PEKiP-Gruppe Do, Babys geb. Okt.–Nov. 2026",
+     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern und Einzelberatung, 8 Termine. Externer Partnerkurs, Buchung über das Formular des Studios.",
      "topics": [
       "pekip"
      ],
@@ -59,7 +59,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über das Buchungsformular"
+      "note": "Anmeldung über das Buchungsformular; Platzzahl nicht angegeben"
      },
      "schedule": {
       "kind": "weekly",
@@ -76,8 +76,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "PEKiP Fr, Babys geb. Juli–Aug. 2026 (4–6 Mon.)",
-     "summary": "PEKiP-Kurs mit 8 Terminen: Bewegungs- und Spielanregungen, Einzelberatung und Austausch unter den Eltern. Derzeit ausgebucht.",
+     "title": "PEKiP-Gruppe Fr, Babys geb. Juli–Aug. 2026",
+     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern und Einzelberatung, 8 Termine. Externer Partnerkurs; laut Seite ausgebucht.",
      "topics": [
       "pekip"
      ],
@@ -94,7 +94,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Als ausgebucht markiert"
+      "note": "Auf der Seite als ausgebucht markiert"
      },
      "schedule": {
       "kind": "weekly",
@@ -109,11 +109,11 @@
      }
     }
    ],
-   "inputHash": "5fc27d4cacec380a166c2e5a85489ddbbabc4e646130c321b190f60d45b0abfa",
+   "inputHash": "ea8faca21b1c812f23e95514a0320d2a93e8e3bd0bb53290eb7a8fba012b410d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/musikzauber/": {
@@ -370,7 +370,7 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -379,7 +379,7 @@
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -388,7 +388,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -398,7 +398,7 @@
    "inputHash": "900df567d71314e1bacff9a6a5c555c59cce1159e7a25bf4db63c5676e0063a2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1424,7 +1424,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1433,8 +1433,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "Babymassage + Babyyoga (ab 6 Wochen, Do 11:15)",
-     "summary": "Sanfte indische Babymassage mit Babyyoga und Achtsamkeitsübungen für Eltern und Baby, max. 6 Familien. Externer Partner: Buchung über das Formular auf der Seite, Rechnung vom Kursanbieter. Zwei Blöcke à 4 Termine im Februar und März 2027.",
+     "title": "Babymassage + Babyyoga (ab 6 Wochen)",
+     "summary": "Sanfte indische Babymassage und Babyyoga mit Achtsamkeitsübungen für Babys ab ca. 6 Wochen bis 4 Monate, max. 6 Paare, Austausch unter Eltern. Zwei Kursläufe donnerstags im Februar und März 2027 (je 4 Termine). Angebot eines externen Kooperationspartners; Buchung über das Formular auf der Seite.",
      "topics": [
       "babymassage",
       "yoga-mit-baby"
@@ -1442,7 +1442,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "69 € je Block (4 Termine)",
+     "price": "69 € (4 Termine)",
      "url": "https://studioherzschlag.de/angebot/babymassage/",
      "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
      "category": "babykurse",
@@ -1452,7 +1452,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Buchung über das Formular auf der Seite; Warteliste oder Einstieg im laufenden Kurs per Anfrage"
+      "note": "Keine Platzangabe auf der Seite; Buchung über das Buchungsformular auf der Seite, bei Fragen oder Warteliste über das Kontaktformular."
      },
      "schedule": {
       "kind": "dates",
@@ -1493,11 +1493,11 @@
      }
     }
    ],
-   "inputHash": "1c9ab4463d6fa4b5ab00b398006e4a1905c709b3da0e15b4a34fc0885419130e",
+   "inputHash": "0ab67685cd8a69e957558c2d95e8f29e79f879009b3f2ad5390177d70384a93f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsnest/": {
@@ -1505,8 +1505,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "BewegungsNest 1,5–3 J., Do 16 Uhr: Dez. 2026–Feb. 2027",
-     "summary": "Bewegungslandschaften und kleine Impulse, Kinder turnen in ihrem eigenen Tempo, Eltern dabei. Externer Partnerkurs: Vertrag und Rechnung beim Kursanbieter, Buchung über das Formular auf der Seite.",
+     "title": "BewegungsNest 1,5–3 Jahre – Winterkurs (Dez.–Feb.)",
+     "summary": "Turnen mit Bewegungslandschaften für Kinder ab 1,5 Jahren, geleitet von einer externen Kursleitung. Donnerstags 16–17 Uhr, 8 Termine; Vertrag und Rechnung kommen vom Partner. Schnuppertermin für 16 € möglich.",
      "topics": [
       "bewegung",
       "eltern-kind-turnen"
@@ -1524,7 +1524,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anmeldung über das Buchungsformular auf der Seite."
+      "note": "Anmeldung über das Buchungsformular der Seite; keine Platzanzeige"
      },
      "schedule": {
       "kind": "dates",
@@ -1567,8 +1567,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "BewegungsNest 1,5–3 J., Do 16 Uhr: Feb.–Apr. 2027",
-     "summary": "Bewegungslandschaften und kleine Impulse, Kinder turnen in ihrem eigenen Tempo, Eltern dabei. Externer Partnerkurs: Vertrag und Rechnung beim Kursanbieter, Buchung über das Formular auf der Seite.",
+     "title": "BewegungsNest 1,5–3 Jahre – Frühjahrskurs (Feb.–Apr.)",
+     "summary": "Turnen mit Bewegungslandschaften für Kinder ab 1,5 Jahren, geleitet von einer externen Kursleitung. Donnerstags 16–17 Uhr, 8 Termine (ohne 25.03.); Vertrag und Rechnung kommen vom Partner. Schnuppertermin für 16 € möglich.",
      "topics": [
       "bewegung",
       "eltern-kind-turnen"
@@ -1586,7 +1586,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anmeldung über das Buchungsformular auf der Seite."
+      "note": "Anmeldung über das Buchungsformular der Seite; keine Platzanzeige"
      },
      "schedule": {
       "kind": "dates",
@@ -1629,8 +1629,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "BewegungsNest 1,5–3 J., Do 16 Uhr: Apr.–Juli 2027",
-     "summary": "Bewegungslandschaften und kleine Impulse, Kinder turnen in ihrem eigenen Tempo, Eltern dabei. Externer Partnerkurs: Vertrag und Rechnung beim Kursanbieter, Buchung über das Formular auf der Seite.",
+     "title": "BewegungsNest 1,5–3 Jahre – Sommerkurs (Apr.–Juli)",
+     "summary": "Turnen mit Bewegungslandschaften für Kinder ab 1,5 Jahren, geleitet von einer externen Kursleitung. Donnerstags 16–17 Uhr, 8 Termine (ohne 06.05. und 27.05.); Vertrag und Rechnung kommen vom Partner. Schnuppertermin für 16 € möglich.",
      "topics": [
       "bewegung",
       "eltern-kind-turnen"
@@ -1648,7 +1648,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anmeldung über das Buchungsformular auf der Seite."
+      "note": "Anmeldung über das Buchungsformular der Seite; keine Platzanzeige"
      },
      "schedule": {
       "kind": "dates",
@@ -1689,37 +1689,37 @@
      }
     }
    ],
-   "inputHash": "8a304dc74387c52391db6fb24b95881145968883cf75d8789008f271a9122a29",
+   "inputHash": "c19d25bce8ff098d8c718faf420418b0f30a563c2996b56c77489fccc1862be1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/herzzeit/": {
    "events": [],
-   "inputHash": "8ca878b9c4885e79ea62951dfb15b34715fb7ad0d26e54374353e6861ff74b00",
+   "inputHash": "1e8ad830163c4cda9ebec744256b4793fe4c0b9e188cf3c475d4ade91ec6b655",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/yoga-mit-baby/": {
    "events": [],
-   "inputHash": "c927391475d9fa136af71f35f999251f9207cf74e32ba10f0d7bbc6f80f344ce",
+   "inputHash": "29af33f6bed3014d63957dd85134a7963c1aef52eba2cdb9fc87ae9558419020",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/pilates-fitness-mit-baby/": {
    "events": [],
-   "inputHash": "16ae556dd86abd4877e20bfd313481286b6bbcf2b4ab42e30476e082b5e3a10d",
+   "inputHash": "80e341a266f0e2c5df8e539ebe03e908341ea3d9159348abfb01447228fbd1fa",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1791,23 +1791,28 @@
    "status": "ok",
    "checkedAt": "2026-11-11T09:09:51+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
+   "pending": {
+    "inputHash": "34cc912fe8036bf700cee8833b634c8c1e73db70b81528d42362964292094a00",
+    "model": "haiku",
+    "events": []
+   },
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/": {
    "events": [],
-   "inputHash": "e999bd760da1da0c8e72c75a7b4adc065ff5aa9954cbc9dd5fbb293c613446c2",
+   "inputHash": "e6a783db0e4ce3d35ec6d3ffb00fb75a21795e5b9346fc985cd859dfb2746d2c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/eltern-kind-turnen/": {
    "events": [],
-   "inputHash": "cbaa9cd43ca446c411dfae3a96fc07ce634c7160347d0094047fc9d5e5f6b62d",
+   "inputHash": "4aaa29f1d499a8568f5f6529e2ec811a084589b4b7ff98efec1d373b7d04b480",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1854,7 +1859,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"
