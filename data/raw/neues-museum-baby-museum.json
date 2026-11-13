@@ -6,11 +6,10 @@
     {
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
-     "title": "Baby & Museum: Kurzführung für Eltern mit Babys",
-     "summary": "Gemeinsame Führung für Erwachsene mit Babys durch wechselnde Themen aus Kunst und Architektur, mit Pausen zum Füttern und Wickeln. Danach Kaffee und Austausch. Kinderwagen und Trage sind erlaubt. Termine einzeln im go~mus-Shop buchbar; der 13.11. ist ausverkauft.",
+     "title": "Baby & Museum: Kurzführung mit Baby im Neuen Museum",
+     "summary": "Gemeinsame Kurzführung für Erwachsene mit Babys zu monatlich wechselnden Themen, mit Pausen zum Füttern und Wickeln. Kinderwagen und Trage sind erlaubt. Danach Kaffee und Austausch. Tickets gibt es über den Museumsshop.",
      "topics": [
-      "museum",
-      "elterntreff"
+      "museum"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -24,8 +23,8 @@
       "maxMonths": 12
      },
      "availability": {
-      "status": "unbekannt",
-      "note": "Tickets je Termin im go~mus-Shop (nmn-tickets.de). Am 13.11.2026 ausverkauft, für 27.11., 04.12. und 11.12.2026 ist der Ticket-Button aktiv; Kontingent ist auf der Programmseite nicht sichtbar."
+      "status": "frei",
+      "note": "13.11. und 27.11. ausverkauft; 04.12. und 11.12. über den Ticket-Button buchbar. Kontingent nur im Shop sichtbar."
      },
      "schedule": {
       "kind": "dates",
@@ -50,11 +49,11 @@
      }
     }
    ],
-   "inputHash": "09d77b69c1d12d37e361fe4a7ab6ad732b7f6aa54057a6e571108dc0c18dae91",
+   "inputHash": "2e3fdff41ab78ad95608260e5d62edd5dde4669104e7b9137332f3aa042e7b83",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
@@ -96,7 +95,7 @@
    "inputHash": "8d8a8dea2ac2323f2a85f96b246331a25a87a63636ada1522019d72667241958",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
@@ -159,7 +158,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

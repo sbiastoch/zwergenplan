@@ -7,7 +7,7 @@
      "providerId": "martha-maria-st-theresien",
      "venueId": "martha-maria-st-theresien",
      "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
-     "summary": "Ungezwungener Austausch für werdende und junge Eltern mit Fragen an Hebammen und Stillberaterinnen. Kostenlos, ohne Anmeldung, mittwochs 9:30–11:30 Uhr im Stationsbereich B3.",
+     "summary": "Offener Austausch für werdende und junge Eltern, Fragen können an die Hebammen gestellt werden. Einfach kommen, keine Anmeldung nötig; die Quelle nennt Termine bis Dezember 2026.",
      "topics": [
       "elterncafe",
       "elterntreff"
@@ -21,27 +21,22 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Keine Anmeldung erforderlich"
+      "note": "Keine Anmeldung nötig, Treffpunkt Station B3"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-04T09:30",
-        "end": "2026-11-04T11:30"
-       },
-       {
-        "start": "2026-12-02T09:30",
-        "end": "2026-12-02T11:30"
-       }
-      ]
+      "kind": "monthly",
+      "nth": 1,
+      "weekday": "WE",
+      "start": "09:30",
+      "from": "2026-12-02",
+      "skipHolidays": true
      }
     },
     {
      "providerId": "martha-maria-st-theresien",
      "venueId": "martha-maria-st-theresien",
-     "title": "Indische Babymassage (ca. 4 Wochen bis 7 Monate)",
-     "summary": "Traditionelle indische Babymassage für Babys im ersten Lebenshalbjahr, fördert Körperkontakt und Wohlbefinden. Fünf Termine dienstags 10–11 Uhr; Anmeldung per E-Mail oder telefonisch.",
+     "title": "Babymassage-Kurs, Start 09.02.2027",
+     "summary": "Indische Babymassage für Babys von 4 Wochen bis 7 Monaten, fünf Dienstage von 10 bis 11 Uhr auf der Wochenstation. Anmeldung per E-Mail oder Telefon.",
      "topics": [
       "babymassage"
      ],
@@ -67,17 +62,122 @@
       ],
       "start": "10:00",
       "end": "11:00",
-      "from": "2026-11-17",
+      "from": "2027-02-09",
+      "count": 5,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "martha-maria-st-theresien",
+     "venueId": "martha-maria-st-theresien",
+     "title": "Babymassage-Kurs, Start 04.05.2027",
+     "summary": "Indische Babymassage für Babys von 4 Wochen bis 7 Monaten, fünf Dienstage von 10 bis 11 Uhr auf der Wochenstation. Anmeldung per E-Mail oder Telefon.",
+     "topics": [
+      "babymassage"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "60 Euro",
+     "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+     "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 7
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per E-Mail an novakovalenka@web.de oder telefonisch unter 0157 58063006"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2027-05-04",
+      "count": 5,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "martha-maria-st-theresien",
+     "venueId": "martha-maria-st-theresien",
+     "title": "Babymassage-Kurs, Start 21.09.2027",
+     "summary": "Indische Babymassage für Babys von 4 Wochen bis 7 Monaten, fünf Dienstage von 10 bis 11 Uhr auf der Wochenstation. Anmeldung per E-Mail oder Telefon.",
+     "topics": [
+      "babymassage"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "60 Euro",
+     "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+     "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 7
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per E-Mail an novakovalenka@web.de oder telefonisch unter 0157 58063006"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2027-09-21",
+      "count": 5,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "martha-maria-st-theresien",
+     "venueId": "martha-maria-st-theresien",
+     "title": "Babymassage-Kurs, Start 09.11.2027",
+     "summary": "Indische Babymassage für Babys von 4 Wochen bis 7 Monaten, fünf Dienstage von 10 bis 11 Uhr auf der Wochenstation. Anmeldung per E-Mail oder Telefon.",
+     "topics": [
+      "babymassage"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "60 Euro",
+     "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+     "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 7
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per E-Mail an novakovalenka@web.de oder telefonisch unter 0157 58063006"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2027-11-09",
       "count": 5,
       "skipHolidays": false
      }
     }
    ],
-   "inputHash": "b699f2397282a8cc7f6bc4a22cb89cb971351c12519ecae04a61562a686c28a6",
+   "inputHash": "d990c3ee3d073413afec26956dd528af8a29e1d579d6ae27ebfe1333468942ff",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
-   "changedAt": "2026-11-03T09:27:26+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
    "partsHash": "5bf58d8a1afc2879e3bbac7a5ce5f7c3439b581b7ed12eb088636b357c2e0a8a"
   },
   "seite:https://cdn.martha-maria.de/fileadmin/user_upload/KH-Nuernberg/1_KH_Mommsenstrasse/20251219_Flyer__Programm_Elternschule_2026_web.pdf": {
@@ -120,7 +220,7 @@
    "inputHash": "2a0f0e681eb7562cf89442f5a2c5a3234d539110256fe4dbff2f4aa3adab6c81",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "091f597f896233f45ae798711e4b15fd76d21a9c8b0b5c606a5cf81979a1ecdb"
   },
@@ -129,7 +229,7 @@
    "inputHash": "2703ff4fc660dfa5a6d766ffe28aafefb6b0c2c7b8fb5231ba86c0d731962187",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "091f597f896233f45ae798711e4b15fd76d21a9c8b0b5c606a5cf81979a1ecdb"
   }

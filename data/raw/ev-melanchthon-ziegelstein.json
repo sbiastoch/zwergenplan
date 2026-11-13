@@ -136,7 +136,6 @@
    ],
    "inputHash": "e7e200d6e8a22eb245aeae6783534cf554ac015a072d78fc5f8e45aa693359d3",
    "dated": {
-    "2026-11-12": "bb3d3462ac60bc263647d2254aee5d2aa790240f9c2ce752367b7c2bb2ba7b35",
     "2026-11-14": "fdde07bf38e83368d279beb8498feb9869d971ecccc55cda01f04f7980437bb3",
     "2026-11-15": "0de86c930884e8dddb4f1a7b6b6b5876872d849cf486e008cb1397b4c99e48a4",
     "2026-11-16": "5d5e7c8805c77a514c609e568e72249c4ead3a5e9e17cada885b2bc16f3d43ca",
@@ -245,7 +244,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "7a588f5684743d34f43b434b2b4bca9b975902153d2249675e9a712e6c1c9142"
   },
@@ -255,7 +254,7 @@
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
      "title": "Eltern-Kind-Gruppe für Eltern mit Kindern von 0 bis 3 Jahren",
-     "summary": "Mütter und Väter tauschen sich über den Erziehungsalltag aus und erhalten Anregungen zu Ernährung, Sauberkeit, Motorik und Sprache. Die Kinder singen, hören Geschichten und spielen miteinander. Anmeldung und Kosten bitte beim Veranstalter erfragen.",
+     "summary": "Treff im Gemeindehaus der Melanchthonkirche: Eltern tauschen sich über den Erziehungsalltag aus und bekommen Anregungen zu Ernährung, Sauberkeit, Motorik, Sprache und Entwicklungsphasen. Mit den Kindern gibt es Lieder und Geschichten sowie gemeinsames Spielen.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
@@ -272,7 +271,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Plätze und Anmeldung nicht angegeben – bei der Melanchthonkirche Ziegelstein nachfragen"
+      "note": "Keine Anmeldeangabe in der Quelle; bei Unklarheit die Gemeinde kontaktieren."
      },
      "schedule": {
       "kind": "dates",
@@ -356,6 +355,10 @@
        {
         "start": "2027-05-04T09:30",
         "end": "2027-05-04T11:00"
+       },
+       {
+        "start": "2027-05-11T09:30",
+        "end": "2027-05-11T11:00"
        }
       ]
      },
@@ -383,12 +386,13 @@
     "2027-04-13": "d18bf202ee43fc96a9c916efe3e1a71bcd17a8e941d3301b065a217e8d36376b",
     "2027-04-20": "5048ff9b09ac2445fe4f2097a2edbc5a2955db16633b51b3069b275e77e1bc58",
     "2027-04-27": "c30049822d0e59569bf4152674a518d6f21aab064b2f33f7f3cf85a9fe5a0aa8",
-    "2027-05-04": "3013d57251c1dfc83be1cb406e25e63de528befb2c5e74bfb4d9cac12992eae0"
+    "2027-05-04": "3013d57251c1dfc83be1cb406e25e63de528befb2c5e74bfb4d9cac12992eae0",
+    "2027-05-11": "d4edc3b148570a8fffc6523150bbffe4794ed08d8faafa61fabfdf171f395f02"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
    "sources": [
     "evtermine"
    ],

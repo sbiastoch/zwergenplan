@@ -42,57 +42,18 @@
    "inputHash": "10cd13f38e08f531ae13ea34049a583868836b38036f0b780a163c93e44ea982",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
-   "events": [
-    {
-     "providerId": "cvjm-nuernberg-wuselwelt",
-     "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre)",
-     "summary": "Offene Bewegungs- und Spielzeit für Kleinkinder in der Turnhalle im CVJM-Haus (2. UG), freitags 9:30–10:15 Uhr. Einfach vorbeikommen, keine Anmeldung nötig. Der Preis steht nicht auf der Seite.",
-     "topics": [
-      "bewegung",
-      "spielplatz-indoor"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
-     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Offenes Angebot ohne Anmeldung"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "09:30",
-      "end": "10:15",
-      "from": "2026-11-13",
-      "skipHolidays": true
-     }
-    }
-   ],
-   "inputHash": "e72938c1d8ca5378c36f1a55a8bd3da66959e42e757af071992340b4bc6ef047",
+   "events": [],
+   "inputHash": "2ed877db9f8cd95425a10b19a6a7963a4f5ea11de6465c14edbc6e0b7c482f1e",
    "model": "haiku",
-   "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
-   "pending": {
-    "inputHash": "2ed877db9f8cd95425a10b19a6a7963a4f5ea11de6465c14edbc6e0b7c482f1e",
-    "model": "haiku",
-    "events": []
-   },
+   "status": "keine-termine",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
+   "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
@@ -100,7 +61,7 @@
    "inputHash": "292555ec269bf7fd91c76aa137a73476b2e86bfc9133a179d5afbc11b0a05b41",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
@@ -145,7 +106,7 @@
    "inputHash": "7c36009941ba161302120d9a66771261f5d3554a6356b992a54a8a4d2cc30bd0",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
@@ -164,7 +125,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
    "emptySince": "2026-11-02T09:03:46+01:00",
    "sources": [

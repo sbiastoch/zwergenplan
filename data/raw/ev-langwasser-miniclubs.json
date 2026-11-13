@@ -181,7 +181,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -190,45 +190,11 @@
     {
      "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Passionskirche (Do 9:00–10:30)",
-     "summary": "Gruppe für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche, donnerstags. Im Kalender fehlen die Termine an Weihnachten und Silvester.",
+     "title": "Mini-Club Passionskirche, Do 9–10:30 Uhr (Eltern mit Kleinkindern)",
+     "summary": "Offene Gruppe für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche, donnerstags 9–10:30 Uhr.",
      "topics": [
-      "eltern-kind-gruppe",
-      "spielgruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung im Kalendereintrag; Kontakt über die Gemeinde Langwasser"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:00",
-      "end": "10:30",
-      "from": "2026-11-12",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "ev-langwasser-miniclubs",
-     "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Passionskirche (Eltern, Großeltern mit kleinen Kindern), Do 9–10:30",
-     "summary": "Regelmäßiger Treff für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche, donnerstags 9–10:30 Uhr. Die Quelle nennt keine Anmeldung; bei Fragen direkt bei der Gemeinde nachfragen.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "elterntreff"
+      "krabbelgruppe",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -241,8 +207,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Auskunft bei der Gemeinde Passionskirche"
+      "status": "ohne-anmeldung",
+      "note": "Offener Treff, keine Platzangabe"
      },
      "schedule": {
       "kind": "weekly",
@@ -251,7 +217,7 @@
       ],
       "start": "09:00",
       "end": "10:30",
-      "from": "2027-02-11",
+      "from": "2026-11-19",
       "skipHolidays": true
      }
     },
@@ -259,62 +225,38 @@
      "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
      "title": "Mini-Club Passionskirche (donnerstags 9–10:30 Uhr)",
-     "summary": "Offener Gruppentreff für Eltern, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche. Die Termine stehen im Gemeindekalender; Rückfragen laufen über die Gemeinde.",
+     "summary": "Treff für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche. Keine Platzangabe online; Fragen direkt an die Gemeinde.",
      "topics": [
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8115900.html",
+     "url": "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
      "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle. Rückfragen bei der Gemeinde Langwasser."
+      "note": "Keine Platzangabe; bei der Gemeinde Langwasser nachfragen"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-04-29T09:00",
-        "end": "2027-04-29T10:30"
-       },
-       {
-        "start": "2027-05-06T09:00",
-        "end": "2027-05-06T10:30"
-       },
-       {
-        "start": "2027-05-13T09:00",
-        "end": "2027-05-13T10:30"
-       },
-       {
-        "start": "2027-06-03T09:00",
-        "end": "2027-06-03T10:30"
-       },
-       {
-        "start": "2027-06-10T09:00",
-        "end": "2027-06-10T10:30"
-       },
-       {
-        "start": "2027-06-17T09:00",
-        "end": "2027-06-17T10:30"
-       },
-       {
-        "start": "2027-06-24T09:00",
-        "end": "2027-06-24T10:30"
-       },
-       {
-        "start": "2027-07-01T09:00",
-        "end": "2027-07-01T10:30"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:00",
+      "end": "10:30",
+      "from": "2027-02-18",
+      "skipHolidays": false
      }
     }
    ],
    "inputHash": "65acb1193277cc55ced981affa2dcf8c05d2a94de948b400998a3d4465db67d3",
    "dated": {
-    "2026-11-12": "1546c6a628c8f14342beeeb6c93c849135c55ef6f63943ace271fd35f0a47fee",
     "2026-11-16": "8d5e100424df28ed5695362564a5e15668b0db8c233fd35fead22a606f81bb90",
     "2026-11-17": "d411696ad587756a198a8595c43fff4c9ebd35289b05a9103d03be4aa852cb20",
     "2026-11-18": "be1b6d5abf3700d74b4aee5d31ffee53cb65536780f775f346325abc8d3a0e84",
@@ -346,7 +288,7 @@
     "2026-12-28": "ffdb1c54e2d5b89f01864f1b09f5e3e1a8fe75355c8d27a99fbf33147040633c",
     "2026-12-30": "c559177da0ca316bff644e8180ab930763a4f9c908e53c93e061e14e14746261",
     "2027-01-04": "6af8864aea79fe25ba926e0319b7fd551dd3dbc7e84dc4f74f85070d88876952",
-    "2027-01-06": "7ff509f95ce7e2a79b7d8a97d1aa168dab184f2369bd71d4da869c6faa0699bd",
+    "2027-01-06": "1effd6a85f5c256ca3333c1537e58e8b742ad67096ef9acf07da01beeb420270",
     "2027-01-07": "74d5039829f18a2143055b0d99ad315ba62bf8e5c6745c36cb1c77fd95fb73ec",
     "2027-01-10": "eaafe2ca39479395063941712f9e18bb634e8ee9f0f0da08e3193876db81f16d",
     "2027-01-11": "7242ae72167d3e4d94f8fc831554d384a0b9114702ff88348e248d237d965ed5",
@@ -611,8 +553,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
   "seite:http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html": {
@@ -651,7 +593,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -692,7 +634,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -700,19 +642,18 @@
    "events": [
     {
      "providerId": "ev-langwasser-miniclubs",
-     "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Passionskirche, donnerstags 9–10:30 Uhr",
-     "summary": "Eltern-Kind-Gruppe für Kinder bis 3 Jahre mit Spiel, ersten Liedern und Reimen sowie Austausch für Eltern. Anmeldung und Kosten sind in der Quelle nicht genannt; bitte beim Anbieter erfragen.",
+     "venueId": "ev-langwasser-miniclubs",
+     "title": "MiniClub Montag 15–17 Uhr (Dietrich-Bonhoeffer-Kirche)",
+     "summary": "Eltern-Kind-Gruppe für Kinder bis 3 Jahre: gemeinsames Spiel, erste Lieder und Reime, Austausch unter Eltern. Anmeldung und Beitrag bitte beim Veranstalter erfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8009819",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8009819",
+     "url": "https://www.evangelisch-in-langwasser.de",
+     "sourceUrl": "https://www.evangelisch-in-langwasser.de",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -720,15 +661,65 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; bei Fragen beim Anbieter nachfragen"
+      "note": "Plätze nicht angegeben; Anfrage bei der Evangelischen Gemeinde in Langwasser"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-12T09:00",
-        "end": "2026-11-12T10:30"
+        "start": "2026-11-16T15:00",
+        "end": "2026-11-16T17:00"
        },
+       {
+        "start": "2026-11-23T15:00",
+        "end": "2026-11-23T17:00"
+       },
+       {
+        "start": "2026-11-30T15:00",
+        "end": "2026-11-30T17:00"
+       },
+       {
+        "start": "2026-12-07T15:00",
+        "end": "2026-12-07T17:00"
+       },
+       {
+        "start": "2026-12-14T15:00",
+        "end": "2026-12-14T17:00"
+       },
+       {
+        "start": "2026-12-21T15:00",
+        "end": "2026-12-21T17:00"
+       }
+      ]
+     },
+     "via": "evtermine"
+    },
+    {
+     "providerId": "ev-langwasser-miniclubs",
+     "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+     "title": "Mini-Club Donnerstag 9–10:30 Uhr (Passionskirche)",
+     "summary": "Eltern-Kind-Gruppe für Kinder bis 3 Jahre im Bühnenraum des Gemeindehauses: erste Lieder und Reime, Kontakt zu Gleichaltrigen, Austausch unter Eltern. Anmeldung und Beitrag bitte beim Veranstalter erfragen.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8009820",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8009820",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Plätze nicht angegeben; Anfrage bei der Evangelischen Gemeinde in Langwasser"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
        {
         "start": "2026-11-19T09:00",
         "end": "2026-11-19T10:30"
@@ -872,61 +863,18 @@
        {
         "start": "2027-10-28T09:00",
         "end": "2027-10-28T10:30"
-       }
-      ]
-     },
-     "via": "evtermine"
-    },
-    {
-     "providerId": "ev-langwasser-miniclubs",
-     "venueId": "ev-langwasser-miniclubs",
-     "title": "MiniClub Dietrich-Bonhoeffer-Kirche, montags 15–17 Uhr",
-     "summary": "Eltern-Kind-Gruppe für Kinder bis 3 Jahre mit gemeinsamem Spiel, Liedern und Reimen sowie Austausch für Eltern. Die Quelle nennt Termine bis 14.12.2026; Anmeldung und Kosten sind nicht genannt, bitte beim Anbieter erfragen.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "spielgruppe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/ical?vid=560",
-     "sourceUrl": "https://www.evangelisch-in-langwasser.de",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; bei Fragen beim Anbieter nachfragen"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-16T15:00",
-        "end": "2026-11-16T17:00"
        },
        {
-        "start": "2026-11-23T15:00",
-        "end": "2026-11-23T17:00"
+        "start": "2027-11-11T09:00",
+        "end": "2027-11-11T10:30"
        },
        {
-        "start": "2026-11-30T15:00",
-        "end": "2026-11-30T17:00"
+        "start": "2027-11-18T09:00",
+        "end": "2027-11-18T10:30"
        },
        {
-        "start": "2026-12-07T15:00",
-        "end": "2026-12-07T17:00"
-       },
-       {
-        "start": "2026-12-14T15:00",
-        "end": "2026-12-14T17:00"
-       },
-       {
-        "start": "2026-12-21T15:00",
-        "end": "2026-12-21T17:00"
+        "start": "2027-11-25T09:00",
+        "end": "2027-11-25T10:30"
        }
       ]
      },
@@ -935,57 +883,56 @@
    ],
    "inputHash": "6f986df1dae2b4e4a05686667a4f52adb4c1faa34770a470fa535f36669437eb",
    "dated": {
-    "2026-11-12": "5770bffc5028ebf1fc28c7ee2cb50109ca3c18ed7a2a8424072a88c3718988c9",
     "2026-11-16": "c8365aa8b186a029236b7c4e3342d574b9102c68288e14ee77eba5dfe65d718e",
-    "2026-11-19": "ca4ffb60558e02c7807465f962d7a9be3c40e9511fb921fa54644cdd7ef85108",
+    "2026-11-19": "44424a400e34ebc879ce1b105eba5db49a7078bca91e8a14926d326a406cb258",
     "2026-11-23": "0f5a8defbf4dabeba7f6d87eef3ccaac13219e4cfee77cab348d2039a68ba131",
-    "2026-11-26": "e73838cf7094f96e4cc62b0bb94b666e8c045966f2226eaecc20ec203044fea2",
+    "2026-11-26": "85916bf1f7c1c7efa3b0be0b04fab6d140d340da7a882ac8b24202300b94f1a5",
     "2026-11-30": "4d3583d7e83cf4912adab7314aa88dcf3dcfb2cdc29e33cee1ce9d9afd46f465",
-    "2026-12-03": "0141b3973f3731a60f6652f91591f5151541cd43b666c5c1f7dc8bc971349cd3",
+    "2026-12-03": "1ee9f22cd7a01f440172f6e7e1cb9c1ea3c7aec42afdca20e942a0b15f216f7a",
     "2026-12-07": "04877a4bbe2161e9800616c77b7334c24d7eb81122b24ab85850eb7457649e18",
-    "2026-12-10": "d4cc0993bd8c64a558f35b8b89a1b12d5ac2ff499ed79bb3b76ec9b272230095",
+    "2026-12-10": "3c7984efdab265943ff61b8cebec9ddb6da5797ecf46ad5a58b3838c7cb68273",
     "2026-12-14": "72ce7fea707141f27e0a591de65c0e03449fbf975e1c89ea97c1a2cbfb655841",
-    "2026-12-17": "3a29c86f730fc09a227e682677f1aa0ea5a5215f701bc5ac0e7f51d9f9a1b398",
+    "2026-12-17": "1b9f544e335d839693697be4f84a2de479fdd65718f61ab413b26e424d1c60e4",
     "2026-12-21": "9742ddc3714d44137759ee192f84b5ca672b29e626e3296f254f10e8ed641834",
-    "2027-01-07": "650e872410f53fcf0ac70ed4a50bb4c0d3fad99bf38b5f03f36dd0f35455b6c3",
-    "2027-01-14": "66fa60a3c63b06093f6904a497cb4744244dd71a83a620d8884dc86dc4d492b1",
-    "2027-01-21": "878f7b3bcb4c2511c3b071c46177cfd3a477b8656e16ac5f4df4d2fbc9611ed8",
-    "2027-01-28": "4bc5c54b20a8408d653244ce8c194e9838b6773d892bf17328939e76fa75f463",
-    "2027-02-04": "4fa7f5005a1b5af70a5a0c9be5d06e6ec1d212056c9406315eff7c3a282710f8",
-    "2027-02-11": "909c54eadfb110a298ed186621edd1f2bbfd2653fde02166b42f2c96360ffe9b",
-    "2027-02-18": "ef358d9579a6db530a195e5462e573bb4d5f966d317d7f877e92140d438d2e7f",
-    "2027-02-25": "14c4381287269a5ff3600c1da6c0cd6632c29f98338c7e4804ecb4e542b850ba",
-    "2027-03-04": "019d5df908b373b156a302ff3cd521d3c01c4659e72c4e147b1e3640363255eb",
-    "2027-03-11": "70be1acd4d73747fcbc972c949626b9d564a4f655516521d7ac27facdc4add69",
-    "2027-03-18": "806e5773cb438b14d5899de3eae7ec5abd6ff155ad3d6c87b0c51df1af81823d",
-    "2027-03-25": "420c5f808527f4b9d00dc1415cded344f452b5e074b88ecbe873738d39ec016f",
-    "2027-04-01": "6a5f0400c79e2459f2d0c9c08411b74edc05478a0bd8043ad78db8b8ee46fe43",
-    "2027-04-08": "d9c810813bbabf63bc48191113e632d85bdb3f0299c75d1c849a81e6f3feb59b",
-    "2027-04-15": "a4c088e4d60219ee1f5ff5cba0b46d63beafb3194438b4469e280fdc1b5fafd6",
-    "2027-04-22": "e01b46f1083ad773567a8cf3e992d9a28e96dd4571560f247bd4dea99bdd4a57",
-    "2027-04-29": "b4f7e65ce4b15fbe7fedec796f778496554e2f5ca5d50baa3f26fdb1f8d080f8",
-    "2027-05-06": "01aab3ed63a031589c281f2f973fd481436fdd62f73a855a69a028a765f98618",
-    "2027-05-13": "e98ed419f70fa94fa45c95a66c47ccd637941aa379e675c973f47159f85208b5",
-    "2027-06-03": "ae186493978c3ccda7c68bfe8bd94c41fb780bb91d5cbb1659364975e53d3836",
-    "2027-06-10": "0e7895a1cf4c02d24d3fe6ed34c3ca8f95e3f23a5abd364cae76c9f23807fec9",
-    "2027-06-17": "14905cdb980ac7f6975760f5da4d18c24b640ac1e2054546f6fa34a39f08bc65",
-    "2027-06-24": "55a758fd748a008bc52a6246990bdc0108e9a597d6f5b20217dcf9f8d9151d18",
-    "2027-07-01": "25d3a82d92ce5e0e2db8e2c374d75f7656fa59d081569fc12b18923fab33b268",
-    "2027-09-16": "23505321c9afe861288f32f6653835940dc80ecf119a08599cbce892f2de53d6",
-    "2027-09-23": "1aee0ccf95ab710a88f40019e0fc1fee3970691010d4955a9e1c1757806cd448",
-    "2027-09-30": "489525072c5ae02c6f931d2fc07b4fdbe8501d9400179bdfc38c76cc21b38197",
-    "2027-10-07": "4c93f5eafa0a374c78b5284af2da412f028e5bd2a2f4e4b99af3393e42927687",
-    "2027-10-14": "9da9cf3b7ff369f5377cb2cff7cb4529250f91688e6c0823b431cef38de2ab37",
-    "2027-10-21": "31fb016c58805e666e3e473d549c7ef9e49685ae852eb34bf901c372e0aa848c",
-    "2027-10-28": "da017e5c81af23397cbe53f8f42920b5037dad9bc9aca354f94913bb1e4ccc4a",
-    "2027-11-11": "94435baf4d1412d3f08a9e10585a636b241165d41d2f7687c38bb03330b36e88",
-    "2027-11-18": "7a4469a6559992e2d33fbc9959655fdc081d6988702c59f7dce8326abb781054",
-    "2027-11-25": "95ef2c49509c039273ffce5eeedd9ed5edbdd5a4561ebd743a6d92f4983a8f5c"
+    "2027-01-07": "87cf65cb01b1c73d275219fa3c67498d5b6838c96477747ff101124498519204",
+    "2027-01-14": "1cf66c4af7a7f649f650bef45c239e21a31c6e52fabeddc2b863d5c6586ae3bc",
+    "2027-01-21": "d7dd3cef52437a71a47cf0e6748a48743479923456056992217532f12e63c318",
+    "2027-01-28": "627c4419b7a8ddc79a0eccfebc8340040445cf0140c9dfeaffdc7fe00449e94d",
+    "2027-02-04": "0a597fd4d35ec500ac3c0fc7b72685aa1530b9838cb0738c1f12db91dd5694ed",
+    "2027-02-11": "c0f10967be1868bf9da323f5ab309256a0331590ba7da108761ea2b7928eb0cf",
+    "2027-02-18": "2c3469bef579fac0bc0e6b5878881d2cd5f9650b1f71699636fed864c939cc5a",
+    "2027-02-25": "e54863b4e52165a1d0dd108181af213692f3f42b28145afa2c5d9995df01e391",
+    "2027-03-04": "8d9bb804a88080931492a76b54ed989b95989c0c798369cdd906915f3b22f456",
+    "2027-03-11": "02e9c7ba6f8b297465d65583bf1cd6d8a9e4e76f381c07b84e12a6d1af39b33d",
+    "2027-03-18": "f3b900c77f4790d2dbde3b0eb4f866b41c66bf8a0f41a8663da11c412f21bf9c",
+    "2027-03-25": "a10f9a45197c10bafaa141a8af8572cab854c47c82d95aca7760c668b560c19a",
+    "2027-04-01": "ff0d01d9ebf15c8e7baedf926f2afc2323bbb95fc438bf7d5be40ac03da1126b",
+    "2027-04-08": "4ac7b7b97a6988e419a67e78dbcdf6a00750c1192dba1badd7ca71dea3ed5014",
+    "2027-04-15": "4bd2330ed9c90e1edc9338a610c1fb5f28f88c6e1ffd0cb80a8e12f1d7028852",
+    "2027-04-22": "8d36b47e60936aa0d6826f36739b5c3c4791e4cdf8f579e24b1ac885c2b65a15",
+    "2027-04-29": "dbb5a3154aff5ab8229c602c565fbabff3efbad02d643f98446bfc0f1df6ca0a",
+    "2027-05-06": "ad1c5767b0dec1f98993bd43e31b8b1d12e1ce8eb99075287e37191cbb765cbb",
+    "2027-05-13": "40e02669614e6a9b49920c888038706dd7fc777336de4bd121539e53d62bd6ba",
+    "2027-06-03": "188f0a2f0bc30e07fecc28d930c1e9956774c8ec4106355b75f247fcb3818da8",
+    "2027-06-10": "147db453cb13a17c9d7f4c6d16c2e3ace93365073d05bd229737f6c4499aabaa",
+    "2027-06-17": "cf124f241055e862687a5bd0618bbbf57ddfa25e02b61bed7bcb9017faf7f06b",
+    "2027-06-24": "8136e8cf107ae171ca4316bd3aa18d6aaf58600bbabaa8510a2f4682f47f600a",
+    "2027-07-01": "715f2b8f3b746847c42801e42aa53224d8726b91e4d98e8e9fdbd08fa952587e",
+    "2027-09-16": "cc119c1b074c4d981c35e401e8854f3e82114f4b7c8aa0c446e9197915be5632",
+    "2027-09-23": "a96fcf1c649d5094165b7cbcbf147c6c87971d2f6de4122ba4b6aa13b2cb0d3a",
+    "2027-09-30": "03d2689e434fc0e5090e19701b9ab25cadaf91af970376d52e5ff336c302adbb",
+    "2027-10-07": "5e58d0c8a6175bf3ab227a4fe5eb47e21bf058d5c5c878ebf7934e7015da4eed",
+    "2027-10-14": "7ac30bfc5a36edafcb4e7cdf680cfd9473a52bb839492c70894f6d39542666e8",
+    "2027-10-21": "55a2f153313fdb47535a6c93248a21cdf8823dd9a211d9be1f661e60f0abffbf",
+    "2027-10-28": "7a09b5c007afdafcaed0c4b956f9d409a8d46184ab611376d6115c0a953d4f6b",
+    "2027-11-11": "00247944a169955a244e68c424f26046a9060bba65af32467998fe35a538c1e3",
+    "2027-11-18": "a39221b508128aa6f2739f4c8659d633cfe3cd974a4a1720ced71f9384bfa5ad",
+    "2027-11-25": "6d28fefdb128447ca8d4d4813f590ce84708e5ef419016061f4df48f4c96a61e"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
-   "changedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
    "sources": [
     "evtermine"
    ],

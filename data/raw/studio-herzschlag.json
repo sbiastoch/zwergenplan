@@ -112,7 +112,7 @@
    "inputHash": "ea8faca21b1c812f23e95514a0320d2a93e8e3bd0bb53290eb7a8fba012b410d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -370,7 +370,7 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -379,7 +379,7 @@
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -388,7 +388,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -398,7 +398,7 @@
    "inputHash": "900df567d71314e1bacff9a6a5c555c59cce1159e7a25bf4db63c5676e0063a2",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1424,7 +1424,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1496,7 +1496,7 @@
    "inputHash": "0ab67685cd8a69e957558c2d95e8f29e79f879009b3f2ad5390177d70384a93f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1692,7 +1692,7 @@
    "inputHash": "c19d25bce8ff098d8c718faf420418b0f30a563c2996b56c77489fccc1862be1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1701,7 +1701,7 @@
    "inputHash": "1e8ad830163c4cda9ebec744256b4793fe4c0b9e188cf3c475d4ade91ec6b655",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1710,7 +1710,7 @@
    "inputHash": "29af33f6bed3014d63957dd85134a7963c1aef52eba2cdb9fc87ae9558419020",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1719,83 +1719,18 @@
    "inputHash": "80e341a266f0e2c5df8e539ebe03e908341ea3d9159348abfb01447228fbd1fa",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/": {
-   "events": [
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag-outdoor-fitness-mit-baby",
-     "title": "Outdoor Fitness mit Baby – Anfänger (Di 10:00)",
-     "summary": "Draußen am Wöhrder See: Ausdauer-, Kraft- und Beweglichkeitstraining für Mütter, das Baby kommt im Kinderwagen oder in der Trage mit. Angebot eines externen Partners; Buchung über das Formular, Einstieg jederzeit möglich.",
-     "topics": [
-      "fitness-mit-baby",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über das Formular auf der Seite; Einstieg jederzeit möglich"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2026-11-10",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag-outdoor-fitness-mit-baby",
-     "title": "Outdoor Fitness mit Baby – Fortgeschritten (Di 15:00)",
-     "summary": "Draußen am Wöhrder See: Kraft-, Cardio- und Beweglichkeitstraining für Mütter, das Baby kommt im Kinderwagen oder in der Trage mit. Angebot eines externen Partners; Buchung über das Formular, Einstieg jederzeit möglich.",
-     "topics": [
-      "fitness-mit-baby",
-      "bewegung"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Buchung über das Formular auf der Seite; Einstieg jederzeit möglich"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TU"
-      ],
-      "start": "15:00",
-      "end": "16:00",
-      "from": "2026-11-10",
-      "skipHolidays": true
-     }
-    }
-   ],
-   "inputHash": "773e1817698e64e4ffe0dd78a8030e6199004083d33567e81d00d7ad26e4e744",
+   "events": [],
+   "inputHash": "34cc912fe8036bf700cee8833b634c8c1e73db70b81528d42362964292094a00",
    "model": "haiku",
-   "status": "ok",
-   "checkedAt": "2026-11-11T09:09:51+01:00",
-   "changedAt": "2026-11-10T09:46:47+01:00",
-   "pending": {
-    "inputHash": "34cc912fe8036bf700cee8833b634c8c1e73db70b81528d42362964292094a00",
-    "model": "haiku",
-    "events": []
-   },
+   "status": "keine-termine",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
+   "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/": {
@@ -1803,7 +1738,7 @@
    "inputHash": "e6a783db0e4ce3d35ec6d3ffb00fb75a21795e5b9346fc985cd859dfb2746d2c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1811,9 +1746,13 @@
    "events": [],
    "inputHash": "4aaa29f1d499a8568f5f6529e2ec811a084589b4b7ff98efec1d373b7d04b480",
    "model": "haiku",
-   "status": "keine-termine",
+   "status": "fehler",
+   "reason": "https://studioherzschlag.de/angebot/eltern-kind-turnen/: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
    "checkedAt": "2026-11-12T09:45:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
+   "failingSince": "2026-11-13T09:38:01+01:00",
+   "klasse": "voruebergehend",
+   "klasseSince": "2026-11-13T09:38:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "kandidaten": {
@@ -1859,7 +1798,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"

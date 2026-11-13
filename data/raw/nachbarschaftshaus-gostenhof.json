@@ -77,16 +77,16 @@
    "inputHash": "29cfa8bc19a60da9cbdcb4e169e689167b52d194c7fead7e0b10ffb2cb2cceb5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "159ed93d0c00e8cf48580e9e3ed297a9c837e7328224ec8a037d9ce33b01c06b"
   },
   "seite:https://www.nuernberg.de/internet/nh_gostenhof/veranstaltungen.html": {
    "events": [],
-   "inputHash": "9c469eaecc268166222515f63308ebc34cb9a64cfa3a4b5139e4e113ceb6f6b9",
+   "inputHash": "e4447470df0fbfc529519d4a325053031279f8649191090d3ce0432f505e93ed",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   },
@@ -95,7 +95,7 @@
    "inputHash": "7f8409b8a7cc31889e42dd82286fc2942f8ae23e8832e229cfc03d89580fce07",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   }

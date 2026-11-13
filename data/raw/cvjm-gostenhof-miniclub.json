@@ -41,7 +41,7 @@
    "inputHash": "4a186bc1fae5c375b8e1192157a03608e9e83545993dfdd997a5d4cf8dbe555f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "f1ffeccaeeb1caca965d9eb8005c30dba92183ec292df8bacd70319e29fbd01c"
   },
@@ -179,7 +179,6 @@
    ],
    "inputHash": "fea4d2e45168a93803dd204edfa7a651d799184d3d18d2418917a5a3e676bd55",
    "dated": {
-    "2026-11-12": "b93b2a663111d3959972d5f395f1719e16476e234cd54368766b433d5f6c6208",
     "2026-11-13": "0f242011636f5b3b98cb02e0422123a3ab0d7a144d01969645eab722adb50589",
     "2026-11-14": "96c1c34d1fbc06987b261e5fb93902354c94fffb5df594e43423295eed708f9a",
     "2026-11-16": "5409c8362fd7d8ed126681b9e9cc0dd01b9ab418a725be8776331ae0af5db653",
@@ -311,7 +310,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "c25088f3bc444367c5ff4fef08df8eb68bdc3b19e8c10e56c7f87453ed56cbb2"
   },
@@ -320,15 +319,16 @@
     {
      "providerId": "cvjm-gostenhof-miniclub",
      "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club – Kniereiter und Bewegungslieder (18 Monate–3 Jahre)",
-     "summary": "Dienstags treffen sich Eltern mit Kindern ab 18 Monaten zu Kniereitern, Fingerspielen und Bewegungsliedern, dazu Freispiel und Zeit für Austausch. Keine Platzanzeige; Kosten und Anmeldung sind in den Quellen nicht genannt, Info bei Alexandra Gußner (0151/56071708).",
+     "title": "Mini-Club: Kniereiter & Bewegungslieder (18 Monate bis 3 Jahre)",
+     "summary": "Dienstags treffen sich Eltern mit Kindern zu Kniereitern, Fingerspielen und Bewegungsliedern, danach gibt es Freispiel und Kaffee. Findet außer in den Schulferien statt; Infos und Anfrage bei Alexandra Gußner.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "singen",
+      "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
      "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
      "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/",
      "category": "krabbel-spielgruppen",
@@ -338,7 +338,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Info bei Alexandra Gußner, 0151/56071708 oder alexandra.gussner@cvjm-nuernberg-gostenhof.de"
+      "note": "Keine Platzanzeige. Anfrage bei Alexandra Gußner, Tel. 0151/56071708 oder alexandra.gussner@cvjm-nuernberg-gostenhof.de"
      },
      "schedule": {
       "kind": "dates",
@@ -494,6 +494,7 @@
     "2027-04-27": "dd719a4b4c2b196abfa16b2dd50770c4d15c1326a84b280f6a7c5f94211a5688",
     "2027-05-03": "d3b52dc1e1ea0fe17a34d9f940f0493864946569be65b6fe63c1807e0e7068a5",
     "2027-05-04": "20f3bfded0f60eda4e44167f3079e1f2d4bc5316cb74c21808603739e0b0db52",
+    "2027-05-10": "df6d7e10c7668b3311de5f42bb75adbd90793af79e1f60d159c41e9557a73c14",
     "2027-05-11": "bc53a06d11b8b47c4da02a618c771184b2b01cca9bafaa8124793f987f03cd91",
     "2027-06-01": "592be05c99ee2784b1e441437a02fc7c9a42f4ea982a95e55ffa2ee1cb4119fd",
     "2027-06-08": "8f2aafd0804dce16531813e1387515dcbb34d0a29e2e339b6ee50e85fa8e9b33",
@@ -503,8 +504,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "changedAt": "2026-11-13T09:38:01+01:00",
    "sources": [
     "evtermine",
     "frankenkids"
