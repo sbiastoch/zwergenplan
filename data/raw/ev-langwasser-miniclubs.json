@@ -58,7 +58,6 @@
    ],
    "inputHash": "19e18430b75108533aca76fc7eaf290e1c9a7906384a518c8591c7a09f468f92",
    "dated": {
-    "2026-11-13": "c664efa596e81fdd982bba8253bc973b82e287f7b015611e6a476d31c8d250c3",
     "2026-11-15": "2521825768fd8b30430af9e32d4a98180f467d6fcdf3f3d2db21bcdf7161216c",
     "2026-11-16": "8f5130116d7febe10a78d23f51fc3e93b74a1e64dd4cc2b7e030de177977fe6f",
     "2026-11-17": "0c6ba727f29eed15f5e215f71c6bd70fffa27f7f7658b01a0ab14591d883b1f4",
@@ -181,7 +180,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -553,7 +552,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -593,7 +592,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -634,7 +633,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -931,7 +930,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "sources": [
     "evtermine"

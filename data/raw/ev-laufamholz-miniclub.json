@@ -6,17 +6,18 @@
     {
      "providerId": "ev-laufamholz-miniclub",
      "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub freitags 9:00–10:30 (Eltern-Kind-Gruppe, 0–3 J.)",
-     "summary": "Eltern-Kind-Gruppe zum Austausch unter Eltern und für erste Gruppenerfahrungen der Kleinen mit Liedern, Geschichten und Spiel. Preis und Anmeldung stehen nicht in der Quelle; freie Plätze werden dort nicht angezeigt.",
+     "title": "Miniclub Freitag 9:00–10:30 (Eltern-Kind-Gruppe)",
+     "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz: Austausch über den Erziehungsalltag, Anregungen zu Ernährung, Sprach- und Motorikförderung, Lieder und Geschichten. Die Kinder sammeln erste Gruppenerfahrungen. Termine bis Mitte Dezember 2026 gelistet.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "spielgruppe",
+      "elterntreff"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109125",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109125",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109116",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109116",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -24,15 +25,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu freien Plätzen; Anfrage über die Detailseite"
+      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; auf der Detailseite nachsehen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-13T09:00",
-        "end": "2026-11-13T10:30"
-       },
        {
         "start": "2026-11-20T09:00",
         "end": "2026-11-20T10:30"
@@ -60,17 +57,18 @@
     {
      "providerId": "ev-laufamholz-miniclub",
      "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub donnerstags 15:00–16:30, Termin 19.11.2026",
-     "summary": "Einzeltermin der Miniclub-Eltern-Kind-Gruppe am Donnerstag, 19.11., 15–16:30 Uhr, mit Austausch für Eltern und Spielangeboten für die Kleinen. Preis und Anmeldung stehen nicht in der Quelle.",
+     "title": "Miniclub Donnerstag 19.11. 15:00 (Einzeltermin)",
+     "summary": "Einzeltermin der Eltern-Kind-Gruppe im Gemeindehaus Laufamholz am Donnerstag, 19.11.2026, 15:00–16:30 Uhr. Lieder, Geschichten und Austausch für Eltern; die Quelle nennt keine Anmeldung.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "spielgruppe",
+      "elterntreff"
      ],
      "format": "einmalig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109125",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109125",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109116",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109116",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -78,7 +76,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu freien Plätzen; Anfrage über die Detailseite"
+      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; auf der Detailseite nachsehen."
      },
      "schedule": {
       "kind": "dates",
@@ -94,18 +92,17 @@
    ],
    "inputHash": "6f5fb68c166723310b6ad8a626bfd0ecb8c132cd8fa92e84115670af1641a160",
    "dated": {
-    "2026-11-13": "41c894bea754ce67df7b58b7c647d93c0cb69613923a764146117a7224bed71a",
-    "2026-11-19": "11a487dfce5af751821ed3bd1323abac6b378ab447f7927117324a8e9d65cb49",
-    "2026-11-20": "bc1d655c9513fc64e30e54787908d5fb28467b648a1b925082c7fcf80f42b826",
-    "2026-11-27": "369098473900b81eb1a729c62585266a1f36ffb1a92efdeaf0543868be401a41",
-    "2026-12-04": "b86b1e82b2ad6e9f19a00225935c5896ddc85f78a443d5371de217b6df9da7b5",
-    "2026-12-11": "199fc0b24804c9aea5005fef86408f9f0766f376ee2915e7b5caf50f34713b47",
-    "2026-12-18": "45fb90f86f5d5fd367392a0421da046be04675edccde85a4c8b0fe5be4bb18f2"
+    "2026-11-19": "74df0acd86f2525c06f4d0bb95b9afeec8259a44d6cba265902f14b1e72e99e6",
+    "2026-11-20": "ea8d48e2b6e5fa3725da3e65f8ec1ba369eac671471f26dc96ff4f2881c3f9cc",
+    "2026-11-27": "564ba59d2206adfa6d930ea0ad97fb86309a262f251e56bbc9789e6dc22674be",
+    "2026-12-04": "106bc6bdc47e272cbc8169a12bed3030564ac0c75d184084487016c0c94c31c6",
+    "2026-12-11": "af35bd8180ea33dc0e0931752ea42987d43ae1e12256ee9905f494095e7c9f04",
+    "2026-12-18": "b8c7886c0428121687457b912cdafd868ed255a50da5439db4aff65b009522a5"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "sources": [
     "evtermine"
    ],

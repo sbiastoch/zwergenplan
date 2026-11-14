@@ -155,7 +155,7 @@
    "inputHash": "b25733857f81f77d5315cb6c70ff3ea953768aa22b722ad398a64d8818b4eacc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
@@ -301,7 +301,6 @@
    ],
    "inputHash": "4db80008ccb6d7489adb771a1cd005a997de3b2c66fce9bbc3b1ffd291e3db4a",
    "dated": {
-    "2026-11-13": "e7a5459e2ecfe4bb50bc713fc0d06190994d5e47aa2dd5373dd4d18669c4602f",
     "2026-11-15": "0731efa96e7c3547979446e4a23bc1d005b7e70b11c0f899350083ad7780910c",
     "2026-11-16": "7518f2228eda95deea3474690987ab4c60d892f74116f7d8bc5aceae9113045d",
     "2026-11-17": "5876ff2d319a31e874474c3ec8cf3171d04503aca76e4bac2f68d02a465fead8",
@@ -352,7 +351,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
@@ -476,7 +475,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "sources": [
     "evtermine"

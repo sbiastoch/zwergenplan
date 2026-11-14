@@ -6,10 +6,11 @@
     {
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
-     "title": "Baby & Museum: Kurzführung mit Baby im Neuen Museum",
-     "summary": "Gemeinsame Kurzführung für Erwachsene mit Babys zu monatlich wechselnden Themen, mit Pausen zum Füttern und Wickeln. Kinderwagen und Trage sind erlaubt. Danach Kaffee und Austausch. Tickets gibt es über den Museumsshop.",
+     "title": "Baby & Museum: Führung für Erwachsene mit Babys",
+     "summary": "Kurzführung durch das Neue Museum zu monatlich wechselnden Themen, mit Pausen zum Füttern und Wickeln. Danach Kaffee und Austausch. Kinderwagen und Trage sind erlaubt. Pro Termin 3 € zzgl. Eintritt. Der Termin am 27.11. ist ausverkauft.",
      "topics": [
-      "museum"
+      "museum",
+      "elterntreff"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -23,16 +24,12 @@
       "maxMonths": 12
      },
      "availability": {
-      "status": "frei",
-      "note": "13.11. und 27.11. ausverkauft; 04.12. und 11.12. über den Ticket-Button buchbar. Kontingent nur im Shop sichtbar."
+      "status": "unbekannt",
+      "note": "27.11. ausverkauft; 04.12. und 11.12. über den Ticket-Button im go~mus-Shop buchbar"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-13T10:30",
-        "end": "2026-11-13T11:30"
-       },
        {
         "start": "2026-11-27T10:30",
         "end": "2026-11-27T11:30"
@@ -49,11 +46,11 @@
      }
     }
    ],
-   "inputHash": "2e3fdff41ab78ad95608260e5d62edd5dde4669104e7b9137332f3aa042e7b83",
+   "inputHash": "80cdda87735b0a4144ea71f448d93156df5476beee7c3371fd45986859adb508",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "seite:https://www.nmn.de/de/programm/veranstaltungen/workshops/kinder-und-familien/lesestunde-fuer-klein-und-gross.htm": {
@@ -62,7 +59,7 @@
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
      "title": "Lesestunde für Klein und Groß (ab 2 Jahren)",
-     "summary": "Eine Schauspielerin liest im Wonderland-Raum der Ausstellung „Double Up!“ Geschichten rund um Kunst und Design vor. Kinder ab zwei Jahren machen aktiv mit, Familie und Gäste sind willkommen. Erwachsene zahlen 3 € zzgl. Eintritt.",
+     "summary": "Schauspielerin Mara Wengel liest und spielt Geschichten rund um Kunst und Design in der Ausstellung; Kinder ab zwei Jahren machen aktiv mit. Eltern kommen mit Kind, Erwachsene zahlen Eintritt. Tickets über den Online-Shop.",
      "topics": [
       "vorlesen",
       "museum"
@@ -80,7 +77,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Platzangabe ist auf der Programmseite nicht sichtbar."
+      "note": "Tickets über den go~mus-Shop (nmn-tickets.de); Kontingent dort nicht auf der Programmseite sichtbar"
      },
      "schedule": {
       "kind": "dates",
@@ -92,11 +89,11 @@
      }
     }
    ],
-   "inputHash": "8d8a8dea2ac2323f2a85f96b246331a25a87a63636ada1522019d72667241958",
+   "inputHash": "f4254256e1f0207040872596f255d3323d2ce8e9dd66bb12eaa6cdb68802b5e8",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
   "kandidaten": {
@@ -150,7 +147,6 @@
    ],
    "inputHash": "32a2f01bb91b2709ebe8d2dbf6dac25456924409c81593cc4a8dfa86ddadc905",
    "dated": {
-    "2026-11-13": "02758077c4f295a349671c42fd4810985342d83bb86afa633e9bac9349a6d8d6",
     "2026-11-27": "708428860f7ba415fa818653b16b68d576c6c9fe9ec4e0b27ca6a3df1d3b1d32",
     "2026-12-04": "62b6512fa0520a45636925c6594b2c50ae087c7d2774473d1a8e880447c75567",
     "2026-12-06": "f3d39363e90d4a4c7db1861e399d25fabb0a01cfafb4f632a797df058955aa59",
@@ -158,7 +154,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

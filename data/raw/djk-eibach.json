@@ -6,14 +6,14 @@
     {
      "providerId": "djk-eibach",
      "venueId": "djk-eibach",
-     "title": "Eltern-Kind-Turnen für 1–2,5 Jahre (Mi 14:45)",
-     "summary": "Eltern und Kinder turnen gemeinsam in der Übungsstunde: Balancieren, Hüpfen, Kriechen, Klettern und Miteinander in der Gruppe. Preis und Anmeldung stehen nicht auf der Seite; Fragen an turnen@djk-eibach.de.",
+     "title": "Eltern-Kind-Turnen 1–2,5 Jahre (Mittwoch 14:45)",
+     "summary": "Bewegungsstunde für Kinder von etwa 1 bis 2,5 Jahren mit Begleitung: Balancieren, Hüpfen, Kriechen, Klettern und Verhalten in der Gruppe. Die Trainingszeiten stammen von der Website (Stand 2023), vorab bei der Abteilung nachfragen.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.djk-eibach.de/abteilungen/turnen/",
      "sourceUrl": "https://www.djk-eibach.de/abteilungen/turnen/",
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anfrage bei turnen@djk-eibach.de"
+      "note": "Keine Platzanzeige. Anfrage per E-Mail an turnen@djk-eibach.de bzw. hertelu-djkeibach@email.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -33,21 +33,21 @@
       ],
       "start": "14:45",
       "end": "15:30",
-      "from": "2026-10-28",
-      "skipHolidays": true
+      "from": "2026-11-18",
+      "skipHolidays": false
      }
     },
     {
      "providerId": "djk-eibach",
      "venueId": "djk-eibach",
-     "title": "Eltern-Kind-Turnen für 2,5–4 Jahre (Mi 15:30)",
-     "summary": "Eltern-Kind-Turnen für ältere Kleinkinder mit Begleitung, Bewegung und Gruppenverhalten in der Turnhalle. Preis und Anmeldung stehen nicht auf der Seite; Fragen an turnen@djk-eibach.de.",
+     "title": "Eltern-Kind-Turnen 2,5–4 Jahre (Mittwoch 15:30)",
+     "summary": "Turnstunde für Kinder von 2,5 bis 4 Jahren mit Begleitung, direkt im Anschluss an die Gruppe für die Kleineren. Die Angaben stammen von der Website (Stand 2023); bitte vorab nachfragen, ob ein Platz für Kinder unter 3 Jahren frei ist.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.djk-eibach.de/abteilungen/turnen/",
      "sourceUrl": "https://www.djk-eibach.de/abteilungen/turnen/",
@@ -58,7 +58,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anfrage bei turnen@djk-eibach.de"
+      "note": "Keine Platzanzeige. Anfrage per E-Mail an turnen@djk-eibach.de bzw. hertelu-djkeibach@email.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -67,16 +67,16 @@
       ],
       "start": "15:30",
       "end": "16:15",
-      "from": "2026-10-28",
-      "skipHolidays": true
+      "from": "2026-11-18",
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "9a3e25f449d83adbc2d9f8442d2b9d326175dfead2d8f79a83878d00baa01e0f",
+   "inputHash": "d3fae3c6c53ce865004413df84a4a2c2cf8fa358ac24d34d3eac87b91f938385",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "136430afb917760bcf856f879d0f05699b6972586a2220957ee3ee7aea3f0ef6"
   }
  }

@@ -6,11 +6,10 @@
     {
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
-     "title": "Schneeflocken, wippediwapp (Lucia Ruf, ab 2 Jahren)",
-     "summary": "Winterlieder zum Mitsingen und Tanzen mit der Kinderliedermacherin Lucia Ruf im Sternenhaus, für Kinder ab 2 Jahren. Die vormittäglichen Vorstellungen am 30.11. sind ausverkauft.",
+     "title": "Schneeflocken, wippediwapp (Lucia Ruf), Kinderkonzert ab 2 Jahren",
+     "summary": "Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitmachen, Tanzen und Klatschen. Einzelne Vorstellungen Ende November sind bereits ausverkauft; Tickets im Webshop prüfen.",
      "topics": [
-      "konzert",
-      "singen"
+      "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
@@ -24,7 +23,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Vorstellung 29.11. 14:00 laut Kalender nicht ausverkauft; 30.11. 09:30 und 10:45 ausverkauft. Tickets im Eventim-Webshop."
+      "note": "Je Vorstellung unterschiedlich: 29.11. 14:00 ohne Ausverkauft-Vermerk; 30.11. 09:30 und 10:45 ausverkauft. Tickets im Eventim-Webshop."
      },
      "schedule": {
       "kind": "dates",
@@ -47,15 +46,15 @@
     {
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
-     "title": "WiWaWaldtraum – Mitmachtheater ab 2 Jahren (Purzeltraumtheater)",
-     "summary": "Mitmachtheater im Zauberwald Baumbolino: Trolli Tolpatsch muss seine Waldprüfung bestehen, Fee Fiofina verwandelt sich mehrfach. Herbststück für Kinder. Karten im Eventim-Webshop.",
+     "title": "WiWaWaldtraum – Mitmachtheater (Purzeltraumtheater)",
+     "summary": "Mitmachtheater für Kinder ab 2: Trolli Tolpatsch legt im Zauberwald Baumbolino seine Waldprüfung ab, begleitet von einer Fee. Herbststück aus dem Vierjahreszeiten-Zyklus; Tickets über den Eventim-Webshop.",
      "topics": [
       "theater"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
+     "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
      "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
      "category": "buehne",
      "age": {
@@ -64,7 +63,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets im Eventim-Webshop; in der Kalenderabfrage nicht als ausverkauft markiert"
+      "note": "Tickets im Eventim-Webshop; in der Kalender-API nicht als ausverkauft markiert"
      },
      "schedule": {
       "kind": "dates",
@@ -85,11 +84,11 @@
      }
     }
    ],
-   "inputHash": "244c7d522e7d7b0426cde12f675f0b18c7d38cc85a80a731fe7686bd8d0243b0",
+   "inputHash": "3ed3db8781b6bdf9f86de017fb02c0ffcda19daccd2a71620905d096698bac49",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "1773169258ff9b94e692feaa4cb6c79f6de49ce0e4ff6630b0de1afcb56cb389"
   },
   "kandidaten": {
@@ -144,7 +143,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

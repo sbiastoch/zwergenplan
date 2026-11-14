@@ -103,7 +103,6 @@
    ],
    "inputHash": "e1098639d45764dc73b636f609f698e2ca7a27eb3205654c45294b033eb0cccd",
    "dated": {
-    "2026-11-13": "88d559b8df4c47c82bb7ea719afd14178ce679d9cb8316f29692e34069e7d10c",
     "2026-11-14": "84242ba6b3d9139a99ec249af250d2ac1b6ca82f73ee2339342a95163d7dcb86",
     "2026-11-15": "61ce131e97fcc328b0176a53a193104ba699f7e81d4842dd3eecde1962f26f77",
     "2026-11-16": "a9bcf170cff476cc08de4313b6d19e0769df220ee242974dd736722eef190358",
@@ -264,7 +263,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -274,7 +273,7 @@
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
      "title": "Café für Alle – offener Familientreff dienstags",
-     "summary": "Offener Treff für Familien mit Kindern jeden Alters im FreiRaum der Markuskirche, bei schönem Wetter auf dem Platz davor. Kaffee und Kuchen gegen Spende, ab und zu Bastel- oder Bilderbuchangebote. Einstieg jederzeit. Die Uhrzeit ist auf der Seite widersprüchlich (15–18 oder 14–17 Uhr), bitte vorher prüfen.",
+     "summary": "Offenes Café im FreiRaum bzw. vor der Markuskirche: Kaffee und Kuchen gegen Spende, Kinder sind willkommen, Einstieg jederzeit. Die Seite nennt widersprüchlich 14–17 Uhr und 15–18 Uhr; vorher bitte prüfen.",
      "topics": [
       "elterncafe",
       "elterntreff"
@@ -282,13 +281,13 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "Kaffee und Kuchen gegen Spende",
+     "price": "Eintritt frei, Kaffee und Kuchen gegen Spende",
      "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
      "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Ohne Anmeldung vorbeikommen; Kontakt: Lisa Betz, platzfueralle@n-gibitzenhof.de, 0152 / 54640266"
+      "note": "Offener Treff, einfach vorbeikommen"
      },
      "schedule": {
       "kind": "weekly",
@@ -296,24 +295,24 @@
        "TU"
       ],
       "start": "15:00",
-      "from": "2026-11-10",
+      "from": "2026-11-17",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "e647a66798538ab3683932ead3c3c16b47dda98c6ac02ddf2058ffc2814efda4",
+   "inputHash": "d42b9a4298ebfbebaae3a98c697d5619eb86c91ad9df8e2736cd50c937ffa4fe",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-11-10T09:46:47+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familien-kinder/": {
    "events": [],
-   "inputHash": "10de50e90f58c173c0c8d4138ab21ea5cf4698310ea689b859fd254251d84a3b",
+   "inputHash": "1146af4e23933207f6a425587b6652201872b6ed94768ff23059624a8bd745a9",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -396,7 +395,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
    "sources": [
     "evtermine"

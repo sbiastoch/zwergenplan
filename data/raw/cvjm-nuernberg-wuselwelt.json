@@ -6,8 +6,8 @@
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungszeit für Kinder 0–3 Jahre mit Eltern",
-     "summary": "Freispiel in der Turnhalle im CVJM-Haus mit vorbereiteter Spielumgebung, Eltern oder Bezugspersonen sind dabei. Hallenschuhe oder ABS-Socken mitbringen. Einfach kommen, keine Anmeldung und keine Kosten; in den Ferien findet keine Wuselwelt statt.",
+     "title": "Wuselwelt: Bewegungs- und Spielzeit für Kinder 0–3 (freitags)",
+     "summary": "Offenes Freispiel in der Turnhalle mit vorbereiteter Spielumgebung, Kinder mit Eltern oder Bezugsperson. Einstieg jederzeit ohne Anmeldung; Hallenschuhe oder ABS-Socken mitbringen. Außer in den Ferien.",
      "topics": [
       "bewegung",
       "spielplatz-indoor"
@@ -15,7 +15,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "keine Kosten",
+     "price": "keine",
      "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
      "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
      "category": "bewegung",
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offenes Angebot, keine Anmeldung nötig"
+      "note": "Offenes Angebot, Anmeldung nicht erforderlich"
      },
      "schedule": {
       "kind": "weekly",
@@ -34,34 +34,34 @@
       ],
       "start": "09:30",
       "end": "10:15",
-      "from": "2026-11-13",
+      "from": "2026-11-20",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "10cd13f38e08f531ae13ea34049a583868836b38036f0b780a163c93e44ea982",
+   "inputHash": "9170dc225ec642aac4fe78bce6dfed0dae708f31bf679fe383a7a855ef286dfb",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
    "events": [],
-   "inputHash": "2ed877db9f8cd95425a10b19a6a7963a4f5ea11de6465c14edbc6e0b7c482f1e",
+   "inputHash": "de96ad95dccf1a8021029db6173b1142a8f803ce82cfb20d5b9fdd6a0a1430e7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
    "events": [],
-   "inputHash": "292555ec269bf7fd91c76aa137a73476b2e86bfc9133a179d5afbc11b0a05b41",
+   "inputHash": "757639fb2bf97eb845ccdf45c4ab4ca3823b9b79716e65b19c0d9b7ffefae041",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
@@ -108,13 +108,17 @@
    "status": "ok",
    "checkedAt": "2026-11-13T09:38:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
+   "pending": {
+    "inputHash": "45373c3d2c45a8ede85710793a39a0da44c14442ec79ff4e2565ed889df8969f",
+    "model": "haiku",
+    "events": []
+   },
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "kandidaten": {
    "events": [],
    "inputHash": "9014d4bb27ab7dbb3157a73c8dd388cfde0e579cdb5bcae0a8ad63e084098ab1",
    "dated": {
-    "2026-11-13": "14ee7260088e25ca0b829b815a2ff79504087d6daad6fb51afb3f0fe280546b5",
     "2026-11-27": "6e208ae887e397b8aa072b44c9ef8699549b6e5911fe091436d2196cd61c8f37",
     "2026-12-04": "e53d63f30e3e38d2e9adc2360d2b71b261ddb361431b4527ba8b954a56b252c8",
     "2026-12-11": "27cb4300486343c9d4f3ecc5340ad096b08dea31b2649bb78b09319da8016d87",
@@ -125,7 +129,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
    "emptySince": "2026-11-02T09:03:46+01:00",
    "sources": [

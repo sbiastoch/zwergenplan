@@ -6,8 +6,8 @@
     {
      "providerId": "ev-eibach",
      "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
-     "title": "Waldkrabbelgruppe im Faberpark (Donnerstag)",
-     "summary": "Eltern-Kind-Gruppe im Wald, donnerstags 10–11 Uhr. Findet außer in den Schulferien und fast bei jedem Wetter statt. Treffpunkt steht in der Kalenderbeschreibung.",
+     "title": "Waldkrabbelgruppe im Faberpark (donnerstags 10–11 Uhr)",
+     "summary": "Eltern-Kind-Gruppe im Wald am Faberpark, donnerstags 10–11 Uhr, außer in den Schulferien und bei fast jedem Wetter. Treffpunkt: Bogen an der Weiherbrücke.",
      "topics": [
       "waldgruppe",
       "krabbelgruppe",
@@ -16,12 +16,12 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107133.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107134.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
      "category": "bewegung",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Anmeldeangabe in der Quelle; bei der Gemeinde nachfragen"
+      "note": "Im Kalender ist keine Anmeldung genannt."
      },
      "schedule": {
       "kind": "weekly",
@@ -30,49 +30,15 @@
       ],
       "start": "10:00",
       "end": "11:00",
-      "from": "2026-11-12",
+      "from": "2026-11-19",
       "skipHolidays": true
      }
     },
     {
      "providerId": "ev-eibach",
      "venueId": "ev-eibach",
-     "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre, freitags)",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils. Freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107096.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
-     "category": "musik",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Anmeldeangabe in der Quelle; bei der Gemeinde nachfragen"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "09:30",
-      "end": "10:30",
-      "from": "2026-11-13",
-      "skipHolidays": false
-     }
-    },
-    {
-     "providerId": "ev-eibach",
-     "venueId": "ev-eibach",
-     "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags im Gemeindehaus Eibach. Der Kalender nennt nur die Termine 18.12.2026 und 15.01.2027; Anmeldung, Preis und weitere Termine bitte bei der Gemeinde erfragen.",
+     "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre), freitags",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach.",
      "topics": [
       "musik",
       "singen",
@@ -81,7 +47,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107101.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107097.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
      "category": "musik",
      "age": {
@@ -90,15 +56,45 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zur Verfügbarkeit in der Quelle; Auskunft über die Gemeinde Eibach."
+      "note": "Im Kalender ist keine Anmeldung genannt."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-11-20",
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "ev-eibach",
+     "venueId": "ev-eibach",
+     "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils. Im Kalender steht nur ein Termin im Horizont (15.01.2027); Anmeldung und Kosten sind dort nicht angegeben.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "einmalig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107106.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+     "category": "musik",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Angabe zur Anmeldung im Kalender; bitte bei der Kirchengemeinde Eibach erfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-12-18T09:30",
-        "end": "2026-12-18T10:30"
-       },
        {
         "start": "2027-01-15T09:30",
         "end": "2027-01-15T10:30"
@@ -109,8 +105,6 @@
    ],
    "inputHash": "0e82dc602ad5f902758163a29689aad3a66dcd1920d7ba797a7ba71d5f956701",
    "dated": {
-    "2026-11-13": "dd1b04a14dd397f38380d39befc8f85ca68377c4646c8c5190550624c1008866",
-    "2026-11-14": "04cb265aeeea6618cf2b7b8a083d59dc2b630a25aac2c8e3399989aad038013d",
     "2026-11-15": "b89364bba947c591cc9b42f1c257525258107dc5259a8c6ae29ceeda91f452d4",
     "2026-11-16": "30031e64662406fdd0bb827728a71bcb586ae3c208a15d3b4fe6b0755fbe6001",
     "2026-11-17": "2654195fa546ef7ce7abdf73d935379dcdb62effe3cf4289882aedd8feaca6fe",
@@ -213,8 +207,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-13T09:38:01+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
   }
  }

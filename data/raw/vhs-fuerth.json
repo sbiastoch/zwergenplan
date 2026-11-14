@@ -6,8 +6,8 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 1½–2½ Jahre (mittwochs 17 Uhr)",
-     "summary": "Wöchentlicher Bewegungsparcours für Kleinkinder mit Eltern, die aktiv mitmachen und den Parcours auf- und abbauen. Kursbeginn war im September 2026; die Termine laufen wöchentlich weiter, Dauer und Ende stehen nicht auf der Seite.",
+     "title": "Eltern-Kind-Turnen 1½–2½ Jahre (Mittwoch 17:00)",
+     "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum Laufen, Krabbeln, Balancieren und Springen, die Eltern machen aktiv mit. Der Kurs begann am 23.09.2026; ob und wann Termine im Winter folgen, steht auf der Seite nicht.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe nicht gelistet; Anmeldung über die vhs (Kursnummer 16301)"
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16301)"
      },
      "schedule": {
       "kind": "weekly",
@@ -40,8 +40,8 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 2–3 Jahre (donnerstags 17 Uhr)",
-     "summary": "Wöchentlicher Bewegungsparcours für Kinder ab 2 Jahren mit Eltern, die aktiv mitmachen und den Parcours auf- und abbauen. Kursbeginn war im September 2026; die Termine laufen wöchentlich weiter, Dauer und Ende stehen nicht auf der Seite.",
+     "title": "Eltern-Kind-Turnen 2–3 Jahre (Donnerstag 17:00)",
+     "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen, die Eltern machen aktiv mit. Der Kurs begann am 24.09.2026; ob und wann Termine im Winter folgen, steht auf der Seite nicht.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -59,7 +59,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe nicht gelistet; Anmeldung über die vhs (Kursnummer 16303)"
+      "note": "Keine Platzangabe auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16303)"
      },
      "schedule": {
       "kind": "weekly",
@@ -67,21 +67,16 @@
        "TH"
       ],
       "start": "17:00",
-      "from": "2026-11-12",
+      "from": "2026-11-19",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "61e2eb3f7c07d6f557314c3fa297abfc43826541d85c5bc57d70f8243060f6b6",
+   "inputHash": "d805668afaec15082a635cb057683eb496d1ffd03f48d779c9e8fd94058ae445",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-12T09:45:21+01:00",
-   "changedAt": "2026-11-12T09:45:21+01:00",
-   "pending": {
-    "inputHash": "1cc9885395459924bbbb1714a32c1c15b24317b23ce29582fbfacb8ae8c400d0",
-    "model": "haiku",
-    "events": []
-   },
+   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }
