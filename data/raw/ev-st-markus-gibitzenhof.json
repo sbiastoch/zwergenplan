@@ -6,20 +6,21 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Offene Tür für Groß und Klein (montags, FreiRaum)",
-     "summary": "Offener Treff im FreiRaum der Markuskirche für Groß und Klein, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung nötig; am 30.11. fällt er aus.",
+     "title": "Offene Tür für Groß und Klein (Montagstreff im FreiRaum)",
+     "summary": "Offener Treff für Familien mit Kleinkindern im FreiRaum der Markuskirche, montags 9–11 Uhr. Einstieg jederzeit, keine Anmeldung nötig. Am 30.11. fällt der Termin aus.",
      "topics": [
-      "elterntreff"
+      "spielgruppe",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8113801.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8113804.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
-     "category": "treffs-cafes",
+     "category": "krabbel-spielgruppen",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "offener Treff, einfach vorbeikommen"
+      "note": "offener Treff, keine Anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -28,7 +29,7 @@
       ],
       "start": "09:00",
       "end": "11:00",
-      "from": "2026-11-09",
+      "from": "2026-11-16",
       "skipHolidays": true,
       "except": [
        "2026-11-30"
@@ -38,20 +39,20 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Café für Alle (dienstags, Helmut-Herold-Platz)",
-     "summary": "Offener Café-Treff am Helmut-Herold-Platz vor der Markuskirche für Groß und Klein, dienstags 15–17 Uhr. Einfach dazukommen; am 24.11. beginnt er schon um 14:30 Uhr mit Bilderbuchkino.",
+     "title": "Café für Alle (Dienstagnachmittag am Helmut-Herold-Platz)",
+     "summary": "Offener Nachmittag auf dem Helmut-Herold-Platz vor der Markuskirche, meist dienstags 15–17 Uhr, ohne Anmeldung. An einzelnen Terminen gibt es ein Bilderbuchkino für Kinder; das Winterfest am 15.12. dauert bis 18 Uhr.",
      "topics": [
       "elterncafe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8053909.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8053910.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "offener Treff, einfach vorbeikommen"
+      "note": "einfach vorbeikommen, keine Anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -60,7 +61,7 @@
       ],
       "start": "15:00",
       "end": "17:00",
-      "from": "2026-11-10",
+      "from": "2026-11-17",
       "skipHolidays": true
      }
     },
@@ -68,14 +69,15 @@
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
      "title": "Offene Tür für Groß und Klein (Markuskirche / FreiRaum)",
-     "summary": "Offener Treff im FreiRaum der Markuskirche für Groß und Klein, montags von 9 bis 11 Uhr. Ohne Anmeldung einfach vorbeikommen; die Termine stehen im Kalender.",
+     "summary": "Offener Treff im FreiRaum der Markuskirche für Familien mit Kindern jeden Alters. Ohne Anmeldung, einfach vorbeikommen. Der Termin steht im Kalender nur einmal; weitere Termine bitte beim Anbieter erfragen.",
      "topics": [
+      "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8286333.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8286335.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=586",
      "category": "treffs-cafes",
      "availability": {
@@ -86,14 +88,6 @@
       "kind": "dates",
       "dates": [
        {
-        "start": "2027-01-11T09:00",
-        "end": "2027-01-11T11:00"
-       },
-       {
-        "start": "2027-01-18T09:00",
-        "end": "2027-01-18T11:00"
-       },
-       {
         "start": "2027-01-25T09:00",
         "end": "2027-01-25T11:00"
        }
@@ -103,8 +97,7 @@
    ],
    "inputHash": "e1098639d45764dc73b636f609f698e2ca7a27eb3205654c45294b033eb0cccd",
    "dated": {
-    "2026-11-14": "84242ba6b3d9139a99ec249af250d2ac1b6ca82f73ee2339342a95163d7dcb86",
-    "2026-11-15": "61ce131e97fcc328b0176a53a193104ba699f7e81d4842dd3eecde1962f26f77",
+    "2026-11-15": "9b27f8c367f62b5586b57e3b70a9ecd527174cdb73f9c4d714380d142281edbe",
     "2026-11-16": "a9bcf170cff476cc08de4313b6d19e0769df220ee242974dd736722eef190358",
     "2026-11-17": "90b0dd6eff7a0d09c31111810677c13380b5dff1ff5b720f3d6ac741ef4d4396",
     "2026-11-18": "b502baadc5d5ee6f9c6857bfcee6c2aa4997920e8d07911868ec02de4a26c698",
@@ -263,8 +256,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-14T08:57:02+01:00",
-   "changedAt": "2026-11-09T09:33:21+01:00",
+   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familiencafe/": {
@@ -303,7 +296,7 @@
    "inputHash": "d42b9a4298ebfbebaae3a98c697d5619eb86c91ad9df8e2736cd50c937ffa4fe",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-15T09:18:13+01:00",
    "changedAt": "2026-11-14T08:57:02+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -312,7 +305,7 @@
    "inputHash": "1146af4e23933207f6a425587b6652201872b6ed94768ff23059624a8bd745a9",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-15T09:18:13+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -395,7 +388,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-15T09:18:13+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
    "sources": [
     "evtermine"

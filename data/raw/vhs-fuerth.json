@@ -6,8 +6,8 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 1½–2½ Jahre (Mittwoch 17:00)",
-     "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum Laufen, Krabbeln, Balancieren und Springen, die Eltern machen aktiv mit. Der Kurs begann am 23.09.2026; ob und wann Termine im Winter folgen, steht auf der Seite nicht.",
+     "title": "Eltern-Kind-Turnen (1½–2½ Jahre), Mittwoch",
+     "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen, Eltern machen aktiv mit. Der Kurs läuft seit 23.09.2026; die Quelle nennt weder Kursende noch Ferienpausen.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -25,7 +25,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16301)"
+      "note": "Anmeldung über die Kursdetails bei der vhs (Kursnummer 16301)"
      },
      "schedule": {
       "kind": "weekly",
@@ -40,8 +40,8 @@
     {
      "providerId": "vhs-fuerth",
      "venueId": "vhs-fuerth",
-     "title": "Eltern-Kind-Turnen 2–3 Jahre (Donnerstag 17:00)",
-     "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen, die Eltern machen aktiv mit. Der Kurs begann am 24.09.2026; ob und wann Termine im Winter folgen, steht auf der Seite nicht.",
+     "title": "Eltern-Kind-Turnen (2–3 Jahre), Donnerstag",
+     "summary": "Wöchentlich neu gestalteter Bewegungsparcours zum freien Turnen, Eltern machen aktiv mit. Der Kurs läuft seit 24.09.2026; die Quelle nennt weder Kursende noch Ferienpausen.",
      "topics": [
       "eltern-kind-turnen",
       "bewegung"
@@ -59,7 +59,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite; Anmeldung über die Kursdetails (Kursnummer 16303)"
+      "note": "Anmeldung über die Kursdetails bei der vhs (Kursnummer 16303)"
      },
      "schedule": {
       "kind": "weekly",
@@ -72,11 +72,11 @@
      }
     }
    ],
-   "inputHash": "d805668afaec15082a635cb057683eb496d1ffd03f48d779c9e8fd94058ae445",
+   "inputHash": "4a3fff97ffd6c83408d0c5c3f9e70c13de49cc323ac1c2bc10f289b6fa10c5d4",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-14T08:57:02+01:00",
-   "changedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "8fd0058c52704137f372e4f013cbf285b5bc4a9b3ecb6ed11aa233d5f3af097d"
   }
  }
