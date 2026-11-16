@@ -6,8 +6,8 @@
     {
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
-     "title": "Jazz für Kinder",
-     "summary": "Jazzkonzert zum Zuhören und Zuschauen ohne Altersgrenze, sonntags um 11 Uhr an mehreren Terminen bis Mai 2027. Alle Termine im Horizont sind ausverkauft.",
+     "title": "Jazz für Kinder (ohne Altersgrenze)",
+     "summary": "Jazzkonzert für Kinder ohne Altersgrenze, meist sonntags um 11 Uhr. Alle im Spielplan gelisteten Vorstellungen sind derzeit ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -20,7 +20,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Alle 6 Termine im Spielplan ausverkauft"
+      "note": "Alle Termine ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -50,7 +50,7 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: SAX.O.PHON",
-     "summary": "Klassisches Konzert zum Zuhören für die Kleinsten, ohne Altersgrenze, aus der Reihe Klassik für Kinder. Der Termin ist ausverkauft.",
+     "summary": "Klassikkonzert für Kinder ohne Altersgrenze, Sonntag um 11 Uhr. Der Termin ist ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -63,7 +63,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausverkauft"
+      "note": "Termin ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -78,7 +78,7 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Brummen und Summen mit dem Kontrabass",
-     "summary": "Klassisches Konzert zum Zuhören für die Kleinsten, ohne Altersgrenze, aus der Reihe Klassik für Kinder. Der Termin ist ausverkauft.",
+     "summary": "Klassikkonzert für Kinder ohne Altersgrenze mit dem Kontrabass, Sonntag um 11 Uhr. Der Termin ist ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -91,7 +91,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausverkauft"
+      "note": "Termin ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -106,7 +106,7 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Die Oboe auf Reisen",
-     "summary": "Klassisches Konzert zum Zuhören für die Kleinsten, ohne Altersgrenze, aus der Reihe Klassik für Kinder. Der Termin ist ausverkauft.",
+     "summary": "Klassikkonzert für Kinder ohne Altersgrenze mit der Oboe, Sonntag um 11 Uhr. Der Termin ist ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -119,7 +119,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausverkauft"
+      "note": "Termin ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -134,7 +134,7 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Pfeif drauf! Die Blockflötenfamilie stellt sich vor",
-     "summary": "Klassisches Konzert zum Zuhören für die Kleinsten, ohne Altersgrenze, aus der Reihe Klassik für Kinder. Der Termin ist ausverkauft.",
+     "summary": "Klassikkonzert für Kinder ohne Altersgrenze, in dem sich die Blockflötenfamilie vorstellt. Sonntag um 11 Uhr, ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -147,7 +147,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausverkauft"
+      "note": "Termin ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -162,7 +162,7 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Klingende und singende Violine",
-     "summary": "Klassisches Konzert zum Zuhören für die Kleinsten, ohne Altersgrenze, aus der Reihe Klassik für Kinder. Der Termin ist ausverkauft.",
+     "summary": "Klassikkonzert für Kinder ohne Altersgrenze mit der Violine, Sonntag um 11 Uhr. Der Termin ist ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -175,7 +175,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausverkauft"
+      "note": "Termin ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -190,7 +190,7 @@
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
      "title": "Klassik für Kinder: Vorhang auf für die Überraschung",
-     "summary": "Klassisches Konzert zum Zuhören für die Kleinsten, ohne Altersgrenze, aus der Reihe Klassik für Kinder. Der Termin ist ausverkauft.",
+     "summary": "Klassikkonzert für Kinder ohne Altersgrenze, Sonntag um 11 Uhr. Der Termin ist ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -203,7 +203,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausverkauft"
+      "note": "Termin ausverkauft"
      },
      "schedule": {
       "kind": "dates",
@@ -215,11 +215,11 @@
      }
     }
    ],
-   "inputHash": "e78066d1a0d7b7209a50d98488804a1b0de9f40cc68d152de614dee900b053f5",
+   "inputHash": "8f61a93731c816b0741fb64393a79d9208f3e005658dacd478a1b283e7c37b30",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
-   "changedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "changedAt": "2026-11-16T09:25:52+01:00",
    "partsHash": "35534a05e45ec78c75433e4af4b6d7dfa3f5816cd79353a2c1c234fa0573313c"
   },
   "seite:https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/": {
@@ -272,7 +272,7 @@
    "inputHash": "73486eeb0d295c1cb347888c4480908255301c6210b6b7f9ce2416245fa423f5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -332,7 +332,7 @@
    "inputHash": "8858f7a5a4afb7e61a764647f548accc0c06fc9ed932c7fafbc933f8a30fc3c9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -351,7 +351,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "frankenkids",

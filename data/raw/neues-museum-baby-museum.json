@@ -49,7 +49,7 @@
    "inputHash": "71e548cfa09e247123ab4b8a8486590dbe1583643d755bc161f6a08a2d2f626c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
@@ -92,7 +92,7 @@
    "inputHash": "7faa65f986ac1f8f5348c4c1e21dabcde6dd20dd9a3a6e4ed28770464ddb67ba",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
@@ -154,7 +154,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"

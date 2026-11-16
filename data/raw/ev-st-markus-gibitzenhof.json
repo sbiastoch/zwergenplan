@@ -97,7 +97,6 @@
    ],
    "inputHash": "e1098639d45764dc73b636f609f698e2ca7a27eb3205654c45294b033eb0cccd",
    "dated": {
-    "2026-11-15": "9b27f8c367f62b5586b57e3b70a9ecd527174cdb73f9c4d714380d142281edbe",
     "2026-11-16": "a9bcf170cff476cc08de4313b6d19e0769df220ee242974dd736722eef190358",
     "2026-11-17": "90b0dd6eff7a0d09c31111810677c13380b5dff1ff5b720f3d6ac741ef4d4396",
     "2026-11-18": "b502baadc5d5ee6f9c6857bfcee6c2aa4997920e8d07911868ec02de4a26c698",
@@ -256,7 +255,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -265,8 +264,8 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Café für Alle – offener Familientreff dienstags",
-     "summary": "Offenes Café im FreiRaum bzw. vor der Markuskirche: Kaffee und Kuchen gegen Spende, Kinder sind willkommen, Einstieg jederzeit. Die Seite nennt widersprüchlich 14–17 Uhr und 15–18 Uhr; vorher bitte prüfen.",
+     "title": "Café für Alle – offener Dienstagstreff mit Kinderprogramm",
+     "summary": "Offener Café-Treff für Familien mit Kindern jeden Alters, mit Kaffee und Kuchen gegen Spende. Regelmäßig Bastelaktionen und Bilderbuchkinos. Die Uhrzeit steht auf der Seite zweimal unterschiedlich (14–17 bzw. 15–18 Uhr), vorab nachfragen. Bei schönem Wetter draußen vor der Kirche.",
      "topics": [
       "elterncafe",
       "elterntreff"
@@ -274,7 +273,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "Eintritt frei, Kaffee und Kuchen gegen Spende",
+     "price": "Kaffee und Kuchen gegen Spende",
      "url": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
      "sourceUrl": "https://www.sanktmarkus-nuernberg.de/familiencafe/",
      "category": "treffs-cafes",
@@ -287,25 +286,26 @@
       "weekdays": [
        "TU"
       ],
-      "start": "15:00",
+      "start": "14:00",
+      "end": "17:00",
       "from": "2026-11-17",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "d42b9a4298ebfbebaae3a98c697d5619eb86c91ad9df8e2736cd50c937ffa4fe",
+   "inputHash": "85a3d665bc30eb45812d5775b956473b3cb5d15f3766281bb3b8e687dbb3f42a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
-   "changedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "changedAt": "2026-11-16T09:25:52+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familien-kinder/": {
    "events": [],
-   "inputHash": "1146af4e23933207f6a425587b6652201872b6ed94768ff23059624a8bd745a9",
+   "inputHash": "382faee034a0a04413c20899316358ba711bfc8e29b868b985e2ef39a90cb4d3",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -388,7 +388,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-15T09:18:13+01:00",
+   "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-10T09:46:47+01:00",
    "sources": [
     "evtermine"
