@@ -114,6 +114,11 @@
    "status": "ok",
    "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
+   "pending": {
+    "inputHash": "b9428c13a945053e7635467ce0338b83bc59e102ebe125303e0ca4abad709146",
+    "model": "haiku",
+    "events": []
+   },
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/musikzauber/": {
@@ -370,7 +375,7 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -379,7 +384,7 @@
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -388,17 +393,17 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/kursart-offener-treff/": {
    "events": [],
-   "inputHash": "900df567d71314e1bacff9a6a5c555c59cce1159e7a25bf4db63c5676e0063a2",
+   "inputHash": "f8d34b4cf4d218c28a47bd907c7b50aa9d16116ee2ff516d8c893a3eda7f7423",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1424,7 +1429,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1433,8 +1438,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "Babymassage + Babyyoga (Babys ab 6 Wochen bis 4 Monate)",
-     "summary": "Sanfte Babymassage nach Leboyer mit Babyyoga und Achtsamkeit für Eltern, dazu Austausch mit anderen Eltern; höchstens 6 Paare. Drei Vierer-Blöcke Januar bis März 2027 (donnerstags 11:15–12:15), Anmeldung über das Formular. Externer Partnerkurs: Der Vertrag besteht mit dem Kursanbieter.",
+     "title": "Babymassage + Babyyoga (Babys 6 Wochen bis 4 Monate)",
+     "summary": "Sanfte indische Babymassage kombiniert mit Babyyoga und kurzen Achtsamkeitsübungen für Eltern; maximal 6 Duos. Drei 4-teilige Blöcke (Jan., Feb., März 2027), Massageöl wird gestellt. Externe Kursleitung, Buchung über das Formular.",
      "topics": [
       "babymassage",
       "yoga-mit-baby"
@@ -1442,7 +1447,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "69 € (4 Termine je Block)",
+     "price": "69 € (4 Termine pro Block)",
      "url": "https://studioherzschlag.de/angebot/babymassage/",
      "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
      "category": "babykurse",
@@ -1452,7 +1457,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Buchung über das Formular auf der Seite"
+      "note": "Anmeldung über das Buchungsformular auf der Seite; Platzanzeige fehlt"
      },
      "schedule": {
       "kind": "dates",
@@ -1509,11 +1514,11 @@
      }
     }
    ],
-   "inputHash": "57f53d9b0993ec6a1d8229940305393f3edfd1a41593fa1804da751438f91267",
+   "inputHash": "dd46f21cb83e4fbde9c16b57c9c2ac141eaf8280dbdf7f6d117dd2e32da5b1da",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
-   "changedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsnest/": {
@@ -1710,32 +1715,37 @@
    "status": "ok",
    "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
+   "pending": {
+    "inputHash": "24d8849e02b5304218fb6e85fc2e4863176dbdba75036f202cd9413e2da2030a",
+    "model": "haiku",
+    "events": []
+   },
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/herzzeit/": {
    "events": [],
-   "inputHash": "1e8ad830163c4cda9ebec744256b4793fe4c0b9e188cf3c475d4ade91ec6b655",
+   "inputHash": "acd760675c6f4b513f8b8ae6ad9d1cba4091deb3c5fe395abc175a35843d2714",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/yoga-mit-baby/": {
    "events": [],
-   "inputHash": "29af33f6bed3014d63957dd85134a7963c1aef52eba2cdb9fc87ae9558419020",
+   "inputHash": "a7dc231dd13d385f2932c25607d5b84fe7b2671777d693eeebec9852531daf63",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/pilates-fitness-mit-baby/": {
    "events": [],
-   "inputHash": "80e341a266f0e2c5df8e539ebe03e908341ea3d9159348abfb01447228fbd1fa",
+   "inputHash": "31e145270dd52d1a037406019cbc81daef6341f693f23c815e75ce1495e3a33d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1743,27 +1753,31 @@
    "events": [],
    "inputHash": "34cc912fe8036bf700cee8833b634c8c1e73db70b81528d42362964292094a00",
    "model": "haiku",
-   "status": "keine-termine",
+   "status": "fehler",
+   "reason": "https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
    "checkedAt": "2026-11-16T09:25:52+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
+   "failingSince": "2026-11-17T10:40:21+01:00",
+   "klasse": "voruebergehend",
+   "klasseSince": "2026-11-17T10:40:21+01:00",
    "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/": {
    "events": [],
-   "inputHash": "e6a783db0e4ce3d35ec6d3ffb00fb75a21795e5b9346fc985cd859dfb2746d2c",
+   "inputHash": "4aec1d34887f43cfeb398aa15c680181abfab25b6c7fffcc259a886032f64b57",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/eltern-kind-turnen/": {
    "events": [],
-   "inputHash": "4aaa29f1d499a8568f5f6529e2ec811a084589b4b7ff98efec1d373b7d04b480",
+   "inputHash": "738fb300f112a073b3f8918ab0dec8894685d481bce10c39f8d91187bf69b445",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1810,7 +1824,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"

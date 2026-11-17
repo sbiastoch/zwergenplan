@@ -75,7 +75,7 @@
    "inputHash": "b4f8666250751c3ce6a4bb064f50dd67ad6959794b8fbe30cc38f3520b00393a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "8fdc3a8a582919153c413399f039f64479ccfa6fed10791255713e99ba7f3951"
   },
@@ -83,7 +83,6 @@
    "events": [],
    "inputHash": "0f93a49928c2a4cdfdc9ab4e4d3f64090f762076d5f4ffbedef552f213aa2657",
    "dated": {
-    "2026-11-16": "19dec541f8c5f5a260c2ddcb045ae89c3d4bb095df93869bbeea2aaa17007a39",
     "2026-11-17": "2d7d36700eb6f8b91bf393b148373844698b9761ab7f2367409505af9bb3c84d",
     "2026-11-18": "e264e584f67e5518ab8d5f6b60f8603fa38d7c9664758051a8dd3efbb3ea2f0c",
     "2026-11-19": "ba230f4aa1d49716ed765a2f17d88399724975f5c94083aaf3404984caaa5daf",
@@ -201,7 +200,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8fdc3a8a582919153c413399f039f64479ccfa6fed10791255713e99ba7f3951"
   },
@@ -209,16 +208,15 @@
    "events": [],
    "inputHash": "894a8cdafbf52c2aa0388a6a7b87933b61e9d738d571165ff0a59a375765cea3",
    "dated": {
-    "2026-11-17": "3c20129a8fc3b02e14d62390be960722cf8c565ad6d94ce6e7760c7015952b76",
-    "2026-11-24": "c585fa487901e0ea6ed32472ac01f5b2eec20e9e9d1ad921fe3e5a837a032831",
-    "2026-12-01": "52606ce3d1e71fb958d4aa0f266b2cbab4c89f74b644db850a19278939e278e7",
-    "2026-12-08": "e0bce374958d50e4c4fd639c4d5a0b676546400884a95c433f49e70c0324ebf8",
-    "2026-12-15": "15dbeb4ea3fdd9f3225988bbe8f6d3e2cbfe3a879786a41f4c0819f9f2c0caf3",
-    "2026-12-22": "9d94aa251b32c78c4a571f050b4e6d148a083a43d24474772d46180c3eeff29d"
+    "2026-11-24": "225f05617c04f111ed505d38dfe763a58a29cffdf561f9e36d73766018d204df",
+    "2026-12-01": "0de7c80612e23b2ac0cae872ae4b3ae9bf398a91cfdbf1f5c9eafd372a9a7f6c",
+    "2026-12-08": "fedb0235756be0f38bda3ce595a52d57b8658c5f0bbdbcc3e4bd4c8b4f11da97",
+    "2026-12-15": "006060ace2c940599ef9bfe3a2d94b6351b6fe2d149ff77ef41f33596878e97a",
+    "2026-12-22": "0964382ed811de35437fcef983d91d49c7a1549a98d5ac3fbacb8616fce1d813"
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-11-03T09:27:26+01:00",
    "sources": [
     "evtermine"

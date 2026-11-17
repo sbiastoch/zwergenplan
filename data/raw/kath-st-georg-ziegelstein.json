@@ -6,12 +6,12 @@
     {
      "providerId": "kath-st-georg-ziegelstein",
      "venueId": "kath-st-georg-ziegelstein",
-     "title": "Kleinkindergottesdienst St. Georg (Pfarrsaal)",
-     "summary": "Gottesdienst für Kleinkinder im Pfarrsaal St. Georg an zwei Sonntagen im Horizont, jeweils um 10.30 Uhr. Auf der Seite ist keine Anmeldung genannt.",
+     "title": "Kleinkindergottesdienst im Pfarrsaal St. Georg",
+     "summary": "Gottesdienst speziell für Kleinkinder mit ihren Familien im Pfarrsaal St. Georg, Bierweg 33. Der Termin steht im Advent am 20.12. um 10.30 Uhr; eine Anmeldung ist nicht genannt.",
      "topics": [
       "krabbelgottesdienst"
      ],
-     "format": "regelmaessig",
+     "format": "einmalig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
      "url": "https://aktuelles-und-medien.stadtkirche-nuernberg.de/gottesdienste/gottesdienste-fuer-familien",
@@ -19,14 +19,11 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Gottesdienst ohne Anmeldung auf der Seite nicht ausdrücklich genannt."
+      "note": "Keine Angabe zu Anmeldung oder Plätzen auf der Seite."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-15T10:30"
-       },
        {
         "start": "2026-12-20T10:30"
        }
@@ -34,11 +31,11 @@
      }
     }
    ],
-   "inputHash": "3f27b76116e71d8b002901f3f4d4472779a35e5cea31c7d3e30bb3d49f372c78",
+   "inputHash": "f1047bf5b4c560207e1a495494011e2a4b5e83c26d5f00b9ad282ce26cbc348d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "3f9123c1f7cc42a865ffba25d851e443c0148030b844b8b413892c2233278c0f"
   }
  }

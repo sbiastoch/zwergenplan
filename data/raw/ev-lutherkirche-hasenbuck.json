@@ -6,8 +6,8 @@
     {
      "providerId": "ev-lutherkirche-hasenbuck",
      "venueId": "ev-lutherkirche-hasenbuck",
-     "title": "Krabbelgruppe (Dienstags, Babys und Kleinkinder mit Eltern)",
-     "summary": "Offene Krabbelgruppe im Pfarramt-Keller der Lutherkirche (Zugang vom Garten), dienstags 10:30–11:30 Uhr. Im Kalender sind die Termine bis 22.12. eingetragen. Anmeldung, Kosten und Plätze sind nicht angegeben; Rückfragen am besten beim Pfarramt.",
+     "title": "Krabbelgruppe (dienstags, Pfarramt-Keller Lutherkirche)",
+     "summary": "Regelmäßige Krabbelgruppe im Keller des Pfarramts (Zugang vom Garten), dienstags 10:30–11:30 Uhr. Der Kalender listet die Termine bis Ende Dezember 2026; Anmeldung und Kosten stehen dort nicht.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -15,7 +15,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8146745.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8146747.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=571",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -24,19 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalender; Rückfrage beim Pfarramt."
+      "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalender; Rückfragen über www.lutherkirche-nuernberg.de"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-10T10:30",
-        "end": "2026-11-10T11:30"
-       },
-       {
-        "start": "2026-11-17T10:30",
-        "end": "2026-11-17T11:30"
-       },
        {
         "start": "2026-11-24T10:30",
         "end": "2026-11-24T11:30"
@@ -63,7 +55,6 @@
    ],
    "inputHash": "a0108ccb4f8fe493aff87dbcab8df70cdbb41277343519898856532532a985f6",
    "dated": {
-    "2026-11-17": "835b8e56de910142846051f0e1fe0c1c928b4890dcf41bfc12b5d207fbe4b6d9",
     "2026-11-18": "0a099445fc380e154542bf39adac3ca34e1c78b28785d61b8c9ebdae64712517",
     "2026-11-19": "d62811f7a77a91f8a07576210e5b002070c042eff9c73ca3616821f2fcf0cff7",
     "2026-11-22": "75ec914ca082b2ac37850415faaf9943ec55f4f166f499c0de550bce7453c09f",
@@ -108,8 +99,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
-   "changedAt": "2026-11-04T08:55:04+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "4997115d57eea8441ea456e2b3761ec206a77bdc46a1b3ec23688c24be8d9b27"
   },
   "kandidaten": {
@@ -117,17 +108,17 @@
     {
      "providerId": "ev-lutherkirche-hasenbuck",
      "venueId": "ev-lutherkirche-hasenbuck",
-     "title": "Krabbelgruppe der Lutherkirche (dienstags 10:30)",
-     "summary": "Krabbelgruppe der Lutherkirche im Keller des Pfarramts (Zugang vom Garten), Termine dienstags um 10:30 Uhr bis 22.12. Anmeldung und Kosten stehen nicht in der Quelle, bitte beim Pfarramt nachfragen.",
+     "title": "Krabbelgruppe im Pfarramt der Lutherkirche Hasenbuck",
+     "summary": "Regelmäßige Krabbelgruppe für Babys und Kleinkinder im Keller des Pfarramts (Zugang vom Garten). Zu Anmeldung und Kosten macht die Quelle keine Angaben; beim Pfarramt nachfragen.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8146746",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146746",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8146747",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146747",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -135,14 +126,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen; Anfrage beim Pfarramt Lutherkirche"
+      "note": "Keine Angabe zur Anmeldung – beim Pfarramt Lutherkirche nachfragen"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-17T10:30"
-       },
        {
         "start": "2026-11-24T10:30"
        },
@@ -165,17 +153,16 @@
    ],
    "inputHash": "8abadccc4fbb77c2f471edc1b73b050678b7a11fa93db672c1960d276885a17b",
    "dated": {
-    "2026-11-17": "a2527460f3f7de619651d143950d99b2df3216c60f90b6587e8c43fa5e98bb81",
-    "2026-11-24": "6f357095389aecf90984bb7214c8e7ee2852d36e514dde1f398d035a990564ac",
-    "2026-12-01": "014ac50ed46647884b4bb6d5e5d7a2d0c61902ed7cce82a7ef5febd1619214db",
-    "2026-12-08": "e19cc00eb5db0abb475611ceaa790ac378fc6be0871a622d9cec7f22dcf44b27",
-    "2026-12-15": "e09afeccc23a01d249eb2fbaf8e4e278c7e67ae5de7c3418a56999646ae292bd",
-    "2026-12-22": "6c2d9515c0a447694f47ff6861ad422b313c16993f09c3e938aff88ae5416ca3"
+    "2026-11-24": "568530cb229079aa6aff38ac9b2524e9cb11118125dae3b9c1dc36497818c8aa",
+    "2026-12-01": "8b301d6701b2cf3713a309be9850b4d70bb6dd00017c810c87d6169005a4503d",
+    "2026-12-08": "40c4251f82a6574e11414e563fbf2c5432989e76599b5bd95f457e2faf3e6fd2",
+    "2026-12-15": "c3246e60b27941ab5ce076015b174f567cec3a7f2e55c8b18238ec56023a2b58",
+    "2026-12-22": "40923feda6e70b2b0604ca8bea761dfc119a5c0c49928f91c32e24af1f3b08b3"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "changedAt": "2026-11-17T10:40:21+01:00",
    "sources": [
     "evtermine"
    ],

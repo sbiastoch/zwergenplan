@@ -70,7 +70,7 @@
    "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "pending": {
-    "inputHash": "68cb2b11a0b2decde4a1de8a3b3ff84a6b49a47d8a9acb7c3b2c021d8dc58455",
+    "inputHash": "f0ee4a49c4c99738cd4b3019d0c278425562af1a8b0575d1ccae963ec74055bd",
     "model": "haiku",
     "events": []
    },
@@ -92,7 +92,7 @@
    "inputHash": "5967542cc8942083fe52c479780716a976ae9ca673450c26a92e620a78591e4e",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "0f480c78bfd0dba598297cfacf6fb3e4c58ad7d92531c1e477facc8971bdc162"
   },
@@ -101,7 +101,7 @@
    "inputHash": "93a046dd1890bf7ca280c6a5f6ad2b08fe803b78091f232d076d4c09f80280ac",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "sources": [
     "stadt-vk"

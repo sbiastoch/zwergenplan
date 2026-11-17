@@ -6,15 +6,15 @@
     {
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
-     "title": "Schneeflocken, wippediwapp (Lucia Ruf), Kinderkonzert ab 2 Jahren",
-     "summary": "Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitmachen, Tanzen und Klatschen. Einzelne Vorstellungen Ende November sind bereits ausverkauft; Tickets im Webshop prüfen.",
+     "title": "Schneeflocken, wippediwapp – Winterlieder mit Lucia Ruf",
+     "summary": "Kinderliedermacherin Lucia Ruf singt Winterlieder zum Mitsingen und Mittanzen. Mehrere Vorstellungen Ende November 2026; die Termine am 30.11. sind ausverkauft.",
      "topics": [
       "konzert"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
+     "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
      "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
      "category": "buehne",
      "age": {
@@ -23,7 +23,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Je Vorstellung unterschiedlich: 29.11. 14:00 ohne Ausverkauft-Vermerk; 30.11. 09:30 und 10:45 ausverkauft. Tickets im Eventim-Webshop."
+      "note": "Je Termin unterschiedlich: 29.11. 14:00 nicht als ausverkauft markiert; 30.11. 09:30 und 10:45 ausverkauft. Tickets im Eventim-Webshop des Sternenhauses."
      },
      "schedule": {
       "kind": "dates",
@@ -47,14 +47,14 @@
      "providerId": "sternenhaus-kuf",
      "venueId": "sternenhaus-kuf",
      "title": "WiWaWaldtraum – Mitmachtheater (Purzeltraumtheater)",
-     "summary": "Mitmachtheater für Kinder ab 2: Trolli Tolpatsch legt im Zauberwald Baumbolino seine Waldprüfung ab, begleitet von einer Fee. Herbststück aus dem Vierjahreszeiten-Zyklus; Tickets über den Eventim-Webshop.",
+     "summary": "Mitmachtheater: Trolli Tolpatsch legt im Zauberwald Baumbolino seine Waldprüfung ab, begleitet von der Fee Fiofina und ihren kniffligen Aufgaben. Für Kinder ab 2 Jahren; Tickets im Webshop.",
      "topics": [
       "theater"
      ],
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
+     "url": "https://www.nuernberg.de/internet/kuf_kultur/sternenhaus.html",
      "sourceUrl": "https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28ortID%20%3D%3D%206239%29&AUSGABEFELDER=TITEL,UNTERTITEL,BESCHREIBUNG,DATUM,AUSVERKAUFT&MAX_LIMIT=300&ALLETERMINE=1&ORDER=DATUM&START_DATUM=2026-11-01&USERNAME=KundF",
      "category": "buehne",
      "age": {
@@ -63,7 +63,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets im Eventim-Webshop; in der Kalender-API nicht als ausverkauft markiert"
+      "note": "Keine Ausverkauft-Meldung im Kalender; Tickets im Eventim-Webshop des KUF"
      },
      "schedule": {
       "kind": "dates",
@@ -84,11 +84,11 @@
      }
     }
    ],
-   "inputHash": "3ed3db8781b6bdf9f86de017fb02c0ffcda19daccd2a71620905d096698bac49",
+   "inputHash": "f66305d8c6a59972933be77afe9d4d0e91fe28135cd72212de868dc4f2a7f96f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
-   "changedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "1773169258ff9b94e692feaa4cb6c79f6de49ce0e4ff6630b0de1afcb56cb389"
   },
   "kandidaten": {
@@ -143,7 +143,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
+   "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"
