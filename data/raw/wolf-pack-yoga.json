@@ -6,8 +6,8 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby bei den Hebammen in Johannis (Babys 3–12 Monate)",
-     "summary": "Postnataler Yoga-Kurs mit Baby nach der Rückbildung, auch für interessierte Papas. 6 Donnerstage 09:30–10:30. Der laufende Kurs (ab 22.10.) ist laut Eversports nicht buchbar; spätere Starttermine laut Website: 10.12.26, 11.02.27, 01.04.27, 03.06.27.",
+     "title": "Yoga mit Baby Donnerstags (Kursstart 22.10.2026)",
+     "summary": "Rückbildungsunterstützendes Yoga mit Baby (3–12 Monate) in den Räumen der Hebammen in Johannis, donnerstags 9:30–10:30, 6 Termine. Der Kurs läuft bereits; Eversports führt ihn als geschlossenen Kurs.",
      "topics": [
       "yoga-mit-baby"
      ],
@@ -24,51 +24,177 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Eversports zeigt „Nicht buchbar“ (geschlossener Kurs). Für spätere Starttermine über die Buchungsseite bzw. bei Wolf Pack Yoga anfragen."
+      "note": "Restplätze nicht angegeben; Anmeldung über Eversports"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-22T09:30",
-        "end": "2026-10-22T10:30"
-       },
-       {
-        "start": "2026-10-29T09:30",
-        "end": "2026-10-29T10:30"
-       },
-       {
-        "start": "2026-11-05T09:30",
-        "end": "2026-11-05T10:30"
-       },
-       {
-        "start": "2026-11-12T09:30",
-        "end": "2026-11-12T10:30"
-       },
-       {
-        "start": "2026-11-19T09:30",
-        "end": "2026-11-19T10:30"
-       },
-       {
-        "start": "2026-11-26T09:30",
-        "end": "2026-11-26T10:30"
-       }
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-10-22",
+      "count": 6,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "wolf-pack-yoga",
+     "venueId": "wolf-pack-yoga",
+     "title": "Yoga mit Baby Donnerstags (Kursstart 10.12.2026)",
+     "summary": "Rückbildungsunterstützendes Yoga mit Baby (3–12 Monate) in den Räumen der Hebammen in Johannis, donnerstags 9:30–10:30, 6 Termine. Am 24.12. und 31.12. findet keine Stunde statt.",
+     "topics": [
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "102 € (6 Termine)",
+     "url": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Restplätze nicht angegeben; Buchung über „hier buchen“ auf der Anbieterseite"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-12-10",
+      "count": 6,
+      "skipHolidays": false,
+      "except": [
+       "2026-12-24",
+       "2026-12-31"
       ]
+     }
+    },
+    {
+     "providerId": "wolf-pack-yoga",
+     "venueId": "wolf-pack-yoga",
+     "title": "Yoga mit Baby Donnerstags (Kursstart 11.02.2027)",
+     "summary": "Rückbildungsunterstützendes Yoga mit Baby (3–12 Monate) in den Räumen der Hebammen in Johannis, donnerstags 9:30–10:30, 6 Termine.",
+     "topics": [
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "102 € (6 Termine)",
+     "url": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Restplätze nicht angegeben; Buchung über „hier buchen“ auf der Anbieterseite"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2027-02-11",
+      "count": 6,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "wolf-pack-yoga",
+     "venueId": "wolf-pack-yoga",
+     "title": "Yoga mit Baby Donnerstags (Kursstart 01.04.2027)",
+     "summary": "Rückbildungsunterstützendes Yoga mit Baby (3–12 Monate) in den Räumen der Hebammen in Johannis, donnerstags 9:30–10:30, 6 Termine.",
+     "topics": [
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "102 € (6 Termine)",
+     "url": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Restplätze nicht angegeben; Buchung über „hier buchen“ auf der Anbieterseite"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2027-04-01",
+      "count": 6,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "wolf-pack-yoga",
+     "venueId": "wolf-pack-yoga",
+     "title": "Yoga mit Baby Donnerstags (Kursstart 03.06.2027)",
+     "summary": "Rückbildungsunterstützendes Yoga mit Baby (3–12 Monate) in den Räumen der Hebammen in Johannis, donnerstags 9:30–10:30, 6 Termine.",
+     "topics": [
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "102 € (6 Termine)",
+     "url": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Restplätze nicht angegeben; Buchung über „hier buchen“ auf der Anbieterseite"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2027-06-03",
+      "count": 6,
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "e289471242e6fe5536b75168ef74e4afe9fa97884a4d529ccdedad4272e0df26",
+   "inputHash": "256ad6d7a8ec1447c116ef7fa48aa4451ca0e8baee63b619ea3761d4dc08c6ac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
-   "changedAt": "2026-11-14T08:57:02+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "changedAt": "2026-11-18T10:00:22+01:00",
    "partsHash": "766e03d83a107d8c166739ed26c23c79486547433de07097e17bb784a4f8c7f9"
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00"
+   "checkedAt": "2026-11-18T10:00:22+01:00"
   }
  }
 }

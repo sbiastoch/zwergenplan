@@ -2,123 +2,13 @@
  "version": 2,
  "units": {
   "seite:https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/": {
-   "events": [
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "PEKiP-Gruppe Do, Babys geb. Mai–Juli 2026",
-     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern und Einzelberatung, 8 Termine. Externer Partnerkurs, Buchung über das Formular des Studios.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "150 €",
-     "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 6,
-      "maxMonths": 9
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular; Platzzahl nicht angegeben"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "11:00",
-      "from": "2027-01-07",
-      "count": 8,
-      "skipHolidays": false
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "PEKiP-Gruppe Do, Babys geb. Okt.–Nov. 2026",
-     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern und Einzelberatung, 8 Termine. Externer Partnerkurs, Buchung über das Formular des Studios.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "150 €",
-     "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 3,
-      "maxMonths": 5
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular; Platzzahl nicht angegeben"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:30",
-      "end": "11:00",
-      "from": "2027-03-04",
-      "count": 8,
-      "skipHolidays": false
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "PEKiP-Gruppe Fr, Babys geb. Juli–Aug. 2026",
-     "summary": "Bewegungs- und Spielanregungen für Babys mit Austausch für Eltern und Einzelberatung, 8 Termine. Externer Partnerkurs; laut Seite ausgebucht.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "150 €",
-     "url": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 4,
-      "maxMonths": 6
-     },
-     "availability": {
-      "status": "ausgebucht",
-      "note": "Auf der Seite als ausgebucht markiert"
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "FR"
-      ],
-      "start": "09:30",
-      "end": "11:00",
-      "from": "2027-01-08",
-      "count": 8,
-      "skipHolidays": false
-     }
-    }
-   ],
-   "inputHash": "ea8faca21b1c812f23e95514a0320d2a93e8e3bd0bb53290eb7a8fba012b410d",
+   "events": [],
+   "inputHash": "b9428c13a945053e7635467ce0338b83bc59e102ebe125303e0ca4abad709146",
    "model": "haiku",
-   "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
-   "changedAt": "2026-11-12T09:45:21+01:00",
-   "pending": {
-    "inputHash": "b9428c13a945053e7635467ce0338b83bc59e102ebe125303e0ca4abad709146",
-    "model": "haiku",
-    "events": []
-   },
+   "status": "keine-termine",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "changedAt": "2026-11-18T10:00:22+01:00",
+   "emptySince": "2026-11-18T10:00:22+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/musikzauber/": {
@@ -375,7 +265,7 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -384,7 +274,7 @@
    "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -393,7 +283,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -403,7 +293,7 @@
    "inputHash": "f8d34b4cf4d218c28a47bd907c7b50aa9d16116ee2ff516d8c893a3eda7f7423",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1429,7 +1319,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1517,209 +1407,18 @@
    "inputHash": "dd46f21cb83e4fbde9c16b57c9c2ac141eaf8280dbdf7f6d117dd2e32da5b1da",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsnest/": {
-   "events": [
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "BewegungsNest 1,5–3 Jahre – Winterkurs (Dez.–Feb.)",
-     "summary": "Turnen mit Bewegungslandschaften für Kinder ab 1,5 Jahren, geleitet von einer externen Kursleitung. Donnerstags 16–17 Uhr, 8 Termine; Vertrag und Rechnung kommen vom Partner. Schnuppertermin für 16 € möglich.",
-     "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "124 € (8 Termine)",
-     "url": "https://studioherzschlag.de/angebot/bewegungsnest/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/bewegungsnest/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular der Seite; keine Platzanzeige"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-03T16:00",
-        "end": "2026-12-03T17:00"
-       },
-       {
-        "start": "2026-12-10T16:00",
-        "end": "2026-12-10T17:00"
-       },
-       {
-        "start": "2026-12-17T16:00",
-        "end": "2026-12-17T17:00"
-       },
-       {
-        "start": "2027-01-07T16:00",
-        "end": "2027-01-07T17:00"
-       },
-       {
-        "start": "2027-01-14T16:00",
-        "end": "2027-01-14T17:00"
-       },
-       {
-        "start": "2027-01-21T16:00",
-        "end": "2027-01-21T17:00"
-       },
-       {
-        "start": "2027-01-28T16:00",
-        "end": "2027-01-28T17:00"
-       },
-       {
-        "start": "2027-02-04T16:00",
-        "end": "2027-02-04T17:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "BewegungsNest 1,5–3 Jahre – Frühjahrskurs (Feb.–Apr.)",
-     "summary": "Turnen mit Bewegungslandschaften für Kinder ab 1,5 Jahren, geleitet von einer externen Kursleitung. Donnerstags 16–17 Uhr, 8 Termine (ohne 25.03.); Vertrag und Rechnung kommen vom Partner. Schnuppertermin für 16 € möglich.",
-     "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "128 € (8 Termine)",
-     "url": "https://studioherzschlag.de/angebot/bewegungsnest/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/bewegungsnest/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular der Seite; keine Platzanzeige"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-02-18T16:00",
-        "end": "2027-02-18T17:00"
-       },
-       {
-        "start": "2027-02-25T16:00",
-        "end": "2027-02-25T17:00"
-       },
-       {
-        "start": "2027-03-04T16:00",
-        "end": "2027-03-04T17:00"
-       },
-       {
-        "start": "2027-03-11T16:00",
-        "end": "2027-03-11T17:00"
-       },
-       {
-        "start": "2027-03-18T16:00",
-        "end": "2027-03-18T17:00"
-       },
-       {
-        "start": "2027-04-01T16:00",
-        "end": "2027-04-01T17:00"
-       },
-       {
-        "start": "2027-04-08T16:00",
-        "end": "2027-04-08T17:00"
-       },
-       {
-        "start": "2027-04-15T16:00",
-        "end": "2027-04-15T17:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "studio-herzschlag",
-     "venueId": "studio-herzschlag",
-     "title": "BewegungsNest 1,5–3 Jahre – Sommerkurs (Apr.–Juli)",
-     "summary": "Turnen mit Bewegungslandschaften für Kinder ab 1,5 Jahren, geleitet von einer externen Kursleitung. Donnerstags 16–17 Uhr, 8 Termine (ohne 06.05. und 27.05.); Vertrag und Rechnung kommen vom Partner. Schnuppertermin für 16 € möglich.",
-     "topics": [
-      "bewegung",
-      "eltern-kind-turnen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "128 € (8 Termine)",
-     "url": "https://studioherzschlag.de/angebot/bewegungsnest/",
-     "sourceUrl": "https://studioherzschlag.de/angebot/bewegungsnest/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular der Seite; keine Platzanzeige"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-04-29T16:00",
-        "end": "2027-04-29T17:00"
-       },
-       {
-        "start": "2027-05-13T16:00",
-        "end": "2027-05-13T17:00"
-       },
-       {
-        "start": "2027-05-20T16:00",
-        "end": "2027-05-20T17:00"
-       },
-       {
-        "start": "2027-06-03T16:00",
-        "end": "2027-06-03T17:00"
-       },
-       {
-        "start": "2027-06-10T16:00",
-        "end": "2027-06-10T17:00"
-       },
-       {
-        "start": "2027-06-17T16:00",
-        "end": "2027-06-17T17:00"
-       },
-       {
-        "start": "2027-06-24T16:00",
-        "end": "2027-06-24T17:00"
-       },
-       {
-        "start": "2027-07-01T16:00",
-        "end": "2027-07-01T17:00"
-       }
-      ]
-     }
-    }
-   ],
-   "inputHash": "c19d25bce8ff098d8c718faf420418b0f30a563c2996b56c77489fccc1862be1",
+   "events": [],
+   "inputHash": "24d8849e02b5304218fb6e85fc2e4863176dbdba75036f202cd9413e2da2030a",
    "model": "haiku",
-   "status": "ok",
-   "checkedAt": "2026-11-16T09:25:52+01:00",
-   "changedAt": "2026-11-12T09:45:21+01:00",
-   "pending": {
-    "inputHash": "24d8849e02b5304218fb6e85fc2e4863176dbdba75036f202cd9413e2da2030a",
-    "model": "haiku",
-    "events": []
-   },
+   "status": "keine-termine",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "changedAt": "2026-11-18T10:00:22+01:00",
+   "emptySince": "2026-11-18T10:00:22+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/herzzeit/": {
@@ -1727,7 +1426,7 @@
    "inputHash": "acd760675c6f4b513f8b8ae6ad9d1cba4091deb3c5fe395abc175a35843d2714",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1736,7 +1435,7 @@
    "inputHash": "a7dc231dd13d385f2932c25607d5b84fe7b2671777d693eeebec9852531daf63",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1745,7 +1444,7 @@
    "inputHash": "31e145270dd52d1a037406019cbc81daef6341f693f23c815e75ce1495e3a33d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1768,7 +1467,7 @@
    "inputHash": "4aec1d34887f43cfeb398aa15c680181abfab25b6c7fffcc259a886032f64b57",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1777,7 +1476,7 @@
    "inputHash": "738fb300f112a073b3f8918ab0dec8894685d481bce10c39f8d91187bf69b445",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1824,7 +1523,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"

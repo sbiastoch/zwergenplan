@@ -6,11 +6,10 @@
     {
      "providerId": "hebanne-schulz",
      "venueId": "hebanne-schulz",
-     "title": "Achtsame Babymassage – Kurs montags ab 9.11.26",
-     "summary": "Anleitung, Babys sanft zu massieren, dabei entsteht Nähe und Austausch mit der Hebamme. Sieben Montagstermine von 11:00 bis 12:15 Uhr in der FamilienBox, Rosenaustraße 7 (Hinterhaus).",
+     "title": "Achtsame Babymassage-Kurs (Mo, 09.11.–21.12.2026)",
+     "summary": "Kursreihe, in der Eltern mit ihrem Baby Massagegriffe und achtsame Berührung üben, um die Bindung zu stärken. Sieben Termine montags von 11:00 bis 12:15 Uhr in der FamilienBox; der Kurs läuft bereits.",
      "topics": [
-      "babymassage",
-      "hebamme"
+      "babymassage"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -20,7 +19,7 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über „Hier anmelden“ auf der Startseite; Teilnehmerzahl steht auf der Detailseite"
+      "note": "Anmeldung über „Hier anmelden“; die Teilnehmerzahl steht auf der Anmeldeseite."
      },
      "schedule": {
       "kind": "dates",
@@ -55,42 +54,13 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "hebanne-schulz",
-     "venueId": "hebanne-schulz",
-     "title": "Babypflege & Babyalltag – Workshop am 28.10.26",
-     "summary": "Workshop rund um Babypflege und den Alltag mit dem Baby, mit Hebamme Anne Schulz. Einmalig am 28.10.2026 von 16:00 bis 18:00 Uhr in der FamilienBox, Rosenaustraße 7 (Hinterhaus).",
-     "topics": [
-      "beratung",
-      "hebamme"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.hebanne-schulz.de/",
-     "sourceUrl": "https://www.hebanne-schulz.de/",
-     "category": "babykurse",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über „Hier anmelden“ auf der Startseite; Teilnehmerzahl steht auf der Detailseite"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-10-28T16:00",
-        "end": "2026-10-28T18:00"
-       }
-      ]
-     }
     }
    ],
-   "inputHash": "0228b297e5eaf13a70456cad1e7698cc6a74d8064ac6d70c18056e8e5b49fff1",
+   "inputHash": "7fc1f66a773d03d2e0d8e5ece5506ba44deabd6e487559d382e8e9b2b8ae6512",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "changedAt": "2026-11-18T10:00:22+01:00",
    "partsHash": "b4b0a862fe96b93dd924928258b6e93282a3a51a7e54c0e92704be9626cb4922"
   },
   "seite:https://www.hebanne-schulz.de/bindung-durch-beruehrung/": {
@@ -171,7 +141,7 @@
    "inputHash": "d3077a614c97f931ec825101761b736926300dec646ef2103d265521087ab2a3",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-11-04T08:55:04+01:00",
    "partsHash": "d8717483da7d0e7e9e62d902115f896177698f46075b90c70c6c08baa18fd088"
   }

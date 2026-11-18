@@ -6,8 +6,8 @@
     {
      "providerId": "brk-familienzentrum",
      "venueId": "brk-familienzentrum",
-     "title": "PEKiP Mi 9:30 Okt.–Dez. 2026 (Babys geb. Juli–Aug. 2026)",
-     "summary": "Laufender Kurs mit achtsamer Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, die Babys sind dabei unbekleidet. Neun Termine bis 16. Dezember, am 4. November kein Termin. Anmeldung telefonisch oder per E-Mail.",
+     "title": "PEKiP-Gruppe Babys Juli/Aug. 2026, Mi, bis 16.12.2026",
+     "summary": "Achtsames Spielen und Bewegen mit dem Baby, Austausch unter Eltern. Der Kurs läuft bereits; die Anmeldung war bis 14 Tage vor Kursbeginn möglich.",
      "topics": [
       "pekip"
      ],
@@ -20,7 +20,7 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anmeldung telefonisch (0911/5301-280) oder per E-Mail"
+      "note": "Anmeldung über das Familienzentrum per Telefon (0911/5301-280) oder E-Mail"
      },
      "schedule": {
       "kind": "weekly",
@@ -29,19 +29,16 @@
       ],
       "start": "09:30",
       "end": "11:00",
-      "from": "2026-10-07",
+      "from": "2026-11-18",
       "until": "2026-12-16",
-      "skipHolidays": false,
-      "except": [
-       "2026-11-04"
-      ]
+      "skipHolidays": false
      }
     },
     {
      "providerId": "brk-familienzentrum",
      "venueId": "brk-familienzentrum",
-     "title": "PEKiP Do 11:15 Nov. 2026–Feb. 2027 (Babys geb. März–Apr. 2026)",
-     "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, die Babys sind dabei unbekleidet. Zehn Termine, keine Termine in den Weihnachtsferien. Anmeldung telefonisch oder per E-Mail bis 14 Tage vor Kursbeginn.",
+     "title": "PEKiP-Gruppe Babys März/Apr. 2026, Do, bis 04.02.2027",
+     "summary": "Achtsames Spielen und Bewegen mit dem Baby, Austausch unter Eltern. Der Kurs läuft bereits; in den Weihnachtsferien finden keine Treffen statt.",
      "topics": [
       "pekip"
      ],
@@ -54,7 +51,7 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anmeldung telefonisch (0911/5301-280) oder per E-Mail"
+      "note": "Anmeldung über das Familienzentrum per Telefon (0911/5301-280) oder E-Mail; Anmeldeschluss war 14 Tage vor Kursbeginn"
      },
      "schedule": {
       "kind": "weekly",
@@ -63,7 +60,7 @@
       ],
       "start": "11:15",
       "end": "12:45",
-      "from": "2026-11-12",
+      "from": "2026-11-19",
       "until": "2027-02-04",
       "skipHolidays": true
      }
@@ -71,8 +68,8 @@
     {
      "providerId": "brk-familienzentrum",
      "venueId": "brk-familienzentrum",
-     "title": "PEKiP Mo 10:00 Jan.–März 2027 (Babys geb. April–Mai 2026)",
-     "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, die Babys sind dabei unbekleidet. Acht Termine. Anmeldung ab sofort telefonisch oder per E-Mail, Anmeldeschluss 14 Tage vor Kursbeginn.",
+     "title": "PEKiP-Gruppe Babys Apr./Mai 2026, Mo, ab 18.01.2027",
+     "summary": "Achtsames Spielen und Bewegen mit dem Baby, Austausch unter Eltern; die Babys sind dabei unbekleidet. 8 Treffen. Anmeldung jetzt möglich, Anmeldeschluss 14 Tage vor Kursbeginn.",
      "topics": [
       "pekip"
      ],
@@ -85,7 +82,7 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anmeldung telefonisch (0911/5301-280) oder per E-Mail"
+      "note": "Anmeldung per Telefon (0911/5301-280) oder E-Mail an das Familienzentrum"
      },
      "schedule": {
       "kind": "weekly",
@@ -95,15 +92,15 @@
       "start": "10:00",
       "end": "11:30",
       "from": "2027-01-18",
-      "until": "2027-03-15",
+      "count": 8,
       "skipHolidays": false
      }
     },
     {
      "providerId": "brk-familienzentrum",
      "venueId": "brk-familienzentrum",
-     "title": "PEKiP Mi 9:30 Jan.–März 2027 (Babys geb. Juli–Aug. 2026)",
-     "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, die Babys sind dabei unbekleidet. Neun Termine. Anmeldung ab sofort telefonisch oder per E-Mail, Anmeldeschluss 14 Tage vor Kursbeginn.",
+     "title": "PEKiP-Gruppe Babys Juni/Juli 2026, Di, ab 19.01.2027",
+     "summary": "Achtsames Spielen und Bewegen mit dem Baby, Austausch unter Eltern; die Babys sind dabei unbekleidet. 9 Treffen. Anmeldung jetzt möglich, Anmeldeschluss 14 Tage vor Kursbeginn.",
      "topics": [
       "pekip"
      ],
@@ -116,7 +113,38 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anmeldung telefonisch (0911/5301-280) oder per E-Mail"
+      "note": "Anmeldung per Telefon (0911/5301-280) oder E-Mail an das Familienzentrum"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:30",
+      "end": "11:00",
+      "from": "2027-01-19",
+      "count": 9,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "brk-familienzentrum",
+     "venueId": "brk-familienzentrum",
+     "title": "PEKiP-Gruppe Babys Juli/Aug. 2026, Mi, ab 20.01.2027",
+     "summary": "Achtsames Spielen und Bewegen mit dem Baby, Austausch unter Eltern; die Babys sind dabei unbekleidet. 9 Treffen. Anmeldung jetzt möglich, Anmeldeschluss 14 Tage vor Kursbeginn.",
+     "topics": [
+      "pekip"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "126 € (9 Einheiten)",
+     "url": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "sourceUrl": "https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/prager-eltern-kind-programm-pekip.html",
+     "category": "babykurse",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Telefon (0911/5301-280) oder E-Mail an das Familienzentrum"
      },
      "schedule": {
       "kind": "weekly",
@@ -126,15 +154,15 @@
       "start": "09:30",
       "end": "11:00",
       "from": "2027-01-20",
-      "until": "2027-03-17",
+      "count": 9,
       "skipHolidays": false
      }
     },
     {
      "providerId": "brk-familienzentrum",
      "venueId": "brk-familienzentrum",
-     "title": "PEKiP Fr 9:00 Jan.–März 2027 (Babys geb. Sept.–Okt. 2026)",
-     "summary": "Achtsame Bewegungs- und Spielzeit für Babys mit Mutter oder Vater, die Babys sind dabei unbekleidet. Neun Termine, am 12. Februar kein Termin. Anmeldung ab sofort telefonisch oder per E-Mail, Anmeldeschluss 14 Tage vor Kursbeginn.",
+     "title": "PEKiP-Gruppe Babys Sept./Okt. 2026, Fr, ab 15.01.2027",
+     "summary": "Achtsames Spielen und Bewegen mit dem Baby, Austausch unter Eltern; die Babys sind dabei unbekleidet. 9 Treffen, am 12.02. findet keiner statt. Anmeldung jetzt möglich.",
      "topics": [
       "pekip"
      ],
@@ -147,7 +175,7 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anmeldung telefonisch (0911/5301-280) oder per E-Mail"
+      "note": "Anmeldung per Telefon (0911/5301-280) oder E-Mail an das Familienzentrum; Anmeldeschluss 14 Tage vor Kursbeginn"
      },
      "schedule": {
       "kind": "weekly",
@@ -165,11 +193,11 @@
      }
     }
    ],
-   "inputHash": "ea3c4f9518f80a804d0c19a0994b362ac2dcd8ff01d834b8f67ccfedc91543d3",
+   "inputHash": "516321cc391404ba844f1fc7b3e60040d9433270217cc342937e5a336e408fba",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "changedAt": "2026-11-18T10:00:22+01:00",
    "partsHash": "191616779e3a9f6c190c44d5263bbddf904a4b676610a6d6a11ace2c9c81cad2"
   },
   "seite:https://www.kvnuernberg-stadt.brk.de/kurse-termine/kursangebote/kurse-fuer-eltern-und-kinder/experimente-fuer-gross-und-klein.html": {
@@ -214,7 +242,7 @@
    "inputHash": "5f410d8ab0b49cdcad83c7960e82015bd23cb4c1f62c930b27cd86b5b48d21dd",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "191616779e3a9f6c190c44d5263bbddf904a4b676610a6d6a11ace2c9c81cad2"
   },
@@ -279,7 +307,7 @@
    "inputHash": "9fa6b6bda2716a642fdf2f0773ad1985e25e1189c2ba4cfe623b2e0c8287119f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "191616779e3a9f6c190c44d5263bbddf904a4b676610a6d6a11ace2c9c81cad2"
   },
@@ -347,7 +375,7 @@
    "inputHash": "0bb643eeabb86fd3d335b17de27c3b3956939d1d18aa4d3490417a4767c003ca",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "191616779e3a9f6c190c44d5263bbddf904a4b676610a6d6a11ace2c9c81cad2"
   },
@@ -363,7 +391,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
    "emptySince": "2026-11-02T09:03:46+01:00",
    "sources": [

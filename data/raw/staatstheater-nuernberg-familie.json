@@ -70,7 +70,7 @@
    "checkedAt": "2026-10-28T08:14:30+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "pending": {
-    "inputHash": "f0ee4a49c4c99738cd4b3019d0c278425562af1a8b0575d1ccae963ec74055bd",
+    "inputHash": "7f7c170356be9927b2f2fa1877d18a8ffd8ff6daeb0258f54bf9352ae9bab5e9",
     "model": "haiku",
     "events": []
    },
@@ -89,10 +89,10 @@
   },
   "seite:https://staatstheater-nuernberg.de/spielplan-26-27/kinder-im-gluck-opa-otti-eierkuchen/14-04-2027/0930": {
    "events": [],
-   "inputHash": "5967542cc8942083fe52c479780716a976ae9ca673450c26a92e620a78591e4e",
+   "inputHash": "b87a6bd0f36958973f7103cd82460c57ec7dd67228a0ae092ec9ae52845fdccc",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "0f480c78bfd0dba598297cfacf6fb3e4c58ad7d92531c1e477facc8971bdc162"
   },
@@ -101,7 +101,7 @@
    "inputHash": "93a046dd1890bf7ca280c6a5f6ad2b08fe803b78091f232d076d4c09f80280ac",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-18T10:00:22+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "sources": [
     "stadt-vk"
