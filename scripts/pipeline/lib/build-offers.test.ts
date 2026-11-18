@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { shortId } from "../../../src/domain/ids.ts";
-import { OffersFile, type Provider } from "../../../src/domain/schema.ts";
+import { type Offer, OffersFile, type Provider } from "../../../src/domain/schema.ts";
 import { loadFixtures } from "../../../src/domain/test-fixtures.ts";
 import { fallbackCategory } from "../../../src/domain/topics.ts";
 import {
@@ -13,7 +13,7 @@ import {
   nightlyWindow,
 } from "./build-offers.ts";
 import { ProviderRaw, RawBatch, RawEvent } from "./raw.ts";
-import { checkIdContinuity, type Draft, SAME_SOURCE_SESSIONS, windowKey } from "./stable-ids.ts";
+import { checkIdContinuity, type Draft, SAME_SOURCE_SESSIONS } from "./stable-ids.ts";
 
 const { providers: fixtureProviders } = loadFixtures();
 const aggregator: Provider = {
@@ -787,7 +787,12 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
       derivedCategory: false,
     };
   };
-  const none = new Set<string>();
+  const none: Offer[] = [];
+  const asOld = (c: Candidate, id: string, listedAt?: string): Offer => ({
+    id,
+    ...c.offer,
+    ...(listedAt === undefined ? {} : { listedAt }),
+  });
 
   it("5) gleiche Quelle, gleicher Kerntitel, gleiche Termine → das frühere bleibt, Themen vereinigt", () => {
     const a = { ...cand(0, { age: { minMonths: 0, maxMonths: 12 } }), derivedCategory: true };
@@ -843,13 +848,13 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
     ]);
   });
 
-  it("6) Fensterschlüssel im Vorstand gewinnt; Kette A ~ B ~ C → A und C; Eingabe unverändert", () => {
+  it("6) Fassung mit Vorgänger gewinnt; Kette A ~ B ~ C → nur A; Eingabe unverändert", () => {
     const x = cand(0, { title: "Babymassage", topics: ["babymassage"] });
     const a = cand(1);
     const b = cand(2, { title: "PEKiP-Gruppe (Babys geb. Jan.–März 2026)", topics: ["pekip", "babymassage"] });
     const input = [x, a, b];
     const before = structuredClone(input);
-    const vorstand = dropSameSourceDuplicates(input, new Set([windowKey(b.offer, FROM)]), FROM);
+    const vorstand = dropSameSourceDuplicates(input, [asOld(b, "bbbbbbbb")], FROM);
     // sortiert B, X, A; die Ausgabe steht aber in der Reihenfolge der Eingabe
     expect(vorstand.kept.map((c) => c.order)).toEqual([0, 2]);
     expect(vorstand.kept[1]?.offer.title).toBe(b.offer.title);
@@ -858,7 +863,8 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
     ]);
     expect(input).toEqual(before);
 
-    // Jaccard A/B = B/C = 9/11 ≈ 0,82, A/C = 8/12 ≈ 0,67
+    // Im gemeinsamen Fenster sind A/B, B/C und A/C deckungsgleich (früher Jaccard A/C 8/12, also A und C; Plan 0061,
+    // Review 2, Major 5). A behält seine Termine und bekommt die späteren von B und C dazu.
     const chain = [
       cand(0, { sessions: tuesdays(10, 0) }),
       cand(1, { sessions: tuesdays(10, 1) }),
@@ -866,9 +872,9 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
     ];
     const chainBefore = structuredClone(chain);
     const kette = dropSameSourceDuplicates(chain, none, FROM);
-    expect(kette.kept.map((c) => c.order)).toEqual([0, 2]);
-    expect(kette.notes).toHaveLength(1);
-    expect(kette.notes[0]).toContain("turnverein-beispiel#1");
+    expect(kette.kept.map((c) => c.order)).toEqual([0]);
+    expect(kette.kept[0]?.offer.sessions).toEqual(tuesdays(12));
+    expect(kette.notes).toHaveLength(2);
     expect(chain).toEqual(chainBefore);
   });
 
@@ -894,14 +900,84 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
     const pair = (n1: number, n2: number) =>
       dropSameSourceDuplicates([cand(0, { sessions: tuesdays(n1) }), cand(1, { sessions: tuesdays(n2) })], none, FROM)
         .kept.length;
-    expect(pair(16, 20)).toBe(1); // 16/20 = 0,8
-    expect(pair(15, 19)).toBe(2); // 15/19 ≈ 0,79
-    // mit vergangenen Terminen nur 6/10; ab from (01.12.) gleich
+    expect(pair(16, 20)).toBe(1);
+    // im gemeinsamen Fenster (die ersten 15) deckungsgleich; früher Jaccard 15/19, also 2 (Plan 0061, Major 5)
+    expect(pair(15, 19)).toBe(1);
+    // Die zweite Fassung beginnt am 01.12. (vor `from` sind es zwei Kurse über verschiedene Zeiträume gewesen)
     const laufend = [cand(0, { sessions: tuesdays(10) }), cand(1, { sessions: tuesdays(6, 4) })];
     const ab = dropSameSourceDuplicates(laufend, none, "2026-12-01");
     expect(ab.kept.map((c) => c.order)).toEqual([0]);
     expect(ab.kept[0]?.offer.sessions).toHaveLength(10);
-    expect(dropSameSourceDuplicates(laufend, none, FROM).kept).toHaveLength(2);
+    // ab FROM liegt die zweite ganz in der ersten: gleich (früher Jaccard 6/10, also 2; Plan 0061, Major 5)
+    expect(dropSameSourceDuplicates(laufend, none, FROM).kept).toHaveLength(1);
+  });
+
+  describe("Plan 0061, E1.3: die ältere Fassung bleibt", () => {
+    const short = (order: number) =>
+      cand(order, { title: "Babyturnen 8–15 Monate, Mi 10:45–11:45", sessions: tuesdays(8, 1) });
+    const long = (order: number) => cand(order, { title: "Babyturnen 8–15 Monate (Mi 10:45)", sessions: tuesdays(12) });
+
+    it("Fassung mit Vorgänger vor einer ohne, auch gegen `order`; sie behält ihre Termine im Fenster und bekommt die äußeren", () => {
+      const s = short(1);
+      const { kept, notes } = dropSameSourceDuplicates([long(0), s], [asOld(s, "ssssssss")], FROM);
+      expect(kept.map((c) => c.order)).toEqual([1]);
+      expect(kept[0]?.offer.sessions).toEqual([...tuesdays(1), ...tuesdays(8, 1), ...tuesdays(3, 9)]);
+      expect(kept[0]?.keepId).toBe("ssssssss");
+      expect(kept[0]?.keepVia).toBe("dublette");
+      expect(notes).toHaveLength(1);
+    });
+
+    it("Vorgänger über `sameOfferTwice`, wenn der Fensterschlüssel nicht trifft", () => {
+      const s = short(1);
+      const renamed = { ...asOld(s, "ssssssss"), title: "Babyturnen 8–15 Monate – mittwochs" };
+      const { kept } = dropSameSourceDuplicates([long(0), s], [renamed], FROM);
+      // beide treffen den Vorgänger über `sameOfferTwice`, dann entscheidet `order`; das Erbe trägt die ID
+      expect(kept.map((c) => c.order)).toEqual([0]);
+      expect(kept[0]?.keepId).toBe("ssssssss");
+    });
+
+    it("zwei Vorgänger: älteres `listedAt`, ein fehlendes gilt als älter, dann die kleinere ID", () => {
+      const a = long(0);
+      const b = short(1);
+      const run = (pa: Offer, pb: Offer) =>
+        dropSameSourceDuplicates([a, b], [pa, pb], FROM).kept.map((c) => [c.order, c.keepId]);
+      expect(
+        run(asOld(a, "aaaaaaaa", "2026-11-12T06:00:00+01:00"), asOld(b, "bbbbbbbb", "2026-10-01T06:00:00+02:00")),
+      ).toEqual([[1, "bbbbbbbb"]]);
+      expect(run(asOld(a, "aaaaaaaa", "2026-10-01T06:00:00+02:00"), asOld(b, "bbbbbbbb"))).toEqual([[1, "bbbbbbbb"]]);
+      expect(run(asOld(a, "zzzzzzzz"), asOld(b, "bbbbbbbb"))).toEqual([[1, "bbbbbbbb"]]);
+      expect(run(asOld(a, "aaaaaaaa"), asOld(b, "bbbbbbbb"))).toEqual([[0, "aaaaaaaa"]]);
+    });
+
+    it("ein Erbe des Richters und ein Widerspruch (`null`) bleiben unberührt", () => {
+      const s = short(1);
+      const richter = { ...long(0), keepId: "rrrrrrrr" };
+      const heir = dropSameSourceDuplicates([richter, s], [asOld(s, "ssssssss")], FROM).kept[0];
+      expect([heir?.order, heir?.keepId, heir?.keepVia]).toEqual([1, "rrrrrrrr", undefined]);
+      const clash = dropSameSourceDuplicates(
+        [
+          { ...long(0), keepId: "rrrrrrrr" },
+          { ...s, keepId: "qqqqqqqq" },
+        ],
+        [asOld(s, "ssssssss")],
+        FROM,
+      ).kept[0];
+      expect([clash?.keepId, clash?.keepVia]).toEqual([null, undefined]);
+    });
+
+    it("teilen sich zwei Überlebende einen Vorgänger, erbt keiner (ADR 0041, Punkt 5)", () => {
+      // Vorgänger über 10 Dienstage; X deckt die ersten 5, Y die letzten 4 – X und Y sind keine Dubletten voneinander
+      const p = cand(9, { title: "Babyturnen 8–15 Monate", sessions: tuesdays(10) });
+      const x = cand(0, { title: "Babyturnen 8–15 Monate (Di)", sessions: tuesdays(5) });
+      const x2 = cand(1, { title: "Babyturnen 8–15 Monate, dienstags", sessions: tuesdays(5) });
+      const y = cand(2, { title: "Babyturnen 8–15 Monate (Di)", sessions: tuesdays(4, 6) });
+      const y2 = cand(3, { title: "Babyturnen 8–15 Monate, dienstags", sessions: tuesdays(4, 6) });
+      const { kept } = dropSameSourceDuplicates([x, x2, y, y2], [asOld(p, "pppppppp")], FROM);
+      expect(kept.map((c) => [c.order, c.keepId])).toEqual([
+        [0, undefined],
+        [2, undefined],
+      ]);
+    });
   });
 
   it("17) über buildOffers: Zwillinge im Vorstand, beide Fassungen neu betitelt → eine alte ID bleibt (E1 + E2)", () => {
@@ -940,10 +1016,11 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
         once("PEKiP-Gruppe (geb. Jan.–März, freitags)", "bbbbbbbb"),
       ],
     };
-    // Beide Fassungen neu betitelt: Kein Fensterschlüssel trifft den Vorstand, also entscheidet in 4b die Reihenfolge
-    // (das erste Event bleibt), und Stufe 0 greift nicht. So trifft der Entwurf beide Zwillinge in Stufe 1 gleich gut,
-    // und die Rangfolge aus E2 entscheidet: höhere Titelähnlichkeit zu „PEKiP-Gruppe (Babys geb. Jan.–März)“ hat
-    // bbbbbbbb (wie Test 9 in stable-ids.test.ts) – obwohl aaaaaaaa die kleinere ID wäre.
+    // Beide Fassungen neu betitelt: Kein Fensterschlüssel trifft den Vorstand. Beide Entwürfe treffen über
+    // `sameOfferTwice` beide Zwillinge; unter Zwillingen gilt seit Plan 0061 (E1.3, Review 2, Minor 8) die Rangfolge
+    // der älteren Fassung (älteres `listedAt`, hier gleich, dann die kleinere ID): Vorgänger ist aaaaaaaa. Bei gleichem
+    // Vorgänger bleibt das erste Event und erbt die ID aus der Dublettenregel. Früher entschied in Stufe 1 die
+    // Titelähnlichkeit (ADR 0031) für bbbbbbbb; welche ID überlebt, ändert nichts daran, worauf ein alter Link zeigt.
     const { file, report } = buildOffers(
       base({
         previous,
@@ -958,15 +1035,15 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
     );
     expect(report.errors).toEqual([]);
     const offers = file?.offers ?? [];
-    expect(offers.map((o) => [o.id, o.title])).toEqual([["bbbbbbbb", "PEKiP-Gruppe (Babys geb. Jan.–März)"]]);
+    expect(offers.map((o) => [o.id, o.title])).toEqual([["aaaaaaaa", "PEKiP-Gruppe (Babys geb. Jan.–März)"]]);
     expect(report.notes).toContain(
       "turnverein-beispiel#1 „PEKiP Fr 9:30 Uhr (geb. Jan.–März)“: Dublette von turnverein-beispiel#0 „PEKiP-Gruppe (Babys geb. Jan.–März)“ (gleiche Quelle, gleiche Termine) – entfällt",
     );
     expect(report.notes).toContain(
-      "IDs: Zwilling im Vorstand – aaaaaaaa „PEKiP Fr 9:30 (geb. Jan.–März)“ fällt weg, bbbbbbbb „PEKiP-Gruppe (geb. Jan.–März, freitags)“ bleibt",
+      "IDs: Zwilling im Vorstand – bbbbbbbb „PEKiP-Gruppe (geb. Jan.–März, freitags)“ fällt weg, aaaaaaaa „PEKiP Fr 9:30 (geb. Jan.–März)“ bleibt",
     );
     expect(report.notes).toContain(
-      "IDs: Stufe 1 bbbbbbbb „PEKiP-Gruppe (geb. Jan.–März, freitags)“ → „PEKiP-Gruppe (Babys geb. Jan.–März)“",
+      "IDs: geerbt aaaaaaaa „PEKiP Fr 9:30 (geb. Jan.–März)“ → „PEKiP-Gruppe (Babys geb. Jan.–März)“ (Dublette)",
     );
     expect(report.notes.join("\n")).not.toContain("mehrdeutig");
     // Das Netz meldet nur Anbieterwechsel einer bleibenden ID; der Wegfall eines Zwillings ist keiner

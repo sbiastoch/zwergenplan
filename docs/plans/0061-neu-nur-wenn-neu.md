@@ -1,6 +1,6 @@
 # Plan 0061 – „Neu“ nur, wenn es neu ist: ruhende Angebote, Dubletten gleicher Quelle, Ortswechsel
 
-Status: Review eingearbeitet
+Status: in Umsetzung
 Datum: 2026-11-18
 
 Bezug:
@@ -243,6 +243,37 @@ Test-first für die Pipeline-Logik. Kein UI-Anteil, also kein `/browser-review`.
    - `data/ruhend.json` ist committet;
    - der Bericht nennt „aus der Ruhe“;
    - ein vorher ruhendes Angebot, falls eins zurückkommt, trägt kein neues `listedAt`.
+
+## Nachtrag Umsetzung Etappe 1 (2026-11-18)
+
+Abweichungen und Ergänzungen gegenüber E1 und E3, jeweils mit Test:
+- **Mindestzahl gemeinsamer Termine** ist min(3, Termine der **größeren** Fassung ab `from`), nicht min(3, |A|, |B|). Mit der kleineren Seite wäre ein Einzeltermin aus einer Reihe gleich gewesen, denn im Fenster eines Einzeltermins haben beide Seiten genau einen Termin (Verhältnis 1,0). Einzeltermin-Paare bleiben vergleichbar (1 von 1).
+- **MiniClub** (E1.2, Nachtrag wie vorgesehen): Der Test war rot, weil das erste Kernwort „blaues“ gegen „dietrich“ steht. Die Korrektur: Stehen alle Kernwörter einer Seite in der anderen und sind es mindestens zwei, ist der Kerntitel gleich. Mit nur einem Wort wäre das Schwesterpaar „Krabbelgruppe Maxis“ / „Wunder-Krabbler Maxis“ (`kihn0m03`/`xdymdkkd`) verschmolzen. Deshalb gilt die Regel erst ab zwei Wörtern.
+- **Wochentagskürzel** (Mo, Di, …) zählen in der Tokenfolge ohne Kernwort zu den Kalenderwörtern.
+- **Daten im Titel** (aus der Messung): Nennen beide Titel verschiedene Tage („Start 29.11.2026“ / „Start 21.02.2027“), sind es verschiedene Durchgänge. Die Messung fand genau diesen Fall bei Babyschwimmen: Die ältere Fassung lief bis zum Horizont weiter und deckte im Fenster den Folgekurs ab. Die Regel gilt nur in `sameCoreTitle`, nicht in Stufe 2.
+- **Rangfolge**: Haben zwei Fassungen denselben Vorgänger, bleibt die mit gleichem Fensterschlüssel (vor `order`). Sonst gewann in Test 6 die Fassung, die den Vorgänger nur über `sameOfferTwice` traf.
+- **Weitere kippende Tests**, je mit Begründung im Test:
+  - `similar.test.ts`: zwei gleiche Titel nur aus Füllwörtern („MiniClub Eltern-Kind-Gruppe (Mo 15–17 Uhr)“) sind jetzt gleich (E1.2).
+  - `build-offers.test.ts`, Test 17: Unter Zwillingen bleibt `aaaaaaaa` (kleinere ID, gleiches `listedAt`) statt `bbbbbbbb` (Titelähnlichkeit), wie Review 2, Minor 8 es verlangt. Das Erbe heißt „(Dublette)“.
+- **`EXPECTED_DUPLICATE_LOSSES`**: Die Fixture stammt vom Nachtlauf am 2026-10-31 (`bb27187`). Damals hatte die Familienbox 20 Gruppen doppelt, dazu zwei weitere Fassungen des Mini-Clubs Passionskirche. Die Liste hat deshalb 22 Paare, nicht die 7 aus B4. Jede verlorene ID hat einen Partner mit gleichem Titelkern, Wochentag und Uhrzeit, der seine alte ID behält.
+
+### Messung Etappe 1
+
+Kette über die 14 Nachtläufe vom 05.11. bis 18.11. (`82d205d` bis `81c3358`). Startvorstand ist `data/offers.json` aus `99ef0fc`. Jede Nacht baut `buildFromState` mit Rohdaten und Katalog dieses Commits, Vorstand ist das Ergebnis der Vornacht. Das Wegwerfskript lag nur im Arbeitsbaum und ist nicht committet.
+
+- **Dubletten**: 8 bis 16 je Nacht, 176 Meldungen über 14 Nächte. Sichtprüfung aller verschiedenen Paare:
+  - Familienbox (Ferienwochen), Passionskirche, Krabbelkäfer, „Eltern-Kind-Gruppe 0–3 Jahre“;
+  - Mutter-Kind-Gruppe, Offene Tür, Café für Alle, nappydancers, MAWIBA, Mini-FiSche, EntdeckerZeit, Geschwisterkurs;
+  - „Klassik für Kinder“ (Sammeltitel gegen das einzelne Konzert am selben Termin; so schon vor Plan 0061).
+
+  Alle sind dasselbe Angebot. Der einzige Fehlgriff (Babyschwimmen, zwei Durchgänge) ist mit der Datumsregel behoben. Keine Schwestergruppe der Gegenprobe ist dabei.
+- **Stufe 2b**: 21 Treffer. Sichtprüfung:
+  - Faberpark (`e3of0bad`, 08.11.);
+  - St. Johannis (`3qsndayf`, 17./18.11., Wechsel zwischen zwei Orten);
+  - die FBS-Termine „Waldwichtel Knorke“ (`x785yle7`, `wdnqpcjx`) und „Waldweihnacht“ (`t9kqqq7q`). Die Extraktion setzt sie nächteweise abwechselnd an `fbs-nuernberg` und an den Waldort.
+
+  Alle sind dasselbe Angebot am selben Termin. Ohne 2b hätten sie bei jedem Wechsel eine neue ID und „Neu“ bekommen.
+- **„Neu“ am 18.11.**: 83 im echten Stand, 71 in der Kette (`listedAt` ab 05.11.). Den Rest erklären vor allem Lücken (B1, B2), die erst Etappe 2 deckt.
 
 ## Risiken
 

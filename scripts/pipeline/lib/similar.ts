@@ -2,7 +2,8 @@
  * Textähnlichkeit für Deduplizierung und Zuordnung (aus enrich.same_event). Zwei Strengen, bewusst getrennt (ADR 0031):
  * - `similarTitle` ist großzügig (ein gemeinsames Schlüsselwort genügt, auch ein Wochentag). Es dient `mergeParts`
  *   (split.ts), der Eval-Bewertung und der Zuordnung der IDs, wo Termine und Eindeutigkeit den Rest entscheiden.
- * - `sameCoreTitle` ist streng (gleiches erstes Kernwort, keine widersprechende Gruppe, Name oder Zeitraum). Es dient
+ * - `sameCoreTitle` ist streng (gleiches erstes Kernwort oder alle Kernwörter einer Seite in der anderen, ohne
+ *   Kernwort gleiche Tokenfolge; keine widersprechende Gruppe, Name oder Zeitraum, Plan 0061, E1.2). Es dient
  *   den Dubletten gleicher Quelle im Build und den Zwillingen des Vorstands (`sameOfferTwice`, stable-ids.ts): Dort
  *   entfällt ein Angebot bzw. eine ID, also müssen echte Parallelgruppen mit gleichen Zeiten getrennt bleiben.
  * - `conflictingLabels` ist der Kennungsteil davon für Stufe 2 der Zuordnung, `compatibleAge` der Altersvergleich.
@@ -101,11 +102,58 @@ export function conflictingLabels(a: string, b: string): boolean {
   return differ(labels(a), labels(b)) || differ(periods(a), periods(b));
 }
 
+/** Wochentagskürzel, für die Tokenfolge eines Titels ohne Kernwort (Plan 0061, E1.2). */
+const WEEKDAY_SHORT = /^(mo|di|mi|do|fr|sa|so)$/;
+/** Uhrzeit samt „Uhr“ und ein alleinstehendes „Uhr“ (Plan 0061, E1.2). */
+const CLOCK = /\b\d{1,2}[:.]\d{2}(?:\s*uhr\b)?|\buhr\b/g;
+
+/**
+ * Tokenfolge eines Titels ohne Kernwort (Plan 0061, E1.2): Wörter und Ziffernfolgen in Kleinbuchstaben, ohne Uhrzeit
+ * und Kalenderwörter. Ziffern bleiben, damit „0–3 Jahre“ und „1–3 Jahre“ verschieden sind (`compatibleAge` trennt
+ * 0–36 und 12–36 Monate nicht).
+ */
+function plainTokens(title: string): string {
+  return (
+    title
+      .toLowerCase()
+      .replace(CLOCK, " ")
+      .match(/[a-zäöüß]+|\d+/g) ?? []
+  )
+    .filter((w) => !CALENDAR.test(w) && !WEEKDAY_SHORT.test(w))
+    .join(" ");
+}
+
+/**
+ * Die Kernwörter der einen Seite, mindestens zwei, stehen alle in der anderen (Plan 0061, E1.2): „Miniclub
+ * Dietrich-Bonhoeffer-Kirche“ / „MiniClub (Blaues Sofa, Dietrich-Bonhoeffer-Kirche)“. Ein einzelnes Wort genügt nicht,
+ * sonst wären „Krabbelgruppe Maxis“ und „Wunder-Krabbler Maxis“ gleich (Schwestergruppen der Gegenprobe).
+ */
+function coreSubset(a: readonly string[], b: readonly string[]): boolean {
+  const [small, large] = a.length <= b.length ? [a, b] : [b, a];
+  return new Set(small).size >= 2 && small.every((w) => large.includes(w));
+}
+
+/**
+ * Daten im Titel als Tag und Monat („Start 29.11.2026“, „ab 21.02.“). Nennen beide Seiten welche und verschiedene,
+ * sind es aufeinanderfolgende Durchgänge (Messung Plan 0061: eine Fassung lief bis zum Horizont weiter und deckte den
+ * Folgekurs ab). Nur für `sameCoreTitle`, nicht für Stufe 2 der Zuordnung: Dort darf ein Titel sein Datum ändern.
+ */
+const titleDates = (t: string) =>
+  new Set(
+    [...t.matchAll(/(?<![\d.])(\d{1,2})\.(\d{1,2})\.(?!\d{1,2}\.)/g)].map((m) => `${Number(m[1])}.${Number(m[2])}`),
+  );
+
 /** Gleicher Kerntitel? Strenger als `similarTitle`, für Dubletten gleicher Quelle und Zwillinge (Kopfkommentar). */
 export function sameCoreTitle(a: string, b: string): boolean {
-  const [x] = coreWords(a);
-  const [y] = coreWords(b);
+  if (differ(titleDates(a), titleDates(b))) return false;
+  const ca = coreWords(a);
+  const cb = coreWords(b);
+  const [x] = ca;
+  const [y] = cb;
+  // beide ohne Kernwort: gleich nur bei gleicher Tokenfolge (Plan 0061, E1.2)
+  if (x === undefined && y === undefined) return plainTokens(a) === plainTokens(b) && !conflictingLabels(a, b);
   if (x === undefined || y === undefined) return false;
+  if (coreSubset(ca, cb)) return !conflictingLabels(a, b);
   // Namensregel: Folgt auf das erste Kernwort beiderseits ein weiteres, verschiedenes, sind es benannte Gruppen
   const name = (t: string) => {
     const ws = words(t);

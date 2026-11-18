@@ -27,6 +27,7 @@ import {
   compareOffers,
   type Draft,
   sameOfferTwice,
+  sharedWindow,
   unionSessions,
   windowKey,
 } from "./stable-ids.ts";
@@ -226,6 +227,8 @@ export interface Candidate {
   derivedCategory: boolean;
   /** ID-Erbe aus `RawEvent.keepIds` (Plan 0049, Nachtrag 2, B3); `null`: zwei verschiedene trafen zusammen, keins gilt */
   keepId?: string | null;
+  /** Herkunft eines Erbes aus der Dublettenregel (Plan 0061, E1.3); fehlt: Richter des ID-Gates */
+  keepVia?: "dublette";
 }
 
 /**
@@ -398,35 +401,101 @@ function courseCohortAge(offer: Offer): Offer {
 }
 
 /**
- * Schritt 4b: Dubletten gleicher Quelle (Plan 0038, E1; ADR 0031). Unter Kandidaten gleichen Rangs entfällt, wer einem
- * schon behaltenen doppelt ist (`sameOfferTwice`). Vorn stehen die, deren Fensterschlüssel im Vorstand vorkommt, dann
- * gilt `order`; so springt der Titel nicht mit der Reihenfolge des Modells. Der Bleibende behält alles außer den
- * Themen (vereinigt), auch `derivedCategory`; Termine werden nicht vereinigt (meist herausgenommene Ferientage).
+ * Vorgänger eines Kandidaten im Vorstand (Plan 0061, E1.3): das eine Vorstandsangebot mit gleichem Fensterschlüssel,
+ * sonst das eine, mit dem er `sameOfferTwice` ist. Sind alle Treffer untereinander Zwillinge (ADR 0031), der nach der
+ * Rangfolge erste (älteres `listedAt`, dann kleinere ID). Sonst keiner.
+ */
+function predecessorOf(
+  c: Candidate,
+  byWindow: ReadonlyMap<string, readonly Offer[]>,
+  byPlace: ReadonlyMap<string, readonly Offer[]>,
+  from: string,
+): { offer: Offer; byKey: boolean } | undefined {
+  const byKey = byWindow.get(windowKey(c.offer, from)) ?? [];
+  if (byKey.length === 1 && byKey[0]) return { offer: byKey[0], byKey: true };
+  const hits = (byPlace.get(placeOf(c.offer)) ?? []).filter((p) => sameOfferTwice(p, c.offer, from));
+  const twins = hits.every((a) => hits.every((b) => a === b || sameOfferTwice(a, b, from)));
+  const [first] = twins ? [...hits].sort(olderFirst) : [];
+  return first && { offer: first, byKey: false };
+}
+
+const placeOf = (o: Draft) => `${o.providerId}|${o.venueId}|${o.format}`;
+/** Älteres `listedAt` zuerst, ein fehlendes gilt als älter (Bestand vor Plan 0043); dann die kleinere ID */
+const olderFirst = (a: Offer, b: Offer) => listedTime(a) - listedTime(b) || a.id.localeCompare(b.id);
+/** `listedAt` als Zeitpunkt, damit verschiedene Offsets richtig vergleichen; fehlend: −∞ */
+function listedTime(o: Offer): number {
+  return o.listedAt === undefined ? Number.NEGATIVE_INFINITY : Date.parse(o.listedAt);
+}
+
+/**
+ * Schritt 4b: Dubletten gleicher Quelle (Plan 0038, E1; ADR 0031; Plan 0061, E1.3). Unter Kandidaten gleichen Rangs
+ * entfällt, wer einem schon behaltenen doppelt ist (`sameOfferTwice`). Es bleibt die ältere Fassung: zuerst die mit
+ * einem Vorgänger im Vorstand, unter zwei Vorgängern die mit dem älteren `listedAt` (ein fehlendes gilt als älter),
+ * dann die mit der kleineren Vorgänger-ID, beim selben Vorgänger die mit gleichem Fensterschlüssel, dann `order`; so
+ * springt der Titel nicht mit der Reihenfolge des Modells.
+ * Der Bleibende behält alles außer den Themen (vereinigt), auch `derivedCategory`. Seine Termine gelten im
+ * gemeinsamen Fenster (meist herausgenommene Ferientage), die Termine der Dublette außerhalb davon kommen dazu.
+ * Hat er einen Vorgänger, erbt er dessen ID (`keepVia: "dublette"`), außer ein Erbe steht schon fest oder ein
+ * anderer Bleibender hat denselben Vorgänger (ADR 0041, Punkt 5: nur bei genau einem Anspruch).
  * Rein: Die Eingabe bleibt unverändert, `kept` steht in ihrer Reihenfolge.
  */
 export function dropSameSourceDuplicates(
   candidates: readonly Candidate[],
-  previousWindowKeys: ReadonlySet<string>,
+  previous: readonly Offer[],
   from: string,
 ): { kept: Candidate[]; notes: string[] } {
   const notes: string[] = [];
-  const inPrevious = (c: Candidate) => (previousWindowKeys.has(windowKey(c.offer, from)) ? 0 : 1);
+  const group = (key: (o: Offer) => string) => {
+    const out = new Map<string, Offer[]>();
+    for (const o of previous) out.set(key(o), [...(out.get(key(o)) ?? []), o]);
+    return out;
+  };
+  const byWindow = group((o) => windowKey(o, from));
+  const byPlace = group(placeOf);
   const sorted = candidates
-    .map((c, index) => ({ c, index, previous: inPrevious(c) }))
-    .sort((a, b) => a.previous - b.previous || a.c.order - b.c.order);
-  const survivors: Array<{ c: Candidate; index: number }> = [];
-  for (const { c: low, index } of sorted) {
+    .map((c, index) => {
+      const found = predecessorOf(c, byWindow, byPlace, from);
+      return { c, index, pred: found?.offer, byKey: found?.byKey ?? false };
+    })
+    .sort(
+      (a, b) =>
+        Number(a.pred === undefined) - Number(b.pred === undefined) ||
+        (a.pred && b.pred ? olderFirst(a.pred, b.pred) : 0) ||
+        Number(b.byKey) - Number(a.byKey) ||
+        a.c.order - b.c.order,
+    );
+  const survivors: Array<{ c: Candidate; index: number; pred: Offer | undefined; absorbed: boolean }> = [];
+  for (const { c: low, index, pred } of sorted) {
     const high = survivors.find(({ c }) => c.rank === low.rank && sameOfferTwice(c.offer, low.offer, from));
     if (high === undefined) {
-      survivors.push({ c: { ...low }, index });
+      survivors.push({ c: { ...low }, index, pred, absorbed: false });
       continue;
     }
+    const window = sharedWindow(high.c.offer, low.offer, from);
+    const outside = low.offer.sessions.filter((s) => {
+      const m = Math.floor(Date.parse(s.start) / 60_000);
+      return window === undefined || m < window.lo || m > window.hi;
+    });
     high.c = withKeep(
-      { ...high.c, offer: { ...high.c.offer, topics: unionTopics(high.c.offer.topics, low.offer.topics) } },
+      {
+        ...high.c,
+        offer: {
+          ...high.c.offer,
+          topics: unionTopics(high.c.offer.topics, low.offer.topics),
+          sessions: unionSessions(high.c.offer.sessions, outside),
+        },
+      },
       mergeKeep(high.c, low, notes),
     );
+    high.absorbed = true;
     notes.push(`${low.label}: Dublette von ${high.c.label} (gleiche Quelle, gleiche Termine) – entfällt`);
   }
+  // Erbe aus der Dublettenregel: nur bei genau einem Anspruch auf den Vorgänger
+  const claims = new Map<string, number>();
+  for (const { pred } of survivors) if (pred) claims.set(pred.id, (claims.get(pred.id) ?? 0) + 1);
+  for (const s of survivors)
+    if (s.absorbed && s.pred && s.c.keepId === undefined && claims.get(s.pred.id) === 1)
+      s.c = { ...s.c, keepId: s.pred.id, keepVia: "dublette" };
   return { kept: survivors.sort((a, b) => a.index - b.index).map(({ c }) => c), notes };
 }
 
@@ -590,13 +659,13 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     return false;
   });
   // 4b. Dubletten gleicher Quelle: gleicher Rang, gleiches Angebot zweimal (Plan 0038, E1; ADR 0031)
-  const previousWindowKeys = new Set(previous.map((o) => windowKey(o, input.horizon.from)));
-  const deduped = dropSameSourceDuplicates(kept, previousWindowKeys, input.horizon.from);
+  const deduped = dropSameSourceDuplicates(kept, previous, input.horizon.from);
   notes.push(...deduped.notes);
   // 5. IDs: Zuordnung gegen den Vorstand samt Kursfortschreibung (ADR 0022)
   const assigned = assignIds({
     drafts: deduped.kept.map((c) => c.offer),
     keepIds: deduped.kept.map((c) => c.keepId ?? undefined),
+    keepVia: deduped.kept.map((c) => (c.keepId ? c.keepVia : undefined)),
     previous: input.previous,
     providers: input.providers,
     horizon: input.horizon,

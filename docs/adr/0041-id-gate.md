@@ -1,6 +1,6 @@
 # ADR 0041 – ID-Gate bei neuer Pipeline-Fassung
 
-Status: **angenommen** (2026-10-31, mit Plan 0049, Nachtrag 2, Schritt B), Nutzerentscheide vom 2026-10-30.
+Status: **angenommen** (2026-10-31, mit Plan 0049, Nachtrag 2, Schritt B), Nutzerentscheide vom 2026-10-30. Ergänzt durch ADR 0044 (2026-11-18, Plan 0061): Punkt 5 Erbe auch aus der Dublettenregel, Punkt 10 befristete Liste erwarteter Verluste im Test der ID-Kontinuität.
 - **Ergänzt** ADR 0022, Punkt 3: Vor den drei Stufen der Zuordnung gilt das vom Richter belegte Erbe (`keepIds`).
 - **Präzisiert** ADR 0026 („Ein Wechsel von Prompt, Schema oder Modell extrahiert einmal alles neu“): Die Neuextraktion bleibt, übernommen wird ihr Ergebnis aber erst nach dem Gate.
 - **Nimmt zurück** ADR 0033, Konsequenzen: Ein Modellwechsel darf keine IDs mehr kosten.

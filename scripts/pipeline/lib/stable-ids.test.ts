@@ -7,6 +7,7 @@ import {
   checkIdContinuity,
   type Draft,
   keyOf,
+  MIN_SIDE_RATIO,
   SAME_DAYS,
   SAME_SESSIONS,
   SAME_SOURCE_SESSIONS,
@@ -350,13 +351,21 @@ describe("sameOfferTwice (Plan 0038, E1)", () => {
     expect(sameOfferTwice(draft({ title: "PEKiP Gruppe A" }), twin({ title: "PEKiP Gruppe B" }), from)).toBe(false);
   });
 
-  it("Schwelle: 80 % gleiche Beginnzeiten", () => {
+  it("Schwelle: 80 % Überdeckung im gemeinsamen Fenster (Plan 0061, E1.1)", () => {
     expect(SAME_SOURCE_SESSIONS).toBe(0.8);
     const days = weekly("2026-10-06", 10);
-    // Jaccard 8/10 = 0,8: zwei Ferientage fehlen in der einen Fassung
-    expect(sameOfferTwice(draft({ sessions: at(days) }), twin({ sessions: at(days.slice(0, 8)) }), from)).toBe(true);
-    // 7/10 = 0,7
-    expect(sameOfferTwice(draft({ sessions: at(days) }), twin({ sessions: at(days.slice(0, 7)) }), from)).toBe(false);
+    // zwei Ferientage fehlen in der einen Fassung: 8 von 10
+    const holidays = [...days.slice(0, 3), ...days.slice(5)];
+    expect(sameOfferTwice(draft({ sessions: at(days) }), twin({ sessions: at(holidays) }), from)).toBe(true);
+    // drei fehlen mitten im Fenster: 7 von 10, Überdeckung 1,0, aber Verhältnis 0,7 – gleich
+    const three = [...days.slice(0, 3), ...days.slice(6)];
+    expect(sameOfferTwice(draft({ sessions: at(days) }), twin({ sessions: at(three) }), from)).toBe(true);
+    // ab dem 7. Termin eine Stunde später: im Fenster 6 von 9 gleich (0,67) – verschieden
+    const mixed = [...at(days.slice(0, 6)), ...at(days.slice(6), "10:30")];
+    expect(sameOfferTwice(draft({ sessions: at(days) }), twin({ sessions: mixed }), from)).toBe(false);
+    // Früher Jaccard 7/10 = 0,7, also verschieden; im gemeinsamen Fenster (bis zum 7. Termin) 7/7: gleich (Plan 0061,
+    // Review 2, Major 5)
+    expect(sameOfferTwice(draft({ sessions: at(days) }), twin({ sessions: at(days.slice(0, 7)) }), from)).toBe(true);
     // gleiche Tage, andere Uhrzeit: auf die Minute verschieden
     expect(sameOfferTwice(draft({ sessions: at(days) }), twin({ sessions: at(days, "10:30") }), from)).toBe(false);
   });
@@ -374,6 +383,134 @@ describe("sameOfferTwice (Plan 0038, E1)", () => {
     expect(
       sameOfferTwice(draft({ sessions: at(days.slice(0, 4)) }), twin({ sessions: at(days.slice(0, 4)) }), from),
     ).toBe(false);
+  });
+});
+
+describe("sameOfferTwice: gemeinsames Fenster und Überdeckung (Plan 0061, E1.1)", () => {
+  const { from } = HORIZON;
+  const twin = (over: Partial<Draft> = {}) => draft({ title: "PEKiP-Gruppe (Babys, dienstags)", ...over });
+  const wed = (first: string, n: number, time = "10:45") => at(weekly(first, n), time);
+  /** Familienbox: 53 Mittwoche gegen 37 ohne die Ferienwochen, alle 37 in den 53 */
+  const year = weekly("2026-10-07", 53);
+  const holidays = new Set([2, 3, 11, 12, 21, 22, 23, 28, 29, 34, 35, 36, 37, 38, 39, 50]);
+  const school = year.filter((_, i) => i > 0 && !holidays.has(i));
+
+  it("gleich: eine Fassung ohne Ferienwochen (Familienbox 53/37)", () => {
+    expect(school.length).toBeGreaterThan(30);
+    const a = draft({ title: "Babyturnen 8–15 Monate (Mi 10:45)", sessions: at(year, "10:45") });
+    const b = draft({ title: "Babyturnen 8–15 Monate, Mi 10:45–11:45", sessions: at(school, "10:45") });
+    expect(sameOfferTwice(a, b, from)).toBe(true);
+    expect(sameOfferTwice(b, a, from)).toBe(true);
+  });
+
+  it("gleich: Krabbelkäfer 12 in 37 und Passionskirche 28 in 37 (eine Fassung nennt nur einen Ausschnitt)", () => {
+    const all = weekly("2026-10-07", 37);
+    const krabbel = (title: string, days: string[]) =>
+      draft({ title, sessions: at(days, "10:00"), age: { minMonths: 0, maxMonths: 36 } });
+    expect(
+      sameOfferTwice(
+        krabbel("Krabbelkäfer – offener Eltern-Kind-Treff, mittwochs 10 Uhr", all.slice(10, 22)),
+        krabbel("Krabbelkäfer – offener Eltern-Kind-Treff (0–3 Jahre)", all),
+        from,
+      ),
+    ).toBe(true);
+    const thursdays = weekly("2026-10-08", 37);
+    expect(
+      sameOfferTwice(
+        draft({ title: "Mini-Club Passionskirche, Do 9–10:30 Uhr", sessions: at(thursdays.slice(9), "09:00") }),
+        draft({
+          title: "Mini-Club Passionskirche (Eltern-Kind-Gruppe, donnerstags)",
+          sessions: at(thursdays, "09:00"),
+        }),
+        from,
+      ),
+    ).toBe(true);
+  });
+
+  it("gleich: Titel ohne Kernwort mit gleicher Tokenfolge, und der Fall MiniClub", () => {
+    const tue = weekly("2026-10-06", 14);
+    expect(
+      sameOfferTwice(
+        draft({ title: "Eltern-Kind-Gruppe 0–3 Jahre (dienstags)", sessions: at(tue) }),
+        draft({ title: "Eltern-Kind-Gruppe 0–3 Jahre (dienstags 9:30)", sessions: at(weekly("2026-10-06", 38)) }),
+        from,
+      ),
+    ).toBe(true);
+    const mon = weekly("2026-10-05", 37);
+    expect(
+      sameOfferTwice(
+        draft({
+          title: "MiniClub Montag 15–17 Uhr (Blaues Sofa, Dietrich-Bonhoeffer-Kirche)",
+          sessions: at(mon.slice(0, 5), "15:00"),
+        }),
+        draft({ title: "Miniclub Dietrich-Bonhoeffer-Kirche (Mo 15–17 Uhr)", sessions: at(mon, "15:00") }),
+        from,
+      ),
+    ).toBe(true);
+  });
+
+  it("verschieden: Gegenprobe der Schwestergruppen mit gleichen Terminen am selben Ort", () => {
+    const sessions = at(weekly("2026-10-08", 20));
+    const pairs: Array<[Partial<Draft>, Partial<Draft>]> = [
+      [
+        { title: "BabySinne 12–30 Monate, Di 9:30–10:15", age: { minMonths: 12, maxMonths: 30 } },
+        { title: "Kleinkindturnen 12–36 Monate, Di 9:30–10:30", age: { minMonths: 12, maxMonths: 36 } },
+      ],
+      [
+        { title: "Mini-Club Donnerstagvormittag (9–10:30 Uhr)", age: { minMonths: 0, maxMonths: 36 } },
+        { title: "Mini-Club Passionskirche (Eltern-Kind-Gruppe, donnerstags)" },
+      ],
+      [
+        { title: "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder (donnerstags)" },
+        { title: "Krabbelgruppe Donnerstag, TabeaHaus" },
+      ],
+      [
+        { title: "Abenteuerturnen 1 (1–3 J., mit Eltern)", age: { minMonths: 12, maxMonths: 36 } },
+        { title: "PapaZeit Spezial: Waldweihnacht (ab 2 Jahren)", age: { minMonths: 24, maxMonths: 36 } },
+      ],
+      [
+        { title: "PapaZeit Spezial: Weihnachtswerkstatt (ab 2 J.)", age: { minMonths: 24, maxMonths: 36 } },
+        { title: "Waldwichtel Knorke durch den Advent (10–12 Uhr)", age: { minMonths: 30, maxMonths: 36 } },
+      ],
+      [
+        { title: "Babymassage Mittwoch 10:00 Uhr (ab ca. 6 Wochen)", age: { minMonths: 1, maxMonths: 36 } },
+        { title: "Krabbelgruppe Minis (0–6 Monate) Mittwoch", age: { minMonths: 0, maxMonths: 6 } },
+      ],
+      [
+        { title: "Krabbelgruppe Maxis (ab 13 Monate) Donnerstag", age: { minMonths: 13, maxMonths: 36 } },
+        { title: "Wunder-Krabbler Maxis (über 12 Monate), donnerstags", age: { minMonths: 13, maxMonths: 24 } },
+      ],
+      [
+        { title: "Achtsame Babymassage-Kurs (Mo, 09.11.–21.12.2026)" },
+        { title: "Bindung durch Berührung (Babymassage), ab Mo 09.11.2026", age: { minMonths: 1, maxMonths: 5 } },
+      ],
+      [{ title: "Eltern-Kind-Gruppe 0–3 Jahre (dienstags)" }, { title: "Eltern-Kind-Gruppe 1–3 Jahre (dienstags)" }],
+    ];
+    for (const [a, b] of pairs)
+      expect(
+        sameOfferTwice(draft({ ...a, sessions }), draft({ ...b, sessions }), from),
+        `${a.title} | ${b.title}`,
+      ).toBe(false);
+  });
+
+  it("verschieden: gemeinsames Fenster mit nur 2 Terminen, eine Seite ohne Termin ab from, Reihe gegen Einzeltermin", () => {
+    const days = weekly("2026-10-07", 20);
+    const a = draft({ sessions: wed("2026-10-07", 10) });
+    // B beginnt mit dem 9. Termin von A: gemeinsam nur 2
+    expect(sameOfferTwice(a, twin({ sessions: at(days.slice(8), "10:45") }), from)).toBe(false);
+    expect(sameOfferTwice(a, twin({ sessions: at(weekly("2026-09-02", 4)) }), from)).toBe(false);
+    // ein Einzeltermin innerhalb der Reihe
+    expect(sameOfferTwice(a, twin({ sessions: wed("2026-10-21", 1) }), from)).toBe(false);
+    // Fenster gleich, aber die kleinere Seite hat weniger als die Hälfte der Termine (4 von 10)
+    expect(MIN_SIDE_RATIO).toBe(0.5);
+    const sparse = draft({ sessions: wed("2026-10-07", 10).filter((_, i) => i === 0 || i === 9 || i % 3 === 0) });
+    expect(sameOfferTwice(a, sparse, from)).toBe(false);
+  });
+
+  it("Einzeltermine: gleich bei gleichem Beginn, sonst verschieden (Review 2, Major 3)", () => {
+    const one = (time: string) => draft({ format: "einmalig", sessions: wed("2026-10-21", 1, time) });
+    expect(sameOfferTwice(one("10:45"), { ...one("10:45"), title: "PEKiP-Gruppe (Babys)" }, from)).toBe(true);
+    expect(sameOfferTwice(one("10:45"), { ...one("11:45"), title: "PEKiP-Gruppe (Babys)" }, from)).toBe(false);
   });
 });
 
@@ -693,6 +830,58 @@ describe("assignIds – Formatwechsel kurs ↔ regelmaessig (Plan 0048, E11)", (
   });
 });
 
+describe("assignIds – Stufe 2b: Ortswechsel (Plan 0061, E3)", () => {
+  const GYM = "turnverein-beispiel-gymnastik";
+  const days = weekly("2026-10-06", 36);
+
+  it("Faberpark: gleiche Termine, ähnlicher Titel, neuer Ort im Katalog → gleiche ID mit Notiz", () => {
+    const previous = prev([old("aaaaaaaa", { title: "Waldkrabbelgruppe Faberpark (Di)", sessions: at(days) })]);
+    const moved = draft({ venueId: GYM, title: "Waldkrabbelgruppe im Faberpark, dienstags", sessions: at(days) });
+    const r = run([moved], previous);
+    expect(r.offers[0]?.id).toBe("aaaaaaaa");
+    expect(r.notes).toContain(
+      `IDs: Stufe 2b (Ortswechsel) aaaaaaaa „Waldkrabbelgruppe Faberpark (Di)“ @turnverein-beispiel-halle → „Waldkrabbelgruppe im Faberpark, dienstags“ @${GYM}`,
+    );
+    expect(r.notes[0]).toContain("1 Ortswechsel");
+  });
+
+  it("zwei Orte mit gleichen Terminen, ein Entwurf am alten Ort: die ID bleibt am gleichen Ort (Gegentest M3)", () => {
+    const previous = prev([
+      old("aaaaaaaa", { title: "PEKiP (Di 9:30)", sessions: at(days) }),
+      old("bbbbbbbb", { title: "PEKiP (Di 9:30)", venueId: GYM, sessions: at(days) }),
+    ]);
+    const r = run([draft({ title: "PEKiP am Dienstag", sessions: at(days) })], previous);
+    expect(r.offers.map((o) => o.id)).toEqual(["aaaaaaaa"]);
+    expect(r.notes.join("\n")).not.toContain("Ortswechsel");
+  });
+
+  it("neue ID bei widersprechender Kennung, anderem Anbieter, unähnlichem Titel oder zwei Kandidaten", () => {
+    const previous = prev([old("aaaaaaaa", { title: "PEKiP Gruppe A", sessions: at(days) })]);
+    const id = (d: Draft, p = previous) => run([d], p).offers[0]?.id;
+    expect(id(draft({ venueId: GYM, title: "PEKiP Gruppe B", sessions: at(days) }))).not.toBe("aaaaaaaa");
+    expect(id(draft({ venueId: GYM, title: "Musikgarten", sessions: at(days) }))).not.toBe("aaaaaaaa");
+    const foreign = prev([
+      old("aaaaaaaa", {
+        providerId: "familientreff-beispiel",
+        venueId: "familientreff-beispiel-haus",
+        title: "PEKiP Gruppe A",
+        sessions: at(days),
+      }),
+    ]);
+    expect(id(draft({ venueId: GYM, title: "PEKiP Gruppe A (neu)", sessions: at(days) }), foreign)).not.toBe(
+      "aaaaaaaa",
+    );
+    const two = run(
+      [
+        draft({ venueId: GYM, title: "PEKiP Gruppe A, Halle 2", sessions: at(days) }),
+        draft({ venueId: GYM, title: "PEKiP Gruppe A, Raum 1", sessions: at(days) }),
+      ],
+      previous,
+    );
+    expect(two.offers.map((o) => o.id)).not.toContain("aaaaaaaa");
+  });
+});
+
 describe("assignIds – Erbe des Richters (Plan 0049, Nachtrag 2, B3; ADR 0041)", () => {
   const withKeep = (drafts: Draft[], keepIds: Array<string | undefined>, previous: OffersFile) =>
     assignIds({ drafts, keepIds, previous, providers, horizon: HORIZON });
@@ -727,6 +916,21 @@ describe("assignIds – Erbe des Richters (Plan 0049, Nachtrag 2, B3; ADR 0041)"
     expect(foreign.notes).toContain("IDs: Erbe bbbbbbbb ignoriert (anderer Anbieter)");
     const twice = withKeep([a, b], ["aaaaaaaa", "aaaaaaaa"], previous);
     expect(twice.notes).toContain("IDs: Erbe aaaaaaaa ignoriert (mehrfach beansprucht)");
+  });
+
+  it("Erbe aus der Dublettenregel trifft und heißt „(Dublette)“ (Plan 0061, E1.3)", () => {
+    const previous = prev([old("aaaaaaaa", { title: "PEKiP (Di 9:30)" })]);
+    const renamed = draft({ title: "Prager Eltern-Kind-Programm", sessions: at(weekly("2026-10-06", 10), "11:00") });
+    const r = assignIds({
+      drafts: [renamed],
+      keepIds: ["aaaaaaaa"],
+      keepVia: ["dublette"],
+      previous,
+      providers,
+      horizon: HORIZON,
+    });
+    expect(r.offers[0]?.id).toBe("aaaaaaaa");
+    expect(r.notes).toContain("IDs: geerbt aaaaaaaa „PEKiP (Di 9:30)“ → „Prager Eltern-Kind-Programm“ (Dublette)");
   });
 
   it("der Ort darf sich ändern (Fehlverortung behoben)", () => {

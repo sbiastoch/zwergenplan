@@ -32,7 +32,7 @@ export const SAME_SESSIONS = 0.8;
 export const SAME_DAYS = 0.5;
 /**
  * Schwelle für „ein Angebot in zwei Fassungen“ (`sameOfferTwice`: Dubletten gleicher Quelle im Build und Zwillinge des
- * Vorstands, Plan 0038, ADR 0031; ADR 0004). Gleicher Wert wie `SAME_SESSIONS`, weil bis zu 20 % abweichende Termine
+ * Vorstands, Plan 0038, ADR 0031; ADR 0004), seit Plan 0061 als Überdeckung im gemeinsamen Fenster. Gleicher Wert wie `SAME_SESSIONS`, weil bis zu 20 % abweichende Termine
  * bei derselben Quelle fast immer herausgenommene Ferientage sind; bewusst entkoppelt, damit eine Änderung der
  * Zuordnung nicht still das Löschen von Dubletten ändert.
  */
@@ -86,19 +86,70 @@ function jaccard<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): number {
 const minuteOf = (s: Session) => Math.floor(Date.parse(s.start) / 60_000);
 
 /**
- * Ein Angebot in zwei Fassungen (Plan 0038, E1; ADR 0031): gleicher Anbieter, Ort und Format, verträgliches Alter,
- * gleicher Kerntitel und Beginnzeiten der Termine ab `from` (`horizon.from` des Laufs; vergangene Kurstermine nennt
- * nicht jede Fassung) zu mindestens `SAME_SOURCE_SESSIONS` gleich. Gilt gleich für Dubletten im Build und Zwillinge.
+ * Mindestverhältnis der kleineren zur größeren Fassung im gemeinsamen Fenster (Plan 0061, E1.1; ADR 0004): Eine
+ * Fassung ohne Ferienwochen (Familienbox 37 in 51, 0,73) ist dasselbe Angebot, eine, die nur jeden dritten Termin
+ * nennt, nicht.
+ */
+export const MIN_SIDE_RATIO = 0.5;
+/** Mindestzahl gemeinsamer Termine, solange eine Seite so viele hat (Plan 0061, E1.1; Review 2, Major 3) */
+const MIN_SHARED = 3;
+
+/** Beginnzeiten auf die Minute ab `from`, aufsteigend und ohne Doppelte */
+const startsFrom = (o: Draft, from: string) =>
+  [...new Set(o.sessions.filter((s) => berlinDay(s.start) >= from).map(minuteOf))].sort((x, y) => x - y);
+
+/**
+ * Gemeinsames Fenster zweier Fassungen (Plan 0061, E1.1): vom späteren der beiden ersten bis zum früheren der beiden
+ * letzten Beginne ab `from`, in Minuten. Ohne Überschneidung keins.
+ */
+export function sharedWindow(a: Draft, b: Draft, from: string): { lo: number; hi: number } | undefined {
+  const sa = startsFrom(a, from);
+  const sb = startsFrom(b, from);
+  const [fa, fb, la, lb] = [sa[0], sb[0], sa.at(-1), sb.at(-1)];
+  if (fa === undefined || fb === undefined || la === undefined || lb === undefined) return undefined;
+  const lo = Math.max(fa, fb);
+  const hi = Math.min(la, lb);
+  return lo <= hi ? { lo, hi } : undefined;
+}
+
+/**
+ * Gleiche Termine zweier Fassungen (Plan 0061, E1.1; ersetzt den Jaccard über alle Termine aus Plan 0038): Im
+ * gemeinsamen Fenster liegen mindestens `SAME_SOURCE_SESSIONS` der Termine der kleineren Seite auch in der größeren
+ * (Überdeckung), die kleinere hat mindestens `MIN_SIDE_RATIO` der größeren, und gemeinsam sind mindestens
+ * min(3, Termine der größeren Fassung ab `from`). So zählt eine Fassung, die nur einen Ausschnitt oder die Wochen ohne
+ * Ferien nennt; ein Einzeltermin aus einer Reihe oder zwei zufällig gleiche Termine zählen nicht.
+ */
+function sameSessions(a: Draft, b: Draft, from: string): boolean {
+  const w = sharedWindow(a, b, from);
+  if (w === undefined) return false;
+  const sa = startsFrom(a, from);
+  const sb = startsFrom(b, from);
+  const inside = (m: number) => m >= w.lo && m <= w.hi;
+  const wa = sa.filter(inside);
+  const wb = new Set(sb.filter(inside));
+  const both = wa.filter((m) => wb.has(m)).length;
+  const small = Math.min(wa.length, wb.size);
+  const large = Math.max(wa.length, wb.size);
+  return (
+    both >= Math.min(MIN_SHARED, Math.max(sa.length, sb.length)) &&
+    both / small >= SAME_SOURCE_SESSIONS &&
+    small / large >= MIN_SIDE_RATIO
+  );
+}
+
+/**
+ * Ein Angebot in zwei Fassungen (Plan 0038, E1; ADR 0031; Plan 0061, E1): gleicher Anbieter, Ort und Format,
+ * verträgliches Alter, gleicher Kerntitel und gleiche Termine im gemeinsamen Fenster ab `from` (`sameSessions`;
+ * vergangene Kurstermine nennt nicht jede Fassung). Gilt gleich für Dubletten im Build und Zwillinge.
  */
 export function sameOfferTwice(a: Draft, b: Draft, from: string): boolean {
-  const starts = (o: Draft) => new Set(o.sessions.filter((s) => berlinDay(s.start) >= from).map(minuteOf));
   return (
     a.providerId === b.providerId &&
     a.venueId === b.venueId &&
     a.format === b.format &&
     compatibleAge(a.age, b.age) &&
     sameCoreTitle(a.title, b.title) &&
-    jaccard(starts(a), starts(b)) >= SAME_SOURCE_SESSIONS
+    sameSessions(a, b, from)
   );
 }
 
@@ -178,6 +229,8 @@ export function assignIds(input: {
    * ID-Gates belegte Zuordnung, geht allen Stufen vor.
    */
   keepIds?: ReadonlyArray<string | undefined>;
+  /** Herkunft des Erbes je Entwurf (Plan 0061, E1.3): `dublette` aus der Dublettenregel, sonst der Richter */
+  keepVia?: ReadonlyArray<"dublette" | undefined>;
   /** data/offers.json vor dem Lauf (fehlt beim ersten Lauf) */
   previous: OffersFile | undefined;
   /** Katalog, für vorhandene Orte */
@@ -194,22 +247,27 @@ export function assignIds(input: {
   // Feste Reihenfolge: Ergebnis unabhängig von der Eingabereihenfolge
   const olds = [...(input.previous?.offers ?? [])].sort((a, b) => a.id.localeCompare(b.id));
   const drafts = input.drafts
-    .map((d, i) => ({ d, key: keyOf(d), keep: input.keepIds?.[i], index: i }))
+    .map((d, i) => ({ d, key: keyOf(d), keep: input.keepIds?.[i], via: input.keepVia?.[i], index: i }))
     .sort((a, b) => a.key.localeCompare(b.key) || JSON.stringify(a.d).localeCompare(JSON.stringify(b.d)));
   const P = olds.map((p) => ({ ...side(p, from, to), id: p.id, window: windowKey(p, from) }));
-  const D = drafts.map(({ d, key, keep, index }) => ({
+  const D = drafts.map(({ d, key, keep, via, index }) => ({
     ...side(d, from, to),
     key,
     window: windowKey(d, from),
     keep,
+    via,
     index,
   }));
 
   const partnerOfDraft = new Map<number, number>(); // Entwurf → Vorstand
   const partnerOfOld = new Map<number, number>();
-  /** 0–2: Stufen nach ADR 0022; 3: Erbe des Richters (ADR 0041) */
-  const stageOf = new Map<number, 0 | 1 | 2 | 3>();
-  const match = (pi: number, di: number, stage: 0 | 1 | 2 | 3) => {
+  /**
+   * 0–2: Stufen nach ADR 0022; 3: Erbe des Richters (ADR 0041) oder aus der Dublettenregel (Plan 0061, E1.3);
+   * 4: Stufe 2b, Ortswechsel (Plan 0061, E3)
+   */
+  type Stage = 0 | 1 | 2 | 3 | 4;
+  const stageOf = new Map<number, Stage>();
+  const match = (pi: number, di: number, stage: Stage) => {
     partnerOfDraft.set(di, pi);
     partnerOfOld.set(pi, di);
     stageOf.set(di, stage);
@@ -380,11 +438,35 @@ export function assignIds(input: {
     if (conflicts.some((c) => c.pi === pi)) notes.push(conflictNote(2, pi, di));
     else match(pi, di, 2);
 
+  // Stufe 2b (Plan 0061, E3): Ortswechsel bei gleichem Anbieter, auch wenn der alte Ort noch im Katalog steht (ein
+  // genauerer Ort wurde angelegt). Nur für die nach Stufe 2 Übrigen, ohne Zwillingskonflikt, mit ≥ 80 % gleichen
+  // Terminen, ähnlichem Titel ohne widersprechende Kennung und genau einem Kandidaten auf beiden Seiten. Nach Stufe 2,
+  // damit derselbe Kurs an zwei Orten eines Anbieters kein eindeutiges Paar aus Stufe 1 verliert (Review M3).
+  const moved = (pi: number, di: number) => {
+    const p = at(P, pi);
+    const d = at(D, di);
+    return (
+      sameProvider(pi, di) &&
+      p.offer.venueId !== d.offer.venueId &&
+      jaccard(p.minutes, d.minutes) >= SAME_SESSIONS &&
+      similarTitle(p.offer.title, d.offer.title) &&
+      !conflictingLabels(p.offer.title, d.offer.title)
+    );
+  };
+  const olds2b = openOlds().filter((pi) => !stage1Conflicts.has(pi) && !conflicts.some((c) => c.pi === pi));
+  const drafts2b = free(D, partnerOfDraft);
+  for (const pi of olds2b) {
+    const ds = drafts2b.filter((di) => moved(pi, di));
+    const di = ds[0];
+    if (ds.length !== 1 || di === undefined) continue;
+    if (olds2b.filter((qi) => moved(qi, di)).length === 1) match(pi, di, 4);
+  }
+
   // Vergabe: Treffer übernehmen die ID (samt Kursfortschreibung), alle anderen bekommen eine neue
   const occupied = new Set(olds.map((p) => p.id));
   const offers: Offer[] = [];
   const sources: number[] = [];
-  const counts = [0, 0, 0, 0];
+  const counts = [0, 0, 0, 0, 0];
   const fresh: number[] = [];
   D.forEach(({ offer: d }, di) => {
     const pi = partnerOfDraft.get(di);
@@ -405,7 +487,14 @@ export function assignIds(input: {
         notes.push(`${p.id}: Kurs fortgeschrieben (${merged.length - d.sessions.length} vergangene Termine)`);
       }
     }
-    if (stage === 3) notes.push(`IDs: geerbt ${p.id} „${p.offer.title}“ → „${d.title}“ (Richter)`);
+    if (stage === 3)
+      notes.push(
+        `IDs: geerbt ${p.id} „${p.offer.title}“ → „${d.title}“ (${at(D, di).via === "dublette" ? "Dublette" : "Richter"})`,
+      );
+    else if (stage === 4)
+      notes.push(
+        `IDs: Stufe 2b (Ortswechsel) ${p.id} „${p.offer.title}“ @${p.offer.venueId} → „${d.title}“ @${d.venueId}`,
+      );
     else if (stage > 0) notes.push(`IDs: Stufe ${stage} ${p.id} „${p.offer.title}“ → „${d.title}“`);
     offers.push({ id: p.id, ...d, sessions });
     sources.push(at(D, di).index);
@@ -447,7 +536,7 @@ export function assignIds(input: {
     notes.push(`IDs: ${id} – ${n} neu, ${g} weggefallen`);
   }
   notes.unshift(
-    `IDs: ${counts[0]} gleicher Schlüssel, ${counts[1]} gleiche Termine, ${counts[2]} ähnlicher Titel, ${counts[3] ? `${counts[3]} geerbt, ` : ""}${fresh.length} neu, ${free(P, partnerOfOld).length} weggefallen`,
+    `IDs: ${counts[0]} gleicher Schlüssel, ${counts[1]} gleiche Termine, ${counts[2]} ähnlicher Titel, ${counts[4] ? `${counts[4]} Ortswechsel, ` : ""}${counts[3] ? `${counts[3]} geerbt, ` : ""}${fresh.length} neu, ${free(P, partnerOfOld).length} weggefallen`,
   );
   return { offers, sources, notes };
 }
