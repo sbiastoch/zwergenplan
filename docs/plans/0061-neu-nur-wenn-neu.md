@@ -77,6 +77,8 @@ Zwei Etappen mit je eigenem Commit und eigener Messung (Review m5): **Etappe 1**
 
    Sind alle Treffer eines Kandidaten untereinander Zwillinge (ADR 0031), wählt er unter ihnen nach derselben Rangfolge (älteres `listedAt`, dann kleinere ID). Er hat dann genau einen Vorgänger, und es gilt nicht `outranks` (Review 2, Minor 8).
 
+   Haben zwei überlebende Kandidaten, die keine Dubletten voneinander sind, denselben Vorgänger (`sameOfferTwice` ist nicht transitiv), bekommt **keiner** das Dubletten-Erbe. Das folgt ADR 0041, Punkt 5 („nur bei genau einem Anspruch“), mit Test (Arch-Review m4).
+
    Die überlebende Fassung bekommt die ID ihres Vorgängers als `keepId`, damit `assignIds` sie sicher trifft. Das gilt **nur, wenn ihr `keepId` noch `undefined` ist** (Review 2, Minor 7). Ein Erbe des Richters (ADR 0041) und ein `null` aus `mergeKeep` (Widerspruch, also kein Erbe) bleiben unberührt. Die Notiz in `assignIds` (heute „geerbt … (Richter)“) unterscheidet künftig zwischen „(Richter)“ und „(Dublette)“. Dazu trägt `Candidate` die Herkunft des Erbes. Die ID der verworfenen Fassung fällt weg. Das ist ein gewollter Verlust (Nutzerentscheid N1). ADR 0044 erweitert damit ADR 0041, Punkt 5 (Erbe auch aus der Dublettenregel).
 
 ### E3 – Ortswechsel als eigene Unterstufe nach Stufe 2
@@ -93,6 +95,7 @@ Das trifft `e3of0bad → vq5l6lmq` (Faberpark): Ein genauerer Ort wurde angelegt
 
 **Datei und Schema** (Review M7, M8):
 - Neue Datei `data/ruhend.json`. Sie schreibt nur der Build des Nachtlaufs (`pipeline nightly`, `--build-only`), nie ein Mensch (ADR 0026). Biome nimmt sie aus wie `data/raw` (`biome.json`, `!data/ruhend.json`), denn sie ist erzeugter Pipeline-Zustand.
+- Die Felder `id`, `format`, `age`, `listedAt` und `providerId` nimmt `RestingEntry` aus `src/domain/schema.ts` (`Offer.shape.*`, `SHORT_ID_PATTERN` aus `ids.ts`), damit es keine zweite Definition gibt (Arch-Review m1, wie `discover-state.ts`).
 - Das Schema `RestingFile` liegt nach dem Vorbild von `ProviderRaw` und `DiscoverState` in `scripts/pipeline/lib/resting.ts`, nicht in `src/domain/schema.ts`. Es ist Zustand der Pipeline, kein Vertrag der Website. `pnpm data:validate` prüft die Datei per Zod (`scripts/validate-data.ts`), mit einer Fixture unter `tests/fixtures/`.
 - I/O-Grenze (Review 2, Minor 10): Lesen und Schreiben stehen in `scripts/pipeline/io/files.ts`. In `lib/resting.ts` liegen nur das Parsen (Zod, Rückfall als Rückgabewert) und die reine Fortschreibung, denn `pipeline-lib-no-node-io` verbietet Node-I/O in `lib/`. `offers.json` und `ruhend.json` werden nur gemeinsam geschrieben: Ohne `file` (Build mit Fehlern) wird auch die Ruhe nicht geschrieben.
 - Form: `{ generatedAt, entries: RestingEntry[] }`. Ein `RestingEntry` hat diese Felder:
@@ -101,9 +104,9 @@ Das trifft `e3of0bad → vq5l6lmq` (Faberpark): Ein genauerer Ort wurde angelegt
   - `providerId`, `venueId`, `title`, `format`, `age?`, `listedAt?`;
   - `restingSince` (`generatedAt` des ersten Laufs ohne das Angebot);
   - `horizonTo` (letzter Tag, bis zu dem `starts` vollständig ist, Review M1);
-  - `starts`: Berliner Schlüssel `YYYYMMDDTHHmm` (`berlinKey`), nur ab `restingSince`, höchstens bis `horizonTo = min(horizon.to des Laufs, restingSince + RESTING_SPAN_DAYS = 112)`.
-- Ohne Ende, Ort und Text bleiben es grob 16 Termine zu 16 Byte je wöchentlichem Angebot. Bei rund 750 Einträgen in 56 Tagen ergibt das eine Schätzung von etwa 200–250 kB roh, Ziel < 300 kB. `writeJson` rückt ein (`JSON.stringify(v, null, 1)`, `io/files.ts`). Deshalb bekommt die Ruhe einen eigenen Writer `writeResting` in `io/files.ts` mit einer Zeile je Eintrag (Review 2, Minor 9). Die Größe wird in Schritt 8 gemessen.
-- **Tage**: `restingSince + 56` und `+ 112` zählen Berliner Kalendertage über `addDays` und `berlinIsoDate` (`src/domain/time.ts`). Die `starts` wandelt `fromBerlinLocal` zurück in Zeitpunkte, für `side()` und `isNewRun` (Review 2, Minor 11). Tests laufen wie alle in `America/Los_Angeles`, mit einem Fall über die Zeitumstellung.
+  - `starts`: Beginnzeiten als ISO-Zeitpunkte mit Offset wie in `offers.json` (Invariante „Zeit“; Arch-Review M2), nur ab `restingSince`, höchstens bis `horizonTo = min(horizon.to des Laufs, restingSince + RESTING_SPAN_DAYS = 112)`.
+- Ohne Ende, Ort und Text bleiben es grob 16 Termine zu etwa 28 Byte je wöchentlichem Angebot. Bei rund 750 Einträgen in 56 Tagen ergibt das eine Schätzung von etwa 350 kB roh. Ziel ist < 400 kB; gemessen wird in Schritt 8. `writeJson` rückt ein (`JSON.stringify(v, null, 1)`, `io/files.ts`). Deshalb bekommt die Ruhe einen eigenen Writer `writeResting` in `io/files.ts` mit einer Zeile je Eintrag (Review 2, Minor 9). Die Größe wird in Schritt 8 gemessen.
+- **Tage**: `restingSince + 56` und `+ 112` zählen Berliner Kalendertage über `addDays` und `berlinIsoDate` (`src/domain/time.ts`). Die `starts` sind schon Zeitpunkte mit Offset und gehen direkt in `side()` und `isNewRun`, ohne Rückwandlung (Arch-Review M2 ersetzt Review 2, Minor 11 an dieser Stelle). Tests laufen wie alle in `America/Los_Angeles`, mit einem Fall über die Zeitumstellung.
 
 **Fortschreibung** (nach Schritt 7, Übernahme):
 - Jede ID aus Vorstand oder alter Ruhe, die nicht in der Ausgabe steht, ruht. `restingSince`, `horizonTo` und `starts` eines schon ruhenden Eintrags bleiben unverändert.
@@ -122,7 +125,7 @@ Das trifft `e3of0bad → vq5l6lmq` (Faberpark): Ein genauerer Ort wurde angelegt
 - Rivalen für den Titel-Widerspruch in Stufe 1 sind **alle** Vorstandsangebote (zugeordnet oder nicht) und alle Ruhe-Einträge desselben Anbieters, wie ADR 0022, Punkt 3 es für den Vorstand verlangt.
 - Das Vergleichsfenster je Paar ist `[horizon.from, min(entry.horizonTo, horizon.to)]` (Review M1).
 - **Keine Kursfortschreibung** bei Treffern aus der Ruhe (Review B3): Der Entwurf behält seine Termine. Ruhe-Einträge haben weder `end` noch vergangene Termine, und eine Fortschreibung erzeugte ungültige Termine.
-- **Belegte IDs:** Neue IDs meiden ruhende IDs (`occupied`), mit einer Ausnahme: Ein freier Entwurf, dessen `keyOf` gleich dem `key` eines ruhenden Eintrags ist, bekommt dessen ID. Das ist genau die heutige Rückkehr über `shortId(key, seed)`, nur ohne die Gefahr, dass ein anderer Seed greift (Review m3).
+- **Belegte IDs:** Neue IDs meiden ruhende IDs (`occupied`), mit einer Ausnahme: Ein freier Entwurf, dessen `keyOf` gleich dem `key` eines ruhenden Eintrags ist, bekommt dessen ID. Das ist genau die heutige Rückkehr über `shortId(key, seed)`, nur ohne die Gefahr, dass ein anderer Seed greift (Review m3). Die Ausnahme gilt nur, wenn der `key` auf beiden Seiten eindeutig ist (wie Stufe 0) und der Entwurf zu den Teilnehmern von Durchgang 2 gehört. Sonst bekommt er eine neue ID mit dem nächsten freien Seed (Arch-Review m5).
 - **Bericht:** Die Kopfzeile meldet zusätzlich `n aus der Ruhe`. Je Treffer erscheint `IDs: aus der Ruhe <id> „alt“ → „neu“ (Stufe s, ruhte seit <Datum>)`.
 
 **`listedAt` und `isNewRun`:** `withListedAt` sucht den Vorgänger in Vorstand und Ruhe. `isNewRun` bekommt für Ruhe-Vorgänger die Termine aus `starts` und als Horizont `entry.horizonTo` (Review M1). Ein Kurs, der Wochen später mit neuen Terminen wiederkommt, ist so weiter neu. Das deckt B1 (gleiche ID nach Lücke) und B2 (neue ID nach Lücke).
@@ -148,7 +151,7 @@ Das trifft `e3of0bad → vq5l6lmq` (Faberpark): Ein genauerer Ort wurde angelegt
 - Es ergänzt ADR 0022, Punkt 3 (Stufe 2b, Durchgang 2 gegen die Ruhe) und den Nachtrag zu Plan 0043 (Vorgänger auch aus der Ruhe).
 - Es ergänzt ADR 0022, Punkt 2 („belegt“ sind Vorstand, Ausgabe und Ruhe) und Punkt 4 (Rückkehr über `key` auch aus der Ruhe).
 - Es ergänzt ADR 0031 (gemeinsames Fenster, Überdeckung, ältere Fassung bleibt, Termine außerhalb des Fensters).
-- Es ergänzt ADR 0041, Punkt 5 (Erbe auch aus der Dublettenregel) und **Punkt 10** (Review 2, Blocker 2): Der Build-Code darf eine ID mit künftigem Termin verlieren, wenn sie eine verworfene Dublette ist, wenn also ein `sameOfferTwice`-Partner desselben Anbieters mit Vorstands-ID in der Ausgabe steht.
+- Es ergänzt ADR 0041, Punkt 5 (Erbe auch aus der Dublettenregel) und **Punkt 10** (Review 2, Blocker 2; Arch-Review M1): Einmalig darf der Build-Code die IDs aus einer festen Liste verworfener Dubletten verlieren. Nach dem ersten Nachtlauf mit Etappe 1 wird die Fixture neu eingefroren, und die Liste entfällt.
 - Unter „Alternativen“ grenzt es die Ruhe von der in ADR 0022 abgelehnten Alias-Liste ab (Review m6): Die Ruhe ist ein Gedächtnis für die Zuordnung, keine Weiterleitung. Eine weggefallene ID zeigt nie auf ein anderes Angebot.
 - Nachgezogen werden:
   - `docs/architecture.md`: Invariante „Stabile IDs“ (Ruhe, Stufe 2b), „Ein Datenvertrag“ (`data/ruhend.json` als Pipeline-Zustand), die Import-Zeile der Pipeline (heute Zeile 49);
@@ -194,7 +197,11 @@ Test-first für die Pipeline-Logik. Kein UI-Anteil, also kein `/browser-review`.
      - Faberpark: gleiche ID;
      - zwei Orte mit gleichen Terminen und ein Entwurf am alten Ort: die ID bleibt am gleichen Ort (Gegentest M3);
      - Titel-Widerspruch oder anderer Anbieter: neue ID.
-2. `id-continuity.test.ts` bekommt eine **benannte Ausnahme** (Review 2, Blocker 2). Neu einfrieren hilft nicht: Die Fixture stammt aus einem Nachtlauf mit altem Code und enthält beide Fassungen. Die Ausnahme: Eine verlorene ID ist erlaubt, wenn in der Ausgabe ein Angebot desselben Anbieters steht, das mit dem verlorenen Vorstandsangebot `sameOfferTwice` ist und selbst eine Vorstands-ID trägt. Der Test listet solche Fälle in seiner Ausgabe, und jeder steht mit Partner im Commit-Text. Jeder andere Verlust bleibt rot. Dazu ein Test des Tests: ein künstlicher Verlust ohne Partner ist rot. `docs/architecture.md` („Stabile IDs“) nennt die Ausnahme.
+2. `id-continuity.test.ts` bekommt eine **feste Liste erwarteter Verluste** (Review 2, Blocker 2; Arch-Review M1). Neu einfrieren hilft vor dem ersten Nachtlauf nicht: Die Fixture stammt aus einem Lauf mit altem Code und enthält beide Fassungen.
+   - Die Liste `EXPECTED_DUPLICATE_LOSSES` nennt Paare (verlorene ID, Partner-ID) aus B4, die die Messung in Schritt 3 bestätigt. Eine Regel „jeder `sameOfferTwice`-Partner genügt“ gibt es bewusst nicht: Die Ausnahme darf sich nicht auf die Funktion stützen, die der Test überwacht.
+   - Jeder Verlust außerhalb der Liste bleibt rot. Dazu ein Test des Tests: ein künstlicher Verlust außerhalb der Liste ist rot.
+   - **Ablauf der Ausnahme:** Nach dem ersten Nachtlauf mit Etappe 1 wird die Fixture neu eingefroren (`node scripts/pipeline/freeze-id-continuity.ts`), die Liste entfällt, mit Begründung im Commit. Das steht als Restpunkt im Plan, bis es erledigt ist.
+   - `docs/architecture.md` („Stabile IDs“) und ADR 0044 (zu ADR 0041, Punkt 10) nennen die befristete Liste.
 3. Messung (Wegwerfskript im Scratch-Verzeichnis, nicht committet, git nur lesend): `buildFromState` auf den Zuständen der letzten 14 Nachtläufe aus git (`data/raw`, Vorstand, `providers.yaml`) mit dem neuen Code. Gezählt werden:
    - verworfene Dubletten (erwartet die 7 aus B4, keine Schwestergruppe);
    - Treffer der Stufe 2b, jeder von Hand angesehen;
@@ -225,13 +232,13 @@ Test-first für die Pipeline-Logik. Kein UI-Anteil, also kein `/browser-review`.
    - `key`-Rückkehr bei mehrdeutiger Stufe 0 ergibt die alte ID, nicht Seed 1 (Review m3).
    - `checkIdContinuity` greift für Ruhe → Ausgabe.
    - Eigenschaftstest: Mit leerer Ruhe ist die Ausgabe identisch zu Etappe 1.
-7. Aufrufer, `publish.ts` samt Test, Workflow, Biome, `data:validate` samt Fixture, Trockenlauf nach `runDir`. `id-continuity.test.ts` bleibt grün, denn die Ruhe ist in der Fixture leer.
+7. Aufrufer, `publish.ts` samt Test, Workflow, Biome, `data:validate` samt Fixture, Trockenlauf nach `runDir`. `freeze-id-continuity.ts` friert `data/ruhend.json` mit ein, und der Test gibt sie an `buildFromState` weiter (Arch-Review m3). Bis zum nächsten Einfrieren ist sie in der Fixture leer, der Test bleibt grün.
 8. Messung wie in Schritt 3, mit Ruhe ab dem 2026-11-04:
    - Zahl „Neu“ am 2026-11-18 (heute 83, erwartet um 55);
    - Treffer aus der Ruhe, jeder von Hand angesehen;
    - Größe von `data/ruhend.json`.
 
-   Eine alte ID auf einem fremden Angebot ist ein Blocker. Liegt die Größe über 300 kB, wird zuerst `RESTING_SPAN_DAYS` gekappt, nicht `RESTING_DAYS`.
+   Eine alte ID auf einem fremden Angebot ist ein Blocker. Liegt die Größe über 400 kB, wird zuerst `RESTING_SPAN_DAYS` gekappt, nicht `RESTING_DAYS`.
 9. ADR 0044 (Teil E2), `docs/architecture.md`, `CLAUDE.md`, Skill, `docs/ideas.md`, Verweise in ADR 0022, 0031, 0041 und Plan 0043. `/arch-review` (Schema, neue Datei, > 200 Zeilen), Commit, CI grün. Nach dem nächsten Nachtlauf prüfen:
    - `data/ruhend.json` ist committet;
    - der Bericht nennt „aus der Ruhe“;
@@ -255,7 +262,7 @@ Test-first für die Pipeline-Logik. Kein UI-Anteil, also kein `/browser-review`.
 
 Alle Punkte übernommen:
 - **B1** Veröffentlichen: `NIGHTLY_PATHS`, Artefaktliste, Test und Trockenlauf (E2, „Veröffentlichen“; Schritt 7).
-- **B2** Die Zusage „Fixture bleibt“ ist gestrichen. Etappe 1 darf Dubletten-IDs verlieren, nur mit Neueinfrieren und Nennung im Commit; jeder andere Verlust ist ein Blocker (Schritt 2). Etappe 2 lässt die Fixture unberührt.
+- **B2** Die Zusage „Fixture bleibt“ ist gestrichen. Ersetzt durch Review 2, Blocker 2 und Arch-Review M1: feste Liste erwarteter Verluste, nach dem ersten Nachtlauf neu einfrieren (Schritt 2).
 - **B3** Keine Kursfortschreibung bei Treffern aus der Ruhe, mit Test (E2, Zuordnung; Schritt 6).
 - **M1** `horizonTo` je Eintrag, Fenster und `isNewRun` damit (E2).
 - **M2** Rivalen sind alle Vorstandsangebote, mehrdeutige Entwürfe nehmen nicht an Durchgang 2 teil (E2).
@@ -291,3 +298,14 @@ B1, B3 und M1–M7 aus Review 1 gelten als gelöst. Alle neuen Punkte sind über
 - **Minor 14** Leere Ruhe beim Start unter Risiken.
 
 Kein offener Blocker. Laut `/plan-review` gibt es höchstens zwei neue Reviews, deshalb folgt keine dritte Runde. Die Messungen in Schritt 3 und 8 sind die Kontrolle, und `/arch-review` folgt bei der Umsetzung.
+
+## Arch-Review (2026-11-18, auf den Plan) – Verdict: Nacharbeit nötig → eingearbeitet
+
+Keine Blocker. Alle Punkte übernommen:
+- **M1** Die Ausnahme ist jetzt eine feste Liste der Paare aus B4 statt einer Regel über `sameOfferTwice`. Sie ist befristet: nach dem ersten Nachtlauf neu einfrieren (Schritt 2, ADR 0044).
+- **M2** `starts` wird mit Offset gespeichert (Variante a), ohne Rückwandlung. Die Größenschätzung ist auf etwa 350 kB angepasst, Ziel < 400 kB.
+- **m1** Die Felder von `RestingEntry` kommen aus `schema.ts`.
+- **m2** Den Widerspruch bei B2 löst ein Verweis auf die Ersetzung.
+- **m3** Die Fixture friert die Ruhe mit ein.
+- **m4** Bei einem geteilten Vorgänger gibt es kein Dubletten-Erbe.
+- **m5** Die `key`-Rückkehr gilt nur bei Eindeutigkeit und nur für Teilnehmer von Durchgang 2.
