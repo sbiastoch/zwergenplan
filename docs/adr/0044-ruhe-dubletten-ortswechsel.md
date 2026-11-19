@@ -44,7 +44,7 @@ Rückmeldung vom 2026-11-18: Viele Angebote tragen „Neu“, obwohl sie es nich
    Zeigen zwei Zwillinge auf verschiedene Entwürfe, trifft keiner (ADR 0031, Punkt 3). Stufe 1 bleibt unverändert, damit derselbe Kurs an zwei Orten eines Anbieters kein eindeutiges Paar verliert. Notiz: `IDs: Stufe 2b (Ortswechsel) <id> „alt“ @<ort> → „neu“ @<ort>`.
 5. **Test der ID-Kontinuität** (ADR 0041, Punkt 10). `scripts/pipeline/id-continuity.test.ts` nennt in `EXPECTED_DUPLICATE_LOSSES` die verworfenen Dubletten der eingefrorenen Fixture, je mit dem Partner, der bleibt. Ein Verlust aus der Liste ist nur erlaubt, wenn der Partner beim selben Anbieter steht.
    - Die Liste ist bewusst fest und keine Regel über `sameOfferTwice`, denn die Ausnahme darf sich nicht auf die überwachte Funktion stützen.
-   - Sie ist befristet: Nach dem ersten Nachtlauf mit diesem Code wird die Fixture neu eingefroren, und die Liste entfällt.
+   - Sie ist befristet: Nach dem ersten Nachtlauf mit diesem Code wird die Fixture neu eingefroren, und die Liste entfällt. **Erledigt 2026-11-19:** Fixture vom Nachtlauf `07993e7`, Liste entfernt.
 
 6. **Ruhende Angebote** (`data/ruhend.json`, `scripts/pipeline/lib/resting.ts`; Nutzerentscheid N2).
    - Ein Angebot des Vorstands, das in der Ausgabe fehlt, ruht bis zu `RESTING_DAYS = 56` Berliner Tage. Gemerkt werden ID, Saat-Schlüssel (`keyOf`), Anbieter, Ort, Titel, Format, Alter, `listedAt`, Ruhebeginn, `horizonTo` und die Beginne ab dem Ruhebeginn mit Offset, höchstens `RESTING_SPAN_DAYS = 112` Tage weit.

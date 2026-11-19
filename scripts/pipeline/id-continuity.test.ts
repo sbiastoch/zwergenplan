@@ -55,90 +55,13 @@ function build(previous: OffersFile, resting: RestingFile): Offer[] {
 
 const future = (o: Offer) => o.sessions.some((s) => berlinIsoDate(s.start) >= meta.today);
 
-/**
- * Befristete Ausnahme (Plan 0061, Schritt 2; ADR 0044 zu ADR 0041, Punkt 10): verworfene Dubletten gleicher Quelle,
- * deren ID der Build seit Plan 0061 (E1, ältere Fassung bleibt) gewollt verliert, je mit der Partner-ID, die bleibt.
- * Bewusst eine feste Liste statt einer Regel über `sameOfferTwice`: Die Ausnahme darf sich nicht auf die Funktion
- * stützen, die der Test überwacht. Entfällt mit dem Neueinfrieren nach dem ersten Nachtlauf mit Plan 0061, Etappe 1.
- */
-/** Fixture, zu der die Liste gehört (Nachtlauf vom 2026-10-31, `bb27187`); neu eingefroren heißt: Liste leeren */
-const LIST_FOR = "2026-10-31T08:43:22+01:00";
-const EXPECTED_DUPLICATE_LOSSES: ReadonlyArray<readonly [lost: string, partner: string]> = [
-  ["j9onxbbk", "yjra3gp9"], // Achtsame Babymassage 6 Wochen–5 Monate, Mo 11:00 (Familienbox)
-  ["4ipjvk1y", "a1fqz31f"], // Babygymnastik 2–5 Monate, Di 12:00
-  ["jlig0xtb", "da0wom76"], // Babygymnastik 5–8 Monate, Di 10:45
-  ["9av43cgf", "uivdyj4b"], // Babymassage 0–4 Monate, Do 12:00
-  ["yowa6a76", "4qcl8tkf"], // BabySinne 12–30 Monate, Di 9:30
-  ["mkgtkrw7", "yu8gebuk"], // BabySinne 6–12 Monate, Di 10:30
-  ["w1orp58q", "pbd2mt1t"], // Babyturnen 8–15 Monate, Do 9:30
-  ["o4xo6513", "u6msbbr7"], // Babyturnen 8–15 Monate, Mi 10:45 (Anlass des Plans)
-  ["oprewsns", "f27vtp28"], // Babyturnen 8–15 Monate, Mo 10:45
-  ["1e7vjtwz", "w2yqks2g"], // Babyturnen 8–18 Monate, Di 14:45
-  ["xmqdby2y", "rb6gyhs5"], // Beckenboden Mama-Baby-Yoga, Fr 10:30
-  ["pjurpnqq", "ja800eov"], // Kleinkindturnen 12–36 Monate, Do 10:45
-  ["89ctcvmc", "9h4opmvn"], // Kleinkindturnen 12–36 Monate, Di 9:30
-  ["n3i6wtqq", "r0ypsyq0"], // Kleinkindturnen 12–36 Monate, Mo 9:30
-  ["cxiojojy", "mqpa27ka"], // Kleinkindturnen 18–36 Monate, Di 16:00
-  ["7zsydjdc", "ogcteqdd"], // Musikalische Früherziehung 1–3 Jahre, Mo 16:30
-  ["lexg976t", "4lgay38d"], // Musikalische Früherziehung 6–12 Monate, Mi 10:30
-  ["cyqagasm", "lmg8yj5q"], // Musikalische Früherziehung 9–15 Monate, Mi 9:30
-  ["8knnhep1", "rz2wvnyl"], // Zumbini 0–4 Jahre, Di 14:00
-  ["npwglq1a", "n71txrp8"], // Zumbini 0–4 Jahre, Di 15:00
-  ["natqt72s", "gmjhemwu"], // Mini-Club Passionskirche, Do 9:00 (ev-langwasser-miniclubs)
-  ["nk3e706i", "gmjhemwu"], // dasselbe, dritte Fassung
-];
-
-/**
- * IDs aus `expected`, die `built` nicht beim selben Anbieter hat, lesbar für die Fehlermeldung. Ausgenommen ist ein
- * Verlust aus `allowed`, wenn dessen Partner beim selben Anbieter in `built` steht.
- */
-function lost(
-  expected: readonly Offer[],
-  built: readonly Offer[],
-  allowed: ReadonlyArray<readonly [string, string]> = EXPECTED_DUPLICATE_LOSSES,
-): string[] {
+/** IDs aus `expected`, die `built` nicht beim selben Anbieter hat, lesbar für die Fehlermeldung */
+function lost(expected: readonly Offer[], built: readonly Offer[]): string[] {
   const owner = new Map(built.map((o) => [o.id, o.providerId] as const));
-  const partner = new Map(allowed);
   return expected
     .filter((o) => owner.get(o.id) !== o.providerId)
-    .filter((o) => {
-      const p = partner.get(o.id);
-      return p === undefined || owner.has(o.id) || owner.get(p) !== o.providerId;
-    })
     .map((o) => `${o.id} ${o.providerId} „${o.title}“${owner.has(o.id) ? ` (jetzt bei ${owner.get(o.id)})` : ""}`);
 }
-
-/** Gelistete IDs, die `built` tatsächlich verliert (bei Partner beim selben Anbieter), sortiert */
-function exempted(expected: readonly Offer[], built: readonly Offer[]): string[] {
-  const all = lost(expected, built, []);
-  const remaining = new Set(lost(expected, built).map((l) => l.slice(0, 8)));
-  return all
-    .map((l) => l.slice(0, 8))
-    .filter((id) => !remaining.has(id))
-    .sort();
-}
-
-describe("Ausnahmeliste der ID-Kontinuität (Plan 0061, Schritt 2)", () => {
-  it("gehört zur eingefrorenen Fixture: neu eingefroren, muss sie leer sein (Arch-Review m1)", () => {
-    if (meta.generatedAt !== LIST_FOR)
-      expect(EXPECTED_DUPLICATE_LOSSES, "Fixture neu eingefroren – EXPECTED_DUPLICATE_LOSSES leeren").toEqual([]);
-  });
-
-  const [sample] = offers("offers.json.gz").offers;
-  if (sample === undefined) throw new Error("Fixture ohne Angebot");
-  const offer = (id: string, providerId = "anbieter-a"): Offer => ({ ...sample, id, providerId });
-  it("nimmt nur gelistete Verluste aus, und nur, wenn der Partner beim selben Anbieter bleibt", () => {
-    const allowed = [["aaaaaaaa", "bbbbbbbb"]] as const;
-    const expected = [offer("aaaaaaaa"), offer("cccccccc")];
-    // gelistet, Partner da: kein Befund; ein künstlicher Verlust außerhalb der Liste bleibt rot
-    expect(lost(expected, [offer("bbbbbbbb")], allowed).map((l) => l.slice(0, 8))).toEqual(["cccccccc"]);
-    // Partner fehlt oder wechselte den Anbieter: rot
-    expect(lost([offer("aaaaaaaa")], [], allowed)).toHaveLength(1);
-    expect(lost([offer("aaaaaaaa")], [offer("bbbbbbbb", "anbieter-b")], allowed)).toHaveLength(1);
-    // die ID selbst wechselt den Anbieter: rot, auch wenn gelistet
-    expect(lost([offer("aaaaaaaa")], [offer("aaaaaaaa", "anbieter-b"), offer("bbbbbbbb")], allowed)).toHaveLength(1);
-  });
-});
 
 describe("ID-Kontinuität des Build-Codes (Plan 0049, Nachtrag 2, B7)", () => {
   it(
@@ -148,8 +71,6 @@ describe("ID-Kontinuität des Build-Codes (Plan 0049, Nachtrag 2, B7)", () => {
       const built = build(after, restingAfter);
       const missing = lost(after.offers.filter(future), built);
       expect(missing, `${missing.length} IDs mit künftigem Termin verloren – ${HINT}`).toEqual([]);
-      // jeder Eintrag der Liste wird gebraucht: ein überzähliger deckte sonst später einen anderen Verlust (Arch-Review m1)
-      expect(exempted(after.offers.filter(future), built)).toEqual(EXPECTED_DUPLICATE_LOSSES.map(([id]) => id).sort());
     },
     BUILD_TIMEOUT_MS,
   );

@@ -1,6 +1,6 @@
 # Plan 0061 – „Neu“ nur, wenn es neu ist: ruhende Angebote, Dubletten gleicher Quelle, Ortswechsel
 
-Status: in Umsetzung
+Status: abgeschlossen, live seit 673b052 (2026-11-19)
 Datum: 2026-11-18
 
 Bezug:
@@ -321,10 +321,10 @@ Kein Blocker. Übernommen, je mit Test:
 
 ## Restpunkte
 
-- [ ] Nach dem ersten Nachtlauf mit diesem Code: Fixture neu einfrieren (`node scripts/pipeline/freeze-id-continuity.ts`), `EXPECTED_DUPLICATE_LOSSES` leeren (der Test erzwingt es), Commit mit Begründung.
-- [ ] Nach dem Nachtlauf prüfen: Die Dubletten aus B4 sind weg, `u6msbbr7` steht, `o4xo6513` ist weg. `data/ruhend.json` ist committet, und der Bericht nennt die Ruhe.
-- [ ] Test „Gate und Build bekommen dieselbe Ruhe“ (Arch-Review E2, m5).
-- [ ] Ungültige `data/ruhend.json` als Wächter-Befund melden statt nur als Notiz im Bericht (Arch-Review E2, m6).
+- [x] Nach dem ersten Nachtlauf mit diesem Code (manuell ausgelöst, `07993e7`, 2026-11-19): Fixture neu eingefroren, `EXPECTED_DUPLICATE_LOSSES` samt Bindung entfernt.
+- [x] Nachtlauf geprüft: Alle 7 Dubletten aus B4 sind weg, die Partner bleiben (`o4xo6513` weg, `u6msbbr7` steht). `data/ruhend.json` ist committet (9 Einträge), die Ampel grün. „Neu“: 77 von 406 (am 18.11.: 83 von 412).
+- [→] Test „Gate und Build bekommen dieselbe Ruhe“ (Arch-Review E2, m5): nach `docs/ideas.md`.
+- [→] Ungültige `data/ruhend.json` als Wächter-Befund melden (Arch-Review E2, m6): nach `docs/ideas.md`.
 
 ## Risiken
 

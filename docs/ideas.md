@@ -122,6 +122,9 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 
 Restpunkte archivierter Pläne (Plan 0027, Etappe 6, Nutzerentscheid 3). Die Einzelheiten stehen jeweils im genannten Abschnitt des Plans in `docs/plans/archiv/`. Die meisten Punkte sind Prüfungen am echten Gerät, die nur der Nutzer machen kann.
 
+- **Plan 0061** („Neu“ nur, wenn es neu ist, live seit 673b052, 2026-11-19; Einzelheiten in „Arch-Review Etappe 2“ des Plans):
+  - **Test „Gate und Build bekommen dieselbe Ruhe“** (Arch-Review E2, m5): Heute sichert es nur der Aufbau (`runNightly` liest `data/ruhend.json` einmal und gibt sie Gate und Build). Ein Test bräuchte einen Richter-Aufbau wie in `scripts/pipeline/io/nightly.test.ts`.
+  - **Ungültige `data/ruhend.json` als Wächter-Befund** (Arch-Review E2, m6): Heute steht nur eine Notiz im Bericht, und der Lauf legt die Ruhe leer neu an.
 - **Plan 0059** (Karte groß, live seit 10be9c9, 2026-10-31; Einzelheiten in „Browser-Review“ und „Branch-CI“ des Plans):
   - **Am echten Handy prüfen:** Bewegt ein Finger die große Karte? Schließt ein Tipp auf den Schleier über der Karte das Detail? Und wie verhält sich iPhone-Safari mit der Leiste unten (`100dvh`)?
   - **Nachtrag 1, Statusleiste am iPhone** (live seit 5564f4e): In der installierten App prüfen, ob die große Karte unter der Notch weiterläuft, ob die weiße Uhr auf Streifen bzw. Verlauf lesbar ist (hell und dunkel) und ob der Kopf der App frei von der Uhr bleibt. Dafür eventuell die App neu öffnen oder neu zum Home-Bildschirm hinzufügen.
