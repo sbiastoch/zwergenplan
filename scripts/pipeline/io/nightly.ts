@@ -28,7 +28,17 @@ import { offerUnits } from "../lib/refresh.ts";
 import { changedProviders, type NightlyReport, type ProviderState } from "../lib/report.ts";
 import { planFetch } from "../lib/select.ts";
 import type { fetchInputs } from "./fetch-inputs.ts";
-import { readCatalog, readPreviousOffers, readRawDir, removeRaw, writeJson, writeOffers, writeRaw } from "./files.ts";
+import {
+  readCatalog,
+  readPreviousOffers,
+  readRawDir,
+  readResting,
+  removeRaw,
+  writeJson,
+  writeOffers,
+  writeRaw,
+  writeResting,
+} from "./files.ts";
 import { loadFreeDays } from "./holidays.ts";
 import type { Abruf } from "./http.ts";
 import { runIdGate } from "./id-gate.ts";
@@ -223,6 +233,8 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
   );
   // einmal bestimmt: Die Builds des ID-Gates und der Build danach rechnen mit demselben Stand (Altbestand, listedAt)
   const generatedAt = o.now();
+  // ebenso einmal gelesen: Gate und Build mit derselben Ruhe (Plan 0061, E2; Risiken)
+  const resting = readResting(join(o.dataDir, "ruhend.json"), generatedAt);
   let idGate: NightlyReport["idGate"];
   if (o.judge) {
     // ID-Gate (ADR 0041): nach allen Anbietern, vor dem Build; eigene Bremse. Frist ab Laufstart (Arch-Review M2): Der
@@ -239,6 +251,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
       next: { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(outDir) : {}) },
       catalog,
       previous,
+      resting: resting.resting,
       today: o.today,
       now: fetchedAt,
       generatedAt,
@@ -260,6 +273,7 @@ export async function runNightly(o: NightlyOptions): Promise<NightlyReport> {
     dataDir: o.dataDir,
     catalog,
     previous,
+    resting,
     today: o.today,
     now: () => generatedAt,
     sources,
@@ -306,6 +320,8 @@ async function buildFromRaw(o: {
   dataDir: string;
   catalog: readonly Provider[];
   previous: OffersFile | undefined;
+  /** ruhende Angebote (`readResting`, Plan 0061, E2); geschrieben wird `ruhend.json` neben `offers.json` */
+  resting: ReturnType<typeof readResting>;
   today: string;
   now: () => string;
   sources: BuildInput["sources"];
@@ -326,10 +342,11 @@ async function buildFromRaw(o: {
 
   const raws = { ...readRawDir(rawDir), ...(o.dryRun ? readRawDir(o.dryRun.overlayDir) : {}) };
   const span = nightlyWindow(o.today).freeDaysSpan;
-  const { file, report, notes } = buildFromState({
+  const { file, report, notes, resting } = buildFromState({
     raws,
     catalog: o.catalog,
     previous: o.previous,
+    resting: o.resting.resting,
     today: o.today,
     freeDays: await (o.freeDays ?? loadFreeDays)(span.from, span.to),
     generatedAt: o.now(),
@@ -339,6 +356,8 @@ async function buildFromRaw(o: {
   if (file) {
     written = o.dryRun?.target ?? join(o.dataDir, "offers.json");
     writeOffers(file, written);
+    // nur zusammen mit offers.json (Plan 0061, E2; Review 2, Minor 10)
+    if (resting) writeResting(resting, join(dirname(written), "ruhend.json"));
   }
   return {
     removed,
@@ -346,7 +365,7 @@ async function buildFromRaw(o: {
       offers: report.offers,
       sessions: report.sessions,
       errors: report.errors,
-      notes: [...notes, ...report.notes],
+      notes: [...(o.resting.warning ? [`Ruhe: ${o.resting.warning}`] : []), ...notes, ...report.notes],
       ...(written ? { written } : {}),
       derivedCategories: report.derivedCategories,
     },
@@ -365,12 +384,14 @@ export async function runBuildOnly(o: {
   now: () => string;
   freeDays?: typeof loadFreeDays;
 }): Promise<{ removed: string[]; build: NightlyReport["build"] }> {
+  const now = o.now();
   return buildFromRaw({
     dataDir: o.dataDir,
     catalog: readCatalog(join(o.dataDir, "providers.yaml")),
     previous: readPreviousOffers(join(o.dataDir, "offers.json")),
+    resting: readResting(join(o.dataDir, "ruhend.json"), now),
     today: o.today,
-    now: o.now,
+    now: () => now,
     // ohne Abruf kein Status der Sammelkalender; mit Zustand je Anbieter wirkt er ohnehin nicht (build-offers)
     sources: {},
     ...(o.freeDays ? { freeDays: o.freeDays } : {}),

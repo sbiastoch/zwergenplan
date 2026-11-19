@@ -11,6 +11,7 @@ import {
   ProvidersFile,
 } from "../../../src/domain/schema.ts";
 import { IdAcceptance, ProviderRaw } from "../lib/raw.ts";
+import { parseResting, type RestingFile } from "../lib/resting.ts";
 
 export const ROOT = fileURLToPath(new URL("../../../", import.meta.url));
 const CATALOG = join(ROOT, "data/providers.yaml");
@@ -60,6 +61,41 @@ export function readIdAcceptanceOrWarn(dataDir: string, warn: (message: string) 
     warn((e as Error).message);
     return [];
   }
+}
+
+/**
+ * Ruhende Angebote `<dataDir>/ruhend.json` (Plan 0061, E2). Fehlt die Datei oder ist sie ungültig, gilt die leere Ruhe
+ * mit Hinweis: Der Build verhält sich dann wie ohne Ruhe und legt sie neu an.
+ */
+export function readResting(file: string, generatedAt: string): { resting: RestingFile; warning?: string } {
+  const empty: RestingFile = { generatedAt, entries: [] };
+  if (!existsSync(file)) return { resting: empty, warning: `${file} fehlt – ohne Ruhe gebaut, neu angelegt` };
+  let value: unknown;
+  try {
+    value = readJson(file);
+  } catch (e) {
+    const why = e instanceof Error ? e.message : String(e);
+    return { resting: empty, warning: `${file} ist kein JSON (${why}) – ohne Ruhe gebaut` };
+  }
+  const parsed = parseResting(value);
+  return "file" in parsed
+    ? { resting: parsed.file }
+    : { resting: empty, warning: `${file} ungültig (${parsed.error}) – ohne Ruhe gebaut` };
+}
+
+/**
+ * Schreibt die Ruhe atomar, ein Eintrag je Zeile (Plan 0061, E2; Review 2, Minor 9): `writeJson` rückt ein und ließe
+ * die Datei um ein Vielfaches wachsen. Biome nimmt die Datei aus (`biome.json`).
+ */
+export function writeResting(file: RestingFile, target: string): void {
+  mkdirSync(dirname(target), { recursive: true });
+  const tmp = `${target}.${process.pid}.tmp`;
+  const entries = file.entries.map((e) => `    ${JSON.stringify(e)}`).join(",\n");
+  writeFileSync(
+    tmp,
+    `{\n  "generatedAt": ${JSON.stringify(file.generatedAt)},\n  "entries": [${entries ? `\n${entries}\n  ` : ""}]\n}\n`,
+  );
+  renameSync(tmp, target);
 }
 
 export function readPreviousOffers(file: string = OFFERS): OffersFile | undefined {

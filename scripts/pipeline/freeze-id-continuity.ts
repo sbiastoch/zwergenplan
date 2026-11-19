@@ -8,6 +8,7 @@
  * - `offers.json.gz`: `data/offers.json` dieses Commits, das Ergebnis des Laufs;
  * - `offers-before.json.gz`: `data/offers.json` davor, der Vorstand des Laufs;
  * - `free-days.json.gz`: die freien Tage des Nachtlaufs (OpenHolidays über den Cache, Spanne wie in `io/nightly.ts`);
+ * - `ruhend.json.gz`: `data/ruhend.json` vor dem Lauf, die Ruhe seines Builds (Plan 0061, E2); fehlt sie, die leere;
  * - `meta.json`: `today` und `generatedAt` des Laufs (`horizon.from`, `generatedAt` aus seinem Ergebnis), der Commit.
  * So baut der Test den Lauf mit demselben Stichtag nach, und ein erneutes Einfrieren ohne neuen Lauf ändert nichts.
  * gzip (Stufe 9, ohne Zeitstempel im Kopf) hält die rund 3,7 MB im Repo bei rund 0,4 MB und die Bytes reproduzierbar.
@@ -46,6 +47,14 @@ for (const f of run("ls-tree", "--name-only", `${commit}:data/raw`)
   .sort())
   raws[f.slice(0, -".json".length)] = JSON.parse(show(commit, `data/raw/${f}`));
 
+/** Ruhe vor dem Lauf: `data/ruhend.json` des Vorgänger-Commits, sonst die leere (Plan 0061, E2) */
+function restingBefore(): string {
+  const listed = run("ls-tree", "--name-only", `${commit}^`, "data/").split("\n");
+  return listed.includes("data/ruhend.json")
+    ? show(`${commit}^`, "data/ruhend.json")
+    : JSON.stringify({ generatedAt: after.generatedAt, entries: [] });
+}
+
 const gz = (name: string, text: string) => {
   const bytes = gzipSync(text, { level: 9 });
   writeFileSync(join(OUT, name), bytes);
@@ -58,6 +67,7 @@ const sizes = {
   "offers.json.gz": gz("offers.json.gz", offers),
   "offers-before.json.gz": gz("offers-before.json.gz", show(`${commit}^`, "data/offers.json")),
   "free-days.json.gz": gz("free-days.json.gz", JSON.stringify(freeDays)),
+  "ruhend.json.gz": gz("ruhend.json.gz", restingBefore()),
 };
 const meta = { today, generatedAt: after.generatedAt, commit };
 // Einrückung wie Biome, das scripts/ prüft

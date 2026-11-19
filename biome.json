@@ -17,6 +17,7 @@
       "!docs/design",
       "!data/oepnv",
       "!data/raw",
+      "!data/ruhend.json",
       "!data/discover",
       "!evals/cases",
       "!tests/fixtures/oepnv"

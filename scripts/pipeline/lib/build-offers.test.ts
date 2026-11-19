@@ -13,6 +13,7 @@ import {
   nightlyWindow,
 } from "./build-offers.ts";
 import { ProviderRaw, RawBatch, RawEvent } from "./raw.ts";
+import type { RestingFile } from "./resting.ts";
 import { checkIdContinuity, type Draft, SAME_SOURCE_SESSIONS } from "./stable-ids.ts";
 
 const { providers: fixtureProviders } = loadFixtures();
@@ -965,6 +966,26 @@ describe("dropSameSourceDuplicates: Dubletten gleicher Quelle (Plan 0038, E1; AD
       expect([clash?.keepId, clash?.keepVia]).toEqual([null, undefined]);
     });
 
+    it("auch ein Bleibender ohne Dublette zählt als Anspruch (Arch-Review m3), ebenso ein Richter-Erbe (m4)", () => {
+      // T hat denselben Fensterschlüssel wie der Vorgänger, S trifft ihn über `sameOfferTwice` und nimmt eine Dublette auf
+      const t = cand(0, { title: "Babyturnen 8–15 Monate", sessions: tuesdays(5) });
+      const p = asOld(cand(9, { title: "Babyturnen 8–15 Monate", sessions: tuesdays(10) }), "pppppppp");
+      const s1 = cand(1, { title: "Babyturnen 8–15 Monate (Di)", sessions: tuesdays(4, 6) });
+      const s2 = cand(2, { title: "Babyturnen 8–15 Monate, dienstags", sessions: tuesdays(4, 6) });
+      const { kept } = dropSameSourceDuplicates([t, s1, s2], [p], FROM);
+      expect(kept.map((c) => [c.order, c.keepId])).toEqual([
+        [0, undefined],
+        [1, undefined],
+      ]);
+      // ein anderer Kandidat trägt das Richter-Erbe auf den Vorgänger: kein Dubletten-Erbe daneben
+      const x = cand(3, { title: "Musikgarten", sessions: tuesdays(10) });
+      const judged = dropSameSourceDuplicates([{ ...x, keepId: "pppppppp" }, s1, s2], [p], FROM).kept;
+      expect(judged.map((c) => [c.order, c.keepId])).toEqual([
+        [3, "pppppppp"],
+        [1, undefined],
+      ]);
+    });
+
     it("teilen sich zwei Überlebende einen Vorgänger, erbt keiner (ADR 0041, Punkt 5)", () => {
       // Vorgänger über 10 Dienstage; X deckt die ersten 5, Y die letzten 4 – X und Y sind keine Dubletten voneinander
       const p = cand(9, { title: "Babyturnen 8–15 Monate", sessions: tuesdays(10) });
@@ -1172,6 +1193,78 @@ describe("listedAt: zuerst im Zwergenplan (Plan 0043, E1)", () => {
   it("das Rohformat kennt das Feld nicht: nur der Build setzt es", () => {
     expect(RawEvent.safeParse({ ...ev(), listedAt: "2026-10-05T06:00:00+02:00" }).success).toBe(false);
     expect(RawEvent.safeParse(ev()).success).toBe(true);
+  });
+});
+
+describe("Ruhe: Rückkehr nach einer Lücke (Plan 0061, E2)", () => {
+  const status = { "familientreff-beispiel": ok };
+  const night = (generatedAt: string, events: unknown[], previous?: OffersFile, resting?: RestingFile) => {
+    const out = buildOffers(
+      base({
+        batches: [batch("familientreff-beispiel", events, status)],
+        generatedAt,
+        ...(previous ? { previous } : {}),
+        resting: resting ?? { generatedAt, entries: [] },
+      }),
+    );
+    expect(out.report.errors).toEqual([]);
+    if (!out.file || !out.resting) throw new Error("kein Ergebnis");
+    return { file: out.file, resting: out.resting, notes: out.report.notes };
+  };
+  const N1 = "2026-10-05T06:00:00+02:00";
+  const N2 = "2026-10-06T06:00:00+02:00";
+  const N3 = "2026-10-12T06:00:00+02:00";
+
+  it("B1: gleiche ID nach Nächten ohne das Angebot, `listedAt` bleibt", () => {
+    const first = night(N1, [ev()]);
+    const gap = night(N2, [], first.file, first.resting);
+    expect(gap.file.offers).toEqual([]);
+    expect(gap.resting.entries.map((e) => e.id)).toEqual([first.file.offers[0]?.id]);
+    const back = night(N3, [ev()], gap.file, gap.resting);
+    expect(back.file.offers[0]?.id).toBe(first.file.offers[0]?.id);
+    expect(back.file.offers[0]?.listedAt).toBe(N1);
+    expect(back.resting.entries).toEqual([]);
+  });
+
+  it("B2: umformuliert nach der Lücke – alte ID und altes `listedAt` über Stufe 1", () => {
+    const first = night(N1, [ev()]);
+    const gap = night(N2, [], first.file, first.resting);
+    const back = night(N3, [ev({ title: "Krabbeltreff am Mittwoch" })], gap.file, gap.resting);
+    expect(back.file.offers[0]?.id).toBe(first.file.offers[0]?.id);
+    expect(back.file.offers[0]?.listedAt).toBe(N1);
+    expect(back.notes.some((n) => n.startsWith(`IDs: aus der Ruhe ${first.file.offers[0]?.id}`))).toBe(true);
+  });
+
+  it("ein Kurs, der nach der Lücke mit neuen Terminen wiederkommt, ist neu (`isNewRun` mit `horizonTo`)", () => {
+    const kurs = (days: string[]) =>
+      ev({
+        title: "PEKiP",
+        format: "kurs",
+        topics: ["pekip"],
+        schedule: { kind: "dates", dates: days.map((d) => ({ start: `${d}T10:00` })) },
+      });
+    const first = night(N1, [kurs(["2026-10-07", "2026-10-14", "2026-10-21"])]);
+    const gap = night(N2, [], first.file, first.resting);
+    const back = night(
+      N3,
+      [kurs(["2026-10-07", "2026-10-14", "2026-10-21", "2026-11-11", "2026-11-18"])],
+      gap.file,
+      gap.resting,
+    );
+    expect(back.file.offers[0]?.id).toBe(first.file.offers[0]?.id);
+    expect(back.file.offers[0]?.listedAt).toBe(N3);
+    // keine Kursfortschreibung aus der Ruhe: die Ausgabe ist gültig und hat nur die Termine des Entwurfs
+    expect(back.file.offers[0]?.sessions).toHaveLength(5);
+  });
+
+  it("mit leerer Ruhe ist die Ausgabe dieselbe wie ohne Ruhe; ohne Ruhe keine fortgeschriebene", () => {
+    const { file: previous } = loadFixtures();
+    const input = base({ previous, generatedAt: N2, batches: [batch("familientreff-beispiel", [ev()], status)] });
+    const without = buildOffers(input);
+    const empty = buildOffers({ ...input, resting: { generatedAt: N1, entries: [] } });
+    expect(empty.file).toEqual(without.file);
+    expect(without.resting).toBeUndefined();
+    expect(empty.resting?.entries.length).toBeGreaterThan(0);
   });
 });
 

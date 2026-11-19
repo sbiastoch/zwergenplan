@@ -18,6 +18,7 @@ import {
   type RawEvent,
   rawExtracted,
 } from "./raw.ts";
+import { type RestingEntry, type RestingFile, updateResting } from "./resting.ts";
 import { expandSchedule } from "./schedule.ts";
 import { similarTitle } from "./similar.ts";
 import { mergeParts } from "./split.ts";
@@ -57,6 +58,11 @@ export interface BuildInput {
    * zusätzliche Übernahme ergäbe Dubletten, wenn die Zuordnung eine neue ID vergibt (Arch-Review S2, m2).
    */
   extracted?: ReadonlySet<string>;
+  /**
+   * Ruhende Angebote (`data/ruhend.json`, Plan 0061, E2): Durchgang 2 der Zuordnung und Vorgänger für `listedAt`. Mit
+   * Ruhe gibt `buildOffers` die fortgeschriebene zurück; fehlt sie, verhält es sich wie vor Plan 0061.
+   */
+  resting?: RestingFile | undefined;
 }
 
 /** Datenhorizont von `data/offers.json` im Nachtlauf: heute + 12 Monate (Plan 0032, E5; ADR 0003 bisher 4). */
@@ -173,7 +179,15 @@ export function buildFromState(o: {
   freeDays: Readonly<Record<string, string>>;
   generatedAt: string;
   sources: BuildInput["sources"];
-}): { file?: OffersFile; report: BuildReport; notes: string[]; unitOf: Record<string, string> } {
+  /** ruhende Angebote (Plan 0061, E2): Nachtlauf, `--build-only` und alle Builds des ID-Gates */
+  resting?: RestingFile | undefined;
+}): {
+  file?: OffersFile;
+  report: BuildReport;
+  notes: string[];
+  unitOf: Record<string, string>;
+  resting?: RestingFile;
+} {
   const { horizon } = nightlyWindow(o.today);
   // vor `buildOffers`: Abgleich und Vereinigung der Einheiten brauchen die freien Tage (Plan 0048, E6)
   const { batches, extracted, notes, unitOf } = batchesFromRaw(o.raws, o.catalog, {
@@ -191,6 +205,7 @@ export function buildFromState(o: {
     sources: o.sources,
     perProviderStatus: true,
     extracted,
+    ...(o.resting ? { resting: o.resting } : {}),
   });
   return { ...built, notes, unitOf };
 }
@@ -490,9 +505,15 @@ export function dropSameSourceDuplicates(
     high.absorbed = true;
     notes.push(`${low.label}: Dublette von ${high.c.label} (gleiche Quelle, gleiche Termine) – entfällt`);
   }
-  // Erbe aus der Dublettenregel: nur bei genau einem Anspruch auf den Vorgänger
+  // Erbe aus der Dublettenregel: nur bei genau einem Anspruch auf den Vorgänger. Mit zählen alle Bleibenden, auch die
+  // ohne aufgenommene Dublette (sonst verlöre einer mit gleichem Fensterschlüssel Stufe 0, Arch-Review m3), und jedes
+  // Richter-Erbe auf dieselbe ID (es geht vor, Arch-Review m4).
   const claims = new Map<string, number>();
-  for (const { pred } of survivors) if (pred) claims.set(pred.id, (claims.get(pred.id) ?? 0) + 1);
+  const claim = (id: string) => claims.set(id, (claims.get(id) ?? 0) + 1);
+  for (const { c, pred } of survivors) {
+    if (pred) claim(pred.id);
+    if (typeof c.keepId === "string" && c.keepId !== pred?.id) claim(c.keepId);
+  }
   for (const s of survivors)
     if (s.absorbed && s.pred && s.c.keepId === undefined && claims.get(s.pred.id) === 1)
       s.c = { ...s.c, keepId: s.pred.id, keepVia: "dublette" };
@@ -523,12 +544,30 @@ export function isNewRun(
   return day <= previousHorizonTo && day >= addDays(berlinDay(last.start), NEW_RUN_GAP_DAYS);
 }
 
-/** `listedAt` hängt an der ID (ADR 0022): vom Vorgänger übernommen, auch „fehlt“; neu oder neuer Durchgang: jetzt. */
-function withListedAt(offer: Offer, previous: Offer | undefined, input: BuildInput): Offer {
-  const horizonTo = input.previous?.horizon.to;
-  if (previous === undefined || (horizonTo !== undefined && isNewRun(previous, offer, horizonTo)))
+/**
+ * `listedAt` hängt an der ID (ADR 0022): vom Vorgänger übernommen, auch „fehlt“; neu oder neuer Durchgang: jetzt.
+ * Vorgänger ist das Angebot im Vorstand, sonst der ruhende Eintrag mit dieser ID; dessen Termine reichen bis zu seinem
+ * `horizonTo` (Plan 0061, E2; Review M1).
+ */
+function withListedAt(
+  offer: Offer,
+  previous: Offer | undefined,
+  resting: RestingEntry | undefined,
+  input: BuildInput,
+): Offer {
+  const before =
+    previous !== undefined
+      ? { offer: previous, horizonTo: input.previous?.horizon.to, listedAt: previous.listedAt }
+      : resting !== undefined
+        ? {
+            offer: { format: resting.format, sessions: resting.starts.map((start) => ({ start, end: start })) },
+            horizonTo: resting.horizonTo,
+            listedAt: resting.listedAt,
+          }
+        : undefined;
+  if (before === undefined || (before.horizonTo !== undefined && isNewRun(before.offer, offer, before.horizonTo)))
     return { ...offer, listedAt: input.generatedAt };
-  return previous.listedAt === undefined ? offer : { ...offer, listedAt: previous.listedAt };
+  return before.listedAt === undefined ? offer : { ...offer, listedAt: before.listedAt };
 }
 
 /** Gleicher Ort (≤ 50 m), gleicher Beginn, ähnlicher Titel, aber verschiedene Anbieter – meist derselbe Kurs zweimal erfasst. */
@@ -553,7 +592,7 @@ function crossProviderDuplicates(offers: readonly Offer[], providers: readonly P
   return out;
 }
 
-export function buildOffers(input: BuildInput): { file?: OffersFile; report: BuildReport } {
+export function buildOffers(input: BuildInput): { file?: OffersFile; report: BuildReport; resting?: RestingFile } {
   const report: BuildReport = {
     offers: 0,
     sessions: 0,
@@ -669,13 +708,17 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
     previous: input.previous,
     providers: input.providers,
     horizon: input.horizon,
+    ...(input.resting ? { resting: input.resting.entries } : {}),
   });
   assigned.offers.forEach((o, i) => {
     const c = deduped.kept[assigned.sources[i] ?? -1];
     if (c) report.origins[o.id] = c.batch;
   });
   const previousById = new Map(previous.map((o) => [o.id, o] as const));
-  const offers = assigned.offers.map((o) => courseCohortAge(withListedAt(o, previousById.get(o.id), input)));
+  const restingById = new Map((input.resting?.entries ?? []).map((e) => [e.id, e] as const));
+  const offers = assigned.offers.map((o) =>
+    courseCohortAge(withListedAt(o, previousById.get(o.id), restingById.get(o.id), input)),
+  );
   notes.push(...assigned.notes);
   for (const c of deduped.kept) if (c.derivedCategory) countDerived(c.offer.providerId);
   // 6. braucht IDs, deshalb nach der Zuordnung
@@ -731,8 +774,18 @@ export function buildOffers(input: BuildInput): { file?: OffersFile; report: Bui
   const file: OffersFile = { generatedAt: input.generatedAt, horizon: input.horizon, offers };
   const result = validateDataset(input.providers, file);
   if (!result.ok) report.errors.push(...result.errors);
-  report.errors.push(...checkIdContinuity(input.previous, offers));
+  report.errors.push(...checkIdContinuity(input.previous, offers, input.resting?.entries));
   report.offers = offers.length;
   report.sessions = offers.reduce((n, o) => n + o.sessions.length, 0);
-  return report.errors.length > 0 ? { report } : { file, report };
+  if (report.errors.length > 0) return { report };
+  // Ruhe fortschreiben (Plan 0061, E2): nur mit `file`, damit offers.json und ruhend.json zusammenpassen
+  if (input.resting === undefined) return { file, report };
+  const resting = updateResting({
+    previous: input.previous,
+    resting: input.resting,
+    next: offers,
+    generatedAt: input.generatedAt,
+    horizon: input.horizon,
+  });
+  return { file, report, resting };
 }

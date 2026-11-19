@@ -1,6 +1,7 @@
 /**
  * Prüft den Datenbestand (Schema + Invarianten), den Fahrplanauszug für die Wegzeit (Plan 0009), den Zustand
- * je Anbieter in data/raw (Plan 0032, E5) und den Zustand des Entdeckens in data/discover (E7).
+ * je Anbieter in data/raw (Plan 0032, E5), den Zustand des Entdeckens in data/discover (E7) und die ruhenden Angebote
+ * in data/ruhend.json (Plan 0061, E2).
  *   --against-deployed   zusätzlich Plausibilität gegen den LIVE deployten Stand (ADR 0002)
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -13,6 +14,7 @@ import { EXTRACT_KEY_PARTS } from "./pipeline/io/extract.ts";
 import { DiscoverState, reservedConflicts } from "./pipeline/lib/discover-state.ts";
 import { hasResultFor, promptHash } from "./pipeline/lib/eval-score.ts";
 import { idAcceptanceIssues, providerRawIssues } from "./pipeline/lib/raw.ts";
+import { parseResting } from "./pipeline/lib/resting.ts";
 import { duplicateUnitIds } from "./pipeline/lib/units.ts";
 import { timetableWarnings } from "./transit/freshness.ts";
 
@@ -104,6 +106,23 @@ function acceptanceIssues(today: string): string[] {
 }
 
 /**
+ * Ruhende Angebote `data/ruhend.json` (Plan 0061, E2): Schema `RestingFile`. Fehlt die Datei, ist das kein Fehler
+ * (der nächste Nachtlauf legt sie an); ungültig ist rot, auch wenn der Build dann ohne Ruhe weiterkäme.
+ */
+function restingIssues(): string[] {
+  const file = new URL(source === "fixture" ? "tests/fixtures/ruhend.json" : "data/ruhend.json", ROOT);
+  if (!existsSync(file)) return [];
+  let value: unknown;
+  try {
+    value = JSON.parse(readFileSync(file, "utf8"));
+  } catch (e) {
+    return [`data/ruhend.json: kein JSON: ${e instanceof Error ? e.message : String(e)}`];
+  }
+  const parsed = parseResting(value);
+  return "error" in parsed ? [`data/ruhend.json: ${parsed.error}`] : [];
+}
+
+/**
  * Eval zum aktuellen Prompt (Plan 0032, E9): kein Gate, nur ein Hinweis, wenn `evals/results.md` für Prompt und
  * Antwortschema (`EXTRACT_KEY_PARTS`) keine Zeile hat. Nach einem Prompt- oder Schemawechsel `pnpm eval` laufen lassen.
  */
@@ -132,6 +151,7 @@ const errors = [
   ...discoverIssues(),
   ...unitIssues,
   ...acceptanceIssues(berlinIsoDate(now)),
+  ...restingIssues(),
 ];
 const warnings = [
   ...plausibility.warnings,

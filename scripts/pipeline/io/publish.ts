@@ -1,14 +1,15 @@
 /**
  * `pipeline publish RUN_DIR` nach dem Nachtlauf (Plan 0032, E6): prüft, committet den Zustand des Laufs und pusht
  * nach `main`. Vor dem Push `pull --rebase`; ein Konflikt bricht ohne Push ab (Workflow rot). Committet werden nur
- * `data/raw/`, `data/offers.json` und `data/kosten.csv`; jede andere Änderung im Arbeitsbaum bricht ab.
+ * `data/raw/`, `data/offers.json`, `data/ruhend.json` (ruhende Angebote, Plan 0061, E2) und `data/kosten.csv`; jede
+ * andere Änderung im Arbeitsbaum bricht ab.
  * Das Token für den Push setzt der Workflow nur für diesen Schritt (`persist-credentials: false`).
  */
 
 /** git im Projekt; wirft bei Exit-Code ≠ 0 (wie `execFileSync`) */
 export type Git = (args: string[]) => string;
 
-const NIGHTLY_PATHS = ["data/raw", "data/offers.json", "data/kosten.csv"] as const;
+const NIGHTLY_PATHS = ["data/raw", "data/offers.json", "data/ruhend.json", "data/kosten.csv"] as const;
 
 const inNightlyPaths = (path: string) => NIGHTLY_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
 

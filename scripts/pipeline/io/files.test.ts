@@ -1,8 +1,8 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { readIdAcceptance, readIdAcceptanceOrWarn } from "./files.ts";
+import { readIdAcceptance, readIdAcceptanceOrWarn, readResting, writeResting } from "./files.ts";
 
 describe("readIdAcceptance (ADR 0041, Punkt 7)", () => {
   const dirs: string[] = [];
@@ -42,5 +42,49 @@ describe("readIdAcceptance (ADR 0041, Punkt 7)", () => {
     const yaml = "- anbieter: familientreff-beispiel\n  grund: Kurs neu zugeschnitten\n  datum: 2026-11-02\n";
     expect(readIdAcceptanceOrWarn(dataDir(yaml), (m) => warnings.push(m))).toHaveLength(1);
     expect(warnings).toHaveLength(1);
+  });
+});
+
+describe("readResting / writeResting (Plan 0061, E2)", () => {
+  const dirs: string[] = [];
+  const file = (content?: string) => {
+    const dir = mkdtempSync(join(tmpdir(), "zp-ruhend-"));
+    dirs.push(dir);
+    const path = join(dir, "ruhend.json");
+    if (content !== undefined) writeFileSync(path, content);
+    return path;
+  };
+  afterEach(() => {
+    for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
+  });
+  const NOW = "2026-11-19T06:00:00+01:00";
+  const entry = {
+    id: "aaaaaaaa",
+    key: "k",
+    providerId: "anbieter-a",
+    venueId: "anbieter-a-haus",
+    title: "Krabbeltreff",
+    format: "regelmaessig" as const,
+    restingSince: "2026-11-12T06:00:00+01:00",
+    horizonTo: "2027-03-04",
+    starts: ["2026-11-25T10:00:00+01:00"],
+  };
+
+  it("schreibt einen Eintrag je Zeile und liest ihn unverändert zurück", () => {
+    const path = file();
+    const resting = { generatedAt: NOW, entries: [entry, { ...entry, id: "bbbbbbbb" }] };
+    writeResting(resting, path);
+    expect(readFileSync(path, "utf8").split("\n").filter((l) => l.includes('"id"'))).toHaveLength(2);
+    expect(readResting(path, NOW)).toEqual({ resting });
+    writeResting({ generatedAt: NOW, entries: [] }, path);
+    expect(readResting(path, NOW)).toEqual({ resting: { generatedAt: NOW, entries: [] } });
+  });
+
+  it("fehlt, kein JSON oder ungültig: leere Ruhe mit Hinweis, kein Wurf", () => {
+    for (const path of [file(), file("{kaputt"), file(JSON.stringify({ generatedAt: NOW, entries: [{ id: 1 }] }))]) {
+      const r = readResting(path, NOW);
+      expect(r.resting).toEqual({ generatedAt: NOW, entries: [] });
+      expect(r.warning).toContain("ohne Ruhe gebaut");
+    }
   });
 });

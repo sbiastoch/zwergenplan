@@ -248,11 +248,12 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          # data/raw, offers.json, kosten.csv: Diff ansehen (trocken), Eingabe für `veroeffentlichen` (live)
+          # data/raw, offers.json, ruhend.json, kosten.csv: Diff ansehen (trocken), Eingabe für `veroeffentlichen` (live)
           name: daten-${{ github.run_id }}
           path: |
             data/raw/
             data/offers.json
+            data/ruhend.json
             data/kosten.csv
           retention-days: 14
           if-no-files-found: error

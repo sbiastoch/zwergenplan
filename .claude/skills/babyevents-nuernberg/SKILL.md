@@ -7,10 +7,10 @@ description: Datenpflege des Zwergenplans – Berichte von Nachtlauf und Entdeck
 
 Die Daten aktualisieren sich selbst (Plan 0032, ADR 0026):
 
-- **Nachtlauf** (`.github/workflows/nightly.yml`, täglich): ruft alle Seiten des Katalogs ab, extrahiert geänderte Anbieter mit dem Modell und schreibt `data/raw/<id>.json`, `data/offers.json` und `data/kosten.csv` auf `main`.
+- **Nachtlauf** (`.github/workflows/nightly.yml`, täglich): ruft alle Seiten des Katalogs ab, extrahiert geänderte Anbieter mit dem Modell und schreibt `data/raw/<id>.json`, `data/offers.json`, `data/ruhend.json` (ruhende Angebote: fehlt ein Angebot einige Nächte, behält es bei der Rückkehr ID und `listedAt`, 56 Tage lang; ADR 0044) und `data/kosten.csv` auf `main`.
 - **Entdecken** (`.github/workflows/discover.yml`, seit Plan 0050, S1 nur per `workflow_dispatch`; Monatslauf ab S6): sucht neue Anbieter je Region und nimmt einen auf, wenn er mindestens ein Angebot für 0–3 Jahre liefert. Es schreibt `data/providers.yaml` (nur neue Einträge), `data/raw/<id>.json` und `data/discover/<region>.json`. Im Modus `trocken` (Repo-Variable `ENTDECKEN_MODUS` leer) steht das Ergebnis nur im Bericht.
 
-Dieser Skill ist der **Wartungsleitfaden** dafür. Er ruft dieselben Befehle wie die Workflows; Übersicht im Kopf von `scripts/pipeline/cli.ts` und `scripts/pipeline/eval.ts`. `data/offers.json`, `data/raw/` und `data/discover/` werden nie von Hand bearbeitet, mit einer Ausnahme: `abgelehnt` in `data/discover/<region>.json`. Der Datenvertrag ist `src/domain/schema.ts` (Katalog exportiert nach `schema/providers.schema.json`).
+Dieser Skill ist der **Wartungsleitfaden** dafür. Er ruft dieselben Befehle wie die Workflows; Übersicht im Kopf von `scripts/pipeline/cli.ts` und `scripts/pipeline/eval.ts`. `data/offers.json`, `data/ruhend.json`, `data/raw/` und `data/discover/` werden nie von Hand bearbeitet, mit einer Ausnahme: `abgelehnt` in `data/discover/<region>.json`. Der Datenvertrag ist `src/domain/schema.ts` (Katalog exportiert nach `schema/providers.schema.json`).
 
 Läufe mit Modell kosten Geld bzw. Abo-Kontingent. Lokal nutzen sie den Login des Entwicklers (`io/llm.ts`). Vor einem Lauf ohne `--only` oder `--terms` kurz sagen, was er etwa kostet (Nachtlauf voll ≈ $0,60, Entdecken voll ≈ $0,80–1,00).
 

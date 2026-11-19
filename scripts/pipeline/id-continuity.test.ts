@@ -14,6 +14,7 @@ import { type Offer, OffersFile, ProvidersFile } from "../../src/domain/schema.t
 import { berlinIsoDate } from "../../src/domain/time.ts";
 import { buildFromState } from "./lib/build-offers.ts";
 import { ProviderRaw } from "./lib/raw.ts";
+import { RestingFile } from "./lib/resting.ts";
 
 const DIR = new URL("./fixtures/id-continuity/", import.meta.url);
 const gz = (name: string) => gunzipSync(readFileSync(new URL(name, DIR))).toString("utf8");
@@ -34,6 +35,8 @@ const input = {
   raws: z.record(z.string(), ProviderRaw).parse(JSON.parse(gz("raw.json.gz"))),
   catalog: ProvidersFile.parse(parse(gz("providers.yaml.gz"))),
   freeDays: z.record(z.string(), z.string()).parse(JSON.parse(gz("free-days.json.gz"))),
+  // Ruhe vor dem Lauf (Plan 0061, E2); bis zum ersten Lauf mit Ruhe leer
+  resting: RestingFile.parse(JSON.parse(gz("ruhend.json.gz"))),
 };
 
 function build(previous: OffersFile): Offer[] {
@@ -56,6 +59,8 @@ const future = (o: Offer) => o.sessions.some((s) => berlinIsoDate(s.start) >= me
  * Bewusst eine feste Liste statt einer Regel über `sameOfferTwice`: Die Ausnahme darf sich nicht auf die Funktion
  * stützen, die der Test überwacht. Entfällt mit dem Neueinfrieren nach dem ersten Nachtlauf mit Plan 0061, Etappe 1.
  */
+/** Fixture, zu der die Liste gehört (Nachtlauf vom 2026-10-31, `bb27187`); neu eingefroren heißt: Liste leeren */
+const LIST_FOR = "2026-10-31T08:43:22+01:00";
 const EXPECTED_DUPLICATE_LOSSES: ReadonlyArray<readonly [lost: string, partner: string]> = [
   ["j9onxbbk", "yjra3gp9"], // Achtsame Babymassage 6 Wochen–5 Monate, Mo 11:00 (Familienbox)
   ["4ipjvk1y", "a1fqz31f"], // Babygymnastik 2–5 Monate, Di 12:00
@@ -101,7 +106,22 @@ function lost(
     .map((o) => `${o.id} ${o.providerId} „${o.title}“${owner.has(o.id) ? ` (jetzt bei ${owner.get(o.id)})` : ""}`);
 }
 
+/** Gelistete IDs, die `built` tatsächlich verliert (bei Partner beim selben Anbieter), sortiert */
+function exempted(expected: readonly Offer[], built: readonly Offer[]): string[] {
+  const all = lost(expected, built, []);
+  const remaining = new Set(lost(expected, built).map((l) => l.slice(0, 8)));
+  return all
+    .map((l) => l.slice(0, 8))
+    .filter((id) => !remaining.has(id))
+    .sort();
+}
+
 describe("Ausnahmeliste der ID-Kontinuität (Plan 0061, Schritt 2)", () => {
+  it("gehört zur eingefrorenen Fixture: neu eingefroren, muss sie leer sein (Arch-Review m1)", () => {
+    if (meta.generatedAt !== LIST_FOR)
+      expect(EXPECTED_DUPLICATE_LOSSES, "Fixture neu eingefroren – EXPECTED_DUPLICATE_LOSSES leeren").toEqual([]);
+  });
+
   const [sample] = offers("offers.json.gz").offers;
   if (sample === undefined) throw new Error("Fixture ohne Angebot");
   const offer = (id: string, providerId = "anbieter-a"): Offer => ({ ...sample, id, providerId });
@@ -123,8 +143,11 @@ describe("ID-Kontinuität des Build-Codes (Plan 0049, Nachtrag 2, B7)", () => {
     "Fixpunkt: mit dem Ergebnis des Laufs als Vorstand bleibt jede ID mit Termin ab today",
     () => {
       const after = offers("offers.json.gz");
-      const missing = lost(after.offers.filter(future), build(after));
+      const built = build(after);
+      const missing = lost(after.offers.filter(future), built);
       expect(missing, `${missing.length} IDs mit künftigem Termin verloren – ${HINT}`).toEqual([]);
+      // jeder Eintrag der Liste wird gebraucht: ein überzähliger deckte sonst später einen anderen Verlust (Arch-Review m1)
+      expect(exempted(after.offers.filter(future), built)).toEqual(EXPECTED_DUPLICATE_LOSSES.map(([id]) => id).sort());
     },
     BUILD_TIMEOUT_MS,
   );

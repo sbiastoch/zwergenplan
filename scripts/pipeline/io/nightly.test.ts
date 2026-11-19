@@ -19,6 +19,7 @@ import type { CallRecord, ExtractOutcome, Extractor, ExtractResult } from "../li
 import type { PageOutcome } from "../lib/fetch.ts";
 import type { Judge, JudgeInput, JudgeResult, Verdict } from "../lib/judge.ts";
 import { isV2, type ProviderRaw, providerStatus, RawEvent } from "../lib/raw.ts";
+import { RestingFile } from "../lib/resting.ts";
 import type { FetchPlan } from "../lib/select.ts";
 import { watchFindings } from "../lib/watch.ts";
 import { type FetchResult, unitInputs } from "./fetch-inputs.ts";
@@ -229,6 +230,11 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     });
     expect(first.build.errors).toEqual([]);
     expect(first.build.written).toBe(join(dirsOf.dataDir, "offers.json"));
+    // ohne data/ruhend.json: leere Ruhe mit Hinweis, danach angelegt (Plan 0061, E2)
+    expect(first.build.notes.some((n) => n.startsWith("Ruhe:") && n.includes("fehlt"))).toBe(true);
+    expect(RestingFile.parse(JSON.parse(readFileSync(join(dirsOf.dataDir, "ruhend.json"), "utf8"))).generatedAt).toBe(
+      NOW(),
+    );
     const rawDir = join(dirsOf.dataDir, "raw");
     const ft = readRaw(rawDir, "familientreff-beispiel");
     expect(ft && isV2(ft)).toBe(true);
@@ -386,6 +392,9 @@ describe("runNightly (Plan 0032, E5/E6)", () => {
     expect(r.build.written).toBe(join(dirsOf.runDir, "offers.json"));
     const dry = JSON.parse(readFileSync(join(dirsOf.runDir, "offers.json"), "utf8"));
     expect(dry.offers.some((o: { title: string }) => o.title === "Offener Krabbeltreff 1")).toBe(true);
+    // die Ruhe landet wie offers.json im Laufverzeichnis (Plan 0061, E2)
+    expect(existsSync(join(dirsOf.runDir, "ruhend.json"))).toBe(true);
+    expect(existsSync(join(dirsOf.dataDir, "ruhend.json"))).toBe(false);
   });
 
   it("räumt den Zustand von Anbietern weg, die nicht mehr im Katalog stehen (Rücknahme, E7)", async () => {

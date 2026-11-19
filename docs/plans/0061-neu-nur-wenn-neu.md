@@ -275,6 +275,39 @@ Kette über die 14 Nachtläufe vom 05.11. bis 18.11. (`82d205d` bis `81c3358`). 
   Alle sind dasselbe Angebot am selben Termin. Ohne 2b hätten sie bei jedem Wechsel eine neue ID und „Neu“ bekommen.
 - **„Neu“ am 18.11.**: 83 im echten Stand, 71 in der Kette (`listedAt` ab 05.11.). Den Rest erklären vor allem Lücken (B1, B2), die erst Etappe 2 deckt.
 
+### Arch-Review Etappe 1 (`0431d8c`) – Verdict: Nacharbeit nötig → eingearbeitet
+
+Kein Blocker. Alle Punkte übernommen, je mit Test:
+- **M1** Stufe 2b war zu großzügig (`similarTitle` genügte ein gemeinsamer Wochentag). Jetzt gilt sie streng wie eine Dublette: `sameCoreTitle`, `compatibleAge`, gleiches Format (oder `kurs` ↔ `regelmaessig` mit gleichem ersten Termin). Sie gilt nur für Entwürfe und Vorstandsangebote ohne Kandidaten in Stufe 1 und 2. Gegentests: das Schwesterpaar „Babymassage Mittwoch“ / „Krabbelgruppe Minis … Mittwoch“ an zwei Orten, ein mehrdeutiger Entwurf. Die Nachrechnung ergab dieselben 21 Treffer wie vorher. Das Restrisiko steht in ADR 0044.
+- **m1** Die Ausnahmeliste ist an die Fixture gebunden (`LIST_FOR`). Neu eingefroren muss sie leer sein, und jeder Eintrag muss tatsächlich gebraucht werden.
+- **m2** Stufe 2b sammelt erst alle Vorschläge und wendet dann `twinConflicts` an.
+- **m3, m4** Beim Dubletten-Erbe zählen alle Bleibenden als Anspruch, ebenso jedes Richter-Erbe auf dieselbe ID.
+- **m5** ADR 0044 und 0031 schränken „die ältere Fassung entscheidet unter Zwillingen“ auf den Fall mit aufgenommener Dublette ein. Der Kopfkommentar in `similar.ts` ist nachgezogen.
+
+## Nachtrag Umsetzung Etappe 2 (2026-11-19)
+
+- **Stufe 2 gegen die Ruhe** verlangt `sameCoreTitle` und `compatibleAge` statt `similarTitle`. Die erste Messung fand einen Fehlgriff: „Babyschwimmen Fürth-Burgfarrnbach, Sa 14:50“ (ruhend) → „Minis ab 1 Jahr – Sa 15:50 (Fürth-Burgfarrnbach)“. Gemeinsam war nur der Ortsname. Laut Schritt 8 ist eine alte ID auf einem fremden Angebot ein Blocker, deshalb kam erst der rote Test, dann die Regel.
+- **Anlegen der Ruhe**: Fehlt `data/ruhend.json` (erster Lauf) oder ist sie ungültig, baut der Nachtlauf mit **leerer** Ruhe statt ohne. Ein Build mit leerer Ruhe ist gleich einem ohne (Eigenschaftstest), schreibt sie aber neu. Ohne das legte kein Lauf die Datei je an. Der Bericht nennt den Grund („Ruhe: … fehlt – ohne Ruhe gebaut, neu angelegt“).
+- **`RestingSide`** in `stable-ids.ts` ist strukturgleich zu `RestingEntry`. Ein Import aus `resting.ts` wäre ein Zyklus, denn `resting.ts` braucht `keyOf`.
+- **Fixture**: `ruhend.json.gz` ist leer, bis die Fixture neu eingefroren wird. `freeze-id-continuity.ts` friert die Ruhe vor dem Lauf mit ein, `tests/fixtures/ruhend.json` prüft `data:validate`.
+
+### Messung Etappe 2
+
+Gleiche Kette wie in Etappe 1, mit Ruhe ab dem ersten Lauf (05.11., leer):
+- **Treffer aus der Ruhe**: 23 Meldungen, 20 verschiedene IDs. Sichtprüfung:
+  - „Jazz für Räuber …“ (10 Termine, „großer“ / „grosser“);
+  - Abenteuerturnen 1 (3 Termine), PapaZeit Waldweihnacht, Yoga mit Baby (Wolf Pack, zwei Kurse);
+  - MilchZeit, Mini-Club Kniereiter, Café für Alle, Waldracker.
+
+  Alle sind dasselbe Angebot, keine alte ID liegt auf einem fremden Angebot. Den einen Fehlgriff der ersten Messung (Babyschwimmen) behebt die Regel oben.
+- **„Neu“ am 18.11.**: 83 im echten Stand, 71 nach Etappe 1, 69 mit Ruhe. Die Erwartung von etwa 55 stimmt nicht: Die meisten Lücken aus B1/B2 begannen vor dem 05.11. (Wolf Pack 02.–04.11., vhs Fürth 02.–07.11.), als die Ruhe noch leer war (Risiko „Start mit leerer Ruhe“). Den Rest der Fehletiketten hatte E1 schon behoben (Familienbox).
+- **Größe** von `data/ruhend.json` nach 14 Nächten: 74 Einträge, 43 kB. Bei 56 Tagen sind es hochgerechnet unter 200 kB.
+
+## Restpunkte
+
+- [ ] Nach dem ersten Nachtlauf mit diesem Code: Fixture neu einfrieren (`node scripts/pipeline/freeze-id-continuity.ts`), `EXPECTED_DUPLICATE_LOSSES` leeren (der Test erzwingt es), Commit mit Begründung.
+- [ ] Nach dem Nachtlauf prüfen: Die Dubletten aus B4 sind weg, `u6msbbr7` steht, `o4xo6513` ist weg. `data/ruhend.json` ist committet, und der Bericht nennt die Ruhe.
+
 ## Risiken
 
 - **Falsche Rückkehr**: Eine ruhende ID trifft ein anderes Angebot desselben Anbieters. Dagegen stehen:

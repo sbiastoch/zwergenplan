@@ -1,6 +1,6 @@
 # ADR 0031 – Stabile IDs: Dubletten gleicher Quelle und veränderte Terminreihen
 
-Status: angenommen (2026-10-17), mit Plan 0038. **Ergänzt** ADR 0022, Punkt 3 (Zuordnung gegen den Vorstand): Gleichstand unter Zwillingen des Vorstands und Stufe 2 mit erstem Termin. Die übrigen Regeln von ADR 0022 bleiben, auch „keine Zusammenlegungen“. **Geändert durch** ADR 0044 (2026-11-18, Plan 0061): gleiche Termine im gemeinsamen Fenster statt Jaccard, Titel ohne Kernwort, die ältere Fassung bleibt; unter Zwillingen entscheidet im Build die ältere Fassung.
+Status: angenommen (2026-10-17), mit Plan 0038. **Ergänzt** ADR 0022, Punkt 3 (Zuordnung gegen den Vorstand): Gleichstand unter Zwillingen des Vorstands und Stufe 2 mit erstem Termin. Die übrigen Regeln von ADR 0022 bleiben, auch „keine Zusammenlegungen“. **Geändert durch** ADR 0044 (2026-11-18, Plan 0061): gleiche Termine im gemeinsamen Fenster statt Jaccard, Titel ohne Kernwort, die ältere Fassung bleibt. Hat sie eine Dublette aufgenommen, erbt sie die ID ihres Vorgängers, unter Zwillingen des älteren; ohne aufgenommene Dublette entscheidet unter Zwillingen weiter die Titelähnlichkeit (Punkt 3).
 
 ## Kontext
 

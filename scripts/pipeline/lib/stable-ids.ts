@@ -16,6 +16,25 @@ import { berlinDate, berlinKey } from "../../../src/domain/time.ts";
 import { compatibleAge, conflictingLabels, ratio, sameCoreTitle, similarTitle } from "./similar.ts";
 
 export type Draft = Omit<Offer, "id">;
+/** Was der Vergleich zweier Fassungen braucht: auch ein ruhender Eintrag hat das (Plan 0061, E2) */
+export type Comparable = Pick<Draft, "providerId" | "venueId" | "title" | "format" | "age" | "sessions">;
+
+/**
+ * Ruhendes Angebot für Durchgang 2 der Zuordnung (Plan 0061, E2). Strukturgleich mit `RestingEntry` aus
+ * `resting.ts`; hier ausgeschrieben, weil `resting.ts` `keyOf` von hier importiert.
+ */
+export interface RestingSide {
+  id: string;
+  key: string;
+  providerId: string;
+  venueId: string;
+  title: string;
+  format: Draft["format"];
+  age?: Draft["age"];
+  restingSince: string;
+  horizonTo: string;
+  starts: readonly string[];
+}
 
 export interface IdAssignment {
   offers: Offer[];
@@ -47,7 +66,7 @@ const berlinDay = (instant: string) => {
 export const keyOf = (o: Draft): string => offerKey({ ...o, firstStart: o.sessions[0]?.start ?? "" });
 
 /** Fensterschlüssel: `offerKey` mit dem ersten Termin ab `from`, ohne Termin im Fenster mit dem ersten (E14, m3). */
-export function windowKey(o: Draft, from: string): string {
+export function windowKey(o: Comparable, from: string): string {
   const first = o.sessions.find((s) => berlinDay(s.start) >= from) ?? o.sessions[0];
   return offerKey({ ...o, firstStart: first?.start ?? "" });
 }
@@ -95,14 +114,14 @@ export const MIN_SIDE_RATIO = 0.5;
 const MIN_SHARED = 3;
 
 /** Beginnzeiten auf die Minute ab `from`, aufsteigend und ohne Doppelte */
-const startsFrom = (o: Draft, from: string) =>
+const startsFrom = (o: Comparable, from: string) =>
   [...new Set(o.sessions.filter((s) => berlinDay(s.start) >= from).map(minuteOf))].sort((x, y) => x - y);
 
 /**
  * Gemeinsames Fenster zweier Fassungen (Plan 0061, E1.1): vom späteren der beiden ersten bis zum früheren der beiden
  * letzten Beginne ab `from`, in Minuten. Ohne Überschneidung keins.
  */
-export function sharedWindow(a: Draft, b: Draft, from: string): { lo: number; hi: number } | undefined {
+export function sharedWindow(a: Comparable, b: Comparable, from: string): { lo: number; hi: number } | undefined {
   const sa = startsFrom(a, from);
   const sb = startsFrom(b, from);
   const [fa, fb, la, lb] = [sa[0], sb[0], sa.at(-1), sb.at(-1)];
@@ -119,7 +138,7 @@ export function sharedWindow(a: Draft, b: Draft, from: string): { lo: number; hi
  * min(3, Termine der größeren Fassung ab `from`). So zählt eine Fassung, die nur einen Ausschnitt oder die Wochen ohne
  * Ferien nennt; ein Einzeltermin aus einer Reihe oder zwei zufällig gleiche Termine zählen nicht.
  */
-function sameSessions(a: Draft, b: Draft, from: string): boolean {
+function sameSessions(a: Comparable, b: Comparable, from: string): boolean {
   const w = sharedWindow(a, b, from);
   if (w === undefined) return false;
   const sa = startsFrom(a, from);
@@ -142,7 +161,7 @@ function sameSessions(a: Draft, b: Draft, from: string): boolean {
  * verträgliches Alter, gleicher Kerntitel und gleiche Termine im gemeinsamen Fenster ab `from` (`sameSessions`;
  * vergangene Kurstermine nennt nicht jede Fassung). Gilt gleich für Dubletten im Build und Zwillinge.
  */
-export function sameOfferTwice(a: Draft, b: Draft, from: string): boolean {
+export function sameOfferTwice(a: Comparable, b: Comparable, from: string): boolean {
   return (
     a.providerId === b.providerId &&
     a.venueId === b.venueId &&
@@ -159,8 +178,8 @@ export function unionSessions(...lists: ReadonlyArray<readonly Session[]>): Sess
   return [...byStart.entries()].sort(([a], [b]) => a - b).map(([, s]) => s);
 }
 
-interface Side {
-  offer: Draft;
+interface Side<T extends Comparable = Draft> {
+  offer: T;
   /** Beginn auf die Minute, nur Termine im Vergleichsfenster */
   minutes: Set<number>;
   days: Set<string>;
@@ -170,7 +189,7 @@ interface Side {
   clocks: Set<string>;
 }
 
-function side(offer: Draft, from: string, to: string): Side {
+function side<T extends Comparable>(offer: T, from: string, to: string): Side<T> {
   const inWindow = offer.sessions.filter((s) => {
     const d = berlinDay(s.start);
     return d >= from && d <= to;
@@ -182,6 +201,18 @@ function side(offer: Draft, from: string, to: string): Side {
     days: new Set(inWindow.map((s) => berlinDay(s.start))),
     first: minutes.length > 0 ? Math.min(...minutes) : undefined,
     clocks: new Set(inWindow.map((s) => berlinKey(s.start).slice(9))),
+  };
+}
+
+/** Ruhender Eintrag als vergleichbare Fassung: die Beginne als Termine ohne Dauer (nur `start` zählt im Vergleich) */
+function restingDraft(e: RestingSide): Comparable {
+  return {
+    providerId: e.providerId,
+    venueId: e.venueId,
+    title: e.title,
+    format: e.format,
+    ...(e.age ? { age: e.age } : {}),
+    sessions: e.starts.map((start) => ({ start, end: start })),
   };
 }
 
@@ -237,6 +268,8 @@ export function assignIds(input: {
   providers: readonly Provider[];
   /** Datenhorizont des Laufs (Berliner Daten) */
   horizon: { from: string; to: string };
+  /** ruhende Angebote (`data/ruhend.json`, Plan 0061, E2) für Durchgang 2; fehlt: wie vor Plan 0061 */
+  resting?: readonly RestingSide[];
 }): IdAssignment {
   const { from } = input.horizon;
   const to =
@@ -375,6 +408,13 @@ export function assignIds(input: {
   // Gleichstand unter Zwillingen zählt nicht als Rivale: Es trifft der nach der Rangfolge erste (ADR 0031, Punkt 3).
   // Je Durchgang erst alle Gewinner, dann anwenden; zeigen zwei Zwillinge auf verschiedene Entwürfe, trifft keiner.
   const stage1Conflicts = new Map<number, string>();
+  /**
+   * Entwürfe, die in Stufe 1 oder 2 mehrdeutig waren oder in einem Zwillingskonflikt standen: Ihr naher Kandidat ist
+   * ein Vorstandsangebot, keine ruhende ID; sie nehmen an Durchgang 2 nicht teil (Plan 0061, Review M2)
+   */
+  const unsure = new Set<number>();
+  /** Vorstandsangebote mit Kandidaten in Stufe 1 oder 2, die nicht trafen: Stufe 2b löst sie nicht auf (Arch-Review M1) */
+  const unsureOld = new Set<number>();
   for (let changed = true; changed; ) {
     changed = false;
     const pairs = openOlds().flatMap((pi) =>
@@ -390,8 +430,10 @@ export function assignIds(input: {
     );
     const conflicts = twinConflicts(winners);
     for (const w of winners) {
-      if (conflicts.includes(w)) stage1Conflicts.set(w.pi, conflictNote(1, w.pi, w.di));
-      else {
+      if (conflicts.includes(w)) {
+        stage1Conflicts.set(w.pi, conflictNote(1, w.pi, w.di));
+        unsure.add(w.di);
+      } else {
         match(w.pi, w.di, 1);
         changed = true;
       }
@@ -400,6 +442,8 @@ export function assignIds(input: {
   for (const pi of openOlds()) {
     const conflict = stage1Conflicts.get(pi);
     const ds = free(D, partnerOfDraft).filter((di) => stage1(pi, di) > 0);
+    for (const di of ds) unsure.add(di);
+    if (ds.length > 0 || conflict !== undefined) unsureOld.add(pi);
     if (conflict !== undefined) notes.push(conflict);
     else if (ds.length > 0)
       notes.push(
@@ -420,6 +464,8 @@ export function assignIds(input: {
       (di) => sameClock(pi, di),
     );
     if (ds.length > 1) {
+      for (const di of ds) unsure.add(di);
+      unsureOld.add(pi);
       notes.push(`IDs: mehrdeutig in Stufe 2 – ${P[pi]?.id} „${P[pi]?.offer.title}“ hat ${ds.length} Kandidaten`);
       continue;
     }
@@ -431,44 +477,201 @@ export function assignIds(input: {
     );
     const allTwins = back.every((a) => back.every((b) => a === b || isTwin(a, b)));
     const best = allTwins ? back.reduce((x, y) => (before(y, x, di) ? y : x)) : undefined;
+    if (!allTwins) {
+      unsure.add(di);
+      unsureOld.add(pi);
+    }
     if (best === pi) proposals.push({ pi, di });
   }
   const conflicts = twinConflicts(proposals);
   for (const { pi, di } of proposals)
-    if (conflicts.some((c) => c.pi === pi)) notes.push(conflictNote(2, pi, di));
-    else match(pi, di, 2);
+    if (conflicts.some((c) => c.pi === pi)) {
+      notes.push(conflictNote(2, pi, di));
+      unsure.add(di);
+      unsureOld.add(pi);
+    } else match(pi, di, 2);
 
   // Stufe 2b (Plan 0061, E3): Ortswechsel bei gleichem Anbieter, auch wenn der alte Ort noch im Katalog steht (ein
-  // genauerer Ort wurde angelegt). Nur für die nach Stufe 2 Übrigen, ohne Zwillingskonflikt, mit ≥ 80 % gleichen
-  // Terminen, ähnlichem Titel ohne widersprechende Kennung und genau einem Kandidaten auf beiden Seiten. Nach Stufe 2,
-  // damit derselbe Kurs an zwei Orten eines Anbieters kein eindeutiges Paar aus Stufe 1 verliert (Review M3).
+  // genauerer Ort wurde angelegt). Nach Stufe 2, damit derselbe Kurs an zwei Orten eines Anbieters kein eindeutiges
+  // Paar aus Stufe 1 verliert (Review M3). Weil das starke Signal „alter Ort gestrichen“ fehlt, streng wie eine
+  // Dublette (Arch-Review M1): gleicher Kerntitel (`sameCoreTitle`, nicht nur `similarTitle`), verträgliches Alter,
+  // gleiches Format (oder `kurs` ↔ `regelmaessig` mit gleichem ersten Termin), ≥ 80 % gleiche Beginnzeiten. Nur für
+  // Entwürfe und Vorstandsangebote, die in Stufe 1 und 2 keinen Kandidaten hatten, mit genau einem Kandidaten auf
+  // beiden Seiten; zeigen zwei Zwillinge auf verschiedene Entwürfe, trifft keiner (ADR 0031, Punkt 3).
   const moved = (pi: number, di: number) => {
     const p = at(P, pi);
     const d = at(D, di);
+    const sameFirst = p.first !== undefined && p.first === d.first;
+    const format =
+      p.offer.format === d.offer.format ||
+      (SWITCHABLE.has(p.offer.format) && SWITCHABLE.has(d.offer.format) && sameFirst);
     return (
       sameProvider(pi, di) &&
       p.offer.venueId !== d.offer.venueId &&
+      format &&
+      compatibleAge(p.offer.age, d.offer.age) &&
       jaccard(p.minutes, d.minutes) >= SAME_SESSIONS &&
-      similarTitle(p.offer.title, d.offer.title) &&
-      !conflictingLabels(p.offer.title, d.offer.title)
+      sameCoreTitle(p.offer.title, d.offer.title)
     );
   };
-  const olds2b = openOlds().filter((pi) => !stage1Conflicts.has(pi) && !conflicts.some((c) => c.pi === pi));
-  const drafts2b = free(D, partnerOfDraft);
+  const olds2b = openOlds().filter((pi) => !stage1Conflicts.has(pi) && !unsureOld.has(pi));
+  const drafts2b = free(D, partnerOfDraft).filter((di) => !unsure.has(di));
+  const proposals2b: Array<{ pi: number; di: number }> = [];
   for (const pi of olds2b) {
     const ds = drafts2b.filter((di) => moved(pi, di));
     const di = ds[0];
     if (ds.length !== 1 || di === undefined) continue;
-    if (olds2b.filter((qi) => moved(qi, di)).length === 1) match(pi, di, 4);
+    if (olds2b.filter((qi) => moved(qi, di)).length === 1) proposals2b.push({ pi, di });
+  }
+  const conflicts2b = twinConflicts(proposals2b);
+  for (const { pi, di } of proposals2b) if (!conflicts2b.some((c) => c.pi === pi)) match(pi, di, 4);
+
+  // Durchgang 2 (Plan 0061, E2; ADR 0044): Stufe 0, 1 und 2 sowie die Rückkehr über den Schlüssel für die noch freien
+  // Entwürfe gegen die ruhenden Angebote, ohne Stufe 2b. Nicht dabei sind mehrdeutige Entwürfe aus Durchgang 1 und
+  // ruhende Einträge, die eine verworfene Dublette eines zugeordneten Angebots sind (sie kehrten sonst als zweite
+  // Fassung zurück). Rivalen im Titel-Widerspruch sind alle Vorstandsangebote und alle ruhenden Einträge. Das
+  // Vergleichsfenster endet je Eintrag bei seinem `horizonTo` (Review M1); keine Kursfortschreibung (Review B3).
+  const assignedDrafts = [...partnerOfDraft.keys()].map((di) => at(D, di).offer);
+  const R = [...(input.resting ?? [])]
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .filter((e) => !pinIndex.has(e.id))
+    .map((e) => ({ e, offer: restingDraft(e) }))
+    .filter(({ offer }) => !assignedDrafts.some((d) => sameOfferTwice(d, offer, from)))
+    .map(({ e, offer }) => {
+      const restTo = e.horizonTo < input.horizon.to ? e.horizonTo : input.horizon.to;
+      return { ...side(offer, from, restTo), e, to: restTo, window: windowKey(offer, from) };
+    });
+  const partnerOfDraftR = new Map<number, number>();
+  const partnerOfRest = new Map<number, number>();
+  const restStageOf = new Map<number, "0" | "1" | "2" | "Schlüssel">();
+  const matchRest = (ri: number, di: number, stage: "0" | "1" | "2" | "Schlüssel") => {
+    partnerOfDraftR.set(di, ri);
+    partnerOfRest.set(ri, di);
+    restStageOf.set(di, stage);
+  };
+  const players = () => free(D, partnerOfDraft).filter((di) => !unsure.has(di) && !partnerOfDraftR.has(di));
+  const openRest = () => R.flatMap((_, ri) => (partnerOfRest.has(ri) ? [] : [ri]));
+  const pairSides = new Map<string, Side>();
+  /** Entwurf im Vergleichsfenster des ruhenden Eintrags */
+  const draftFor = (ri: number, di: number): Side => {
+    const k = `${ri}|${di}`;
+    const cached = pairSides.get(k);
+    if (cached) return cached;
+    const made = side(at(D, di).offer, from, at(R, ri).to);
+    pairSides.set(k, made);
+    return made;
+  };
+  const sameRestProvider = (ri: number, di: number) => R[ri]?.offer.providerId === D[di]?.offer.providerId;
+
+  // Stufe 0 gegen die Ruhe: gleicher Fensterschlüssel, auf beiden Seiten genau einer
+  const restByWindow = groupBy(
+    R.map((_, ri) => ri),
+    (ri) => R[ri]?.window ?? "",
+  );
+  for (const [key, ds] of groupBy(players(), (di) => D[di]?.window ?? "")) {
+    const rs = restByWindow.get(key) ?? [];
+    if (ds.length === 1 && rs.length === 1) matchRest(at(rs, 0), at(ds, 0), "0");
+  }
+
+  // Stufe 1 gegen die Ruhe: gleiche Termine, strikt bester Partner für beide Seiten, mit Titel-Widerspruch
+  const restStage1 = (ri: number, di: number) => {
+    if (!sameRestProvider(ri, di)) return 0;
+    const r = at(R, ri);
+    const d = draftFor(ri, di);
+    if (r.offer.venueId !== d.offer.venueId && venues.has(r.offer.venueId)) return 0;
+    const t = jaccard(r.minutes, d.minutes);
+    if (t < SAME_SESSIONS) return 0;
+    if (similarTitle(r.offer.title, d.offer.title)) return t;
+    const rivalTitle = (q: { offer: Comparable }) =>
+      q.offer.providerId === d.offer.providerId && similarTitle(q.offer.title, d.offer.title);
+    const rival = P.some(rivalTitle) || R.some((q, qi) => qi !== ri && rivalTitle(q));
+    return rival ? 0 : t;
+  };
+  for (let changed = true; changed; ) {
+    changed = false;
+    const pairs = openRest().flatMap((ri) =>
+      players().flatMap((di) => {
+        const t = restStage1(ri, di);
+        return t > 0 ? [{ ri, di, t }] : [];
+      }),
+    );
+    for (const w of pairs)
+      if (pairs.filter((q) => (q.ri === w.ri) !== (q.di === w.di)).every((q) => q.t < w.t)) {
+        matchRest(w.ri, w.di, "1");
+        changed = true;
+      }
+  }
+
+  // Stufe 2 gegen die Ruhe: wie Stufe 2, aber mit gleichem Kerntitel und verträglichem Alter, nur als einziger
+  // Kandidat auf beiden Seiten (ohne Zwillinge)
+  const restStage2 = (ri: number, di: number) => {
+    if (!sameRestProvider(ri, di)) return false;
+    const r = at(R, ri);
+    const d = draftFor(ri, di);
+    const sameFirst = r.first !== undefined && r.first === d.first;
+    const format =
+      r.offer.format === d.offer.format
+        ? jaccard(r.days, d.days) >= SAME_DAYS || sameFirst
+        : SWITCHABLE.has(r.offer.format) && SWITCHABLE.has(d.offer.format) && sameFirst;
+    // streng wie eine Dublette (Messung Plan 0061): ein gemeinsames Wort wie ein Ortsname genügt nicht, sonst erbte
+    // die Gruppe zur nächsten Uhrzeit die ID einer ruhenden Schwestergruppe
+    return (
+      r.offer.venueId === d.offer.venueId &&
+      format &&
+      compatibleAge(r.offer.age, d.offer.age) &&
+      sameCoreTitle(r.offer.title, d.offer.title)
+    );
+  };
+  const restClock = (ri: number, di: number) => [...at(R, ri).clocks].some((c) => draftFor(ri, di).clocks.has(c));
+  const rests2 = openRest();
+  const players2 = players();
+  const restProposals: Array<{ ri: number; di: number }> = [];
+  for (const ri of rests2) {
+    const ds = byClock(
+      players2.filter((di) => restStage2(ri, di)),
+      (di) => restClock(ri, di),
+    );
+    const di = ds[0];
+    if (ds.length !== 1 || di === undefined) continue;
+    const back = byClock(
+      rests2.filter((qi) => restStage2(qi, di)),
+      (qi) => restClock(qi, di),
+    );
+    if (back.length === 1 && back[0] === ri) restProposals.push({ ri, di });
+  }
+  for (const { ri, di } of restProposals) matchRest(ri, di, "2");
+
+  // Rückkehr über den Schlüssel (Review m3; Arch-Review m5): heute über `shortId(key, seed)`, jetzt ohne die Gefahr
+  // eines anderen Seeds, weil neue IDs ruhende meiden. Nur bei einem Schlüssel, der auf beiden Seiten eindeutig ist.
+  const restByKey = groupBy(
+    R.map((_, ri) => ri),
+    (ri) => R[ri]?.e.key ?? "",
+  );
+  for (const [key, ds] of groupBy(players(), (di) => D[di]?.key ?? "")) {
+    const rs = restByKey.get(key) ?? [];
+    const ri = rs[0];
+    if (ds.length === 1 && rs.length === 1 && ri !== undefined && !partnerOfRest.has(ri))
+      matchRest(ri, at(ds, 0), "Schlüssel");
   }
 
   // Vergabe: Treffer übernehmen die ID (samt Kursfortschreibung), alle anderen bekommen eine neue
-  const occupied = new Set(olds.map((p) => p.id));
+  const occupied = new Set([...olds.map((p) => p.id), ...(input.resting ?? []).map((e) => e.id)]);
   const offers: Offer[] = [];
   const sources: number[] = [];
   const counts = [0, 0, 0, 0, 0];
   const fresh: number[] = [];
   D.forEach(({ offer: d }, di) => {
+    const ri = partnerOfDraftR.get(di);
+    if (ri !== undefined) {
+      const { e } = at(R, ri);
+      const stage = restStageOf.get(di) ?? "0";
+      notes.push(
+        `IDs: aus der Ruhe ${e.id} „${e.title}“ → „${d.title}“ (${stage === "Schlüssel" ? stage : `Stufe ${stage}`}, ruhte seit ${berlinDay(e.restingSince)})`,
+      );
+      offers.push({ id: e.id, ...d });
+      sources.push(at(D, di).index);
+      return;
+    }
     const pi = partnerOfDraft.get(di);
     if (pi === undefined) {
       fresh.push(di);
@@ -536,14 +739,21 @@ export function assignIds(input: {
     notes.push(`IDs: ${id} – ${n} neu, ${g} weggefallen`);
   }
   notes.unshift(
-    `IDs: ${counts[0]} gleicher Schlüssel, ${counts[1]} gleiche Termine, ${counts[2]} ähnlicher Titel, ${counts[4] ? `${counts[4]} Ortswechsel, ` : ""}${counts[3] ? `${counts[3]} geerbt, ` : ""}${fresh.length} neu, ${free(P, partnerOfOld).length} weggefallen`,
+    `IDs: ${counts[0]} gleicher Schlüssel, ${counts[1]} gleiche Termine, ${counts[2]} ähnlicher Titel, ${counts[4] ? `${counts[4]} Ortswechsel, ` : ""}${counts[3] ? `${counts[3]} geerbt, ` : ""}${partnerOfDraftR.size ? `${partnerOfDraftR.size} aus der Ruhe, ` : ""}${fresh.length} neu, ${free(P, partnerOfOld).length} weggefallen`,
   );
   return { offers, sources, notes };
 }
 
-/** Eine ID, die vorher und nachher besteht, behält ihren Anbieter – das Netz gegen Fehler in der Zuordnung. */
-export function checkIdContinuity(previous: OffersFile | undefined, next: readonly Offer[]): string[] {
-  const before = new Map((previous?.offers ?? []).map((o) => [o.id, o.providerId] as const));
+/**
+ * Eine ID, die vorher und nachher besteht, behält ihren Anbieter – das Netz gegen Fehler in der Zuordnung. Vorher
+ * heißt im Vorstand oder in der Ruhe (Plan 0061, E2).
+ */
+export function checkIdContinuity(
+  previous: OffersFile | undefined,
+  next: readonly Offer[],
+  resting: ReadonlyArray<{ id: string; providerId: string }> = [],
+): string[] {
+  const before = new Map([...resting, ...(previous?.offers ?? [])].map((o) => [o.id, o.providerId] as const));
   return next.flatMap((o) => {
     const was = before.get(o.id);
     return was !== undefined && was !== o.providerId

@@ -28,6 +28,8 @@ Bewusst zurückgestellt. Wer eine davon angeht, schreibt zuerst einen Plan (`doc
 - **Visuelle Regression** (Playwright-Screenshots als Gate), sobald das Design steht. Baselines entstehen dann im Playwright-Docker-Image, plus ein `workflow_dispatch` zum Aktualisieren.
 - **Lighthouse CI**, falls `@lhci/cli` wieder aktuell gepflegt wird. Bis dahin decken Playwright-Web-Vitals und axe das ab.
 - **React Compiler**, sobald es Komponenten mit spürbaren Re-Render-Kosten gibt.
+- **Wächter: Anbieter verliert über Nacht ≥ 50 % seiner Angebote** → Hinweis im Bericht (Plan 0061, Nicht-Ziel): Wolf Pack Yoga, vhs Fürth und die Familienbox verloren nächteweise Angebote. Die Ruhe (ADR 0044) hält ihre IDs, die Ursache liegt in Abruf und Extraktion.
+- **Ruhende Angebote in der App zeigen** (Plan 0061, Nicht-Ziel): „pausiert“ statt „gibt es nicht mehr“ für Merklisten-Einträge, deren ID in `data/ruhend.json` steht.
 - **Architektur-Review in CI** über `anthropics/claude-code-action`. Braucht einen API-Key und kostet pro Lauf.
 - **Erinnerung „Anmeldung öffnet“** als eigener ICS-Termin.
 - **Einstieg in laufende Kurse**: Seit Plan 0053 (E1) fehlen Kurse mit Anmeldung ab ihrem ersten Termin in „Entdecken“. Ob ein Quereinstieg möglich ist, wissen die Daten nicht – dafür bräuchte das Schema ein Feld.

@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-10-05T06:00:00+02:00",
+  "entries": [
+    {
+      "id": "r0hend01",
+      "key": "familientreff-beispiel--babycafe-fiktiv--familientreff-beispiel-haus",
+      "providerId": "familientreff-beispiel",
+      "venueId": "familientreff-beispiel-haus",
+      "title": "Babycafé (fiktiv)",
+      "format": "regelmaessig",
+      "age": { "minMonths": 0, "maxMonths": 12 },
+      "listedAt": "2026-09-20T06:00:00+02:00",
+      "restingSince": "2026-10-05T06:00:00+02:00",
+      "horizonTo": "2027-01-25",
+      "starts": ["2026-10-09T15:00:00+02:00", "2026-10-16T15:00:00+02:00", "2026-10-23T15:00:00+02:00"]
+    }
+  ]
+}

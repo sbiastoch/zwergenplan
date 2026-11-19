@@ -8,6 +8,7 @@ import {
   type Draft,
   keyOf,
   MIN_SIDE_RATIO,
+  type RestingSide,
   SAME_DAYS,
   SAME_SESSIONS,
   SAME_SOURCE_SESSIONS,
@@ -882,6 +883,67 @@ describe("assignIds – Stufe 2b: Ortswechsel (Plan 0061, E3)", () => {
   });
 });
 
+describe("assignIds – Stufe 2b streng wie eine Dublette (Arch-Review M1, m2)", () => {
+  const GYM = "turnverein-beispiel-gymnastik";
+  const days = weekly("2026-10-07", 36);
+
+  it("Schwesterpaar der Gegenprobe an zwei Orten: neue ID trotz gleicher Termine und gemeinsamem Wochentag", () => {
+    const previous = prev([
+      old("aaaaaaaa", {
+        title: "Babymassage Mittwoch 10:00 Uhr (ab ca. 6 Wochen)",
+        age: { minMonths: 1, maxMonths: 36 },
+        sessions: at(days),
+      }),
+    ]);
+    const sister = draft({
+      venueId: GYM,
+      title: "Krabbelgruppe Minis (0–6 Monate) Mittwoch",
+      age: { minMonths: 0, maxMonths: 6 },
+      sessions: at(days),
+    });
+    expect(run([sister], previous).offers[0]?.id).not.toBe("aaaaaaaa");
+  });
+
+  it("anderes Format oder unverträgliches Alter: neue ID", () => {
+    const previous = prev([
+      old("aaaaaaaa", { title: "PEKiP (Mi)", age: { minMonths: 0, maxMonths: 6 }, sessions: at(days) }),
+    ]);
+    const id = (over: Partial<Draft>) =>
+      run([draft({ venueId: GYM, title: "PEKiP am Mittwoch", sessions: at(days), ...over })], previous).offers[0]?.id;
+    expect(id({})).toBe("aaaaaaaa");
+    expect(id({ format: "einmalig", sessions: at(days.slice(0, 1)) })).not.toBe("aaaaaaaa");
+    expect(id({ age: { minMonths: 12, maxMonths: 36 } })).not.toBe("aaaaaaaa");
+  });
+
+  it("ein Entwurf, der in Stufe 1 mehrdeutig war, wird nicht über einen Ortswechsel aufgelöst", () => {
+    const previous = prev([
+      // benannte Gruppen (keine Zwillinge), beide passen zum Entwurf: mehrdeutig
+      old("aaaaaaaa", { title: "Turnstunde Löwen", sessions: at(days) }),
+      old("cccccccc", { title: "Turnstunde Bären", sessions: at(days) }),
+      old("eeeeeeee", { title: "Turnstunde", venueId: GYM, sessions: at(days) }),
+    ]);
+    const r = run([draft({ title: "Turnstunde (Mi)", sessions: at(days) })], previous);
+    expect(r.notes.join("\n")).toContain("mehrdeutig in Stufe 1");
+    expect(r.offers[0]?.id).not.toBe("eeeeeeee");
+  });
+
+  it("Zwillinge mit Vorschlägen an verschiedene Entwürfe am neuen Ort: keiner trifft (ADR 0031, Punkt 3)", () => {
+    // P1 (alle Termine) und P2 (die ersten 18) sind Zwillinge; D1 und D2 am neuen Ort passen je zu einem
+    const previous = prev([
+      old("aaaaaaaa", { title: "PEKiP (Mi)", sessions: at(days) }),
+      old("bbbbbbbb", { title: "PEKiP-Gruppe mittwochs", sessions: at(days.slice(0, 18)) }),
+    ]);
+    const r = run(
+      [
+        draft({ venueId: GYM, title: "PEKiP (Mi) neu", sessions: at(days) }),
+        draft({ venueId: GYM, title: "PEKiP-Gruppe mittwochs neu", format: "kurs", sessions: at(days.slice(0, 18)) }),
+      ],
+      previous,
+    );
+    expect(r.offers.map((o) => o.id).filter((id) => id === "aaaaaaaa" || id === "bbbbbbbb")).toEqual([]);
+  });
+});
+
 describe("assignIds – Erbe des Richters (Plan 0049, Nachtrag 2, B3; ADR 0041)", () => {
   const withKeep = (drafts: Draft[], keepIds: Array<string | undefined>, previous: OffersFile) =>
     assignIds({ drafts, keepIds, previous, providers, horizon: HORIZON });
@@ -937,5 +999,133 @@ describe("assignIds – Erbe des Richters (Plan 0049, Nachtrag 2, B3; ADR 0041)"
     const previous = prev([old("aaaaaaaa")]);
     const moved = draft({ venueId: "turnverein-beispiel-anderswo", title: "PEKiP woanders" });
     expect(withKeep([moved], ["aaaaaaaa"], previous).offers[0]?.id).toBe("aaaaaaaa");
+  });
+});
+
+describe("assignIds – Durchgang 2 gegen die Ruhe (Plan 0061, E2)", () => {
+  const days = weekly("2026-10-06", 17);
+  /** Ruhender Eintrag wie `updateResting` ihn schreibt: Beginne ab `from` bis `horizonTo` */
+  const rest = (id: string, over: Partial<Draft> = {}, horizonTo = "2027-01-26"): RestingSide => {
+    const d = draft({ sessions: at(days), ...over });
+    return {
+      id,
+      key: keyOf(d),
+      providerId: d.providerId,
+      venueId: d.venueId,
+      title: d.title,
+      format: d.format,
+      ...(d.age ? { age: d.age } : {}),
+      restingSince: "2026-09-28T06:00:00+02:00",
+      horizonTo,
+      starts: d.sessions.map((s) => s.start).filter((s) => s.slice(0, 10) <= horizonTo),
+    };
+  };
+  const runR = (drafts: Draft[], resting: RestingSide[], previous: OffersFile | undefined = prev([])) =>
+    assignIds({ drafts, previous, providers, horizon: HORIZON, resting });
+
+  it("B2: umformuliert nach der Lücke – Stufe 1 trifft die ruhende ID, mit Notiz und Zählung", () => {
+    const r = runR([draft({ title: "PEKiP am Dienstag", sessions: at(days) })], [rest("rrrrrrrr")]);
+    expect(r.offers[0]?.id).toBe("rrrrrrrr");
+    expect(r.notes).toContain(
+      "IDs: aus der Ruhe rrrrrrrr „PEKiP (Di 9:30)“ → „PEKiP am Dienstag“ (Stufe 1, ruhte seit 2026-09-28)",
+    );
+    expect(r.notes[0]).toContain("1 aus der Ruhe");
+  });
+
+  it("B2: neue Uhrzeit und ähnlicher Titel – Stufe 2; gleicher Fensterschlüssel – Stufe 0", () => {
+    const moved = runR([draft({ title: "PEKiP (Di 10:30)", sessions: at(days, "10:30") })], [rest("rrrrrrrr")]);
+    expect(moved.offers[0]?.id).toBe("rrrrrrrr");
+    expect(moved.notes.some((n) => n.includes("(Stufe 2, ruhte seit"))).toBe(true);
+    const same = runR([draft({ sessions: at(days) })], [rest("rrrrrrrr")]);
+    expect(same.notes.some((n) => n.includes("rrrrrrrr") && n.includes("(Stufe 0, ruhte seit"))).toBe(true);
+  });
+
+  it("Stufe 2 gegen die Ruhe verlangt den gleichen Kerntitel: ein Ortsname im Titel genügt nicht (Messung)", () => {
+    const saturdays = weekly("2026-10-10", 17);
+    const r = runR(
+      [draft({ title: "Minis ab 1 Jahr – Sa 15:50 (Fürth-Burgfarrnbach)", sessions: at(saturdays, "15:50") })],
+      [rest("rrrrrrrr", { title: "Babyschwimmen Fürth-Burgfarrnbach, Sa 14:50", sessions: at(saturdays, "14:50") })],
+    );
+    expect(r.offers[0]?.id).not.toBe("rrrrrrrr");
+  });
+
+  it("Vergleichsfenster bis horizonTo des Eintrags (Review M1)", () => {
+    // Der Eintrag kennt Beginne nur bis zum 03.11.; der Entwurf hat danach weitere, die nicht zählen
+    const short = rest("rrrrrrrr", {}, "2026-11-03");
+    expect(runR([draft({ title: "PEKiP am Dienstag", sessions: at(days) })], [short]).offers[0]?.id).toBe("rrrrrrrr");
+  });
+
+  it("keine Kursfortschreibung aus der Ruhe: der Entwurf behält seine Termine (Review B3)", () => {
+    const kurs = { format: "kurs" as const, title: "PEKiP-Kurs" };
+    const d = draft({ ...kurs, title: "PEKiP-Kurs (Di)", sessions: at(days.slice(4)) });
+    const r = runR([d], [rest("rrrrrrrr", kurs)]);
+    expect(r.offers[0]).toEqual({ id: "rrrrrrrr", ...d });
+  });
+
+  it("key-Rückkehr: gleicher Schlüssel bei mehrdeutiger Stufe 0 gibt die alte ID, nicht Seed 1 (Review m3)", () => {
+    // Zwei ruhende Fassungen mit gleichem Fensterschlüssel, aber nur eine mit diesem Schlüssel samt erstem Termin
+    const a = rest(shortId(keyOf(draft()), 0));
+    const b = { ...rest("bbbbbbbb", { sessions: at(days.slice(2)) }), key: "anderer-schluessel" };
+    // Donnerstags statt dienstags: Stufe 1 und 2 treffen nicht, nur der Schlüssel (regelmäßig: ohne Termin)
+    const thursdays = draft({ sessions: at(weekly("2026-10-08", 17)) });
+    expect(keyOf(thursdays)).toBe(a.key);
+    const r = runR([thursdays, draft({ title: "Musikgarten", sessions: at(days, "16:00") })], [a, b]);
+    expect(idOf(r, "PEKiP (Di 9:30)")).toBe(a.id);
+    expect(r.notes.some((n) => n.includes(`aus der Ruhe ${a.id}`) && n.includes("(Schlüssel, ruhte seit"))).toBe(true);
+    // eine neue ID meidet ruhende IDs
+    expect(r.offers.map((o) => o.id)).not.toContain("bbbbbbbb");
+  });
+
+  it("kein Treffer für einen Entwurf, der in Durchgang 1 mehrdeutig war (Review M2)", () => {
+    // Zwei Vorstandsangebote mit gleichen Terminen, beide fallen weg; ein Entwurf passt zu beiden: mehrdeutig
+    const previous = prev([
+      old("aaaaaaaa", { title: "Babyturnen", sessions: at(days) }),
+      old("cccccccc", { title: "Kinderturnen", sessions: at(days) }),
+    ]);
+    const d = draft({ title: "Turnstunde", sessions: at(days) });
+    const r = runR([d], [rest("rrrrrrrr", { title: "Turnstunde (Di)" })], previous);
+    expect(r.notes.join("\n")).toContain("mehrdeutig in Stufe 1");
+    expect(r.offers[0]?.id).not.toBe("rrrrrrrr");
+  });
+
+  it("ein Rivale aus dem Vorstand verhindert den Treffer (Titel-Widerspruch, Review M2)", () => {
+    // Der neue Titel ähnelt nicht dem ruhenden, aber einem (zugeordneten) Vorstandsangebot desselben Anbieters
+    const previous = prev([old("aaaaaaaa", { title: "Musikgarten", sessions: at(days, "16:00") })]);
+    const r = runR(
+      [
+        draft({ title: "Musikgarten", sessions: at(days, "16:00") }),
+        draft({ title: "Musikgarten Mini", sessions: at(days) }),
+      ],
+      [rest("rrrrrrrr", { title: "PEKiP (Di 9:30)" })],
+      previous,
+    );
+    expect(idOf(r, "Musikgarten")).toBe("aaaaaaaa");
+    expect(idOf(r, "Musikgarten Mini")).not.toBe("rrrrrrrr");
+  });
+
+  it("eine verworfene Dublette eines zugeordneten Angebots kehrt nicht zurück", () => {
+    const previous = prev([old("aaaaaaaa", { title: "PEKiP (Di 9:30)", sessions: at(days) })]);
+    // rrrrrrrr war die jüngere Fassung desselben Angebots
+    const r = runR(
+      [draft({ sessions: at(days) }), draft({ title: "PEKiP-Gruppe (dienstags)", sessions: at(days) })],
+      [rest("rrrrrrrr", { title: "PEKiP-Gruppe (dienstags)" })],
+      previous,
+    );
+    expect(r.offers.map((o) => o.id)).not.toContain("rrrrrrrr");
+  });
+
+  it("ohne Ruhe und mit leerer Ruhe dieselbe Zuordnung", () => {
+    const previous = prev([old("aaaaaaaa"), old("bbbbbbbb", { title: "Musikgarten", sessions: at(days, "16:00") })]);
+    const drafts = [draft({ title: "PEKiP neu" }), draft({ title: "Babymassage", sessions: at(days, "11:00") })];
+    expect(runR(drafts, [], previous)).toEqual(run(drafts, previous));
+  });
+});
+
+describe("checkIdContinuity mit Ruhe (Plan 0061, E2)", () => {
+  it("eine ruhende ID wechselt nie den Anbieter", () => {
+    const resting = [{ id: "aaaaaaaa", providerId: "familientreff-beispiel" }];
+    expect(checkIdContinuity(undefined, [old("aaaaaaaa")], resting)).toEqual([
+      "ID aaaaaaaa wechselt den Anbieter: familientreff-beispiel → turnverein-beispiel (Fehler in der Zuordnung)",
+    ]);
   });
 });

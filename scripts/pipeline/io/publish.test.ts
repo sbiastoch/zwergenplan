@@ -36,9 +36,10 @@ function setup() {
 }
 
 describe("publishNightly (Plan 0032, E6)", () => {
-  it("committet data/raw, offers.json und kosten.csv mit dem Text und pusht nach main", () => {
+  it("committet data/raw, offers.json, ruhend.json und kosten.csv mit dem Text und pusht nach main", () => {
     const { origin, work, run } = setup();
     write(work.dir, "data/offers.json", "neu\n");
+    write(work.dir, "data/ruhend.json", "{}\n");
     write(work.dir, "data/raw/a.json", "{}\n");
     write(work.dir, "data/kosten.csv", "kopf\nzeile\n");
     let validated = 0;
@@ -51,6 +52,7 @@ describe("publishNightly (Plan 0032, E6)", () => {
       "data/kosten.csv",
       "data/offers.json",
       "data/raw/a.json",
+      "data/ruhend.json",
     ]);
   });
 

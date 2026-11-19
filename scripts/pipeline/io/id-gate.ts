@@ -13,6 +13,7 @@ import { decide, type Judge, type Verdict } from "../lib/judge.ts";
 import { isV2, type ProviderRaw, type ProviderRawV2, type UnitState } from "../lib/raw.ts";
 import { type FetchedProvider, holdUnit } from "../lib/refresh.ts";
 import type { IdGateEntry } from "../lib/report.ts";
+import type { RestingFile } from "../lib/resting.ts";
 import { type UnitDef, unitExcerpt, unitsOf } from "../lib/units.ts";
 
 export interface IdGateOptions {
@@ -22,6 +23,8 @@ export interface IdGateOptions {
   next: Readonly<Record<string, ProviderRaw>>;
   catalog: readonly Provider[];
   previous: OffersFile | undefined;
+  /** ruhende Angebote, dieselben wie im Build danach (Plan 0061, E2): gleiche `origins`, Verluste und `listedAt` */
+  resting?: RestingFile;
   today: string;
   /** Abrufzeit des Laufs: `since` beim Halten */
   now: string;
@@ -129,6 +132,7 @@ async function gate(o: IdGateOptions, calls: CallRecord[]): Promise<IdGateResult
       freeDays: o.freeDays,
       generatedAt: o.generatedAt,
       sources: o.sources,
+      ...(o.resting ? { resting: o.resting } : {}),
     });
   const b = build(heldBack(o.prev, o.next, gated));
   // Ohne gültigen Stand (b) gibt es keinen Vergleich: alle gated Einheiten halten (nächste Nacht erneut). Der Build

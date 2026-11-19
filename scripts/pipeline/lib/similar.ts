@@ -2,10 +2,11 @@
  * Textähnlichkeit für Deduplizierung und Zuordnung (aus enrich.same_event). Zwei Strengen, bewusst getrennt (ADR 0031):
  * - `similarTitle` ist großzügig (ein gemeinsames Schlüsselwort genügt, auch ein Wochentag). Es dient `mergeParts`
  *   (split.ts), der Eval-Bewertung und der Zuordnung der IDs, wo Termine und Eindeutigkeit den Rest entscheiden.
- * - `sameCoreTitle` ist streng (gleiches erstes Kernwort oder alle Kernwörter einer Seite in der anderen, ohne
- *   Kernwort gleiche Tokenfolge; keine widersprechende Gruppe, Name oder Zeitraum, Plan 0061, E1.2). Es dient
- *   den Dubletten gleicher Quelle im Build und den Zwillingen des Vorstands (`sameOfferTwice`, stable-ids.ts): Dort
- *   entfällt ein Angebot bzw. eine ID, also müssen echte Parallelgruppen mit gleichen Zeiten getrennt bleiben.
+ * - `sameCoreTitle` ist streng (gleiches erstes Kernwort oder alle, mindestens zwei, Kernwörter einer Seite in der
+ *   anderen, ohne Kernwort gleiche Tokenfolge; keine widersprechende Gruppe, Name, Zeitraum oder verschiedene Daten
+ *   im Titel; Plan 0061, E1.2). Es dient den Dubletten gleicher Quelle im Build, den Zwillingen des Vorstands
+ *   (`sameOfferTwice`, stable-ids.ts) und Stufe 2b der Zuordnung: Dort entfällt ein Angebot bzw. wandert eine ID,
+ *   also müssen echte Parallelgruppen mit gleichen Zeiten getrennt bleiben.
  * - `conflictingLabels` ist der Kennungsteil davon für Stufe 2 der Zuordnung, `compatibleAge` der Altersvergleich.
  */
 import type { AgeRange } from "../../../src/domain/schema.ts";
