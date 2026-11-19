@@ -98,7 +98,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T02:10:39+01:00",
+   "checkedAt": "2026-11-19T10:17:22+01:00",
    "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "4997115d57eea8441ea456e2b3761ec206a77bdc46a1b3ec23688c24be8d9b27"
   },
@@ -160,7 +160,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T02:10:39+01:00",
+   "checkedAt": "2026-11-19T10:17:22+01:00",
    "changedAt": "2026-11-17T10:40:21+01:00",
    "sources": [
     "evtermine"

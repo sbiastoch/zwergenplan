@@ -180,27 +180,27 @@
    "checkedAt": "2026-11-17T10:40:21+01:00",
    "changedAt": "2026-11-16T09:25:52+01:00",
    "pending": {
-    "inputHash": "fcb32ea2672a67ccae50c9064277567fd764bd01c18f1b80d19b391db5190b1c",
+    "inputHash": "513a6e35c51d02343817acd14bbd545250c2b3457216408276a3cf49d597d44b",
     "model": "haiku",
     "events": [
      {
       "providerId": "martha-maria-st-theresien",
       "venueId": "martha-maria-st-theresien",
       "title": "Elterncafé in der Schwangerschaft und nach der Geburt",
-      "summary": "Ungezwungener Austausch für Schwangere und junge Eltern, Fragen können direkt an die Hebammen gehen. Kostenlos und ohne Anmeldung. Bisher sind nur Termine bis Dezember 2026 veröffentlicht.",
+      "summary": "Ungezwungener Austausch für Schwangere sowie junge Mütter und Väter, Fragen können an die Hebammen gestellt werden. Kostenlos, ohne Anmeldung; genannt ist der Termin im Dezember 2026.",
       "topics": [
-       "elterncafe"
+       "elterncafe",
+       "elterntreff"
       ],
       "format": "regelmaessig",
       "registration": "ohne-anmeldung",
       "cost": "kostenlos",
-      "price": "kostenlos",
       "url": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
       "sourceUrl": "https://kh-nuernberg.martha-maria.de/fachbereiche/kliniken/frauenklinik/geburtshilfe#c56608",
       "category": "treffs-cafes",
       "availability": {
        "status": "ohne-anmeldung",
-       "note": "Keine Anmeldung nötig, einfach zur Station B3 kommen"
+       "note": "keine Anmeldung nötig"
       },
       "schedule": {
        "kind": "dates",
@@ -215,8 +215,8 @@
      {
       "providerId": "martha-maria-st-theresien",
       "venueId": "martha-maria-st-theresien",
-      "title": "Indische Babymassage (Babys ca. 4 Wochen bis 7 Monate)",
-      "summary": "Traditionelle indische Babymassage für Eltern und Baby zur Förderung von Nähe und Wohlbefinden. Fünf Dienstage à eine Stunde je Kurs; Starttermine im Februar, Mai, September und November 2027. Anmeldung per E-Mail oder Telefon.",
+      "title": "Indische Babymassage (Babys 4 Wochen bis 7 Monate)",
+      "summary": "Traditionelle indische Babymassage für Eltern mit Baby, Kurs mit fünf Terminen dienstags von 10 bis 11 Uhr. Genannt sind die Starttermine der Durchgänge; Anmeldung per E-Mail oder Telefon.",
       "topics": [
        "babymassage"
       ],
@@ -243,80 +243,16 @@
          "end": "2027-02-09T11:00"
         },
         {
-         "start": "2027-02-16T10:00",
-         "end": "2027-02-16T11:00"
-        },
-        {
-         "start": "2027-02-23T10:00",
-         "end": "2027-02-23T11:00"
-        },
-        {
-         "start": "2027-03-02T10:00",
-         "end": "2027-03-02T11:00"
-        },
-        {
-         "start": "2027-03-09T10:00",
-         "end": "2027-03-09T11:00"
-        },
-        {
          "start": "2027-05-04T10:00",
          "end": "2027-05-04T11:00"
-        },
-        {
-         "start": "2027-05-11T10:00",
-         "end": "2027-05-11T11:00"
-        },
-        {
-         "start": "2027-05-18T10:00",
-         "end": "2027-05-18T11:00"
-        },
-        {
-         "start": "2027-05-25T10:00",
-         "end": "2027-05-25T11:00"
-        },
-        {
-         "start": "2027-06-01T10:00",
-         "end": "2027-06-01T11:00"
         },
         {
          "start": "2027-09-21T10:00",
          "end": "2027-09-21T11:00"
         },
         {
-         "start": "2027-09-28T10:00",
-         "end": "2027-09-28T11:00"
-        },
-        {
-         "start": "2027-10-05T10:00",
-         "end": "2027-10-05T11:00"
-        },
-        {
-         "start": "2027-10-12T10:00",
-         "end": "2027-10-12T11:00"
-        },
-        {
-         "start": "2027-10-19T10:00",
-         "end": "2027-10-19T11:00"
-        },
-        {
          "start": "2027-11-09T10:00",
          "end": "2027-11-09T11:00"
-        },
-        {
-         "start": "2027-11-16T10:00",
-         "end": "2027-11-16T11:00"
-        },
-        {
-         "start": "2027-11-23T10:00",
-         "end": "2027-11-23T11:00"
-        },
-        {
-         "start": "2027-11-30T10:00",
-         "end": "2027-11-30T11:00"
-        },
-        {
-         "start": "2027-12-07T10:00",
-         "end": "2027-12-07T11:00"
         }
        ]
       }
@@ -365,7 +301,7 @@
    "inputHash": "2a0f0e681eb7562cf89442f5a2c5a3234d539110256fe4dbff2f4aa3adab6c81",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T02:10:39+01:00",
+   "checkedAt": "2026-11-19T10:17:22+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "091f597f896233f45ae798711e4b15fd76d21a9c8b0b5c606a5cf81979a1ecdb"
   },
@@ -374,7 +310,7 @@
    "inputHash": "493dd1721fce901d1d162a97cff74e8bc3330ddea11e7d004a8d4d5e3c047b19",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T02:10:39+01:00",
+   "checkedAt": "2026-11-19T10:17:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "091f597f896233f45ae798711e4b15fd76d21a9c8b0b5c606a5cf81979a1ecdb"
   }
