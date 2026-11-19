@@ -110,16 +110,22 @@ function acceptanceIssues(today: string): string[] {
  * (der nächste Nachtlauf legt sie an); ungültig ist rot, auch wenn der Build dann ohne Ruhe weiterkäme.
  */
 function restingIssues(): string[] {
-  const file = new URL(source === "fixture" ? "tests/fixtures/ruhend.json" : "data/ruhend.json", ROOT);
+  const label = source === "fixture" ? "tests/fixtures/ruhend.json" : "data/ruhend.json";
+  const file = new URL(label, ROOT);
   if (!existsSync(file)) return [];
   let value: unknown;
   try {
     value = JSON.parse(readFileSync(file, "utf8"));
   } catch (e) {
-    return [`data/ruhend.json: kein JSON: ${e instanceof Error ? e.message : String(e)}`];
+    return [`${label}: kein JSON: ${e instanceof Error ? e.message : String(e)}`];
   }
   const parsed = parseResting(value);
-  return "error" in parsed ? [`data/ruhend.json: ${parsed.error}`] : [];
+  if ("error" in parsed) return [`${label}: ${parsed.error}`];
+  // eine ruhende ID steht nie zugleich in offers.json (Arch-Review E2, m3)
+  const live = new Set(result.ok ? result.offers.offers.map((o) => o.id) : []);
+  return parsed.file.entries
+    .filter((e) => live.has(e.id))
+    .map((e) => `${label}: ID ${e.id} ruht und steht in offers.json`);
 }
 
 /**

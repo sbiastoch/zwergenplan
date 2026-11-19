@@ -1198,11 +1198,18 @@ describe("listedAt: zuerst im Zwergenplan (Plan 0043, E1)", () => {
 
 describe("Ruhe: Rückkehr nach einer Lücke (Plan 0061, E2)", () => {
   const status = { "familientreff-beispiel": ok };
-  const night = (generatedAt: string, events: unknown[], previous?: OffersFile, resting?: RestingFile) => {
+  const night = (
+    generatedAt: string,
+    events: unknown[],
+    previous?: OffersFile,
+    resting?: RestingFile,
+    from = "2026-10-05",
+  ) => {
     const out = buildOffers(
       base({
         batches: [batch("familientreff-beispiel", events, status)],
         generatedAt,
+        horizon: { from, to: "2027-02-05" },
         ...(previous ? { previous } : {}),
         resting: resting ?? { generatedAt, entries: [] },
       }),
@@ -1255,6 +1262,29 @@ describe("Ruhe: Rückkehr nach einer Lücke (Plan 0061, E2)", () => {
     expect(back.file.offers[0]?.listedAt).toBe(N3);
     // keine Kursfortschreibung aus der Ruhe: die Ausgabe ist gültig und hat nur die Termine des Entwurfs
     expect(back.file.offers[0]?.sessions).toHaveLength(5);
+  });
+
+  it("nennt die Quelle nach der Lücke auch vergangene Termine, zählt der neue Durchgang trotzdem (Arch-Review E2, m2)", () => {
+    const kurs = (days: string[]) =>
+      ev({
+        title: "PEKiP",
+        format: "kurs",
+        topics: ["pekip"],
+        schedule: { kind: "dates", dates: days.map((d) => ({ start: `${d}T10:00` })) },
+      });
+    const first = night(N1, [kurs(["2026-10-07", "2026-10-14", "2026-10-21"])]);
+    // Lücke ab dem 12.10.: gemerkt werden nur die Beginne ab dann (14. und 21.10.)
+    const gap = night("2026-10-12T06:00:00+02:00", [], first.file, first.resting, "2026-10-12");
+    expect(gap.resting.entries[0]?.starts).toHaveLength(2);
+    const back = night(
+      "2026-10-19T06:00:00+02:00",
+      [kurs(["2026-10-07", "2026-10-14", "2026-10-21", "2026-11-11", "2026-11-18"])],
+      gap.file,
+      gap.resting,
+      "2026-10-19",
+    );
+    expect(back.file.offers[0]?.id).toBe(first.file.offers[0]?.id);
+    expect(back.file.offers[0]?.listedAt).toBe("2026-10-19T06:00:00+02:00");
   });
 
   it("mit leerer Ruhe ist die Ausgabe dieselbe wie ohne Ruhe; ohne Ruhe keine fortgeschriebene", () => {

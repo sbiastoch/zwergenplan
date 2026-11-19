@@ -303,6 +303,18 @@ Gleiche Kette wie in Etappe 1, mit Ruhe ab dem ersten Lauf (05.11., leer):
 - **„Neu“ am 18.11.**: 83 im echten Stand, 71 nach Etappe 1, 69 mit Ruhe. Die Erwartung von etwa 55 stimmt nicht: Die meisten Lücken aus B1/B2 begannen vor dem 05.11. (Wolf Pack 02.–04.11., vhs Fürth 02.–07.11.), als die Ruhe noch leer war (Risiko „Start mit leerer Ruhe“). Den Rest der Fehletiketten hatte E1 schon behoben (Familienbox).
 - **Größe** von `data/ruhend.json` nach 14 Nächten: 74 Einträge, 43 kB. Bei 56 Tagen sind es hochgerechnet unter 200 kB.
 
+### Arch-Review Etappe 2 (`dfc8f47` mit Arbeitsbaum) – Verdict: Nacharbeit nötig → eingearbeitet
+
+Kein Blocker. Übernommen, je mit Test:
+- **M1** Stufe 1 gegen die Ruhe ordnete ohne Titelbezug zu (Zweig „kein Rivale ⇒ Treffer“). Über Wochen ist ein neuer Titel auf einem alten Termin oft eine Neubelegung, etwa PEKiP auf dem Platz einer gestrichenen Babymassage. Jetzt sind `similarTitle` und `compatibleAge` Pflicht. Die Nachmessung ergab dieselben 23 Treffer.
+- **m1** Eindeutigkeit für Stufe 0 und die Schlüssel-Rückkehr gilt unter allen Entwürfen (auch den mehrdeutigen) und allen ruhenden Einträgen.
+- **m2** `isNewRun` mit ruhendem Vorgänger vergleicht nur die Termine des Entwurfs ab dem Ruhebeginn. Sonst verlor ein neuer Durchgang „Neu“, wenn die Quelle die alten Termine mitnennt.
+- **m3** Das Schema `RestingFile` verlangt eindeutige IDs. `data:validate` meldet eine ruhende ID, die zugleich in `offers.json` steht.
+- **m4** Die Fixture friert auch die Ruhe nach dem Lauf ein (`ruhend-after.json.gz`). Der Fixpunkt baut damit, der nachgebaute Lauf mit der Ruhe davor.
+- **m5** Neue Tests: Zeitumstellung samt Beginn kurz nach Mitternacht, Rivale aus der Ruhe, ein Entwurf, der in Stufe 2 mehrdeutig war. **Nicht** als Test umgesetzt: „Gate und Build bekommen dieselbe Ruhe“. Die Ruhe wird in `runNightly` genau einmal gelesen und an beide gegeben, im Gate laufen alle drei Builds über dieselbe Closure. Ein Test bräuchte einen eigenen Richter-Aufbau. Das bleibt als Restpunkt.
+- **m6** Die Meldung bei ungültiger Datei lautet „Inhalt verworfen, ohne Ruhe gebaut, leer neu angelegt“. Eine Meldung als Wächter-Befund ist ein Restpunkt.
+- **m7** Kopfkommentar in `stable-ids.ts`, Pfad der Fixture in den Meldungen von `data:validate`.
+
 ### Nebenbefund Stop-Gate: Zombies zählten als lebende Prozesse
 
 `scripts/heavy.test.ts` („… danach ist die Gruppe leer“) war in der Cloud-Session dauerhaft rot und blockierte Stop-Gate und pre-commit. Ursache war ein echter Fehler in `alive()` (`scripts/lib/process-group.ts`): `kill(pid, 0)` gelingt auch für Zombies. Erntet PID 1 verwaiste Prozesse nicht (Container mit `process_api`), bleibt eine beendete Gruppe „lebendig“. Die Korrektur liest unter Linux den Zustand aus `/proc/<pid>/stat`, ein Zombie zählt als beendet; ohne `/proc` gilt das Signal 0 wie bisher. Test: `scripts/lib/process-group.test.ts`. Damit sind die beiden `--no-verify`-Commits dieses Plans (`0431d8c`, `dfc8f47`) nachträglich durch ein grünes `check:fast` gedeckt.
@@ -311,6 +323,8 @@ Gleiche Kette wie in Etappe 1, mit Ruhe ab dem ersten Lauf (05.11., leer):
 
 - [ ] Nach dem ersten Nachtlauf mit diesem Code: Fixture neu einfrieren (`node scripts/pipeline/freeze-id-continuity.ts`), `EXPECTED_DUPLICATE_LOSSES` leeren (der Test erzwingt es), Commit mit Begründung.
 - [ ] Nach dem Nachtlauf prüfen: Die Dubletten aus B4 sind weg, `u6msbbr7` steht, `o4xo6513` ist weg. `data/ruhend.json` ist committet, und der Bericht nennt die Ruhe.
+- [ ] Test „Gate und Build bekommen dieselbe Ruhe“ (Arch-Review E2, m5).
+- [ ] Ungültige `data/ruhend.json` als Wächter-Befund melden statt nur als Notiz im Bericht (Arch-Review E2, m6).
 
 ## Risiken
 

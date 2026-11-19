@@ -1,7 +1,9 @@
 /**
  * Stabile Angebots-IDs (ADR 0022, Plan 0015 E13–E17): Die ID ist gespeichert, nicht abgeleitet. `assignIds` ordnet
- * die Entwürfe eines Laufs dem Vorstand (data/offers.json vor dem Lauf) zu und übernimmt dessen IDs; nur Entwürfe ohne
- * Partner bekommen eine neue. Rein und deterministisch: gleiche Eingabe und gleicher Vorstand ergeben dieselben IDs.
+ * die Entwürfe eines Laufs dem Vorstand (data/offers.json vor dem Lauf) zu und übernimmt dessen IDs (Durchgang 1: Erbe,
+ * Stufe 0, 1, 2, 2b). Die übrigen Entwürfe prüft Durchgang 2 gegen die ruhenden Angebote (`data/ruhend.json`, Plan 0061,
+ * E2; ADR 0044); nur Entwürfe ohne Partner bekommen eine neue ID, die keine ruhende belegt. Rein und deterministisch:
+ * gleiche Eingabe, gleicher Vorstand und gleiche Ruhe ergeben dieselben IDs.
  *
  * Lieber eine neue ID als eine vertauschte: Eine neue ID ist der Zustand vor ADR 0022, eine falsche Zuordnung ließe
  * einen alten Link still auf ein fremdes Angebot zeigen. Deshalb verlangen Stufe 1 und 2 Eindeutigkeit.
@@ -563,29 +565,36 @@ export function assignIds(input: {
   };
   const sameRestProvider = (ri: number, di: number) => R[ri]?.offer.providerId === D[di]?.offer.providerId;
 
+  // Eindeutig heißt unter allen Entwürfen und allen ruhenden Einträgen, nicht nur unter den Teilnehmern
+  // (Arch-Review E2, m1): Ein mehrdeutiger Entwurf oder eine verworfene Dublette mit gleichem Schlüssel macht ihn unsicher
+  const allRest = (input.resting ?? []).map(restingDraft);
+  const count = (keys: readonly string[]) => groupBy(keys, (k) => k);
+  const draftWindows = count(D.map((d) => d.window));
+  const restWindows = count(allRest.map((o) => windowKey(o, from)));
+  const draftKeys = count(D.map((d) => d.key));
+  const restKeys = count((input.resting ?? []).map((e) => e.key));
+  const unique = (counts: ReadonlyMap<string, readonly string[]>, k: string) => counts.get(k)?.length === 1;
+
   // Stufe 0 gegen die Ruhe: gleicher Fensterschlüssel, auf beiden Seiten genau einer
-  const restByWindow = groupBy(
-    R.map((_, ri) => ri),
-    (ri) => R[ri]?.window ?? "",
-  );
-  for (const [key, ds] of groupBy(players(), (di) => D[di]?.window ?? "")) {
-    const rs = restByWindow.get(key) ?? [];
-    if (ds.length === 1 && rs.length === 1) matchRest(at(rs, 0), at(ds, 0), "0");
+  for (const di of players()) {
+    const key = at(D, di).window;
+    const ri = R.findIndex((r) => r.window === key);
+    if (ri >= 0 && unique(draftWindows, key) && unique(restWindows, key)) matchRest(ri, di, "0");
   }
 
-  // Stufe 1 gegen die Ruhe: gleiche Termine, strikt bester Partner für beide Seiten, mit Titel-Widerspruch
+  // Stufe 1 gegen die Ruhe: gleiche Termine, ähnlicher Titel, verträgliches Alter, strikt bester Partner für beide
+  // Seiten
   const restStage1 = (ri: number, di: number) => {
     if (!sameRestProvider(ri, di)) return 0;
     const r = at(R, ri);
     const d = draftFor(ri, di);
     if (r.offer.venueId !== d.offer.venueId && venues.has(r.offer.venueId)) return 0;
     const t = jaccard(r.minutes, d.minutes);
-    if (t < SAME_SESSIONS) return 0;
-    if (similarTitle(r.offer.title, d.offer.title)) return t;
-    const rivalTitle = (q: { offer: Comparable }) =>
-      q.offer.providerId === d.offer.providerId && similarTitle(q.offer.title, d.offer.title);
-    const rival = P.some(rivalTitle) || R.some((q, qi) => qi !== ri && rivalTitle(q));
-    return rival ? 0 : t;
+    // Anders als über Nacht ist über Wochen ein neuer Titel bei gleichen Terminen oft eine Neubelegung: ähnlicher Titel
+    // und verträgliches Alter sind Pflicht, der Zweig „kein Rivale“ aus Durchgang 1 entfällt (Arch-Review E2, M1)
+    if (t < SAME_SESSIONS || !similarTitle(r.offer.title, d.offer.title) || !compatibleAge(r.offer.age, d.offer.age))
+      return 0;
+    return t;
   };
   for (let changed = true; changed; ) {
     changed = false;
@@ -643,15 +652,11 @@ export function assignIds(input: {
 
   // Rückkehr über den Schlüssel (Review m3; Arch-Review m5): heute über `shortId(key, seed)`, jetzt ohne die Gefahr
   // eines anderen Seeds, weil neue IDs ruhende meiden. Nur bei einem Schlüssel, der auf beiden Seiten eindeutig ist.
-  const restByKey = groupBy(
-    R.map((_, ri) => ri),
-    (ri) => R[ri]?.e.key ?? "",
-  );
-  for (const [key, ds] of groupBy(players(), (di) => D[di]?.key ?? "")) {
-    const rs = restByKey.get(key) ?? [];
-    const ri = rs[0];
-    if (ds.length === 1 && rs.length === 1 && ri !== undefined && !partnerOfRest.has(ri))
-      matchRest(ri, at(ds, 0), "Schlüssel");
+  for (const di of players()) {
+    const key = at(D, di).key;
+    const ri = R.findIndex((r) => r.e.key === key);
+    if (ri >= 0 && !partnerOfRest.has(ri) && unique(draftKeys, key) && unique(restKeys, key))
+      matchRest(ri, di, "Schlüssel");
   }
 
   // Vergabe: Treffer übernehmen die ID (samt Kursfortschreibung), alle anderen bekommen eine neue

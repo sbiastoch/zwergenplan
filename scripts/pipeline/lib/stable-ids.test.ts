@@ -1049,6 +1049,64 @@ describe("assignIds – Durchgang 2 gegen die Ruhe (Plan 0061, E2)", () => {
     expect(r.offers[0]?.id).not.toBe("rrrrrrrr");
   });
 
+  it("Stufe 1 gegen die Ruhe verlangt einen ähnlichen Titel und verträgliches Alter (Arch-Review E2, M1)", () => {
+    // ein neues Angebot auf dem Termin eines gestrichenen: über Wochen eine Neubelegung, keine Umformulierung
+    const massage = rest("rrrrrrrr", { title: "Babymassage (Mi 10:00)", age: { minMonths: 0, maxMonths: 6 } });
+    expect(runR([draft({ title: "Krabbelgruppe", sessions: at(days) })], [massage]).offers[0]?.id).not.toBe("rrrrrrrr");
+    expect(
+      runR(
+        [draft({ title: "Babymassage am Mittwoch", age: { minMonths: 12, maxMonths: 36 }, sessions: at(days) })],
+        [massage],
+      ).offers[0]?.id,
+    ).not.toBe("rrrrrrrr");
+    // ein Einzeltermin wird nicht von jedem Einzeltermin zur selben Minute getroffen
+    const one = { format: "einmalig" as const, sessions: at(days.slice(3, 4)) };
+    expect(
+      runR([draft({ ...one, title: "Lesestunde" })], [rest("ssssssss", { ...one, title: "Konzert" })]).offers[0]?.id,
+    ).not.toBe("ssssssss");
+  });
+
+  it("ein Rivale aus der Ruhe selbst verhindert den Treffer (Arch-Review E2, m5)", () => {
+    // zwei ruhende Einträge mit gleichen Terminen, der Entwurf ähnelt beiden: mehrdeutig, keine ruhende ID
+    const r = runR(
+      [draft({ title: "PEKiP Gruppe", sessions: at(days) })],
+      [rest("rrrrrrrr", { title: "PEKiP Gruppe Löwen" }), rest("ssssssss", { title: "PEKiP Gruppe Bären" })],
+    );
+    expect(["rrrrrrrr", "ssssssss"]).not.toContain(r.offers[0]?.id);
+  });
+
+  it("kein Treffer für einen Entwurf, der in Stufe 2 mehrdeutig war (Arch-Review E2, m5)", () => {
+    // zwei Vorstandsangebote passen in Stufe 2 (neue Uhrzeit, ähnlicher Titel) zum Entwurf: mehrdeutig
+    const previous = prev([
+      old("aaaaaaaa", { title: "Turnen Löwen", sessions: at(days, "08:00") }),
+      old("cccccccc", { title: "Turnen Bären", sessions: at(days, "08:30") }),
+    ]);
+    const r = runR(
+      [draft({ title: "Turnen", sessions: at(days, "11:00") })],
+      [rest("rrrrrrrr", { title: "Turnen" })],
+      previous,
+    );
+    // beide alten zeigen auf den Entwurf, keiner trifft (Gegenrichtung mehrdeutig)
+    expect(r.offers[0]?.id).not.toMatch(/^(aaaaaaaa|cccccccc|rrrrrrrr)$/);
+  });
+
+  it("Schlüssel-Rückkehr nur bei Eindeutigkeit unter allen Entwürfen, auch den mehrdeutigen (Arch-Review E2, m1)", () => {
+    // Y ist in Stufe 1 mehrdeutig (zwei benannte Gruppen), X hat denselben Schlüssel an einem anderen Wochentag
+    const previous = prev([
+      old("aaaaaaaa", { title: "Turnen Löwen", sessions: at(days) }),
+      old("cccccccc", { title: "Turnen Bären", sessions: at(days) }),
+    ]);
+    const y = draft({ title: "Turnen", sessions: at(days) });
+    const x = draft({ title: "Turnen", sessions: at(weekly("2026-10-08", 17), "16:00") });
+    expect(keyOf(x)).toBe(keyOf(y));
+    const resting = {
+      ...rest("rrrrrrrr", { title: "Turnen", sessions: at(weekly("2026-10-05", 17), "12:00") }),
+      key: keyOf(x),
+    };
+    const r = runR([y, x], [resting], previous);
+    expect(r.offers.map((o) => o.id)).not.toContain("rrrrrrrr");
+  });
+
   it("Vergleichsfenster bis horizonTo des Eintrags (Review M1)", () => {
     // Der Eintrag kennt Beginne nur bis zum 03.11.; der Entwurf hat danach weitere, die nicht zählen
     const short = rest("rrrrrrrr", {}, "2026-11-03");

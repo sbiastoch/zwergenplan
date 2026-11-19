@@ -563,9 +563,14 @@ function withListedAt(
             offer: { format: resting.format, sessions: resting.starts.map((start) => ({ start, end: start })) },
             horizonTo: resting.horizonTo,
             listedAt: resting.listedAt,
+            /** die Ruhe kennt Beginne erst ab dem Ruhebeginn (Arch-Review E2, m2) */
+            since: berlinDay(resting.restingSince),
           }
         : undefined;
-  if (before === undefined || (before.horizonTo !== undefined && isNewRun(before.offer, offer, before.horizonTo)))
+  const since = before && "since" in before ? before.since : undefined;
+  const next =
+    since === undefined ? offer : { ...offer, sessions: offer.sessions.filter((s) => berlinDay(s.start) >= since) };
+  if (before === undefined || (before.horizonTo !== undefined && isNewRun(before.offer, next, before.horizonTo)))
     return { ...offer, listedAt: input.generatedAt };
   return before.listedAt === undefined ? offer : { ...offer, listedAt: before.listedAt };
 }

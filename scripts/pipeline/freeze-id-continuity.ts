@@ -9,6 +9,7 @@
  * - `offers-before.json.gz`: `data/offers.json` davor, der Vorstand des Laufs;
  * - `free-days.json.gz`: die freien Tage des Nachtlaufs (OpenHolidays über den Cache, Spanne wie in `io/nightly.ts`);
  * - `ruhend.json.gz`: `data/ruhend.json` vor dem Lauf, die Ruhe seines Builds (Plan 0061, E2); fehlt sie, die leere;
+ * - `ruhend-after.json.gz`: `data/ruhend.json` nach dem Lauf, passend zum Fixpunkt (Vorstand = Ergebnis);
  * - `meta.json`: `today` und `generatedAt` des Laufs (`horizon.from`, `generatedAt` aus seinem Ergebnis), der Commit.
  * So baut der Test den Lauf mit demselben Stichtag nach, und ein erneutes Einfrieren ohne neuen Lauf ändert nichts.
  * gzip (Stufe 9, ohne Zeitstempel im Kopf) hält die rund 3,7 MB im Repo bei rund 0,4 MB und die Bytes reproduzierbar.
@@ -47,11 +48,11 @@ for (const f of run("ls-tree", "--name-only", `${commit}:data/raw`)
   .sort())
   raws[f.slice(0, -".json".length)] = JSON.parse(show(commit, `data/raw/${f}`));
 
-/** Ruhe vor dem Lauf: `data/ruhend.json` des Vorgänger-Commits, sonst die leere (Plan 0061, E2) */
-function restingBefore(): string {
-  const listed = run("ls-tree", "--name-only", `${commit}^`, "data/").split("\n");
+/** `data/ruhend.json` eines Commits, sonst die leere Ruhe (Plan 0061, E2) */
+function restingAt(rev: string): string {
+  const listed = run("ls-tree", "--name-only", rev, "data/").split("\n");
   return listed.includes("data/ruhend.json")
-    ? show(`${commit}^`, "data/ruhend.json")
+    ? show(rev, "data/ruhend.json")
     : JSON.stringify({ generatedAt: after.generatedAt, entries: [] });
 }
 
@@ -67,7 +68,8 @@ const sizes = {
   "offers.json.gz": gz("offers.json.gz", offers),
   "offers-before.json.gz": gz("offers-before.json.gz", show(`${commit}^`, "data/offers.json")),
   "free-days.json.gz": gz("free-days.json.gz", JSON.stringify(freeDays)),
-  "ruhend.json.gz": gz("ruhend.json.gz", restingBefore()),
+  "ruhend.json.gz": gz("ruhend.json.gz", restingAt(`${commit}^`)),
+  "ruhend-after.json.gz": gz("ruhend-after.json.gz", restingAt(commit)),
 };
 const meta = { today, generatedAt: after.generatedAt, commit };
 // Einrückung wie Biome, das scripts/ prüft

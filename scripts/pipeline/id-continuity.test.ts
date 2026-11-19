@@ -35,14 +35,16 @@ const input = {
   raws: z.record(z.string(), ProviderRaw).parse(JSON.parse(gz("raw.json.gz"))),
   catalog: ProvidersFile.parse(parse(gz("providers.yaml.gz"))),
   freeDays: z.record(z.string(), z.string()).parse(JSON.parse(gz("free-days.json.gz"))),
-  // Ruhe vor dem Lauf (Plan 0061, E2); bis zum ersten Lauf mit Ruhe leer
-  resting: RestingFile.parse(JSON.parse(gz("ruhend.json.gz"))),
 };
+/** Ruhe vor und nach dem Lauf (Plan 0061, E2; Arch-Review E2, m4); bis zum ersten Lauf mit Ruhe leer */
+const restingBefore = RestingFile.parse(JSON.parse(gz("ruhend.json.gz")));
+const restingAfter = RestingFile.parse(JSON.parse(gz("ruhend-after.json.gz")));
 
-function build(previous: OffersFile): Offer[] {
+function build(previous: OffersFile, resting: RestingFile): Offer[] {
   const { file, report } = buildFromState({
     ...input,
     previous,
+    resting,
     today: meta.today,
     generatedAt: meta.generatedAt,
     sources: {},
@@ -143,7 +145,7 @@ describe("ID-Kontinuität des Build-Codes (Plan 0049, Nachtrag 2, B7)", () => {
     "Fixpunkt: mit dem Ergebnis des Laufs als Vorstand bleibt jede ID mit Termin ab today",
     () => {
       const after = offers("offers.json.gz");
-      const built = build(after);
+      const built = build(after, restingAfter);
       const missing = lost(after.offers.filter(future), built);
       expect(missing, `${missing.length} IDs mit künftigem Termin verloren – ${HINT}`).toEqual([]);
       // jeder Eintrag der Liste wird gebraucht: ein überzähliger deckte sonst später einen anderen Verlust (Arch-Review m1)
@@ -159,7 +161,7 @@ describe("ID-Kontinuität des Build-Codes (Plan 0049, Nachtrag 2, B7)", () => {
       const before = offers("offers-before.json.gz");
       const kept = new Set(before.offers.map((o) => o.id));
       const expected = offers("offers.json.gz").offers.filter((o) => kept.has(o.id) && future(o));
-      const missing = lost(expected, build(before));
+      const missing = lost(expected, build(before, restingBefore));
       expect(missing, `${missing.length} IDs mit künftigem Termin verloren – ${HINT}`).toEqual([]);
     },
     BUILD_TIMEOUT_MS,

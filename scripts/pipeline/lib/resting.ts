@@ -38,7 +38,19 @@ export const RestingEntry = z.strictObject({
 });
 export type RestingEntry = z.infer<typeof RestingEntry>;
 
-export const RestingFile = z.strictObject({ generatedAt: Instant, entries: z.array(RestingEntry) });
+/**
+ * Jede ID höchstens einmal (Arch-Review E2, m3): Zwei Einträge mit derselben ID gingen in Durchgang 2 an zwei Entwürfe,
+ * der Build schlüge an der doppelten ID fehl und schriebe Nacht für Nacht nichts.
+ */
+export const RestingFile = z
+  .strictObject({ generatedAt: Instant, entries: z.array(RestingEntry) })
+  .superRefine((f, ctx) => {
+    const seen = new Set<string>();
+    f.entries.forEach((e, i) => {
+      if (seen.has(e.id)) ctx.addIssue({ code: "custom", message: `ID ${e.id} doppelt`, path: ["entries", i, "id"] });
+      seen.add(e.id);
+    });
+  });
 export type RestingFile = z.infer<typeof RestingFile>;
 
 /** Geprüft lesen; ungültig ist ein Rückgabewert, kein Wurf: Der Build fällt dann auf „ohne Ruhe“ zurück (E2). */

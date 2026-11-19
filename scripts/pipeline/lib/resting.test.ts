@@ -132,5 +132,31 @@ describe("parseResting (Plan 0061, E2)", () => {
     const bad = parseResting({ generatedAt: "gestern", entries: [] });
     expect("error" in bad && bad.error).toMatch(/generatedAt/);
     expect("error" in parseResting({ ...file, entries: [{ ...file.entries[0], id: "ZU-LANG-123" }] })).toBe(true);
+    // doppelte ID (Arch-Review E2, m3)
+    const twice = parseResting({ ...file, entries: [file.entries[0], file.entries[0]] });
+    expect("error" in twice && twice.error).toMatch(/doppelt/);
+  });
+});
+
+describe("updateResting über die Zeitumstellung (Plan 0061, E2; Arch-Review E2, m5)", () => {
+  it("zählt Berliner Tage: Beginn kurz nach Mitternacht und Kappung über den 28.03.", () => {
+    // mittwochs 00:30 Berliner Zeit: in UTC noch der Dienstag
+    const sessions = Array.from({ length: 20 }, (_, i) => {
+      const d = new Date(Date.UTC(2027, 0, 6 + 7 * i, 12)).toISOString().slice(0, 10);
+      const off = d < "2027-03-28" ? "+01:00" : "+02:00";
+      return { start: `${d}T00:30:00${off}`, end: `${d}T01:30:00${off}` };
+    });
+    const previous = offersFile([offer("bbbbbbbb", { sessions })], "2028-01-06");
+    const [entry] = updateResting({
+      previous,
+      resting: undefined,
+      next: [],
+      generatedAt: "2027-01-06T06:00:00+01:00",
+      horizon: { from: "2027-01-06", to: "2028-01-06" },
+    }).entries;
+    expect(entry?.horizonTo).toBe("2027-04-28");
+    expect(entry?.starts[0]).toBe("2027-01-06T00:30:00+01:00");
+    expect(entry?.starts.at(-1)).toBe("2027-04-28T00:30:00+02:00");
+    expect(entry?.starts).toHaveLength(17);
   });
 });

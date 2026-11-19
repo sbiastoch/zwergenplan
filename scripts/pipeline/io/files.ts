@@ -75,12 +75,18 @@ export function readResting(file: string, generatedAt: string): { resting: Resti
     value = readJson(file);
   } catch (e) {
     const why = e instanceof Error ? e.message : String(e);
-    return { resting: empty, warning: `${file} ist kein JSON (${why}) – ohne Ruhe gebaut` };
+    return {
+      resting: empty,
+      warning: `${file} ist kein JSON (${why}) – Inhalt verworfen, ohne Ruhe gebaut, leer neu angelegt`,
+    };
   }
   const parsed = parseResting(value);
   return "file" in parsed
     ? { resting: parsed.file }
-    : { resting: empty, warning: `${file} ungültig (${parsed.error}) – ohne Ruhe gebaut` };
+    : {
+        resting: empty,
+        warning: `${file} ungültig (${parsed.error}) – Inhalt verworfen, ohne Ruhe gebaut, leer neu angelegt`,
+      };
 }
 
 /**
