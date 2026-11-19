@@ -123,7 +123,6 @@
    ],
    "inputHash": "e7e200d6e8a22eb245aeae6783534cf554ac015a072d78fc5f8e45aa693359d3",
    "dated": {
-    "2026-11-18": "475f8f8b231af5ee54f04d6c56c3615d58a5855c9e0ee6f0ebe1844fad0cf57c",
     "2026-11-19": "4fbbb619de00acf3e3e20bf4557252efefeeb345c285057ed1bb9a1cdfe16601",
     "2026-11-21": "34cb8883f54cb47dabf01b4511982c94d11031517dccb3f8ff4aa3af2fa3207f",
     "2026-11-22": "605fdb1325ddc9110dcc06d7ebc694fcee00063c281ccb393ff34b36c2f2325b",
@@ -227,7 +226,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-11-18T10:00:22+01:00",
    "partsHash": "7a588f5684743d34f43b434b2b4bca9b975902153d2249675e9a712e6c1c9142"
   },
@@ -236,11 +235,10 @@
     {
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
-     "title": "Eltern-Kind-Gruppe 0–3 Jahre, dienstags (Melanchthonkirche)",
-     "summary": "Austausch unter Müttern und Vätern über den Erziehungsalltag, dazu Anregungen zu Ernährung, Entwicklung und Sprache, gemeinsames Spielen und Lieder für die Kleinen. Dienstags 9:30–11:00 Uhr, in den Ferien Pause. Zu Anmeldung und Kosten macht die Quelle keine Angaben; bitte bei der Gemeinde nachfragen.",
+     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags, Gemeindehaus Ziegelstein)",
+     "summary": "Treffen für Mütter und Väter mit Kindern von 0 bis 3 Jahren: Austausch über den Erziehungsalltag, Anregungen zu Ernährung, Sauberkeit, Motorik und Sprache, gemeinsames Singen und Geschichten. Die Kinder spielen dabei miteinander. In den Ferienpausen finden keine Treffen statt.",
      "topics": [
-      "eltern-kind-gruppe",
-      "elterntreff"
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -254,7 +252,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; bei der Gemeinde Melanchthonkirche Ziegelstein erfragen."
+      "note": "Im Eintrag keine Angabe zu Plätzen oder zur Anmeldung; bei Unklarheit direkt bei der Melanchthonkirche Ziegelstein nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -342,6 +340,10 @@
        {
         "start": "2027-06-01T09:30",
         "end": "2027-06-01T11:00"
+       },
+       {
+        "start": "2027-06-08T09:30",
+        "end": "2027-06-08T11:00"
        }
       ]
      },
@@ -370,12 +372,13 @@
     "2027-04-27": "def732cbd7f208896958ea8cc5ce2d153ff22f842984c8c17595ae782d2de4af",
     "2027-05-04": "7a1e480f9fb44f5e2d017c96acea0ab4f0af7cb72398485d9e28e71757fa1182",
     "2027-05-11": "f493a03c14595c586068db5951090b3fa0d44345fb11b89d81c0d4399d4099d1",
-    "2027-06-01": "2ec8258eb9c043c4394161d17b18f84d9a2e1069a1483bad3dbe50e8474e9d58"
+    "2027-06-01": "2ec8258eb9c043c4394161d17b18f84d9a2e1069a1483bad3dbe50e8474e9d58",
+    "2027-06-08": "81415fd938eb88fdb6957dfc2c5f2d4d263120e69c41d6a028fe415a2987a086"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
-   "changedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
+   "changedAt": "2026-11-19T02:10:39+01:00",
    "sources": [
     "evtermine"
    ],

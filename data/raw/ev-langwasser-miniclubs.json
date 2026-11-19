@@ -177,7 +177,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -306,7 +306,6 @@
    ],
    "inputHash": "65acb1193277cc55ced981affa2dcf8c05d2a94de948b400998a3d4465db67d3",
    "dated": {
-    "2026-11-18": "be1b6d5abf3700d74b4aee5d31ffee53cb65536780f775f346325abc8d3a0e84",
     "2026-11-19": "252ab7086d004d0b8a8588f4aac3ef0bf077acd9404a6bcfc155e12801693ace",
     "2026-11-22": "08112c8f4f4e5f76bba7cc1ef841602c7fa80360965a83ee1d786ba714b98d16",
     "2026-11-23": "a8bafcf4b2c82c5dd908d8b096f5b21583b77794c69a5b4cc6668cee9096816e",
@@ -600,7 +599,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -640,7 +639,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -681,7 +680,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -965,7 +964,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-11-17T10:40:21+01:00",
    "sources": [
     "evtermine"

@@ -6,8 +6,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Babyschwimmen (3–12 Monate), Start 29.11.2026",
-     "summary": "Babyschwimmen im Langwasser Bad für Babys von 3 bis 12 Monaten, Start am 29.11.2026. Derzeit keine freien Plätze, aber eine Warteliste.",
+     "title": "Babyschwimmen (3–12 Mon.), Start 29.11.2026",
+     "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten im Langwasser Bad. Derzeit keine freien Plätze, Anmeldung nur auf die Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -23,7 +23,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "0 Plätze frei, 4 auf der Warteliste"
+      "note": "Keine freien Plätze, 4 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -38,9 +38,10 @@
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
      "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Start 29.11.2026",
-     "summary": "Eltern-Kind-Schwimmen im Langwasser Bad für Kinder ab 2,5 Jahren, Start am 29.11.2026. Derzeit ausgebucht, Warteliste möglich.",
+     "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren im Langwasser Bad. Derzeit keine freien Plätze, nur Warteliste.",
      "topics": [
-      "kleinkindschwimmen"
+      "kleinkindschwimmen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -54,7 +55,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "0 Plätze frei, 2 auf der Warteliste"
+      "note": "Keine freien Plätze, 2 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -67,9 +68,40 @@
     },
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
+     "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
+     "title": "Babyschwimmen (3–12 Mon.), Start 30.11.2026",
+     "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten in der Boxdorfer Werkstatt. Der Kurs ist ausgebucht.",
+     "topics": [
+      "babyschwimmen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
+     "sourceUrl": "https://api.kursorganizer.com/graphql",
+     "category": "wasser",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 12
+     },
+     "availability": {
+      "status": "ausgebucht",
+      "note": "Keine freien Plätze, keine Warteliste"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-30T16:20"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Babyschwimmen (3–12 Monate), Start 21.02.2027",
-     "summary": "Babyschwimmen im Langwasser Bad für Babys von 3 bis 12 Monaten, Start am 21.02.2027. Nur noch ein Platz frei.",
+     "title": "Babyschwimmen (3–12 Mon.), Start 21.02.2027",
+     "summary": "Wassergewöhnung für Babys von 3 bis 12 Monaten im Langwasser Bad. Nur noch ein Platz frei.",
      "topics": [
       "babyschwimmen"
      ],
@@ -99,8 +131,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
-     "title": "Kleinkinderschwimmen (ab 15 Monate), Start 21.02.2027",
-     "summary": "Kleinkinderschwimmen im Langwasser Bad für Kinder ab 15 Monaten, Start am 21.02.2027. Derzeit ausgebucht, Warteliste möglich.",
+     "title": "Kleinkinderschwimmen (ab 15 Mon.), Start 21.02.2027",
+     "summary": "Wasserangebot für Kleinkinder ab 15 Monaten im Langwasser Bad. Derzeit keine freien Plätze, nur Warteliste.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -116,7 +148,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "0 Plätze frei, 1 auf der Warteliste"
+      "note": "Keine freien Plätze, 1 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -131,9 +163,10 @@
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg",
      "title": "Eltern-Kind-Schwimmen 1 (ab 2,5 J.), Start 21.02.2027",
-     "summary": "Eltern-Kind-Schwimmen im Langwasser Bad für Kinder ab 2,5 Jahren, Start am 21.02.2027. Derzeit ausgebucht, Warteliste möglich.",
+     "summary": "Gemeinsames Schwimmen für Kinder ab 2,5 Jahren im Langwasser Bad. Derzeit keine freien Plätze, nur Warteliste.",
      "topics": [
-      "kleinkindschwimmen"
+      "kleinkindschwimmen",
+      "eltern-kind-gruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -147,7 +180,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "0 Plätze frei, 1 auf der Warteliste"
+      "note": "Keine freien Plätze, 1 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -161,39 +194,8 @@
     {
      "providerId": "schwimmschule-wassermaeuse-nuernberg",
      "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-     "title": "Babyschwimmen (3–12 Monate), Start 30.11.2026",
-     "summary": "Babyschwimmen in der Boxdorfer Werkstatt für Babys von 3 bis 12 Monaten, Start am 30.11.2026. Ausgebucht, keine Warteliste.",
-     "topics": [
-      "babyschwimmen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.schwimmschule-wassermaeuse.de/standorte/nuernberg-fuerth/",
-     "sourceUrl": "https://api.kursorganizer.com/graphql",
-     "category": "wasser",
-     "age": {
-      "minMonths": 3,
-      "maxMonths": 12
-     },
-     "availability": {
-      "status": "ausgebucht",
-      "note": "0 Plätze frei, keine Warteliste"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-30T16:20"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "schwimmschule-wassermaeuse-nuernberg",
-     "venueId": "schwimmschule-wassermaeuse-nuernberg-boxdorfer-werkstatt",
-     "title": "Babyschwimmen 2 (ab 8 Monate), Start 22.02.2027",
-     "summary": "Babyschwimmen in der Boxdorfer Werkstatt für Babys ab 8 Monaten, Start am 22.02.2027. Alle Plätze sind derzeit frei.",
+     "title": "Babyschwimmen 2 (ab 8 Mon.), Start 22.02.2027",
+     "summary": "Wasserangebot für Babys ab 8 Monaten in der Boxdorfer Werkstatt. Der Kurs hat noch alle Plätze frei.",
      "topics": [
       "babyschwimmen"
      ],
@@ -221,11 +223,11 @@
      }
     }
    ],
-   "inputHash": "02ec1b6b49bcec980b7dfa980e71571c4376ec061b793cf1fe15c9b9d82e6c30",
+   "inputHash": "934012fac1f6307adb0bae7b07853f6a8ca690dc6903b0f0eeb90dd3e4d4cb3a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
-   "changedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
+   "changedAt": "2026-11-19T02:10:39+01:00",
    "partsHash": "e214e5f818d739a00baad01c33c44a169546b2e788677037cad30c1990911103"
   }
  }

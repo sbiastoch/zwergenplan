@@ -88,7 +88,7 @@
    "inputHash": "2ce2ad662fdbfab99f40c887ebcc778d60e81981ec4f61cc4231fddfdfe5afb5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-11-18T10:00:22+01:00",
    "partsHash": "1773169258ff9b94e692feaa4cb6c79f6de49ce0e4ff6630b0de1afcb56cb389"
   },
@@ -144,7 +144,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-19T02:10:39+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "sources": [
     "stadt-vk"
