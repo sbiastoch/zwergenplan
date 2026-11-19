@@ -74,7 +74,11 @@ describe("readResting / writeResting (Plan 0061, E2)", () => {
     const path = file();
     const resting = { generatedAt: NOW, entries: [entry, { ...entry, id: "bbbbbbbb" }] };
     writeResting(resting, path);
-    expect(readFileSync(path, "utf8").split("\n").filter((l) => l.includes('"id"'))).toHaveLength(2);
+    expect(
+      readFileSync(path, "utf8")
+        .split("\n")
+        .filter((l) => l.includes('"id"')),
+    ).toHaveLength(2);
     expect(readResting(path, NOW)).toEqual({ resting });
     writeResting({ generatedAt: NOW, entries: [] }, path);
     expect(readResting(path, NOW)).toEqual({ resting: { generatedAt: NOW, entries: [] } });

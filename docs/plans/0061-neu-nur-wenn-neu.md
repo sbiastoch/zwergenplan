@@ -303,6 +303,10 @@ Gleiche Kette wie in Etappe 1, mit Ruhe ab dem ersten Lauf (05.11., leer):
 - **„Neu“ am 18.11.**: 83 im echten Stand, 71 nach Etappe 1, 69 mit Ruhe. Die Erwartung von etwa 55 stimmt nicht: Die meisten Lücken aus B1/B2 begannen vor dem 05.11. (Wolf Pack 02.–04.11., vhs Fürth 02.–07.11.), als die Ruhe noch leer war (Risiko „Start mit leerer Ruhe“). Den Rest der Fehletiketten hatte E1 schon behoben (Familienbox).
 - **Größe** von `data/ruhend.json` nach 14 Nächten: 74 Einträge, 43 kB. Bei 56 Tagen sind es hochgerechnet unter 200 kB.
 
+### Nebenbefund Stop-Gate: Zombies zählten als lebende Prozesse
+
+`scripts/heavy.test.ts` („… danach ist die Gruppe leer“) war in der Cloud-Session dauerhaft rot und blockierte Stop-Gate und pre-commit. Ursache war ein echter Fehler in `alive()` (`scripts/lib/process-group.ts`): `kill(pid, 0)` gelingt auch für Zombies. Erntet PID 1 verwaiste Prozesse nicht (Container mit `process_api`), bleibt eine beendete Gruppe „lebendig“. Die Korrektur liest unter Linux den Zustand aus `/proc/<pid>/stat`, ein Zombie zählt als beendet; ohne `/proc` gilt das Signal 0 wie bisher. Test: `scripts/lib/process-group.test.ts`. Damit sind die beiden `--no-verify`-Commits dieses Plans (`0431d8c`, `dfc8f47`) nachträglich durch ein grünes `check:fast` gedeckt.
+
 ## Restpunkte
 
 - [ ] Nach dem ersten Nachtlauf mit diesem Code: Fixture neu einfrieren (`node scripts/pipeline/freeze-id-continuity.ts`), `EXPECTED_DUPLICATE_LOSSES` leeren (der Test erzwingt es), Commit mit Begründung.
