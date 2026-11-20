@@ -170,7 +170,7 @@
    "inputHash": "a62ddbc82a4debe7774e13486a8b9fb5e5181b3a5019574b29d80c007cda15c2",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -179,8 +179,8 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP (geb. Juni–Aug. 2026), donnerstags 14 Uhr",
-     "summary": "Spielanregungen und Sinnesreize für Babys im ersten Lebensjahr, dazu Austausch für Eltern. Die Kursgebühr gilt für eine/n Erwachsene/n mit einem Kind. Handtuch fürs Kind und leichte Kleidung mit Socken mitbringen.",
+     "title": "PEKiP (Babys geb. Juni–August 2026)",
+     "summary": "Entwicklungsbegleitung für Babys im ersten Lebensjahr mit Sinneseindrücken, Spielmaterial und Austausch für Eltern. Handtuch fürs Baby und Socken für Erwachsene mitbringen. Manche Krankenkassen bezuschussen den Kurs.",
      "topics": [
       "pekip"
      ],
@@ -191,12 +191,12 @@
      "sourceUrl": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
      "category": "babykurse",
      "age": {
-      "minMonths": 2,
-      "maxMonths": 8
+      "minMonths": 1,
+      "maxMonths": 12
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzstand in der Liste nicht angegeben; Anmeldung über die Detailseite"
+      "note": "Platzangabe nicht auf der Übersicht; Anmeldung über die Kursseite des Anbieters"
      },
      "schedule": {
       "kind": "weekly",
@@ -204,49 +204,16 @@
        "TH"
       ],
       "start": "14:00",
-      "end": "15:30",
       "from": "2026-11-26",
       "until": "2027-02-04",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "Schnupperstunde PEKiP (geb. Juni–Aug. 2026)",
-     "summary": "Probestunde zum Reinschnuppern für Eltern, die noch unsicher sind, ob PEKiP passt. Handtuch fürs Kind und leichte Kleidung mit Socken mitbringen.",
-     "topics": [
-      "pekip"
-     ],
-     "format": "einmalig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
-     "sourceUrl": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
-     "category": "babykurse",
-     "age": {
-      "minMonths": 2,
-      "maxMonths": 5
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Platzstand in der Liste nicht angegeben; Anmeldung über die Detailseite"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-19T14:00",
-        "end": "2026-11-19T15:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "zoff-harmonie",
-     "venueId": "zoff-harmonie",
-     "title": "PEKiP (geb. Dez. 2025–Feb. 2026), dienstags 11:30 Uhr",
-     "summary": "Laufender PEKiP-Kurs für Babys mit Spielanregungen und Austausch für Eltern, Kurs endet am 15.12.2026. Laut Programmseite ausgebucht.",
+     "title": "PEKiP (Babys geb. Dez. 2025–Feb. 2026)",
+     "summary": "Laufender PEKiP-Kurs dienstags für Babys, geboren Dezember 2025 bis Februar 2026. Laut Programm ausgebucht. Handtuch fürs Baby und Socken für Erwachsene mitbringen.",
      "topics": [
       "pekip"
      ],
@@ -257,12 +224,12 @@
      "sourceUrl": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
      "category": "babykurse",
      "age": {
-      "minMonths": 6,
+      "minMonths": 1,
       "maxMonths": 12
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "Ausgebucht laut Programmseite"
+      "note": "Laut Programmübersicht ausgebucht"
      },
      "schedule": {
       "kind": "weekly",
@@ -270,17 +237,16 @@
        "TU"
       ],
       "start": "11:30",
-      "end": "13:00",
       "from": "2026-09-22",
       "until": "2026-12-15",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     },
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP (geb. Apr.–Juni 2026), dienstags 9:30 Uhr",
-     "summary": "Laufender PEKiP-Kurs für Babys mit Sinnesanregungen und Austausch für Eltern, Kurs endet am 15.12.2026. Neueinstieg nach Rücksprache nicht angegeben; Anmeldung über die Detailseite.",
+     "title": "PEKiP (Babys geb. April–Juni 2026)",
+     "summary": "Laufender PEKiP-Kurs dienstags für Babys, geboren April bis Juni 2026: Sinneseindrücke, Spielmaterial und Austausch für Eltern. Handtuch fürs Baby und Socken für Erwachsene mitbringen.",
      "topics": [
       "pekip"
      ],
@@ -291,12 +257,12 @@
      "sourceUrl": "https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip",
      "category": "babykurse",
      "age": {
-      "minMonths": 2,
-      "maxMonths": 8
+      "minMonths": 1,
+      "maxMonths": 12
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzstand in der Liste nicht angegeben; Anmeldung über die Detailseite"
+      "note": "Platzangabe nicht auf der Übersicht; Anmeldung über die Kursseite des Anbieters"
      },
      "schedule": {
       "kind": "weekly",
@@ -304,18 +270,17 @@
        "TU"
       ],
       "start": "09:30",
-      "end": "11:00",
       "from": "2026-09-22",
       "until": "2026-12-15",
-      "skipHolidays": true
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "2e9e3032d3784bb82a21fd4f37f356233b84bb07e3badbc3c97b2f91635e7803",
+   "inputHash": "83ef2c74d07b7b1e34a0acff3205ea6ae14214da5a4043a74a0d548e41d12d32",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
+   "changedAt": "2026-11-20T10:02:41+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/fenkid": {
@@ -323,7 +288,7 @@
    "inputHash": "7dec4a0dda160e9dd229b8a2361e586180d08acd994edf0c3ea5e8c3f8fe8c17",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -433,7 +398,7 @@
    "inputHash": "1191e7196a3b6d4af8ab9a0f9d6cdfc15119b6f201655c5dd6d12031522867be",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -512,7 +477,7 @@
    "inputHash": "e8f2b51135bc88c3162a9c7c607e9b8d8048f3f63ab5c72eebf820c0e2835097",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -555,7 +520,7 @@
    "inputHash": "b0f0cd537b118e472fefb53a675945ba581145c8531f1282738d875754fa2e11",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -564,7 +529,7 @@
    "inputHash": "c9452e09995dab30629b11d5c6d5a8ea4aff7f094f651daba85b4935102bfb09",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
@@ -574,7 +539,7 @@
    "inputHash": "352bcaa7d1bf11f0bebbd21b99006b92499187da1d2f418e0fcfdda8daf2a5af",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -583,7 +548,7 @@
    "inputHash": "fae2a67cf63b71b4279877b0a8ce0c70497d3495fe79bf505b7f50d0e9b2b937",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "stadt-vk"

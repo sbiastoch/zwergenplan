@@ -177,7 +177,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -306,7 +306,6 @@
    ],
    "inputHash": "65acb1193277cc55ced981affa2dcf8c05d2a94de948b400998a3d4465db67d3",
    "dated": {
-    "2026-11-19": "252ab7086d004d0b8a8588f4aac3ef0bf077acd9404a6bcfc155e12801693ace",
     "2026-11-22": "08112c8f4f4e5f76bba7cc1ef841602c7fa80360965a83ee1d786ba714b98d16",
     "2026-11-23": "a8bafcf4b2c82c5dd908d8b096f5b21583b77794c69a5b4cc6668cee9096816e",
     "2026-11-24": "cfd809087b096559b17064b663fe8b8a62861270546ce27fb7857965ef259249",
@@ -599,7 +598,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -639,7 +638,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -680,7 +679,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -688,18 +687,18 @@
    "events": [
     {
      "providerId": "ev-langwasser-miniclubs",
-     "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Passionskirche (donnerstags 9–10:30 Uhr)",
-     "summary": "Eltern-Kind-Gruppe für Familien mit Kleinkindern: gemeinsames Spiel, Austausch unter Eltern, erste Lieder und Reime. Rückfragen zu Anmeldung und Ablauf beim Veranstalter.",
+     "venueId": "ev-langwasser-miniclubs",
+     "title": "MiniClub Montag 15–17 Uhr (Dietrich-Bonhoeffer-Kirche)",
+     "summary": "Eltern-Kind-Gruppe im Gemeindezentrum: gemeinsames Spiel, erste Lieder und Reime, Austausch unter Eltern. Die Termine sind bis Ende Dezember 2026 bekannt. Kosten und Anmeldung beim Anbieter erfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "elterntreff"
+      "spielgruppe"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8009820",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8009820",
+     "url": "https://www.evangelisch-in-langwasser.de",
+     "sourceUrl": "https://www.evangelisch-in-langwasser.de",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -707,15 +706,61 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle."
+      "note": "Keine Platzangabe. Anfrage beim Anbieter (Kontakt über die Gemeinde)."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-19T09:00",
-        "end": "2026-11-19T10:30"
+        "start": "2026-11-23T15:00",
+        "end": "2026-11-23T17:00"
        },
+       {
+        "start": "2026-11-30T15:00",
+        "end": "2026-11-30T17:00"
+       },
+       {
+        "start": "2026-12-07T15:00",
+        "end": "2026-12-07T17:00"
+       },
+       {
+        "start": "2026-12-14T15:00",
+        "end": "2026-12-14T17:00"
+       },
+       {
+        "start": "2026-12-21T15:00",
+        "end": "2026-12-21T17:00"
+       }
+      ]
+     },
+     "via": "evtermine"
+    },
+    {
+     "providerId": "ev-langwasser-miniclubs",
+     "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+     "title": "Mini-Club Donnerstag 9–10:30 Uhr (Passionskirche)",
+     "summary": "Eltern-Kind-Gruppe im Bühnenraum des Gemeindehauses: Spiel, erste Lieder und Reime unter Anleitung, Kontakt zu anderen Kindern und Eltern. Kosten und Anmeldung beim Anbieter erfragen.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8009821",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8009821",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe. Anfrage beim Anbieter (Kontakt über die Gemeinde)."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
        {
         "start": "2026-11-26T09:00",
         "end": "2026-11-26T10:30"
@@ -859,56 +904,10 @@
        {
         "start": "2027-11-11T09:00",
         "end": "2027-11-11T10:30"
-       }
-      ]
-     },
-     "via": "evtermine"
-    },
-    {
-     "providerId": "ev-langwasser-miniclubs",
-     "venueId": "ev-langwasser-miniclubs",
-     "title": "MiniClub Dietrich-Bonhoeffer-Kirche (montags 15–17 Uhr)",
-     "summary": "Eltern-Kind-Gruppe im Gemeindezentrum (Blaues Sofa): gemeinsames Spiel, Austausch unter Eltern und erste Lieder und Reime für die Kleinen. Rückfragen zu Anmeldung und Ablauf beim Veranstalter.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelisch-in-langwasser.de",
-     "sourceUrl": "https://www.evangelisch-in-langwasser.de",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle."
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-23T15:00",
-        "end": "2026-11-23T17:00"
        },
        {
-        "start": "2026-11-30T15:00",
-        "end": "2026-11-30T17:00"
-       },
-       {
-        "start": "2026-12-07T15:00",
-        "end": "2026-12-07T17:00"
-       },
-       {
-        "start": "2026-12-14T15:00",
-        "end": "2026-12-14T17:00"
-       },
-       {
-        "start": "2026-12-21T15:00",
-        "end": "2026-12-21T17:00"
+        "start": "2027-11-18T09:00",
+        "end": "2027-11-18T10:30"
        }
       ]
      },
@@ -917,55 +916,54 @@
    ],
    "inputHash": "6f986df1dae2b4e4a05686667a4f52adb4c1faa34770a470fa535f36669437eb",
    "dated": {
-    "2026-11-19": "44424a400e34ebc879ce1b105eba5db49a7078bca91e8a14926d326a406cb258",
     "2026-11-23": "52c95a1e91f08311c10e32cacbc5ac7dcbf93a5a4cd99bbc4ee31f3bc20f8a78",
-    "2026-11-26": "85916bf1f7c1c7efa3b0be0b04fab6d140d340da7a882ac8b24202300b94f1a5",
+    "2026-11-26": "e6f7cd91bed0ffab0728392057e8468da08794ff583a8fac0e85fc0bdf2a4506",
     "2026-11-30": "6197cc7438dfc5f213382080486df31f0077b95bb14074f7aa3b44874d0fb213",
-    "2026-12-03": "1ee9f22cd7a01f440172f6e7e1cb9c1ea3c7aec42afdca20e942a0b15f216f7a",
+    "2026-12-03": "01f62fb6c8a71b982c0d982b7bb665fbe05f7c557fe3b409c175c0b4b1bd5655",
     "2026-12-07": "7ba60b4409fb3d2d28a35e41bac0629c7727d9615e14e11ddff579e97113bcac",
-    "2026-12-10": "3c7984efdab265943ff61b8cebec9ddb6da5797ecf46ad5a58b3838c7cb68273",
+    "2026-12-10": "92e17dae7e4536bc7a145e67eb3058427c37386c85e60d9ec0bdcec7707b5682",
     "2026-12-14": "aea5af73eafc9c0f00d1d6c9207911a685b1103af2803113995aa8a05f88a104",
-    "2026-12-17": "1b9f544e335d839693697be4f84a2de479fdd65718f61ab413b26e424d1c60e4",
+    "2026-12-17": "952fd06757fa9b79b11b194ce3d96614add44857ea404398d10ba4cc3459ab2b",
     "2026-12-21": "0732535b8483cf2f38149a1c20a15b5149cc4e769e187a4114d4858f9617c292",
-    "2027-01-07": "87cf65cb01b1c73d275219fa3c67498d5b6838c96477747ff101124498519204",
-    "2027-01-14": "1cf66c4af7a7f649f650bef45c239e21a31c6e52fabeddc2b863d5c6586ae3bc",
-    "2027-01-21": "d7dd3cef52437a71a47cf0e6748a48743479923456056992217532f12e63c318",
-    "2027-01-28": "627c4419b7a8ddc79a0eccfebc8340040445cf0140c9dfeaffdc7fe00449e94d",
-    "2027-02-04": "0a597fd4d35ec500ac3c0fc7b72685aa1530b9838cb0738c1f12db91dd5694ed",
-    "2027-02-11": "c0f10967be1868bf9da323f5ab309256a0331590ba7da108761ea2b7928eb0cf",
-    "2027-02-18": "2c3469bef579fac0bc0e6b5878881d2cd5f9650b1f71699636fed864c939cc5a",
-    "2027-02-25": "e54863b4e52165a1d0dd108181af213692f3f42b28145afa2c5d9995df01e391",
-    "2027-03-04": "8d9bb804a88080931492a76b54ed989b95989c0c798369cdd906915f3b22f456",
-    "2027-03-11": "02e9c7ba6f8b297465d65583bf1cd6d8a9e4e76f381c07b84e12a6d1af39b33d",
-    "2027-03-18": "f3b900c77f4790d2dbde3b0eb4f866b41c66bf8a0f41a8663da11c412f21bf9c",
-    "2027-03-25": "a10f9a45197c10bafaa141a8af8572cab854c47c82d95aca7760c668b560c19a",
-    "2027-04-01": "ff0d01d9ebf15c8e7baedf926f2afc2323bbb95fc438bf7d5be40ac03da1126b",
-    "2027-04-08": "4ac7b7b97a6988e419a67e78dbcdf6a00750c1192dba1badd7ca71dea3ed5014",
-    "2027-04-15": "4bd2330ed9c90e1edc9338a610c1fb5f28f88c6e1ffd0cb80a8e12f1d7028852",
-    "2027-04-22": "8d36b47e60936aa0d6826f36739b5c3c4791e4cdf8f579e24b1ac885c2b65a15",
-    "2027-04-29": "dbb5a3154aff5ab8229c602c565fbabff3efbad02d643f98446bfc0f1df6ca0a",
-    "2027-05-06": "ad1c5767b0dec1f98993bd43e31b8b1d12e1ce8eb99075287e37191cbb765cbb",
-    "2027-05-13": "40e02669614e6a9b49920c888038706dd7fc777336de4bd121539e53d62bd6ba",
-    "2027-06-03": "188f0a2f0bc30e07fecc28d930c1e9956774c8ec4106355b75f247fcb3818da8",
-    "2027-06-10": "147db453cb13a17c9d7f4c6d16c2e3ace93365073d05bd229737f6c4499aabaa",
-    "2027-06-17": "cf124f241055e862687a5bd0618bbbf57ddfa25e02b61bed7bcb9017faf7f06b",
-    "2027-06-24": "8136e8cf107ae171ca4316bd3aa18d6aaf58600bbabaa8510a2f4682f47f600a",
-    "2027-07-01": "715f2b8f3b746847c42801e42aa53224d8726b91e4d98e8e9fdbd08fa952587e",
-    "2027-09-16": "cc119c1b074c4d981c35e401e8854f3e82114f4b7c8aa0c446e9197915be5632",
-    "2027-09-23": "a96fcf1c649d5094165b7cbcbf147c6c87971d2f6de4122ba4b6aa13b2cb0d3a",
-    "2027-09-30": "03d2689e434fc0e5090e19701b9ab25cadaf91af970376d52e5ff336c302adbb",
-    "2027-10-07": "5e58d0c8a6175bf3ab227a4fe5eb47e21bf058d5c5c878ebf7934e7015da4eed",
-    "2027-10-14": "7ac30bfc5a36edafcb4e7cdf680cfd9473a52bb839492c70894f6d39542666e8",
-    "2027-10-21": "55a2f153313fdb47535a6c93248a21cdf8823dd9a211d9be1f661e60f0abffbf",
-    "2027-10-28": "7a09b5c007afdafcaed0c4b956f9d409a8d46184ab611376d6115c0a953d4f6b",
-    "2027-11-11": "00247944a169955a244e68c424f26046a9060bba65af32467998fe35a538c1e3",
-    "2027-11-18": "a39221b508128aa6f2739f4c8659d633cfe3cd974a4a1720ced71f9384bfa5ad",
-    "2027-11-25": "6d28fefdb128447ca8d4d4813f590ce84708e5ef419016061f4df48f4c96a61e"
+    "2027-01-07": "c095badd68bc868215001850135e90209b36a77675241840c3a95814044255e5",
+    "2027-01-14": "da0880da84a87f5ba0ab2d61993666f750a2457e55b99c073cce7545aebc5796",
+    "2027-01-21": "8f4bd3ad9291a0cc1713ecda036e801ed9761bee529e5799064df59cc73beb47",
+    "2027-01-28": "e8c8410855dc8c8d647ee5cca2a61b825308e6e659a832b427aa924a5be0d0f3",
+    "2027-02-04": "944af74d8eaff203c9f0c84bd2d7819f631247723e0c7aa92538a89af57310a4",
+    "2027-02-11": "41c87ca661e3da3ca2578d2597e028f105adebf2133dd19533a123660f508905",
+    "2027-02-18": "f4a812132cd759e933f50b69ee752c3bf3d43788e7b26246aaaa63a0171dc10d",
+    "2027-02-25": "e525e5154f768ab5a8620f4a099a155bd7289faf1a50cae121a4674af17cf577",
+    "2027-03-04": "e39e96a28204608b8a006de492137dc0dde5e8fa84c5d786d7828c78b832a313",
+    "2027-03-11": "12280b75d1c75896a5724e1f94855afff6b3971f081a685ffe624622a1de565c",
+    "2027-03-18": "c3ece11ff29e6eb6b6b8e4ee88a2d00643f87bc443ef08ef106afcdb0611a430",
+    "2027-03-25": "e3608ed1bbb0c6e74e6a8e5ae7d8500c48fe64344f227000e74317db53240a8a",
+    "2027-04-01": "d164f68dc276e4b820ca12955cdbc09a66867083579a383b3603158c08a178ca",
+    "2027-04-08": "c5c2b48f8284ceaea7350f5d93fd9ef634687751cb96c0771f9b16fdc56e8932",
+    "2027-04-15": "1d35b2a4fda3e92d729216afb9f3e06f235f38e7d3b87cd2924ed2d88b3b9acf",
+    "2027-04-22": "541a21ff91117a3396bb4f9495f84e4d660e90729edf207d5e1d017950015b26",
+    "2027-04-29": "08446d20abf033f08fc96c984493739149247cb01e2a1a0a7270e299b89f7a45",
+    "2027-05-06": "eb46bf2d639e789b2276dd97f899866a4190c29239bd80d0e66a27c7dbd374ac",
+    "2027-05-13": "ee04fed3f7a44ccc43f90805194a10ec5a2076653400530a61f56e25c36856d6",
+    "2027-06-03": "bd81adc1f03fe778270028abe38da4251edcc7b57e8832f87851841ea509dd5f",
+    "2027-06-10": "34398e83e9e559c95589deed6023519529af6ba102f13009517eccd40690dec2",
+    "2027-06-17": "1015f26fc5a7fd0b7855027ba213bb1277fb47dab7a55ac87fd70416c4f136d5",
+    "2027-06-24": "a52210f5b6aed6b052e465d92ef3afbe82869f8f24980051b552da387eb785c8",
+    "2027-07-01": "71e8c92a533aad7c27e66debdc260ca0a49a191e1e80fd170569830670589cc0",
+    "2027-09-16": "15016859d7a13b2a2ce12cd66e728a2409d8fc06442d82d6207e3f654b801c9e",
+    "2027-09-23": "37c162b8fede3e3c62ea16c52ffa100cef945e5543c4ed847f0ccfa7beeb2cb0",
+    "2027-09-30": "6a9d6f41e5a6fc313688f411d6e1751a77d1d8a2432c0d5d52c5dd47e0c11a13",
+    "2027-10-07": "c92f97b8fb8fefb8595f5eedeb2008ec59c25395af46d9a9e194f725b5c85b79",
+    "2027-10-14": "7df9d650cf56e56805f510aa0c6da16f29dd81cf14bf43b70937d8bc180031d6",
+    "2027-10-21": "81b909e76833d2e32fca356332d5dec42c4c4d3186530ea8d55d6ee0f8f2f13a",
+    "2027-10-28": "8d3c2d22652fb95637fa66deaaa8f0d475e10e65b4eb52694e3dcdbe4a2991e0",
+    "2027-11-11": "fdf53d0b350d2890fb7ee9a5345d4d7f300a82f6cb10460c989862842a88c342",
+    "2027-11-18": "5bcb489f7bbf3ba98c16f3e24f779df16811fc4e5a7e6d0f736f2cacebadf1cd",
+    "2027-11-25": "91ce79d94abac16f242d941467a03a2d98fca851c3ef77a2714e26b6aae0fdf9"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
-   "changedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
+   "changedAt": "2026-11-20T10:02:41+01:00",
    "sources": [
     "evtermine"
    ],

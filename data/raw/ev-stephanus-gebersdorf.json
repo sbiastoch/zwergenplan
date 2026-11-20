@@ -6,8 +6,8 @@
     {
      "providerId": "ev-stephanus-gebersdorf",
      "venueId": "ev-stephanus-gebersdorf",
-     "title": "Eltern-Kind-Gruppe Stephanuskirche (donnerstags, Väter und Mütter mit Kind)",
-     "summary": "Donnerstags 9:30 bis 11:30 Uhr im Gemeindehaus: Spielen, gemeinsames Singen und Austausch für Eltern. Die Quelle nennt weder Anmeldung noch Kosten; bei der Gemeinde nachfragen.",
+     "title": "Eltern-Kind-Gruppe donnerstags 9:30–11:30 (Gemeindehaus Stephanuskirche)",
+     "summary": "Eltern und Kinder spielen, singen und tauschen sich zusammen aus. Die Termine stehen donnerstags von 9:30 bis 11:30 Uhr im Gemeindehaus Gebersdorf; Anmeldung ist nicht angegeben.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
@@ -15,20 +15,20 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=7670265",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7670265",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=7670266",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=7670266",
      "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung; Anfrage bei der Gemeinde Stephanuskirche Gebersdorf."
+      "note": "Keine Angabe zur Anmeldung im Kalender; beim Veranstalter nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-19T09:30",
-        "end": "2026-11-19T11:30"
-       },
        {
         "start": "2026-11-26T09:30",
         "end": "2026-11-26T11:30"
@@ -160,6 +160,10 @@
        {
         "start": "2027-11-11T09:30",
         "end": "2027-11-11T11:30"
+       },
+       {
+        "start": "2027-11-18T09:30",
+        "end": "2027-11-18T11:30"
        }
       ]
      },
@@ -168,47 +172,46 @@
    ],
    "inputHash": "312a586887fa297b3d6c8cceed85e603eb732dc84f03c12e61326c42b6a50d27",
    "dated": {
-    "2026-11-19": "ea4de867235e6b8d678d23b1148381da326af29f846b61542d652e0d864ebc1d",
-    "2026-11-26": "c111d15be0ddb973f19c6121144d3ee87881612e4f6fd814c991c3b6ed87c877",
-    "2026-12-03": "ca903b2d0427d042588a3bbc0522f5f978623f34cc79cb4cc698e602daacc5a0",
-    "2026-12-10": "8d34cf750a6df0b7fc996a5fef1c682c2e3ac1ba9bdd4d9c7c3dd0379e487ff1",
-    "2026-12-17": "5ebce706baaeee3c761081566afe510475026b2e04c30dcd1a847c32f876afbf",
-    "2027-01-07": "93feebe78d7c1e2b6cd394ac62c37e0c332a125714b73b7cfcc5303d1b20bdc2",
-    "2027-01-14": "5b93233edf8ffa422aaba92dbc850e9d8e98ee9adb69acbca88fd61b3c47bb8e",
-    "2027-01-21": "1fd3ca1877db042da3e6627f9a69dc0be0ec158910d0da885538759ad3a3ad10",
-    "2027-01-28": "1261fc4be77888dee0c8c1cbcc8b4f28e43c827e6e77e448a9b6a31c381cd000",
-    "2027-02-04": "98b822d961d81eab681fa96d1776d58ff0108d31ec511656fcef1f0d5ec15156",
-    "2027-02-18": "c0607ca654ff3a711b9e040e614ee18ef5efc6179d433438987ac93baf335b6a",
-    "2027-02-25": "b579ced0624c2469f8df9d2fdcb32d715807c57a50b44589fd1d029b6907d88c",
-    "2027-03-04": "d7cece950f3e5657311b59e14d6c389ccb23209ca9e75deb04310d0a9b4c409d",
-    "2027-03-11": "68cdc0bc3f1f5f7901c4dc9a3cf7b055d36266223f07f4464331bd2eca5a257e",
-    "2027-03-18": "6c9499c2dbd173e09c8e8e7cc12f8491d3dcdf1fba8a51f7016615291d8daf88",
-    "2027-04-08": "d51498465b0cf33c119a33819b64de87d37f0ae0bc010de548118c29be15884b",
-    "2027-04-15": "2ae597d56e33c374e65155536581d41c5e999681d7b56e070a3ab68ae2fc0e96",
-    "2027-04-22": "9c35120a935235266631d113727a6f1a8d1a21736de9702422c967b2e69cab55",
-    "2027-04-29": "f6d774229bc31c3440962325f1ba91d61f5549456ee0d3774b53ebe14c94df8e",
-    "2027-05-06": "0210e015b542313863eec83a17b164eb5bbc9d6addab15df34af884c202ecb3e",
-    "2027-05-13": "16ac5b3c3de2f9cd0dc73ec3c531479effe7f971575ec93c74d68f4058a29633",
-    "2027-06-03": "39bd78aede940714517aef7d14cc8835a987b0bbe3d90f9664219a478ab8d2c1",
-    "2027-06-10": "f532e425a46b10b66729f0c1eece11c0809305a903f93cdb77bce0eb87acb3bc",
-    "2027-06-17": "e96396a666f9caff75ac7be67272f4d4908e669af47559e7aaa95b23d32a14ee",
-    "2027-06-24": "a21341e2dfbc367d911b8c44a72864c3cf16a13c86a817bc3b3056d02a567aac",
-    "2027-07-01": "d77754480f63e67fd778d37b834c31ae9e0faf25897033066ebe6cca9e5aa0c4",
-    "2027-09-16": "e1b7741e1914d0b21c83a5b489b75755f9aa5be40295e28996666416cd21a949",
-    "2027-09-23": "f2304983459e0fa6e2eb7f56c36124d3436035eb143e0e1905035a710ebc7936",
-    "2027-09-30": "339e48945ad75c8e239bd9ecb198b12a3fb01f8c33fa8ce228226f8928ff072c",
-    "2027-10-07": "6b857d473117d448de7e36653670c895427414b7adcf04fed16b8a01769104b1",
-    "2027-10-14": "ed8a2811455b321b08d0a795e1c2c33f585f98044c01dfa25e019ea89e98c931",
-    "2027-10-21": "e4117579017884b17889058f4df1c1f3dc349dedeec30c7861041a4d3915309d",
-    "2027-10-28": "513bdfc01cf8830cbc769b56f34f3c27b06b049f0b6f576a6223f893bf72dcff",
-    "2027-11-11": "5a7046f79232522104a82b15892ca0c67247675d784890c2eab907f78fb73ff1",
-    "2027-11-18": "6f6f503b2e35d17a5a637f84941f75b1de91d5afb146580c63defe016a3082ba",
-    "2027-11-25": "da8f7f5e5280e426f2ebc7abd70d920edb274b8489f47ff3a2a82fbb623dc8ee"
+    "2026-11-26": "e76366dd563835ec02f177a34c8f0488ea6008acea93dd87461f4c4cf57e6f13",
+    "2026-12-03": "57eee82c577d25e664945fd565d9375721f5c7e4f41877c103cb00479d0c3906",
+    "2026-12-10": "94dfd0337cd9b55de95e86d1d95815725f06a7b8fc10c1cc97d522ddd6afd0db",
+    "2026-12-17": "b91c76d70b5d8c6a882f6dfecb922d8a7e0532a0ec11044cb8f05a4b18d97168",
+    "2027-01-07": "0f0ec581df4eaaef6d09c03157e728dfcd0650c045c89b574ef35f3e3df4c815",
+    "2027-01-14": "2342c7591e8ade383af7e7a043c2ece370564c772a7c4219302ad10c03bc95eb",
+    "2027-01-21": "7f6c92b53859d90ef77a179ad48ea538b3ee8cca27fd1f2d6550a80be990985c",
+    "2027-01-28": "1c71a25f193d9d7dedc6097e4a53d6d5b5e3e503a6fc656c44b55285e06d9c7a",
+    "2027-02-04": "b0a60ffc005fa3f90ed161fa4824f6e5719acea0fc0776aab9681caf6fbf4ba8",
+    "2027-02-18": "b434cc628992bf5bb2c91538b1057396dadbde60e7b6e499074043b0a1c6db27",
+    "2027-02-25": "2b09097273ced1d1a0e520f611418e25a0e505a3b74ad11c363ea4fc6ae5cb63",
+    "2027-03-04": "a213d43a4f05973851928529daa257162944a36c085f7607848270241d31d5b9",
+    "2027-03-11": "e4e3b6480b5019a189ead11681dd091c1dfcd44ea19740e76f1dc4d5fe97d935",
+    "2027-03-18": "38d2e73cd8a91f8c6d247b4033eadb202235534c12a2a85228867c994b1d09ce",
+    "2027-04-08": "f569176e6efdc9e7913bc7c802e9c4e483cc8466568d2b9e262b7a008edf270a",
+    "2027-04-15": "9c067ef4b4d625c122c5a341789ab96e116f10cd7347c1e0d206448bea8b4b87",
+    "2027-04-22": "5d98e57bb2c718eb53a4de94ad260f0c6cde2e7d9ca237accd5ece958b1b6dab",
+    "2027-04-29": "cddb84fcef6c61a186216041233eab7ee68ebf1e7a2c30943deed1f3d5e4a2b1",
+    "2027-05-06": "250235d72632f29c6d24bbede9bbeaed228614e1e295c0c02616517113689919",
+    "2027-05-13": "0745c4f75db759e8852fe323f2b82c0c72b6a636cddcc2ebd1c0a10344f563df",
+    "2027-06-03": "8433941510912c546b47ac03e3131303aff68e3a1155a3fd142c398ed431f8c7",
+    "2027-06-10": "e8b0dad02fde2e466be282f7b225a2eed941c4c2660e5c4bc3ff66a3e62ab95f",
+    "2027-06-17": "30d86a5d00cb754d146d8cef7eb5ed4ff5e88f4cd89a071f1bdddf87b5290ff7",
+    "2027-06-24": "205e730386e878d66574f75fe8d903537307b506aa31e8a503d7dc46b9c4c497",
+    "2027-07-01": "70d7efd40badc4901e3e109da9bd17dae9d5e8dbbf51e299f971341e320e1dcf",
+    "2027-09-16": "3375de2dd3dd88e9032de19587500cfd8b3b197ff1b901252f37dcd868dadb7d",
+    "2027-09-23": "c95da2ddd0b8f36abf917b5f43bde24ed61ecf722a8fd75111e856ba864c78c7",
+    "2027-09-30": "e3e1dedf1f84a18203c2ef6e66bfca4584ee2b2b046c3ba51439d157f3d4fba5",
+    "2027-10-07": "ef415c1f9e0e4528e81b41e7969cb741fd10169bc3185790370fd90075935bbf",
+    "2027-10-14": "b0cc29aee1c5fccbb110b83b9f3686d96a4213a29ee2ab81da864dfbe1f5a523",
+    "2027-10-21": "3e4981fcc09e30cf47f0edaa82a88d25b79c385270cb3086dbb72d1b8758824a",
+    "2027-10-28": "bd0eaba2573087f57feb62e2b266468a5ec8d77f3c57c89c2dd9672adc0ea39d",
+    "2027-11-11": "c366ddba312b70d9fc3d90dafd4ddb5aa8f8138e8b74ec4874f6ba8d0cd8f650",
+    "2027-11-18": "3ac4f9d73cdb5454bd413d6d88232e4a5802dcf6945354831b926cc6b7c164cf",
+    "2027-11-25": "f53e47f4ed125de0f044f916235d2a2662f44875eb7407df1b678d14358d082c"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
-   "changedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
+   "changedAt": "2026-11-20T10:02:41+01:00",
    "sources": [
     "evtermine"
    ],

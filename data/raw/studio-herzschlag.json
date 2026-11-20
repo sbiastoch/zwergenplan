@@ -6,7 +6,7 @@
    "inputHash": "b9428c13a945053e7635467ce0338b83bc59e102ebe125303e0ca4abad709146",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-18T10:00:22+01:00",
    "emptySince": "2026-11-18T10:00:22+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -265,16 +265,16 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/sinneszauber/": {
    "events": [],
-   "inputHash": "c66c181fc1c4bef591cc7e40882e820ea2938ca28520f2d572cc9c71a4a8ab0a",
+   "inputHash": "7fc8aab5098512276b975a5164f6b90f1352ccb4b6b3eb22ca1a399b017d1c9d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -283,7 +283,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -293,7 +293,7 @@
    "inputHash": "f8d34b4cf4d218c28a47bd907c7b50aa9d16116ee2ff516d8c893a3eda7f7423",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1319,7 +1319,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1407,7 +1407,7 @@
    "inputHash": "dd46f21cb83e4fbde9c16b57c9c2ac141eaf8280dbdf7f6d117dd2e32da5b1da",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-17T10:40:21+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1416,7 +1416,7 @@
    "inputHash": "24d8849e02b5304218fb6e85fc2e4863176dbdba75036f202cd9413e2da2030a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-18T10:00:22+01:00",
    "emptySince": "2026-11-18T10:00:22+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -1426,7 +1426,7 @@
    "inputHash": "acd760675c6f4b513f8b8ae6ad9d1cba4091deb3c5fe395abc175a35843d2714",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1435,7 +1435,7 @@
    "inputHash": "a7dc231dd13d385f2932c25607d5b84fe7b2671777d693eeebec9852531daf63",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1443,9 +1443,13 @@
    "events": [],
    "inputHash": "31e145270dd52d1a037406019cbc81daef6341f693f23c815e75ce1495e3a33d",
    "model": "haiku",
-   "status": "keine-termine",
+   "status": "fehler",
+   "reason": "https://studioherzschlag.de/angebot/pilates-fitness-mit-baby/: fetch failed (UND_ERR_CONNECT_TIMEOUT)",
    "checkedAt": "2026-11-19T10:17:22+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
+   "failingSince": "2026-11-20T10:02:41+01:00",
+   "klasse": "voruebergehend",
+   "klasseSince": "2026-11-20T10:02:41+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/outdoor-fitness-mit-baby/": {
@@ -1453,7 +1457,7 @@
    "inputHash": "84ddaa871c538bd5e40801f492379f55e3edd28a6576f3e655796909216baf05",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -1463,7 +1467,7 @@
    "inputHash": "4aec1d34887f43cfeb398aa15c680181abfab25b6c7fffcc259a886032f64b57",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1472,7 +1476,7 @@
    "inputHash": "738fb300f112a073b3f8918ab0dec8894685d481bce10c39f8d91187bf69b445",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1519,7 +1523,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"

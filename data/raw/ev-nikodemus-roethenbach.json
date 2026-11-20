@@ -6,8 +6,8 @@
     {
      "providerId": "ev-nikodemus-roethenbach",
      "venueId": "ev-nikodemus-roethenbach",
-     "title": "Krabbelgruppe Mittwoch (Kinder bis 3 Jahre)",
-     "summary": "Vormittagsgruppe für Kinder bis 3 Jahre mit Eltern im Gemeindezentrum, zum Austausch und für gemeinsame Aktionen. Zum Mitmachen bei Diakonin Marion Hanek melden.",
+     "title": "Krabbelgruppe bis 3 Jahre – mittwochs 9:00–10:30",
+     "summary": "Wöchentlicher Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -15,8 +15,8 @@
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.nikodemuskirche-nbg.de",
-     "sourceUrl": "https://www.nikodemuskirche-nbg.de",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8107483",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107483",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kontakt über Diakonin Marion Hanek"
+      "note": "Kontakt bei Diakonin Marion Hanek"
      },
      "schedule": {
       "kind": "dates",
@@ -60,8 +60,8 @@
     {
      "providerId": "ev-nikodemus-roethenbach",
      "venueId": "ev-nikodemus-roethenbach",
-     "title": "Krabbelgruppe Donnerstag (Kinder bis 3 Jahre)",
-     "summary": "Vormittagsgruppe für Kinder bis 3 Jahre mit Eltern im Gemeindezentrum, zum Austausch und für gemeinsame Aktionen. Zum Mitmachen bei Diakonin Marion Hanek melden.",
+     "title": "Krabbelgruppe bis 3 Jahre – donnerstags 9:30–11:00",
+     "summary": "Wöchentlicher Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -69,8 +69,8 @@
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.nikodemuskirche-nbg.de",
-     "sourceUrl": "https://www.nikodemuskirche-nbg.de",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8107483",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8107483",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -78,15 +78,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kontakt über Diakonin Marion Hanek"
+      "note": "Kontakt bei Diakonin Marion Hanek"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-19T09:30",
-        "end": "2026-11-19T11:00"
-       },
        {
         "start": "2026-11-26T09:30",
         "end": "2026-11-26T11:00"
@@ -110,63 +106,28 @@
       ]
      },
      "via": "evtermine"
-    },
-    {
-     "providerId": "ev-nikodemus-roethenbach",
-     "venueId": "ev-nikodemus-roethenbach",
-     "title": "Café Niko – Das Familiencafé",
-     "summary": "Offenes Familiencafé mit Kaffee und Kuchen: Jung und Alt kommen ins Gespräch, für die Kinder stehen Spielsachen bereit. Keine Anmeldung angegeben.",
-     "topics": [
-      "elterncafe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.pfar-rer.de",
-     "sourceUrl": "https://www.pfar-rer.de",
-     "category": "treffs-cafes",
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Offenes Café, keine Anmeldung angegeben"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-20T14:30",
-        "end": "2026-11-20T16:30"
-       },
-       {
-        "start": "2027-01-22T14:30",
-        "end": "2027-01-22T16:30"
-       }
-      ]
-     },
-     "via": "evtermine"
     }
    ],
    "inputHash": "ff24f096f9a19b357ee4a1b36e0e85d8bf60cb0515ad70f8c8a46c37e7b5ab31",
    "dated": {
-    "2026-11-19": "cf04753b6e1ea103f685a879653243178aa092897a435794d0d9f9ea57a7627d",
     "2026-11-20": "adebc3e107aa4ebd93162d7f1e9b0051349e3cdd99cda089e1ffd61772152e7e",
-    "2026-11-25": "df8a2b20e8d7111aa02b15b66db4b086699f22b3d3b4e918052eb3eecb6cdc1f",
-    "2026-11-26": "cbb1a82752d3f277bae5daba2a71e087f7f5a44362e69f6164d8063c4498c41b",
-    "2026-12-02": "743ef5845755e7739a523a0edb2d632f238bfc01d33f41f6040ec98fb96bcf61",
-    "2026-12-03": "66ba59db3f256f0d35e777919e27b85c30f5b7ce9e216eedb423aa411a979b6a",
-    "2026-12-09": "44ce7bc23185cf0d1c66951379afd65fbe755a0c9f5644d1fb9b4b23b43cf1e1",
-    "2026-12-10": "1756b5c8c307fa246bb6fd5b1430c94d8d71357fdea01b5d356e155b010983a5",
-    "2026-12-16": "2c398974a4c71f8d1b62f82a22a19731b0fcfac91737bbc625431d5b7e9a6384",
-    "2026-12-17": "a260fead47211627d4ea158fa3dec409f2ba78a6d148f93d3aed9af7c61dad8c",
-    "2026-12-23": "c9f8703567ab6e1575ea85944c39a7af0a8aa120f3ffa5d96c4d5d9376c78c25",
-    "2027-01-13": "9430450f8550114ebd906b984230cc4d102ef839a427eb5cac95c05c501d4084",
-    "2027-01-14": "e0189a264d5437b218bfa9ebedf2d54666f85d332d2c3dc475d53ad903bdc8e1",
+    "2026-11-25": "def62b60c1aa15eacd277423b32fd3f7f769455024a1e8a01332e07a97c79ce9",
+    "2026-11-26": "c457f8fda5d11a189a452041a6395b6462878f813671f5d6e629db4b216b5575",
+    "2026-12-02": "7b039db15d34342ba277245669b46c1464f99554d5b3fb533bd20f600679e8d2",
+    "2026-12-03": "ae130c153a8f3f2cc8bae8b38552246b807e473acf2c0a915a8fc15e7ef73b6b",
+    "2026-12-09": "0e04d457b2870f6c36f89d53ffe562a6bfeb39eee92382837ccaf58afe58b920",
+    "2026-12-10": "5c31b4cdc2bf4cb103939024f12011e5825ce5c2eee8750a45b9392093a180eb",
+    "2026-12-16": "26e56123e9bb539a589d5dd9913abc0d40f3129c91aadaeef34a25d5d222eee0",
+    "2026-12-17": "a86e0d6ec8b4910d24b71d747556d3ec57f4d8448c1875a6f442a5e29d021aeb",
+    "2026-12-23": "c35fc4f113cc208eab27ba8bf0e6b7ea98bcdc2597d0f8b8870fe30ec36487f4",
+    "2027-01-13": "7c2fc49e0210c2838d190a7316a83db443b00f9c324bea5ed3b2169688ba1122",
+    "2027-01-14": "6b1b4f37935f48f0f17b9aebc7b4cc8d026a170a8058186e0e4eab07a5c3193f",
     "2027-01-22": "0db1e5ad15fc7f3ebc6a466da9d9e7edc77ab6c1af5ea8bf6ed2229961c6aca9"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-19T10:17:22+01:00",
-   "changedAt": "2026-11-19T02:10:39+01:00",
+   "checkedAt": "2026-11-20T10:02:41+01:00",
+   "changedAt": "2026-11-20T10:02:41+01:00",
    "sources": [
     "evtermine"
    ],
