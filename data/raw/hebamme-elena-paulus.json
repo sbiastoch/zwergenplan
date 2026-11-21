@@ -6,8 +6,8 @@
     {
      "providerId": "hebamme-elena-paulus",
      "venueId": "hebamme-elena-paulus",
-     "title": "Babymassage (4 Wochen bis 6 Monate, dienstags, Nov./Dez. 2026)",
-     "summary": "Sanfte Massage und Bindungsförderung für Babys ab 4 Wochen bis 6 Monate, fünf Dienstagstermine von 9:00 bis 9:45 Uhr in der Hartstraße. Der Kurs ist ausgebucht; der nächste Kurs ist voraussichtlich ab Februar 2027 geplant, ein fester Termin steht noch nicht fest.",
+     "title": "Babymassage-Kurs (ab 4 Wochen bis 6 Monate)",
+     "summary": "Sanfte Massage mit dem Baby zur Förderung der Bindung und zur Entspannung, dienstags 9:00–9:45 Uhr in Nürnberg-Fischbach. Der Start ist laut Seite voraussichtlich am 16.02.2027, Gebühr 65 € inkl. Skript.",
      "topics": [
       "babymassage"
      ],
@@ -23,41 +23,27 @@
       "maxMonths": 6
      },
      "availability": {
-      "status": "ausgebucht",
-      "note": "Kurs 24.11.–22.12.2026 ausgebucht"
+      "status": "unbekannt",
+      "note": "Keine Platzangabe auf der Seite."
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-24T09:00",
-        "end": "2026-11-24T09:45"
-       },
-       {
-        "start": "2026-12-01T09:00",
-        "end": "2026-12-01T09:45"
-       },
-       {
-        "start": "2026-12-08T09:00",
-        "end": "2026-12-08T09:45"
-       },
-       {
-        "start": "2026-12-15T09:00",
-        "end": "2026-12-15T09:45"
-       },
-       {
-        "start": "2026-12-22T09:00",
-        "end": "2026-12-22T09:45"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:00",
+      "end": "09:45",
+      "from": "2027-02-16",
+      "until": "2027-03-16",
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "7f6d5715c30f5688ad21655732fb7148dbc3363e9b9cc74ad99cfd4196d6b807",
+   "inputHash": "d2c900a7cd0950e820bf28430f029b9665768aecdfbd4913da99b5aa17912c8c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "changedAt": "2026-11-21T09:41:55+01:00",
    "partsHash": "bb9d6fde7e81c173cbc00f829ce7d140fffc7ecaefde6f88961af01e5c6d26bb"
   }
  }

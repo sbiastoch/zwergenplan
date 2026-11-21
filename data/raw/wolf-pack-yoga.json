@@ -6,15 +6,15 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby – Kurs ab 22.10.2026 (6 Donnerstage)",
-     "summary": "Kräftigende, fließende Übungen nach der Rückbildung, mit Atmung und Entspannung; das Baby ist dabei. Der Kurs läuft bereits und endet am 26.11.; die Buchungsseite zeigt ihn als geschlossen, ein Einstieg ist laut Seite nicht mehr möglich.",
+     "title": "Yoga mit Baby – Start 22.10.2026 (Do, 9:30)",
+     "summary": "Laufender Kurs nach der Geburt mit Baby: kräftigende, fließende Übungen für Körpermitte und Beckenboden. Der Kurs ist geschlossen; nur der letzte Termin am 26.11. liegt noch im Zeitraum.",
      "topics": [
       "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 € (Einzelticket)",
      "url": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
      "sourceUrl": "https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe",
      "category": "bewegung",
@@ -24,31 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kurs läuft bereits; Buchungsseite zeigt „Geschlossener Kurs“"
+      "note": "Geschlossener Kurs, nicht buchbar"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-10-22T09:30",
-        "end": "2026-10-22T10:30"
-       },
-       {
-        "start": "2026-10-29T09:30",
-        "end": "2026-10-29T10:30"
-       },
-       {
-        "start": "2026-11-05T09:30",
-        "end": "2026-11-05T10:30"
-       },
-       {
-        "start": "2026-11-12T09:30",
-        "end": "2026-11-12T10:30"
-       },
-       {
-        "start": "2026-11-19T09:30",
-        "end": "2026-11-19T10:30"
-       },
        {
         "start": "2026-11-26T09:30",
         "end": "2026-11-26T10:30"
@@ -59,15 +39,15 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby – Kurs ab 10.12.2026 (6 Donnerstage)",
-     "summary": "Rückbildungsergänzende Yogastunden mit Baby: Kräftigung, Körpermitte, Beckenboden, Atemübungen. Die Termine am 24.12. und 31.12. entfallen; die sechs Donnerstage reichen bis 28.01.2027.",
+     "title": "Yoga mit Baby – Start 10.12.2026 (Do, 9:30)",
+     "summary": "Yoga nach der Geburt mit Baby: kräftigende, fließende Übungen für Körpermitte und Beckenboden, das Baby darf dabei sein. Für Mamas am Ende der Rückbildung oder danach sowie interessierte Papas; ergänzt die Rückbildung, ersetzt sie nicht. Am 24.12. und 31.12. entfällt die Stunde.",
      "topics": [
       "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 € (6 Termine)",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -77,50 +57,36 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht sichtbar"
+      "note": "Anmeldung über „hier buchen“ auf der Website; Platzangabe nicht sichtbar"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-10T09:30",
-        "end": "2026-12-10T10:30"
-       },
-       {
-        "start": "2026-12-17T09:30",
-        "end": "2026-12-17T10:30"
-       },
-       {
-        "start": "2027-01-07T09:30",
-        "end": "2027-01-07T10:30"
-       },
-       {
-        "start": "2027-01-14T09:30",
-        "end": "2027-01-14T10:30"
-       },
-       {
-        "start": "2027-01-21T09:30",
-        "end": "2027-01-21T10:30"
-       },
-       {
-        "start": "2027-01-28T09:30",
-        "end": "2027-01-28T10:30"
-       }
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-12-10",
+      "count": 6,
+      "skipHolidays": false,
+      "except": [
+       "2026-12-24",
+       "2026-12-31"
       ]
      }
     },
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby – Kurs ab 11.02.2027 (6 Donnerstage)",
-     "summary": "Rückbildungsergänzende Yogastunden mit Baby für Mütter und interessierte Väter, Babys von 3 bis 12 Monaten. Sechs Donnerstage in Johannis, 9:30–10:30 Uhr.",
+     "title": "Yoga mit Baby – Start 11.02.2027 (Do, 9:30)",
+     "summary": "Yoga nach der Geburt mit Baby: kräftigende, fließende Übungen für Körpermitte und Beckenboden, das Baby darf dabei sein. Für Mamas am Ende der Rückbildung oder danach sowie interessierte Papas; ergänzt die Rückbildung, ersetzt sie nicht.",
      "topics": [
       "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 € (6 Termine)",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -130,7 +96,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht sichtbar"
+      "note": "Anmeldung über „hier buchen“ auf der Website; Platzangabe nicht sichtbar"
      },
      "schedule": {
       "kind": "weekly",
@@ -147,15 +113,15 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby – Kurs ab 01.04.2027 (6 Donnerstage)",
-     "summary": "Rückbildungsergänzende Yogastunden mit Baby für Mütter und interessierte Väter, Babys von 3 bis 12 Monaten. Sechs Donnerstage in Johannis, 9:30–10:30 Uhr.",
+     "title": "Yoga mit Baby – Start 01.04.2027 (Do, 9:30)",
+     "summary": "Yoga nach der Geburt mit Baby: kräftigende, fließende Übungen für Körpermitte und Beckenboden, das Baby darf dabei sein. Für Mamas am Ende der Rückbildung oder danach sowie interessierte Papas; ergänzt die Rückbildung, ersetzt sie nicht.",
      "topics": [
       "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 € (6 Termine)",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -165,7 +131,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht sichtbar"
+      "note": "Anmeldung über „hier buchen“ auf der Website; Platzangabe nicht sichtbar"
      },
      "schedule": {
       "kind": "weekly",
@@ -182,15 +148,15 @@
     {
      "providerId": "wolf-pack-yoga",
      "venueId": "wolf-pack-yoga",
-     "title": "Yoga mit Baby – Kurs ab 03.06.2027 (6 Donnerstage)",
-     "summary": "Rückbildungsergänzende Yogastunden mit Baby für Mütter und interessierte Väter, Babys von 3 bis 12 Monaten. Sechs Donnerstage in Johannis, 9:30–10:30 Uhr.",
+     "title": "Yoga mit Baby – Start 03.06.2027 (Do, 9:30)",
+     "summary": "Yoga nach der Geburt mit Baby: kräftigende, fließende Übungen für Körpermitte und Beckenboden, das Baby darf dabei sein. Für Mamas am Ende der Rückbildung oder danach sowie interessierte Papas; ergänzt die Rückbildung, ersetzt sie nicht.",
      "topics": [
       "yoga-mit-baby"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "102 € (6 Termine)",
+     "price": "102,00 € (6 Termine)",
      "url": "https://www.wolfpack.yoga/yoga-mit-baby",
      "sourceUrl": "https://www.wolfpack.yoga/yoga-mit-baby",
      "category": "bewegung",
@@ -200,7 +166,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über „hier buchen“ auf der Anbieterseite; Platzangabe nicht sichtbar"
+      "note": "Anmeldung über „hier buchen“ auf der Website; Platzangabe nicht sichtbar"
      },
      "schedule": {
       "kind": "weekly",
@@ -215,18 +181,18 @@
      }
     }
    ],
-   "inputHash": "e2e6e9e5c2b33fd07899f1b2ead753100048a6cef19642c0e1e7ace9fa92f7c4",
+   "inputHash": "19daf0febeea6f341cba02df7598b021f32fd1e9b3bc2873fe6879548248d0a0",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
-   "changedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "changedAt": "2026-11-21T09:41:55+01:00",
    "partsHash": "766e03d83a107d8c166739ed26c23c79486547433de07097e17bb784a4f8c7f9"
   }
  },
  "beilagen": {
   "seite:https://www.eversports.de/org/activity/f9e64e0f-0aa7-4b1d-bef9-54c89588bdbe": {
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00"
+   "checkedAt": "2026-11-21T09:41:55+01:00"
   }
  }
 }

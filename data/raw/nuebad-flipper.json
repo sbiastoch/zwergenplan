@@ -6,8 +6,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Mo 16:30 (Sep.–Dez. 2026)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Der Kurs ist voll; Plätze gibt es nur über die Warteliste. Letzter Termin ist der 14. Dezember.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Mo 16:30 (Start 21.09.2026)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, montags 16:30–17:00. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -19,11 +19,43 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 2 Personen auf der Warteliste"
+      "note": "0 Plätze frei, 2 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-21T16:30",
+        "end": "2026-09-21T17:00"
+       },
+       {
+        "start": "2026-09-28T16:30",
+        "end": "2026-09-28T17:00"
+       },
+       {
+        "start": "2026-10-05T16:30",
+        "end": "2026-10-05T17:00"
+       },
+       {
+        "start": "2026-10-12T16:30",
+        "end": "2026-10-12T17:00"
+       },
+       {
+        "start": "2026-10-19T16:30",
+        "end": "2026-10-19T17:00"
+       },
+       {
+        "start": "2026-10-26T16:30",
+        "end": "2026-10-26T17:00"
+       },
+       {
+        "start": "2026-11-09T16:30",
+        "end": "2026-11-09T17:00"
+       },
+       {
+        "start": "2026-11-16T16:30",
+        "end": "2026-11-16T17:00"
+       },
        {
         "start": "2026-11-23T16:30",
         "end": "2026-11-23T17:00"
@@ -46,8 +78,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Mo 17:00 (Sep.–Dez. 2026)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Der Kurs ist voll; Plätze gibt es nur über die Warteliste. Letzter Termin ist der 14. Dezember.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Mo 17:00 (Start 21.09.2026)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, montags 17:00–17:30. Die laufende Reihe ist ausgebucht, es gibt eine Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -59,11 +91,43 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 2 Personen auf der Warteliste"
+      "note": "0 Plätze frei, 2 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-21T17:00",
+        "end": "2026-09-21T17:30"
+       },
+       {
+        "start": "2026-09-28T17:00",
+        "end": "2026-09-28T17:30"
+       },
+       {
+        "start": "2026-10-05T17:00",
+        "end": "2026-10-05T17:30"
+       },
+       {
+        "start": "2026-10-12T17:00",
+        "end": "2026-10-12T17:30"
+       },
+       {
+        "start": "2026-10-19T17:00",
+        "end": "2026-10-19T17:30"
+       },
+       {
+        "start": "2026-10-26T17:00",
+        "end": "2026-10-26T17:30"
+       },
+       {
+        "start": "2026-11-09T17:00",
+        "end": "2026-11-09T17:30"
+       },
+       {
+        "start": "2026-11-16T17:00",
+        "end": "2026-11-16T17:30"
+       },
        {
         "start": "2026-11-23T17:00",
         "end": "2026-11-23T17:30"
@@ -86,8 +150,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Mo 17:30 (Sep.–Dez. 2026)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Der Kurs ist voll; Plätze gibt es nur über die Warteliste. Letzter Termin ist der 14. Dezember.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Mo 17:30 (Start 21.09.2026)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, montags 17:30–18:00. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -99,11 +163,43 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 2 Personen auf der Warteliste"
+      "note": "0 Plätze frei, 2 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-21T17:30",
+        "end": "2026-09-21T18:00"
+       },
+       {
+        "start": "2026-09-28T17:30",
+        "end": "2026-09-28T18:00"
+       },
+       {
+        "start": "2026-10-05T17:30",
+        "end": "2026-10-05T18:00"
+       },
+       {
+        "start": "2026-10-12T17:30",
+        "end": "2026-10-12T18:00"
+       },
+       {
+        "start": "2026-10-19T17:30",
+        "end": "2026-10-19T18:00"
+       },
+       {
+        "start": "2026-10-26T17:30",
+        "end": "2026-10-26T18:00"
+       },
+       {
+        "start": "2026-11-09T17:30",
+        "end": "2026-11-09T18:00"
+       },
+       {
+        "start": "2026-11-16T17:30",
+        "end": "2026-11-16T18:00"
+       },
        {
         "start": "2026-11-23T17:30",
         "end": "2026-11-23T18:00"
@@ -126,8 +222,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Kleinkind-Schwimmen Do 16:30 (Sep.–Dez. 2026)",
-     "summary": "Schwimmen für Kleinkinder zusammen mit einem Elternteil im Langwasserbad. Der Kurs ist voll; Anmeldung nur auf die Warteliste.",
+     "title": "Mutter/Vater-Kleinkind-Schwimmen, Do 16:30 (Start 24.09.2026)",
+     "summary": "Schwimmen gemeinsam mit einem Elternteil für Kleinkinder im Langwasserbad, donnerstags 16:30–17:15. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -139,11 +235,43 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 6 Personen auf der Warteliste"
+      "note": "0 Plätze frei, 6 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-24T16:30",
+        "end": "2026-09-24T17:15"
+       },
+       {
+        "start": "2026-10-01T16:30",
+        "end": "2026-10-01T17:15"
+       },
+       {
+        "start": "2026-10-08T16:30",
+        "end": "2026-10-08T17:15"
+       },
+       {
+        "start": "2026-10-15T16:30",
+        "end": "2026-10-15T17:15"
+       },
+       {
+        "start": "2026-10-22T16:30",
+        "end": "2026-10-22T17:15"
+       },
+       {
+        "start": "2026-10-29T16:30",
+        "end": "2026-10-29T17:15"
+       },
+       {
+        "start": "2026-11-12T16:30",
+        "end": "2026-11-12T17:15"
+       },
+       {
+        "start": "2026-11-19T16:30",
+        "end": "2026-11-19T17:15"
+       },
        {
         "start": "2026-11-26T16:30",
         "end": "2026-11-26T17:15"
@@ -166,8 +294,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Sa 10:15 (Sep.–Dez. 2026)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Der Kurs ist voll; Anmeldung nur auf die Warteliste.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Sa 10:15 (Start 26.09.2026)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, samstags 10:15–10:45. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -179,11 +307,35 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 5 Personen auf der Warteliste"
+      "note": "0 Plätze frei, 5 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-26T10:15",
+        "end": "2026-09-26T10:45"
+       },
+       {
+        "start": "2026-10-10T10:15",
+        "end": "2026-10-10T10:45"
+       },
+       {
+        "start": "2026-10-17T10:15",
+        "end": "2026-10-17T10:45"
+       },
+       {
+        "start": "2026-10-24T10:15",
+        "end": "2026-10-24T10:45"
+       },
+       {
+        "start": "2026-10-31T10:15",
+        "end": "2026-10-31T10:45"
+       },
+       {
+        "start": "2026-11-14T10:15",
+        "end": "2026-11-14T10:45"
+       },
        {
         "start": "2026-11-21T10:15",
         "end": "2026-11-21T10:45"
@@ -210,8 +362,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Kleinkinderschwimmen ab 2 Jahre mit Elternteil, Sa 10:45 (Sep.–Dez. 2026)",
-     "summary": "Schwimmen für Kinder ab 2 Jahren zusammen mit einem Elternteil im Langwasserbad. Der Kurs ist voll; Anmeldung nur auf die Warteliste.",
+     "title": "Kleinkinderschwimmen ab 2 Jahre mit Elternteil, Sa 10:45 (Start 26.09.2026)",
+     "summary": "Schwimmen für Kinder ab 2 Jahren gemeinsam mit einem Elternteil im Langwasserbad, samstags 10:45–11:30. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -227,11 +379,35 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 5 Personen auf der Warteliste"
+      "note": "0 Plätze frei, 5 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-26T10:45",
+        "end": "2026-09-26T11:30"
+       },
+       {
+        "start": "2026-10-10T10:45",
+        "end": "2026-10-10T11:30"
+       },
+       {
+        "start": "2026-10-17T10:45",
+        "end": "2026-10-17T11:30"
+       },
+       {
+        "start": "2026-10-24T10:45",
+        "end": "2026-10-24T11:30"
+       },
+       {
+        "start": "2026-10-31T10:45",
+        "end": "2026-10-31T11:30"
+       },
+       {
+        "start": "2026-11-14T10:45",
+        "end": "2026-11-14T11:30"
+       },
        {
         "start": "2026-11-21T10:45",
         "end": "2026-11-21T11:30"
@@ -258,8 +434,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen So 08:45 (Sep.–Dez. 2026)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Der Kurs ist voll; Anmeldung nur auf die Warteliste.",
+     "title": "Mutter/Vater-Baby-Schwimmen, So 08:45 (Start 27.09.2026)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, sonntags 08:45–09:15. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -271,11 +447,35 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 1 Person auf der Warteliste"
+      "note": "0 Plätze frei, 1 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-27T08:45",
+        "end": "2026-09-27T09:15"
+       },
+       {
+        "start": "2026-10-04T08:45",
+        "end": "2026-10-04T09:15"
+       },
+       {
+        "start": "2026-10-11T08:45",
+        "end": "2026-10-11T09:15"
+       },
+       {
+        "start": "2026-10-18T08:45",
+        "end": "2026-10-18T09:15"
+       },
+       {
+        "start": "2026-10-25T08:45",
+        "end": "2026-10-25T09:15"
+       },
+       {
+        "start": "2026-11-15T08:45",
+        "end": "2026-11-15T09:15"
+       },
        {
         "start": "2026-11-22T08:45",
         "end": "2026-11-22T09:15"
@@ -302,8 +502,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen So 09:15 (Sep.–Dez. 2026)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Der Kurs ist voll; Anmeldung nur auf die Warteliste.",
+     "title": "Mutter/Vater-Baby-Schwimmen, So 09:15 (Start 27.09.2026)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, sonntags 09:15–09:45. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -315,11 +515,35 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 4 Personen auf der Warteliste"
+      "note": "0 Plätze frei, 4 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-27T09:15",
+        "end": "2026-09-27T09:45"
+       },
+       {
+        "start": "2026-10-04T09:15",
+        "end": "2026-10-04T09:45"
+       },
+       {
+        "start": "2026-10-11T09:15",
+        "end": "2026-10-11T09:45"
+       },
+       {
+        "start": "2026-10-18T09:15",
+        "end": "2026-10-18T09:45"
+       },
+       {
+        "start": "2026-10-25T09:15",
+        "end": "2026-10-25T09:45"
+       },
+       {
+        "start": "2026-11-15T09:15",
+        "end": "2026-11-15T09:45"
+       },
        {
         "start": "2026-11-22T09:15",
         "end": "2026-11-22T09:45"
@@ -346,8 +570,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Kleinkind-Schwimmen So 09:45 (Sep.–Dez. 2026)",
-     "summary": "Schwimmen für Kleinkinder zusammen mit einem Elternteil im Langwasserbad. Der Kurs ist voll; Anmeldung nur auf die Warteliste.",
+     "title": "Mutter/Vater-Kleinkind-Schwimmen, So 09:45 (Start 27.09.2026)",
+     "summary": "Schwimmen gemeinsam mit einem Elternteil für Kleinkinder im Langwasserbad, sonntags 09:45–10:30. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -359,11 +583,35 @@
      "category": "wasser",
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 10 Personen auf der Warteliste"
+      "note": "Keine freien Plätze, 10 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-27T09:45",
+        "end": "2026-09-27T10:30"
+       },
+       {
+        "start": "2026-10-04T09:45",
+        "end": "2026-10-04T10:30"
+       },
+       {
+        "start": "2026-10-11T09:45",
+        "end": "2026-10-11T10:30"
+       },
+       {
+        "start": "2026-10-18T09:45",
+        "end": "2026-10-18T10:30"
+       },
+       {
+        "start": "2026-10-25T09:45",
+        "end": "2026-10-25T10:30"
+       },
+       {
+        "start": "2026-11-15T09:45",
+        "end": "2026-11-15T10:30"
+       },
        {
         "start": "2026-11-22T09:45",
         "end": "2026-11-22T10:30"
@@ -390,8 +638,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Kleinkinderschwimmen ab 2 Jahre mit Elternteil, So 10:30 (Sep.–Dez. 2026)",
-     "summary": "Schwimmen für Kinder ab 2 Jahren zusammen mit einem Elternteil im Langwasserbad. Der Kurs ist voll; Anmeldung nur auf die Warteliste.",
+     "title": "Kleinkinderschwimmen ab 2 Jahre mit Elternteil, So 10:30 (Start 27.09.2026)",
+     "summary": "Schwimmen für Kinder ab 2 Jahren gemeinsam mit einem Elternteil im Langwasserbad, sonntags 10:30–11:15. Die laufende Reihe hat keine freien Plätze, es gibt eine Warteliste.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -407,11 +655,35 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "Kurs voll, 41 Personen auf der Warteliste"
+      "note": "Keine freien Plätze, 41 auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
+       {
+        "start": "2026-09-27T10:30",
+        "end": "2026-09-27T11:15"
+       },
+       {
+        "start": "2026-10-04T10:30",
+        "end": "2026-10-04T11:15"
+       },
+       {
+        "start": "2026-10-11T10:30",
+        "end": "2026-10-11T11:15"
+       },
+       {
+        "start": "2026-10-18T10:30",
+        "end": "2026-10-18T11:15"
+       },
+       {
+        "start": "2026-10-25T10:30",
+        "end": "2026-10-25T11:15"
+       },
+       {
+        "start": "2026-11-15T10:30",
+        "end": "2026-11-15T11:15"
+       },
        {
         "start": "2026-11-22T10:30",
         "end": "2026-11-22T11:15"
@@ -438,8 +710,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Mo 16:30 (Jan.–Apr. 2027)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Noch Plätze frei; Anmeldung über das Buchungssystem.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Mo 16:30 (Start 11.01.2027)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, montags 16:30–17:00. Kursreihe von Januar bis April 2027 mit 7 freien Plätzen.",
      "topics": [
       "babyschwimmen"
      ],
@@ -510,8 +782,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Mo 17:00 (Jan.–Apr. 2027)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Noch wenige Plätze; Anmeldung über das Buchungssystem.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Mo 17:00 (Start 11.01.2027)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, montags 17:00–17:30. Kursreihe von Januar bis April 2027 mit 3 freien Plätzen.",
      "topics": [
       "babyschwimmen"
      ],
@@ -582,8 +854,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Mo 17:30 (Jan.–Apr. 2027)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Noch Plätze frei; Anmeldung über das Buchungssystem.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Mo 17:30 (Start 11.01.2027)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, montags 17:30–18:00. Kursreihe von Januar bis April 2027 mit 7 freien Plätzen.",
      "topics": [
       "babyschwimmen"
      ],
@@ -654,8 +926,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Kleinkind-Schwimmen Do 16:30 (Jan.–Apr. 2027)",
-     "summary": "Schwimmen für Kleinkinder zusammen mit einem Elternteil im Langwasserbad. Noch Plätze frei; Anmeldung über das Buchungssystem.",
+     "title": "Mutter/Vater-Kleinkind-Schwimmen, Do 16:30 (Start 14.01.2027)",
+     "summary": "Schwimmen gemeinsam mit einem Elternteil für Kleinkinder im Langwasserbad, donnerstags 16:30–17:15. Kursreihe von Januar bis April 2027 mit 5 freien Plätzen.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -726,8 +998,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen Sa 10:15 (Jan.–Apr. 2027)",
-     "summary": "Wassergewöhnung für Babys zusammen mit Mutter oder Vater im Langwasserbad. Der Kurs ist voll und hat keine Warteliste.",
+     "title": "Mutter/Vater-Baby-Schwimmen, Sa 10:15 (Start 16.01.2027)",
+     "summary": "Babyschwimmen gemeinsam mit einem Elternteil im Langwasserbad, samstags 10:15–10:45. Kursreihe von Januar bis April 2027, derzeit ausgebucht ohne Warteliste.",
      "topics": [
       "babyschwimmen"
      ],
@@ -739,7 +1011,7 @@
      "category": "wasser",
      "availability": {
       "status": "ausgebucht",
-      "note": "Kurs voll, keine Warteliste"
+      "note": "0 Plätze frei, keine Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -798,8 +1070,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Kleinkinderschwimmen ab 2 Jahren mit Elternteil (Sa, 10:45 Uhr)",
-     "summary": "Wassergewöhnung und erste Schwimmschritte gemeinsam mit einem Elternteil im Langwasserbad, 45 Minuten an 12 Samstagen. Aktuell keine freien Plätze, 5 Personen stehen auf der Warteliste.",
+     "title": "Kleinkinderschwimmen ab 2 Jahre mit Elternteil (Sa 10:45)",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren mit einem Elternteil im Langwasserbad, 12 Samstagstermine von Januar bis April 2027. Der Kurs ist voll; auf der Warteliste stehen 5 Personen.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -815,7 +1087,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "0 freie Plätze, 5 auf der Warteliste"
+      "note": "Kurs voll, 5 Personen auf der Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -874,8 +1146,84 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen (So, 08:45 Uhr)",
-     "summary": "Gemeinsames Wassererleben für Mutter oder Vater und Baby im Langwasserbad, 30 Minuten an 12 Sonntagen. Derzeit sind 9 Plätze frei.",
+     "title": "Kleinkinderschwimmen ab 2 Jahre mit Elternteil (So 10:30)",
+     "summary": "Schwimmkurs für Kinder ab 2 Jahren mit einem Elternteil im Langwasserbad, 12 Sonntagstermine von Januar bis April 2027. Der Kurs ist voll; auf der Warteliste stehen 6 Personen.",
+     "topics": [
+      "kleinkindschwimmen"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.xn--nbad-flipper-dlb.de/kurskategorie/eltern-kind-schwimmkurse/",
+     "sourceUrl": "https://api.kursorganizer.com/graphql",
+     "category": "wasser",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "warteliste",
+      "note": "Kurs voll, 6 Personen auf der Warteliste"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-17T10:30",
+        "end": "2027-01-17T11:15"
+       },
+       {
+        "start": "2027-01-24T10:30",
+        "end": "2027-01-24T11:15"
+       },
+       {
+        "start": "2027-01-31T10:30",
+        "end": "2027-01-31T11:15"
+       },
+       {
+        "start": "2027-02-07T10:30",
+        "end": "2027-02-07T11:15"
+       },
+       {
+        "start": "2027-02-21T10:30",
+        "end": "2027-02-21T11:15"
+       },
+       {
+        "start": "2027-02-28T10:30",
+        "end": "2027-02-28T11:15"
+       },
+       {
+        "start": "2027-03-07T10:30",
+        "end": "2027-03-07T11:15"
+       },
+       {
+        "start": "2027-03-14T10:30",
+        "end": "2027-03-14T11:15"
+       },
+       {
+        "start": "2027-03-21T10:30",
+        "end": "2027-03-21T11:15"
+       },
+       {
+        "start": "2027-04-11T10:30",
+        "end": "2027-04-11T11:15"
+       },
+       {
+        "start": "2027-04-18T10:30",
+        "end": "2027-04-18T11:15"
+       },
+       {
+        "start": "2027-04-25T10:30",
+        "end": "2027-04-25T11:15"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "nuebad-flipper",
+     "venueId": "nuebad-flipper",
+     "title": "Mutter/Vater-Baby-Schwimmen (So 08:45)",
+     "summary": "Babyschwimmen mit Mutter oder Vater im Langwasserbad, 12 Sonntagstermine von Januar bis April 2027. Es sind noch 8 Plätze frei.",
      "topics": [
       "babyschwimmen"
      ],
@@ -887,7 +1235,7 @@
      "category": "wasser",
      "availability": {
       "status": "frei",
-      "note": "9 Plätze frei"
+      "note": "8 Plätze frei"
      },
      "schedule": {
       "kind": "dates",
@@ -946,8 +1294,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Baby-Schwimmen (So, 09:15 Uhr)",
-     "summary": "Gemeinsames Wassererleben für Mutter oder Vater und Baby im Langwasserbad, 30 Minuten an 12 Sonntagen. Der Kurs ist ausgebucht.",
+     "title": "Mutter/Vater-Baby-Schwimmen (So 09:15)",
+     "summary": "Babyschwimmen mit Mutter oder Vater im Langwasserbad, 12 Sonntagstermine von Januar bis April 2027. Der Kurs ist ausgebucht, eine Warteliste gibt es nicht.",
      "topics": [
       "babyschwimmen"
      ],
@@ -959,7 +1307,7 @@
      "category": "wasser",
      "availability": {
       "status": "ausgebucht",
-      "note": "ausgebucht, keine Warteliste"
+      "note": "Kurs voll, keine Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -1018,8 +1366,8 @@
     {
      "providerId": "nuebad-flipper",
      "venueId": "nuebad-flipper",
-     "title": "Mutter/Vater-Kleinkind-Schwimmen (So, 09:45 Uhr)",
-     "summary": "Schwimmen für Kleinkinder gemeinsam mit Mutter oder Vater im Langwasserbad, 45 Minuten an 12 Sonntagen. Der Kurs ist ausgebucht.",
+     "title": "Mutter/Vater-Kleinkind-Schwimmen (So 09:45)",
+     "summary": "Schwimmkurs für Kleinkinder mit Mutter oder Vater im Langwasserbad, 12 Sonntagstermine von Januar bis April 2027. Der Kurs ist ausgebucht, eine Warteliste gibt es nicht.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -1031,7 +1379,7 @@
      "category": "wasser",
      "availability": {
       "status": "ausgebucht",
-      "note": "ausgebucht, keine Warteliste"
+      "note": "Kurs voll, keine Warteliste"
      },
      "schedule": {
       "kind": "dates",
@@ -1086,89 +1434,13 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "nuebad-flipper",
-     "venueId": "nuebad-flipper",
-     "title": "Kleinkinderschwimmen ab 2 Jahren mit Elternteil (So, 10:30 Uhr)",
-     "summary": "Schwimmen mit Elternteil für Kinder ab 2 Jahren im Langwasserbad, 45 Minuten an 12 Sonntagen. Aktuell keine freien Plätze, 6 Personen stehen auf der Warteliste.",
-     "topics": [
-      "kleinkindschwimmen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.xn--nbad-flipper-dlb.de/kurskategorie/eltern-kind-schwimmkurse/",
-     "sourceUrl": "https://api.kursorganizer.com/graphql",
-     "category": "wasser",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "warteliste",
-      "note": "0 freie Plätze, 6 auf der Warteliste"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-17T10:30",
-        "end": "2027-01-17T11:15"
-       },
-       {
-        "start": "2027-01-24T10:30",
-        "end": "2027-01-24T11:15"
-       },
-       {
-        "start": "2027-01-31T10:30",
-        "end": "2027-01-31T11:15"
-       },
-       {
-        "start": "2027-02-07T10:30",
-        "end": "2027-02-07T11:15"
-       },
-       {
-        "start": "2027-02-21T10:30",
-        "end": "2027-02-21T11:15"
-       },
-       {
-        "start": "2027-02-28T10:30",
-        "end": "2027-02-28T11:15"
-       },
-       {
-        "start": "2027-03-07T10:30",
-        "end": "2027-03-07T11:15"
-       },
-       {
-        "start": "2027-03-14T10:30",
-        "end": "2027-03-14T11:15"
-       },
-       {
-        "start": "2027-03-21T10:30",
-        "end": "2027-03-21T11:15"
-       },
-       {
-        "start": "2027-04-11T10:30",
-        "end": "2027-04-11T11:15"
-       },
-       {
-        "start": "2027-04-18T10:30",
-        "end": "2027-04-18T11:15"
-       },
-       {
-        "start": "2027-04-25T10:30",
-        "end": "2027-04-25T11:15"
-       }
-      ]
-     }
     }
    ],
-   "inputHash": "2d15abda759a700a12b2c36f7bd2c3d96448f06cf37c68b2f96212a619e6aefa",
+   "inputHash": "380913b656a72ef5f23b7d972b64fb004fc2ca432e556bebffcd236b6a16abd9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
-   "changedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "changedAt": "2026-11-21T09:41:55+01:00",
    "partsHash": "7e4189b6e0885976631a734b2a544575d93a3ce1710d2ccbd90ec018a8c34d38"
   }
  }

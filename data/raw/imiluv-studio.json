@@ -48,6 +48,11 @@
    "status": "ok",
    "checkedAt": "2026-11-20T10:02:41+01:00",
    "changedAt": "2026-11-15T09:18:13+01:00",
+   "pending": {
+    "inputHash": "068a15470d4200c9422ee37b36a0cd2d6b155ed2aa7d3854bf599bf50507e5fc",
+    "model": "ohne-eingabe",
+    "events": []
+   },
    "sources": [
     "frankenkids"
    ],

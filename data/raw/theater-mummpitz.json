@@ -6,8 +6,8 @@
     {
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
-     "title": "Jazz für Kinder – Konzert (ohne Altersgrenze)",
-     "summary": "Jazzkonzert für Kinder, jeweils sonntags um 11 Uhr im Kachelbau; Eltern und Kind sitzen als Publikum. Alle angezeigten Termine bis Mai 2027 sind ausverkauft, Tickets laufen über Reservix.",
+     "title": "Jazz für Kinder (Konzert, ohne Altersgrenze)",
+     "summary": "Jazzkonzerte für Kinder im Theater Mummpitz, jeweils sonntags um 11 Uhr. Alle im Spielplan gelisteten Termine sind ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -20,7 +20,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Alle angezeigten Termine ausverkauft (Stand 20.11.2026)"
+      "note": "Alle gelisteten Termine ausverkauft (Stand Spielplan); Tickets über Reservix"
      },
      "schedule": {
       "kind": "dates",
@@ -49,8 +49,8 @@
     {
      "providerId": "theater-mummpitz",
      "venueId": "theater-mummpitz",
-     "title": "Klassik für Kinder – Konzertreihe (ohne Altersgrenze)",
-     "summary": "Klassische Konzerte für Kinder mit wechselnden Programmen (u. a. Oboe, Kontrabass, Blockflöte, Violine), jeweils sonntags um 11 Uhr. Alle angezeigten Termine bis April 2027 sind ausverkauft, Tickets laufen über Reservix.",
+     "title": "Klassik für Kinder (Konzertreihe, ohne Altersgrenze)",
+     "summary": "Klassische Konzerte für kleine Zuhörer im Theater Mummpitz, jeweils sonntags um 11 Uhr mit wechselnden Instrumenten und Programmen. Alle im Spielplan gelisteten Termine sind ausverkauft.",
      "topics": [
       "konzert",
       "musik"
@@ -63,7 +63,7 @@
      "category": "buehne",
      "availability": {
       "status": "ausgebucht",
-      "note": "Alle angezeigten Termine ausverkauft (Stand 20.11.2026)"
+      "note": "Alle gelisteten Termine ausverkauft (Stand Spielplan); Tickets über Reservix"
      },
      "schedule": {
       "kind": "dates",
@@ -90,11 +90,11 @@
      }
     }
    ],
-   "inputHash": "d41f27f64d83f79a61256efd8bb946ba79d34d5ac04dcd97ab5ba285e98c18ce",
+   "inputHash": "d9c3ff9dc0153911f7b1d15af0d7a8f87449ce103c929c1c5bab3de7810c3e55",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
-   "changedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "changedAt": "2026-11-21T09:41:55+01:00",
    "partsHash": "35534a05e45ec78c75433e4af4b6d7dfa3f5816cd79353a2c1c234fa0573313c"
   },
   "seite:https://www.theater-mummpitz.de/stuecke/jazz-fuer-kinder/": {
@@ -147,7 +147,7 @@
    "inputHash": "73486eeb0d295c1cb347888c4480908255301c6210b6b7f9ce2416245fa423f5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
    "changedAt": "2026-11-09T09:33:21+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -207,7 +207,7 @@
    "inputHash": "8858f7a5a4afb7e61a764647f548accc0c06fc9ed932c7fafbc933f8a30fc3c9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "67db435ae95f168364699da3314de5713a2fef4255efe206593843bd57c6c72e"
   },
@@ -226,7 +226,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "frankenkids",

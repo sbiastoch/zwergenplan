@@ -6,18 +6,17 @@
     {
      "providerId": "ev-laufamholz-miniclub",
      "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub Laufamholz (freitags 9–10:30 Uhr, Kinder bis 3 Jahre)",
-     "summary": "Eltern-Kind-Gruppe der Heilig-Geist-Kirche Laufamholz: Austausch unter Eltern, Lieder, Geschichten und erste Gruppenerfahrungen für die Kleinen. Bekannt sind die Freitage bis 18.12.2026; Anmeldeweg und Kosten stehen nicht in der Quelle, beim Veranstalter nachfragen.",
+     "title": "Miniclub – Eltern-Kind-Gruppe Laufamholz",
+     "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz: Austausch unter Eltern, Anregungen zu Ernährung, Sprache und Entwicklung, gemeinsame Lieder und Geschichten. Kosten und Anmeldung stehen nicht in der Quelle, bitte beim Anbieter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe",
-      "elterntreff"
+      "spielgruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109126",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109126",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109127",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109127",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -25,15 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldeweg nicht angegeben; beim Veranstalter (Gemeindehaus Laufamholz) nachfragen"
+      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-20T09:00",
-        "end": "2026-11-20T10:30"
-       },
        {
         "start": "2026-11-27T09:00",
         "end": "2026-11-27T10:30"
@@ -57,16 +52,15 @@
    ],
    "inputHash": "6f5fb68c166723310b6ad8a626bfd0ecb8c132cd8fa92e84115670af1641a160",
    "dated": {
-    "2026-11-20": "866f665ca713503c96907e66c20cd2f747808e4bfa9e435844a677c25b6a1f0c",
-    "2026-11-27": "d5a67cb7b4365bdd246e3d134f27af4899b9ac0e8cfa37fbb12074cb7220a57e",
-    "2026-12-04": "33205eb3acf0c865a2bc5ae126aeb5fe64e4979335d4a73370c077adaadfe304",
-    "2026-12-11": "3b0a267a268074d3bb38912a84d8c7322fb6252831d4427b73cc3211f89a364b",
-    "2026-12-18": "c480b5b3822132a3b102efbd1c839ead4486e1afbdf548bcf726bdce40eae97b"
+    "2026-11-27": "6c9b4cad809d2f5ec79c20e990ab23ba6f4a2931c05cc113cd38c93e1218f968",
+    "2026-12-04": "1a9b9fb9793bfc249ce9113a4764f9032fd97ecb3875b3eafdfe8599154dae47",
+    "2026-12-11": "3e691bf5f0b947dd73af820a8a47d6bcdd84d5ee4cfea88d773dbdc1c566210c",
+    "2026-12-18": "1da9f29292df5aef6de34db4e8a106f9a71d6bf0b22f13a3ce7fc814ac86bbb9"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
-   "changedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "changedAt": "2026-11-21T09:41:55+01:00",
    "sources": [
     "evtermine"
    ],

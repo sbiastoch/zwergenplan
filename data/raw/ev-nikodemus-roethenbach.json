@@ -6,8 +6,8 @@
     {
      "providerId": "ev-nikodemus-roethenbach",
      "venueId": "ev-nikodemus-roethenbach",
-     "title": "Krabbelgruppe bis 3 Jahre – mittwochs 9:00–10:30",
-     "summary": "Wöchentlicher Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
+     "title": "Krabbelgruppe bis 3 Jahre – mittwochs 9:00–10:30 Uhr",
+     "summary": "Vormittags einmal wöchentlich Treffen für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Kontakt vorab bei Diakonin Marion Hanek.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kontakt bei Diakonin Marion Hanek"
+      "note": "Anmeldung bzw. Kontakt bei Diakonin Marion Hanek"
      },
      "schedule": {
       "kind": "dates",
@@ -60,8 +60,8 @@
     {
      "providerId": "ev-nikodemus-roethenbach",
      "venueId": "ev-nikodemus-roethenbach",
-     "title": "Krabbelgruppe bis 3 Jahre – donnerstags 9:30–11:00",
-     "summary": "Wöchentlicher Vormittagstreff für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Anmeldung bzw. Kontakt über Diakonin Marion Hanek.",
+     "title": "Krabbelgruppe bis 3 Jahre – donnerstags 9:30–11:00 Uhr",
+     "summary": "Vormittags einmal wöchentlich Treffen für Eltern mit Kindern bis 3 Jahre zum Austausch und für gemeinsame Aktionen. Kontakt vorab bei Diakonin Marion Hanek.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -78,7 +78,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Kontakt bei Diakonin Marion Hanek"
+      "note": "Anmeldung bzw. Kontakt bei Diakonin Marion Hanek"
      },
      "schedule": {
       "kind": "dates",
@@ -110,7 +110,6 @@
    ],
    "inputHash": "ff24f096f9a19b357ee4a1b36e0e85d8bf60cb0515ad70f8c8a46c37e7b5ab31",
    "dated": {
-    "2026-11-20": "adebc3e107aa4ebd93162d7f1e9b0051349e3cdd99cda089e1ffd61772152e7e",
     "2026-11-25": "def62b60c1aa15eacd277423b32fd3f7f769455024a1e8a01332e07a97c79ce9",
     "2026-11-26": "c457f8fda5d11a189a452041a6395b6462878f813671f5d6e629db4b216b5575",
     "2026-12-02": "7b039db15d34342ba277245669b46c1464f99554d5b3fb533bd20f600679e8d2",
@@ -122,12 +121,12 @@
     "2026-12-23": "c35fc4f113cc208eab27ba8bf0e6b7ea98bcdc2597d0f8b8870fe30ec36487f4",
     "2027-01-13": "7c2fc49e0210c2838d190a7316a83db443b00f9c324bea5ed3b2169688ba1122",
     "2027-01-14": "6b1b4f37935f48f0f17b9aebc7b4cc8d026a170a8058186e0e4eab07a5c3193f",
-    "2027-01-22": "0db1e5ad15fc7f3ebc6a466da9d9e7edc77ab6c1af5ea8bf6ed2229961c6aca9"
+    "2027-01-22": "145e5b9388a3a31120d5c370a3d7f6d420442a1f4177339c9b132aa8f1d196df"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
-   "changedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "changedAt": "2026-11-21T09:41:55+01:00",
    "sources": [
     "evtermine"
    ],
