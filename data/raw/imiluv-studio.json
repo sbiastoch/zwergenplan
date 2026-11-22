@@ -2,60 +2,14 @@
  "version": 2,
  "units": {
   "kandidaten": {
-   "events": [
-    {
-     "providerId": "imiluv-studio",
-     "venueId": "imiluv-studio",
-     "title": "Reformer Pilates für Mamas & Babys (Mittwoch 11 Uhr)",
-     "summary": "Sanftes Reformer-Pilates nach der Geburt, bei dem das Baby (ca. 6 Wochen bis 6 Monate) dabei ist. Jeden Mittwoch, 55 Minuten, auf Englisch; ärztliche Freigabe nötig. Anmeldung über die IMILUV-App.",
-     "topics": [
-      "fitness-mit-baby",
-      "rueckbildung",
-      "mehrsprachig"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.frankenkids.de/veranstaltungen/reformer-pilates-fuer-mamas-babys/2026-11-11/",
-     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/reformer-pilates-fuer-mamas-babys/2026-11-11/",
-     "category": "bewegung",
-     "age": {
-      "minMonths": 1,
-      "maxMonths": 6
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung über die IMILUV-App (bsport). Laut Kandidat nicht ausgebucht."
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "WE"
-      ],
-      "start": "11:00",
-      "end": "11:55",
-      "from": "2026-11-25",
-      "skipHolidays": true
-     },
-     "via": "frankenkids"
-    }
-   ],
+   "events": [],
    "inputHash": "068a15470d4200c9422ee37b36a0cd2d6b155ed2aa7d3854bf599bf50507e5fc",
-   "dated": {
-    "2026-11-25": "3852811df235293cd4e8abf3ab2fa66c2e3bac2bda1bbe77b8865e6cf24245d6"
-   },
-   "model": "haiku",
-   "status": "ok",
-   "checkedAt": "2026-11-20T10:02:41+01:00",
-   "changedAt": "2026-11-15T09:18:13+01:00",
-   "pending": {
-    "inputHash": "068a15470d4200c9422ee37b36a0cd2d6b155ed2aa7d3854bf599bf50507e5fc",
-    "model": "ohne-eingabe",
-    "events": []
-   },
-   "sources": [
-    "frankenkids"
-   ],
+   "model": "ohne-eingabe",
+   "status": "keine-termine",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "changedAt": "2026-11-22T09:38:14+01:00",
+   "emptySince": "2026-11-22T09:38:14+01:00",
+   "sources": [],
    "partsHash": "85f53f84e742a069fc2d09a8da1925042a0ded8a46b9cb7687b8569c5c793fbf"
   }
  }

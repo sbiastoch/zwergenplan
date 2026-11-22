@@ -176,7 +176,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -185,11 +185,11 @@
     {
      "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Donnerstagvormittag (9–10:30 Uhr)",
-     "summary": "Regelmäßige Gruppe für Eltern, Großeltern und kleine Kinder im Bühnenraum des Gemeindehauses Passionskirche. Pausen in den Ferien laut Kalender.",
+     "title": "Mini-Club Passionskirche (Do 9–10:30 Uhr)",
+     "summary": "Gruppentreffen für Mütter, Väter und Großeltern mit kleinen Kindern, donnerstags 9–10:30 Uhr im Gemeindehaus der Passionskirche. Platzangaben und Anmeldung stehen im Abruf nicht; bitte beim Anbieter nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -203,7 +203,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platz- oder Anmeldeangabe in der Quelle; bei Unklarheit bei der Gemeinde nachfragen."
+      "note": "Keine Platzangabe und keine Anmeldeinfo auf der Seite; beim Anbieter erfragen."
      },
      "schedule": {
       "kind": "weekly",
@@ -212,36 +212,7 @@
       ],
       "start": "09:00",
       "end": "10:30",
-      "from": "2026-11-19",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "ev-langwasser-miniclubs",
-     "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Passionskirche, Do 9–10:30 Uhr",
-     "summary": "Gruppentreffen für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche, donnerstags. Anmeldung und Kosten stehen in den Terminangaben nicht; bei der Gemeinde nachfragen.",
-     "topics": [
-      "eltern-kind-gruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8009833.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
-     "category": "krabbel-spielgruppen",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung in den Terminen; bei der Gemeinde Langwasser nachfragen."
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "09:00",
-      "end": "10:30",
-      "from": "2027-02-18",
+      "from": "2026-11-26",
       "skipHolidays": true
      }
     },
@@ -249,7 +220,7 @@
      "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
      "title": "Mini-Club Passionskirche (Do 9:00–10:30)",
-     "summary": "Offene Gruppe für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche. Im Kalender sind Termine von Mai bis Anfang Juli 2027 eingetragen; nicht jeder Donnerstag ist dabei.",
+     "summary": "Gruppentreffen für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche. Donnerstags vormittags, in den Ferien pausiert.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
@@ -257,7 +228,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8115901.html",
+     "url": "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -266,15 +237,44 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Anmeldung im Terminkalender genannt; bei der Gemeinde nachfragen."
+      "note": "Keine Platzangabe; der Anbieter zeigt Verfügbarkeit nicht an."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:00",
+      "end": "10:30",
+      "from": "2027-02-25",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "ev-langwasser-miniclubs",
+     "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
+     "title": "Mini-Club Passionskirche, Do 9–10:30 Uhr (Eltern mit kleinen Kindern)",
+     "summary": "Gruppe für Mütter, Väter und Großeltern mit kleinen Kindern im Bühnenraum des Gemeindehauses Passionskirche. Der Kalender nennt nur die Termine Mai bis Juli 2027; Anmeldung und Kosten stehen dort nicht, bei der Gemeinde nachfragen.",
+     "topics": [
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=555",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben – bei der Gemeinde Langwasser nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2027-05-06T09:00",
-        "end": "2027-05-06T10:30"
-       },
        {
         "start": "2027-05-13T09:00",
         "end": "2027-05-13T10:30"
@@ -305,7 +305,6 @@
    ],
    "inputHash": "65acb1193277cc55ced981affa2dcf8c05d2a94de948b400998a3d4465db67d3",
    "dated": {
-    "2026-11-22": "08112c8f4f4e5f76bba7cc1ef841602c7fa80360965a83ee1d786ba714b98d16",
     "2026-11-23": "a8bafcf4b2c82c5dd908d8b096f5b21583b77794c69a5b4cc6668cee9096816e",
     "2026-11-24": "cfd809087b096559b17064b663fe8b8a62861270546ce27fb7857965ef259249",
     "2026-11-25": "2229e94e49be8b8f7efaae8f2295e0fd24139bcc25c812b4e6a93021376959d5",
@@ -597,8 +596,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
-   "changedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "changedAt": "2026-11-22T09:38:14+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
   "seite:http://www.evangelisch-in-langwasser.de/passionskirche-gruppen.html": {
@@ -637,7 +636,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -678,7 +677,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -961,7 +960,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-20T10:02:41+01:00",
    "sources": [
     "evtermine"

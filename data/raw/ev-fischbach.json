@@ -6,15 +6,16 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (3 Monate–3 Jahre), dienstags",
-     "summary": "Gruppe für Kinder von 3 Monaten bis 3 Jahren in Begleitung, dienstags 9:30–11:30 Uhr im Haus der Begegnung. Der Kalender nennt Termine bis 15.12.2026; zu Anmeldung und Kosten steht dort nichts.",
+     "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), dienstags",
+     "summary": "Treff für Mütter mit Kindern von 3 Monaten bis 3 Jahren im Haus der Begegnung, dienstags 9:30–11:30 Uhr. Der Kalender zeigt Termine bis 15.12.; Anmeldung und Kosten sind dort nicht angegeben, daher bei der Gemeinde nachfragen.",
      "topics": [
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "muetter"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109424.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109425.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=556",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -23,15 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Anmeldung im Kalender genannt; bei Fragen die Gemeinde kontaktieren."
+      "note": "Keine Angabe zu freien Plätzen; bei der Gemeinde nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-17T09:30",
-        "end": "2026-11-17T11:30"
-       },
        {
         "start": "2026-11-24T09:30",
         "end": "2026-11-24T11:30"
@@ -54,15 +51,16 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (3 Monate–3 Jahre), donnerstags",
-     "summary": "Gruppe für Kinder von 3 Monaten bis 3 Jahren in Begleitung, donnerstags 9:30–10:30 Uhr im Haus der Begegnung. Der Kalender nennt Termine bis 17.12.2026; zu Anmeldung und Kosten steht dort nichts.",
+     "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), donnerstags",
+     "summary": "Treff für Mütter mit Kindern von 3 Monaten bis 3 Jahren im Haus der Begegnung, donnerstags 9:30–10:30 Uhr. Der Kalender zeigt Termine bis 17.12.; Anmeldung und Kosten sind dort nicht angegeben, daher bei der Gemeinde nachfragen.",
      "topics": [
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "muetter"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8121951.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8121952.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=556",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -71,15 +69,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Anmeldung im Kalender genannt; bei Fragen die Gemeinde kontaktieren."
+      "note": "Keine Angabe zu freien Plätzen; bei der Gemeinde nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-19T09:30",
-        "end": "2026-11-19T10:30"
-       },
        {
         "start": "2026-11-26T09:30",
         "end": "2026-11-26T10:30"
@@ -102,8 +96,6 @@
    ],
    "inputHash": "0d786924c6f71bec5dc879f39c8ed104c247624126309ab6770b95fd7b007770",
    "dated": {
-    "2026-11-21": "cb592a46da39703fd3715998f7f2219d21aa1fc4edbc1cab70372736cfa3c992",
-    "2026-11-22": "75ca95b28d7d21186c64e047c752d354b2639e1a2590aef65135d73478e7f62c",
     "2026-11-23": "3d074e63e80d86a77af3d11d56aa41856f1b8077ee1498cb9b01a792c654e820",
     "2026-11-24": "13955611015c95173db4a9b3f32c88839a15cf8576569cb53994c8f7ecd6f113",
     "2026-11-26": "84c9d494e10783226c7e77d581a513a82e66949ab3b6cc253f536632bbe4050c",
@@ -162,8 +154,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
-   "changedAt": "2026-11-13T09:38:01+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "changedAt": "2026-11-22T09:38:14+01:00",
    "partsHash": "d7bdfa5dfc673ef24ea44d79155ceb596d1cdbc06557d29dc3f2f911053987ba"
   },
   "kandidaten": {
@@ -346,7 +338,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-20T10:02:41+01:00",
    "sources": [
     "evtermine"

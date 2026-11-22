@@ -3,10 +3,10 @@
  "units": {
   "seite:https://studioherzschlag.de/angebot/pekip-prager-eltern-kind-programm/": {
    "events": [],
-   "inputHash": "b9428c13a945053e7635467ce0338b83bc59e102ebe125303e0ca4abad709146",
+   "inputHash": "05a88a096b53ca16ec2c8109772ad53591b3254bc779e366824d5cd2bd50be2b",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-18T10:00:22+01:00",
    "emptySince": "2026-11-18T10:00:22+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -265,7 +265,7 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -274,7 +274,7 @@
    "inputHash": "7fc8aab5098512276b975a5164f6b90f1352ccb4b6b3eb22ca1a399b017d1c9d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -283,7 +283,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -293,7 +293,7 @@
    "inputHash": "f8d34b4cf4d218c28a47bd907c7b50aa9d16116ee2ff516d8c893a3eda7f7423",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1319,7 +1319,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1328,8 +1328,8 @@
     {
      "providerId": "studio-herzschlag",
      "venueId": "studio-herzschlag",
-     "title": "Babymassage + Babyyoga (Babys 6 Wochen bis 4 Monate)",
-     "summary": "Sanfte indische Babymassage kombiniert mit Babyyoga und kurzen Achtsamkeitsübungen für Eltern; maximal 6 Duos. Drei 4-teilige Blöcke (Jan., Feb., März 2027), Massageöl wird gestellt. Externe Kursleitung, Buchung über das Formular.",
+     "title": "Babymassage + Babyyoga, Di 9:00 (ab 24.11.2026)",
+     "summary": "Sanfte Babymassage nach Leboyer mit Babyyoga und Achtsamkeitsübungen für Babys ab ca. 6 Wochen bis 4 Monate, höchstens 6 Familien. Externer Partner: Vertrag und Rechnung direkt beim Kursanbieter; kostenlose Stornierung bis 3 Wochen vorher.",
      "topics": [
       "babymassage",
       "yoga-mit-baby"
@@ -1337,7 +1337,7 @@
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "69 € (4 Termine pro Block)",
+     "price": "69 € (4 Termine)",
      "url": "https://studioherzschlag.de/angebot/babymassage/",
      "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
      "category": "babykurse",
@@ -1347,68 +1347,134 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung über das Buchungsformular auf der Seite; Platzanzeige fehlt"
+      "note": "Buchung über das Formular auf der Seite; keine Platzangabe. Warteliste und Einstieg im laufenden Kurs über das Kontaktformular."
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-07T11:15",
-        "end": "2027-01-07T12:15"
-       },
-       {
-        "start": "2027-01-14T11:15",
-        "end": "2027-01-14T12:15"
-       },
-       {
-        "start": "2027-01-21T11:15",
-        "end": "2027-01-21T12:15"
-       },
-       {
-        "start": "2027-01-28T11:15",
-        "end": "2027-01-28T12:15"
-       },
-       {
-        "start": "2027-02-04T11:15",
-        "end": "2027-02-04T12:15"
-       },
-       {
-        "start": "2027-02-11T11:15",
-        "end": "2027-02-11T12:15"
-       },
-       {
-        "start": "2027-02-18T11:15",
-        "end": "2027-02-18T12:15"
-       },
-       {
-        "start": "2027-02-25T11:15",
-        "end": "2027-02-25T12:15"
-       },
-       {
-        "start": "2027-03-04T11:15",
-        "end": "2027-03-04T12:15"
-       },
-       {
-        "start": "2027-03-11T11:15",
-        "end": "2027-03-11T12:15"
-       },
-       {
-        "start": "2027-03-18T11:15",
-        "end": "2027-03-18T12:15"
-       },
-       {
-        "start": "2027-03-25T11:15",
-        "end": "2027-03-25T12:15"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "09:00",
+      "end": "10:00",
+      "from": "2026-11-24",
+      "count": 4,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "Babymassage + Babyyoga, Do 11:15 (ab 07.01.2027)",
+     "summary": "Sanfte Babymassage nach Leboyer mit Babyyoga und Achtsamkeitsübungen für Babys ab ca. 6 Wochen bis 4 Monate, höchstens 6 Familien. Externer Partner: Vertrag und Rechnung direkt beim Kursanbieter; kostenlose Stornierung bis 3 Wochen vorher.",
+     "topics": [
+      "babymassage",
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "69 € (4 Termine)",
+     "url": "https://studioherzschlag.de/angebot/babymassage/",
+     "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 4
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über das Formular auf der Seite; keine Platzangabe. Warteliste und Einstieg im laufenden Kurs über das Kontaktformular."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "11:15",
+      "end": "12:15",
+      "from": "2027-01-07",
+      "count": 4,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "Babymassage + Babyyoga, Do 11:15 (ab 04.02.2027)",
+     "summary": "Sanfte Babymassage nach Leboyer mit Babyyoga und Achtsamkeitsübungen für Babys ab ca. 6 Wochen bis 4 Monate, höchstens 6 Familien. Externer Partner: Vertrag und Rechnung direkt beim Kursanbieter; kostenlose Stornierung bis 3 Wochen vorher.",
+     "topics": [
+      "babymassage",
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "69 € (4 Termine)",
+     "url": "https://studioherzschlag.de/angebot/babymassage/",
+     "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 4
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über das Formular auf der Seite; keine Platzangabe. Warteliste und Einstieg im laufenden Kurs über das Kontaktformular."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "11:15",
+      "end": "12:15",
+      "from": "2027-02-04",
+      "count": 4,
+      "skipHolidays": false
+     }
+    },
+    {
+     "providerId": "studio-herzschlag",
+     "venueId": "studio-herzschlag",
+     "title": "Babymassage + Babyyoga, Do 11:15 (ab 04.03.2027)",
+     "summary": "Sanfte Babymassage nach Leboyer mit Babyyoga und Achtsamkeitsübungen für Babys ab ca. 6 Wochen bis 4 Monate, höchstens 6 Familien. Externer Partner: Vertrag und Rechnung direkt beim Kursanbieter; kostenlose Stornierung bis 3 Wochen vorher.",
+     "topics": [
+      "babymassage",
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "69 € (4 Termine)",
+     "url": "https://studioherzschlag.de/angebot/babymassage/",
+     "sourceUrl": "https://studioherzschlag.de/angebot/babymassage/",
+     "category": "babykurse",
+     "age": {
+      "minMonths": 1,
+      "maxMonths": 4
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über das Formular auf der Seite; keine Platzangabe. Warteliste und Einstieg im laufenden Kurs über das Kontaktformular."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "11:15",
+      "end": "12:15",
+      "from": "2027-03-04",
+      "count": 4,
+      "skipHolidays": false
      }
     }
    ],
-   "inputHash": "dd46f21cb83e4fbde9c16b57c9c2ac141eaf8280dbdf7f6d117dd2e32da5b1da",
+   "inputHash": "414421a27fe14cee3c5aea3c8b979b9428ec22dfce19f376ad95c7e9f516a40d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
-   "changedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "changedAt": "2026-11-22T09:38:14+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsnest/": {
@@ -1416,26 +1482,26 @@
    "inputHash": "24d8849e02b5304218fb6e85fc2e4863176dbdba75036f202cd9413e2da2030a",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-18T10:00:22+01:00",
    "emptySince": "2026-11-18T10:00:22+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/herzzeit/": {
    "events": [],
-   "inputHash": "acd760675c6f4b513f8b8ae6ad9d1cba4091deb3c5fe395abc175a35843d2714",
+   "inputHash": "9613937859e3643ea91957c6a49fde87f01bd98c17edb88724073c55fbc9d755",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/yoga-mit-baby/": {
    "events": [],
-   "inputHash": "a7dc231dd13d385f2932c25607d5b84fe7b2671777d693eeebec9852531daf63",
+   "inputHash": "91914fb3b962b4b1b2ac2e8df1743f5f2cea3e52be9b04d2defe61f5c4c63c00",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1444,7 +1510,7 @@
    "inputHash": "31e145270dd52d1a037406019cbc81daef6341f693f23c815e75ce1495e3a33d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1453,17 +1519,17 @@
    "inputHash": "84ddaa871c538bd5e40801f492379f55e3edd28a6576f3e655796909216baf05",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://studioherzschlag.de/angebot/bewegungsraum-mit-pikler-hengstenberg-elementen/": {
    "events": [],
-   "inputHash": "4aec1d34887f43cfeb398aa15c680181abfab25b6c7fffcc259a886032f64b57",
+   "inputHash": "548771bfc88a50de283ecbcbbee5398a08e5fd74da52cb0a517b44d614f0c6b4",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1472,7 +1538,7 @@
    "inputHash": "738fb300f112a073b3f8918ab0dec8894685d481bce10c39f8d91187bf69b445",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1519,7 +1585,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"
