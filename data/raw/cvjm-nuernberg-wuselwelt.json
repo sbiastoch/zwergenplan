@@ -6,16 +6,17 @@
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungs- und Spielzeit für Kinder 0–3 Jahre (freitags)",
-     "summary": "Offenes Freispiel in der Turnhalle des CVJM für Kinder bis 3 Jahre mit Eltern oder Bezugsperson, danach Austausch der Erwachsenen. Hallenschuhe oder ABS-Socken mitbringen. Einstieg jederzeit ohne Anmeldung; findet nicht in den Ferien statt.",
+     "title": "Wuselwelt: offene Bewegungs- und Spielzeit für 0–3-Jährige",
+     "summary": "Freies Spielen und Toben in der Turnhalle des CVJM für Kinder bis 3 Jahre mit Eltern oder Bezugsperson, danach Austausch der Erwachsenen. Freitags 9:30–10:15 Uhr, nicht in den Ferien; Hallenschuhe oder ABS-Socken mitbringen.",
      "topics": [
       "bewegung",
-      "spielplatz-indoor"
+      "spielplatz-indoor",
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "price": "keine Kosten",
+     "price": "keine",
      "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
      "sourceUrl": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
      "category": "bewegung",
@@ -39,19 +40,19 @@
      }
     }
    ],
-   "inputHash": "f74c9fe1ba7c7a80f6e93b7bfb49fc9633984fb7050c66191e59a7361e28cbd6",
+   "inputHash": "f383c6766bff5c0e5ca13153d51b8640f4af0494d85949315912429752641a22",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
-   "changedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "changedAt": "2026-11-23T10:37:03+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
    "events": [],
-   "inputHash": "c7b854df6f69738b49598ab29dd3dd5b85a4249b06a84379d99a1e160977e818",
+   "inputHash": "702cf0fac8959d376279d6e098572177f2223a5fbcf07bd8628781c220505f58",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
@@ -97,6 +98,11 @@
    "status": "ok",
    "checkedAt": "2026-11-22T09:38:14+01:00",
    "changedAt": "2026-11-21T09:41:55+01:00",
+   "pending": {
+    "inputHash": "39bf30a0289c3f3c74b3a2a51c0793f71724f70d67c8bda5dd1ba2db0781b5c6",
+    "model": "haiku",
+    "events": []
+   },
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;": {
@@ -104,16 +110,16 @@
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre, freitags)",
-     "summary": "Offene Bewegungs- und Spielzeit in der Turnhalle im CVJM-Haus, freitags 9:30–10:15 Uhr. Ohne Anmeldung, einfach vorbeikommen.",
+     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre)",
+     "summary": "Offene Bewegungs- und Spielzeit in der Turnhalle des CVJM für Kinder bis 3 Jahre mit Begleitung. Freitags, Einstieg jederzeit, ohne Anmeldung. Preis auf der Quellseite nicht angegeben, bitte vorab erfragen.",
      "topics": [
       "bewegung",
       "spielplatz-indoor"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+     "cost": "kostenpflichtig",
+     "url": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
      "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
      "category": "bewegung",
      "age": {
@@ -136,11 +142,11 @@
      }
     }
    ],
-   "inputHash": "0ffc2afe5f75fe949cfd87ba2155a0232ba21e8ec513ad651758593245e6f545",
+   "inputHash": "8ff625a3bac0d89f70597f06d5b48332c11623de63853a804e7cad0c30f1b00f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
-   "changedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "changedAt": "2026-11-23T10:37:03+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "kandidaten": {
@@ -157,7 +163,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
    "emptySince": "2026-11-02T09:03:46+01:00",
    "sources": [

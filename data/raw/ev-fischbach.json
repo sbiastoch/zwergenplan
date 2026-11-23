@@ -6,8 +6,8 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), dienstags",
-     "summary": "Treff für Mütter mit Kindern von 3 Monaten bis 3 Jahren im Haus der Begegnung, dienstags 9:30–11:30 Uhr. Der Kalender zeigt Termine bis 15.12.; Anmeldung und Kosten sind dort nicht angegeben, daher bei der Gemeinde nachfragen.",
+     "title": "Mutter-Kind-Gruppe, dienstags 9:30–11:30 (3 Monate bis 3 Jahre)",
+     "summary": "Treff für Mütter mit Kindern von 3 Monaten bis 3 Jahren im Haus der Begegnung. Termine im Kalender bis 15.12.; Anmeldung und Kosten sind nicht angegeben.",
      "topics": [
       "eltern-kind-gruppe",
       "muetter"
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu freien Plätzen; bei der Gemeinde nachfragen."
+      "note": "Keine Angaben zu Plätzen oder Anmeldung im Kalender; Rückfragen bei der Gemeinde (fischbach-evangelisch.de)"
      },
      "schedule": {
       "kind": "dates",
@@ -51,8 +51,8 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (Kinder 3 Monate–3 Jahre), donnerstags",
-     "summary": "Treff für Mütter mit Kindern von 3 Monaten bis 3 Jahren im Haus der Begegnung, donnerstags 9:30–10:30 Uhr. Der Kalender zeigt Termine bis 17.12.; Anmeldung und Kosten sind dort nicht angegeben, daher bei der Gemeinde nachfragen.",
+     "title": "Mutter-Kind-Gruppe, donnerstags 9:30–10:30 (3 Monate bis 3 Jahre)",
+     "summary": "Treff für Mütter mit Kindern von 3 Monaten bis 3 Jahren im Haus der Begegnung, vormittags eine Stunde. Termine im Kalender bis 17.12.; Anmeldung und Kosten sind nicht angegeben.",
      "topics": [
       "eltern-kind-gruppe",
       "muetter"
@@ -69,7 +69,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu freien Plätzen; bei der Gemeinde nachfragen."
+      "note": "Keine Angaben zu Plätzen oder Anmeldung im Kalender; Rückfragen bei der Gemeinde (fischbach-evangelisch.de)"
      },
      "schedule": {
       "kind": "dates",
@@ -99,21 +99,21 @@
     "2026-11-23": "3d074e63e80d86a77af3d11d56aa41856f1b8077ee1498cb9b01a792c654e820",
     "2026-11-24": "13955611015c95173db4a9b3f32c88839a15cf8576569cb53994c8f7ecd6f113",
     "2026-11-26": "84c9d494e10783226c7e77d581a513a82e66949ab3b6cc253f536632bbe4050c",
-    "2026-11-29": "158baad953f5dbcd5d76e6a3d9e818915309eb58603baee130b48b8fe5687de2",
+    "2026-11-29": "37989a5c9770f57baf205951bff844e602bd1a332c2dda6bebce57b4957a5d6e",
     "2026-11-30": "21122ef81d71f0c52c70778b1a1970674ba11bf56e76d39f10adda3e3be7c85a",
     "2026-12-01": "242bf98c788986e7a646b3c7e138ba606780816d49f2af8f44ece7aeea90d496",
     "2026-12-02": "14828e58ef55ddd9d37213bd998540ebcd09683d03a70cdb5d59b3dedd44dbdc",
     "2026-12-03": "a14b667bbbdd0bb35676da5bc3e796cb17e7fe98ba443d49c25643db6ac7dd12",
-    "2026-12-06": "430a0cc568bbfb23e914ffb4bc6b1cb51db923617875cfeac80232f72dbeefa3",
+    "2026-12-06": "6fddd82016fbd09170ae020c523b1cd363ba17c1220ebb3b7c0f0ac866cbb0f8",
     "2026-12-07": "c8224cad2d17cf6f80eaceec73f581ec68a2150eddabf752e6f23d10786e2622",
     "2026-12-08": "6dc5f15f8899da58175b1738d46d8cc458efbc9be75429f36e403daf48be85ed",
     "2026-12-10": "ebe605884d018d9a329b2b3da30b6b2a1a73da836e9cd0fea18384c7719a8aef",
-    "2026-12-13": "6c0da42e2233a21d5aa3e4fcf2ccddb90b30c4ee53c6910f6b1a7dadbe61be29",
+    "2026-12-13": "17c611b15c6e8c52449de5ef306e5e060f49855799f6815ef0e103a8c42a5d6b",
     "2026-12-14": "67783402986ecb314ddec998a4ece3191cfd9862cadb21446a2da0d8db635f65",
     "2026-12-15": "82ba76a96a9def2bfe1e8b5d1bbac77805c39f1b06cb974934cbc39e4336406a",
     "2026-12-16": "17e05f644b7e26122f48aed58d00683419f65656577ed4b1219cf793e56b293b",
     "2026-12-17": "143b5697bcb4642880514d2afada8ed7417e4cf154de701fee963c6f1a5c77f6",
-    "2026-12-20": "3c56f330e4482a733195fe31baad6e4a5d0b730f3b14ea20c39990169b422e7c",
+    "2026-12-20": "be69f9bddcdec64d13037f3cc8533e5166343d104d9080e41a6e9760104085e9",
     "2026-12-21": "9b11d4c70a4b9fa791c5505bbc0f56ad569447da7d0e18788a9f73e8383dbe4d",
     "2026-12-24": "d63e499f53edb61f36d370de339362b62be13e94cf8e39d8814ac46b9caf9d96",
     "2026-12-27": "79b7eb711a1e8d5abe85d4e4f9b28505bd2804f459ced8a84cdc9acdbbb637ad",
@@ -122,9 +122,12 @@
     "2027-01-03": "afc084a91f0a105d6e0ec0397bced667bb11dbdaf95427b9eae3c84402ce6770",
     "2027-01-06": "a9ae1363b328fe4943fa1e152509f185c37efd1d4a8cf17ce4380bd8a86c7973",
     "2027-01-10": "906e6bf532da797ebcc921650f49ac6b689bcef7aa9ab1a6cc68a3fbe22cb7d9",
+    "2027-01-13": "482fd549a50d9aa52fb37e362aadfed7be9485f78c0b7d45e3e2e30a7bf240d2",
     "2027-01-17": "fc278f67eaf0d6c64f12b7299517f01216d5eeb7b698e8403bddc91c603efced",
+    "2027-01-23": "d9ede5b6a35581357f161725d34f27f25e9234be7024a16bc5bc3ea27d762434",
     "2027-01-24": "afd3fc019c1bcafba3605f72b89f047aba4c4d96f87efbf65b57c5841089b57a",
     "2027-01-31": "b9304ad97c22ba2a0126aa1b72d246c687f1a40b865b17b422e71e807a58f1cc",
+    "2027-02-03": "ffb2e4df2fe8d19ba85de2d3f0545d91a685196e5374845a668e7f63a4c20972",
     "2027-02-07": "06778eff1219eeebcb41ee4eb3e8a934b62e652a30a49c44f18214f83ceaa060",
     "2027-02-14": "d463a056fb18096d61cc81bfc4c08144e07a71fa01182e9a345af8db7ddd4644",
     "2027-02-21": "abdce37a4dd756e4c527a526cfd0e9a96888010dd63649705be2b5896b2fac9e",
@@ -154,8 +157,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
-   "changedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "changedAt": "2026-11-23T10:37:03+01:00",
    "partsHash": "d7bdfa5dfc673ef24ea44d79155ceb596d1cdbc06557d29dc3f2f911053987ba"
   },
   "kandidaten": {
@@ -338,7 +341,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-11-20T10:02:41+01:00",
    "sources": [
     "evtermine"

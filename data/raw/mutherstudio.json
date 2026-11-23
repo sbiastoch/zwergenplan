@@ -6,18 +6,49 @@
    "inputHash": "d7b9a2987e7b46b3ccb1c60bb73919898ac1d845d751e9135e667eb8753f7693",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.com/mamababyyoga": {
-   "events": [],
-   "inputHash": "1bd4a746dfa77b35dedd66487acca47b66a1f1386b80ac0b413d4de3f1c0c5e1",
+   "events": [
+    {
+     "providerId": "mutherstudio",
+     "venueId": "mutherstudio",
+     "title": "Mama-Baby Yoga (mittwochs, ab 20.01.2027)",
+     "summary": "Sanfte Yogaübungen für Mütter, das Baby ist dabei und profitiert von Berührung und Bewegungsimpulsen. Voraussetzung ist eine abgeschlossene Rückbildung. Acht Einheiten, zertifiziert für den Krankenkassen-Zuschuss.",
+     "topics": [
+      "yoga-mit-baby"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "129 € (8 Einheiten)",
+     "url": "https://mutherstudio.com/mamababyyoga",
+     "sourceUrl": "https://mutherstudio.com/mamababyyoga",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung per Mail an annette.samol@gmx.de"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "10:45",
+      "end": "11:45",
+      "from": "2027-01-20",
+      "count": 8,
+      "skipHolidays": true
+     }
+    }
+   ],
+   "inputHash": "a9112440d647e8141dd03b029c100ae537afdd9bcca1b71eb6177bd49319b9b5",
    "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
-   "changedAt": "2026-11-22T09:38:14+01:00",
-   "emptySince": "2026-11-22T09:38:14+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "changedAt": "2026-11-23T10:37:03+01:00",
    "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.com/body-mind-and-kids": {
@@ -25,27 +56,26 @@
     {
      "providerId": "mutherstudio",
      "venueId": "mutherstudio",
-     "title": "Mama, Mini & Mental Health (Babys ca. 0–18 Monate)",
-     "summary": "Austauschgruppe für Mütter mit Babys bis etwa 18 Monate: Gespräche über Alltag, Bedürfnisse und Partnerschaft, dazu sanfte Mobility-Übungen. Die Kinder spielen mit wechselnden Materialien. Maximal 6 Personen, bequeme Kleidung mitbringen.",
+     "title": "Mama, Mini & Mental Health (0–18 Monate) – Start 13.01.2027",
+     "summary": "Austausch für Mütter zu Alltag, Partnerschaft und eigenen Bedürfnissen, dazu sanfte Mobility-Übungen; die Kinder spielen mit wechselnden Materialien. Sechs Mittwochstermine, nicht in Ferien und an Feiertagen.",
      "topics": [
       "elterntreff",
-      "eltern-kind-gruppe",
-      "muetter"
+      "spielgruppe"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "price": "90 € (6 Termine)",
-     "url": "https://mutherstudio.thrivecart.com/mama-mini--mental-health-6x-mittwochs/",
+     "url": "https://mutherstudio.com/body-mind-and-kids",
      "sourceUrl": "https://mutherstudio.com/body-mind-and-kids",
-     "category": "treffs-cafes",
+     "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
       "maxMonths": 18
      },
      "availability": {
       "status": "wenige",
-      "note": "Seite: „Nur noch wenige Plätze“; Buchung über „Termin wählen“"
+      "note": "Seite: „Nur noch wenige Plätze“; Buchung über den Buchen-Button"
      },
      "schedule": {
       "kind": "weekly",
@@ -54,18 +84,51 @@
       ],
       "start": "09:30",
       "end": "10:30",
-      "from": "2026-09-23",
-      "count": 6,
+      "from": "2027-01-13",
+      "until": "2027-02-24",
       "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "mutherstudio",
+     "venueId": "mutherstudio",
+     "title": "Mama, Mini & Mental Health (0–18 Monate) – Herbst 2026, läuft bis 25.11.",
+     "summary": "Laufender Herbstkurs mit Austausch für Mütter und Spielmaterial für die Kinder. Letzter Termin am 25.11.2026; für eine Teilnahme die Buchungsseite prüfen.",
+     "topics": [
+      "elterntreff",
+      "spielgruppe"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "price": "90 € (6 Termine)",
+     "url": "https://mutherstudio.com/body-mind-and-kids",
+     "sourceUrl": "https://mutherstudio.com/body-mind-and-kids",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 18
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Buchung über den Buchen-Button; Platzstand nicht angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-25T09:30",
+        "end": "2026-11-25T10:30"
+       }
+      ]
      }
     }
    ],
-   "inputHash": "d9c8df91136cff59531dcee2c8952f7acb1cac25f7096b815a097c410cab1bc8",
+   "inputHash": "3c321f791db880cdb62b84ed55c8fb408d5240282667b02d18d8885c8ca67752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
-   "changedAt": "2026-10-30T08:39:48+01:00",
-   "emptySince": "2026-10-29T08:35:39+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "changedAt": "2026-11-23T10:37:03+01:00",
    "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.com/waldspielracker": {
@@ -170,16 +233,16 @@
    "inputHash": "37b44d11ea58720fd790ab0b60dfc5f72085576a54ac7790bcc51a937d436937",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"
   },
   "seite:https://mutherstudio.thrivecart.com/mama-mini--mental-health-6x-mittwochs/": {
    "events": [],
-   "inputHash": "23879046ab6066d4e816b8f464c3143b5216f639dc0bce4b616f8a07f0e63a54",
+   "inputHash": "07c82d826f5abe57ef62a462b1db4985a978a3f219ad258ab0dfba78c46dbc09",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "a66a59dd3f54715e6b0382a5fb25f2e49b168b35a7df7ef407882a7fba951511"

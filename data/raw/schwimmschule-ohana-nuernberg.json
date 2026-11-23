@@ -109,7 +109,7 @@
    "inputHash": "2baccc248894a8cb08434610ecf02ad907fc27b7cdb481e5165052b254843b2b",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-11-21T09:41:55+01:00",
    "partsHash": "af30022381f70d519ba33965e65b3cf352e86a32734bb09c23c093e407046922"
   },
@@ -118,8 +118,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Minis ab 1 Jahr – Schwimmkurs samstags 9:30 (Kliniken Dr. Erler)",
-     "summary": "Schwimmkurs für Kinder ab 1 Jahr im Kliniken Dr. Erler, Kontumazgarten, von 20.03. bis 22.05.2027 samstags um 9:30. Anmeldung über das Buchungssystem; laut Quelle sind Plätze frei. Ob Eltern dabei sind, steht nicht ausdrücklich in der Quelle.",
+     "title": "Minis ab 1 Jahr (Samstag 9:30, Kliniken Dr. Erler)",
+     "summary": "Schwimmkurs für Kinder ab 1 Jahr, samstags 9:30 Uhr, vom 20.03. bis 22.05.2027 im Kontumazgarten. Laut Buchungssystem sind Plätze frei; ob Eltern dabei sind, steht in der Quelle nicht.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -136,7 +136,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Kursinstanz laut JSON-LD verfügbar (schema.org/InStock); Anmeldung über Kursolino"
+      "note": "Im Kursolino-System buchbar (JSON-LD: InStock)"
      },
      "schedule": {
       "kind": "weekly",
@@ -150,11 +150,11 @@
      }
     }
    ],
-   "inputHash": "91ad163af01f8373b0e2b24fabf2b4ae7fa93aa817766783bcc40434d166a1c5",
+   "inputHash": "9866a3bddc11a80a39b119a5992e4534c35dc7ee9f9941a30e42893c66686faa",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
-   "changedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "changedAt": "2026-11-23T10:37:03+01:00",
    "partsHash": "a84bb2ed546ae4814a96439cd5b0b540a11301612e87220b19845c91708fd1a7"
   },
   "seite:https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292": {
@@ -231,7 +231,7 @@
    "inputHash": "650b02b9484d91041df1c5f66abe27b325799a59a6678230a318c587b40edc67",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "2dbca5b3382f77e652ff85c49279a49db4118d6b0d169dda8535979136d77bff"
   }

@@ -77,7 +77,7 @@
    "inputHash": "29cfa8bc19a60da9cbdcb4e169e689167b52d194c7fead7e0b10ffb2cb2cceb5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-11-11T09:09:51+01:00",
    "partsHash": "159ed93d0c00e8cf48580e9e3ed297a9c837e7328224ec8a037d9ce33b01c06b"
   },
@@ -86,16 +86,16 @@
    "inputHash": "6c8a037dfd5bf2aac475fa447a8726aef3943d7558dfabd1e7cb8f6df42f1e51",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   },
   "seite:https://www.nuernberg.de/cgi-bin/ajax_vk.pl?ABFRAGE=%28veranstalterID%20%3D%3D%20412%29%20OR%20%28ortID%20%3D%3D%2028%29&AUSGABEFELDER=TITEL,UNTERTITEL,DATUM,ORT&MAX_LIMIT=200&ALLETERMINE=1&ORDER=DATUM&START_DATUM={von}": {
    "events": [],
-   "inputHash": "69dd8293d4f5f4c9b5162580d8cf5bc86479ff8e25e562d0b90f855b7fc9f7ca",
+   "inputHash": "a76e4d820b70c3d44158c2515869236a7a4b882aa1a7a944244bb3c071bb5f1c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-22T09:38:14+01:00",
+   "checkedAt": "2026-11-23T10:37:03+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8065a6046b468822aac2ec95bb3af9ca3bff34969744f8396d8564ee8f549463"
   }
