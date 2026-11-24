@@ -6,29 +6,27 @@
     {
      "providerId": "ev-altenfurt-minigottesdienst",
      "venueId": "ev-altenfurt-minigottesdienst",
-     "title": "Krabbelgruppe Christuskirche Altenfurt (dienstags 9:30)",
-     "summary": "Singen, Spielen, Fingerspiele und Bilderbücher für Eltern mit Kleinkindern, auch für Kinder, die schon die Krippe besuchen. Anmeldung und Kosten stehen nicht im Eintrag; bitte bei der Gemeinde nachfragen.",
+     "title": "Krabbelgruppe (Eltern-Kind-Gruppe, Christuskirche Altenfurt)",
+     "summary": "Eltern-Kind-Treffen mit Singen, Spielen, Kreis- und Fingerspielen sowie Bilderbüchern, dazu Austausch und pädagogische Anregungen für Eltern. Auch für Kinder, die schon die Krippe besuchen. Die Quelle nennt weder Anmeldung noch Kosten.",
      "topics": [
       "krabbelgruppe",
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "elterntreff",
+      "singen"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8290610",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8290610",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8290611",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8290611",
      "category": "krabbel-spielgruppen",
      "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Im Eintrag keine Anmeldung genannt; Nachfrage bei der Christuskirche Altenfurt."
+      "status": "unbekannt",
+      "note": "Keine Angaben zu Plätzen oder Anmeldung in der Quelle; bei Fragen die Gemeinde kontaktieren."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-24T09:30",
-        "end": "2026-11-24T10:30"
-       },
        {
         "start": "2026-12-01T09:30",
         "end": "2026-12-01T10:30"
@@ -52,16 +50,15 @@
    ],
    "inputHash": "8630eb7322bdadf670b7b1e6bc3856686638ced50b00020d0598aa0d09ec2252",
    "dated": {
-    "2026-11-24": "2c0f66ebeed561698379135f205f40d1c9f81b92d08a7be005735eff9c9b908e",
-    "2026-12-01": "aed69808e922221992f43712a4ac1837bda61163d6095268002c305904ab968d",
-    "2026-12-08": "959b7bea00012e18071553955a06ea51f978a0206cd89f95b7afc0073809ef73",
-    "2026-12-15": "f2fb7923eae1397071ca69dc852d380ad8ed66119642246814723592d34bc6bc",
-    "2026-12-22": "91023d2888eeca9bcbcf58d4eccf97def6ad6b2d63f7e947744d12c9b2a01363"
+    "2026-12-01": "c6104c0e45edcd73092faddb1c65f52f8c9d573a77e4238f76e807631caf93c6",
+    "2026-12-08": "e9d586b15bc42672c0959d2f6f9660fab8afc60431bf56d33d02c9bb0da2132c",
+    "2026-12-15": "f3e8fd5cc40c4210ff910b70d5437702e50033d24f46286b116f4b5d606f700b",
+    "2026-12-22": "3da288e73768f42375d677ff11d26d702e745040a0d0b03b5e9a332abf8f04ba"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "sources": [
     "evtermine"
    ],

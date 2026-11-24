@@ -6,18 +6,63 @@
     {
      "providerId": "ev-zerzabelshof-musikzwerge",
      "venueId": "ev-zerzabelshof-musikzwerge",
-     "title": "Musikzwerge für Eltern mit Baby ab ca. 3 Monaten",
-     "summary": "Singen, Rhythmus und Musizieren mit tönenden Materialien und Instrumenten; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Keine Platzangabe, Nachfrage beim Veranstalter nötig.",
+     "title": "Musikzwerge für Eltern mit Kind ab ca. 2 Jahren",
+     "summary": "Musik und Rhythmus mit Gesang, tönenden Materialien und Instrumenten, dazu Krabbel- und Fingerspiele zum Weitergeben an zuhause sowie Raum für Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Veranstalter erfragen.",
      "topics": [
       "musik",
-      "singen",
-      "eltern-kind-gruppe"
+      "singen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8108199",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108199",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8108186",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108186",
+     "category": "musik",
+     "age": {
+      "minMonths": 24,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, beim Veranstalter erfragen."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-30T09:15",
+        "end": "2026-11-30T10:15"
+       },
+       {
+        "start": "2026-12-07T09:15",
+        "end": "2026-12-07T10:15"
+       },
+       {
+        "start": "2026-12-14T09:15",
+        "end": "2026-12-14T10:15"
+       },
+       {
+        "start": "2026-12-21T09:15",
+        "end": "2026-12-21T10:15"
+       }
+      ]
+     },
+     "via": "evtermine"
+    },
+    {
+     "providerId": "ev-zerzabelshof-musikzwerge",
+     "venueId": "ev-zerzabelshof-musikzwerge",
+     "title": "Musikzwerge für Eltern mit Baby ab ca. 3 Monaten",
+     "summary": "Musik und Rhythmus mit Gesang, tönenden Materialien und Instrumenten für Eltern mit ganz kleinen Kindern, dazu Krabbel- und Fingerspiele zum Nachmachen sowie Raum für Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Veranstalter erfragen.",
+     "topics": [
+      "musik",
+      "singen"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8108200",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108200",
      "category": "musik",
      "age": {
       "minMonths": 3,
@@ -25,15 +70,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage beim Veranstalter (Ev. Auferstehungskirche Zerzabelshof)"
+      "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, beim Veranstalter erfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-23T10:30",
-        "end": "2026-11-23T11:30"
-       },
        {
         "start": "2026-11-30T10:30",
         "end": "2026-11-30T11:30"
@@ -58,17 +99,16 @@
      "providerId": "ev-zerzabelshof-musikzwerge",
      "venueId": "ev-zerzabelshof-musikzwerge",
      "title": "Musikzwerge für Eltern mit Kind ab ca. 1 Jahr",
-     "summary": "Singen, Rhythmus und Musizieren mit tönenden Materialien und Instrumenten; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Keine Platzangabe, Nachfrage beim Veranstalter nötig.",
+     "summary": "Musik und Rhythmus mit Gesang, tönenden Materialien und Instrumenten, dazu Krabbel- und Fingerspiele zum Weitergeben an zuhause sowie Raum für Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Veranstalter erfragen.",
      "topics": [
       "musik",
-      "singen",
-      "eltern-kind-gruppe"
+      "singen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8122217",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8122217",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8122218",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8122218",
      "category": "musik",
      "age": {
       "minMonths": 12,
@@ -76,15 +116,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage beim Veranstalter (Ev. Auferstehungskirche Zerzabelshof)"
+      "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, beim Veranstalter erfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-24T09:15",
-        "end": "2026-11-24T10:15"
-       },
        {
         "start": "2026-12-01T09:15",
         "end": "2026-12-01T10:15"
@@ -109,17 +145,16 @@
      "providerId": "ev-zerzabelshof-musikzwerge",
      "venueId": "ev-zerzabelshof-musikzwerge",
      "title": "Musikzwerge für Eltern mit Kind ab ca. 18 Monaten",
-     "summary": "Singen, Rhythmus und Musizieren mit tönenden Materialien und Instrumenten; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Keine Platzangabe, Nachfrage beim Veranstalter nötig.",
+     "summary": "Musik und Rhythmus mit Gesang, tönenden Materialien und Instrumenten, dazu Krabbel- und Fingerspiele zum Weitergeben an zuhause sowie Raum für Erziehungsfragen. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Veranstalter erfragen.",
      "topics": [
       "musik",
-      "singen",
-      "eltern-kind-gruppe"
+      "singen"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8108212",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108212",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8108213",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108213",
      "category": "musik",
      "age": {
       "minMonths": 18,
@@ -127,15 +162,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage beim Veranstalter (Ev. Auferstehungskirche Zerzabelshof)"
+      "note": "Keine Platzangabe; Anmeldung laut Quelle nicht angegeben, beim Veranstalter erfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-24T10:30",
-        "end": "2026-11-24T11:30"
-       },
        {
         "start": "2026-12-01T10:30",
         "end": "2026-12-01T11:30"
@@ -155,72 +186,23 @@
       ]
      },
      "via": "evtermine"
-    },
-    {
-     "providerId": "ev-zerzabelshof-musikzwerge",
-     "venueId": "ev-zerzabelshof-musikzwerge",
-     "title": "Musikzwerge für Eltern mit Kind ab ca. 2 Jahren",
-     "summary": "Singen, Rhythmus und Musizieren mit tönenden Materialien und Instrumenten für Kinder ab 2 Jahren; Eltern lernen Lieder und Fingerspiele zum Weitergeben. Keine Platzangabe, Nachfrage beim Veranstalter nötig.",
-     "topics": [
-      "musik",
-      "singen",
-      "eltern-kind-gruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8108186",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8108186",
-     "category": "musik",
-     "age": {
-      "minMonths": 24,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage beim Veranstalter (Ev. Auferstehungskirche Zerzabelshof)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-30T09:15",
-        "end": "2026-11-30T10:15"
-       },
-       {
-        "start": "2026-12-07T09:15",
-        "end": "2026-12-07T10:15"
-       },
-       {
-        "start": "2026-12-14T09:15",
-        "end": "2026-12-14T10:15"
-       },
-       {
-        "start": "2026-12-21T09:15",
-        "end": "2026-12-21T10:15"
-       }
-      ]
-     },
-     "via": "evtermine"
     }
    ],
    "inputHash": "71821cadb602e27f22ad5cfda1ea40f2eb324209885e68ff92ce7c9b915d104e",
    "dated": {
-    "2026-11-23": "8bcbc48e3df1054b7ac56199cab8de6c411ca4976208c4fc5cb030bd75c31f78",
-    "2026-11-24": "17375da349f2b3ac0ce7f91333cc6ec82efb18ade15a917c22470f6740882c68",
-    "2026-11-30": "b00204a3c9b8b60bb6ebbd7dd66c72d9814f92ce4577aa951b632b02b754115f",
-    "2026-12-01": "97ae6cc3b7600ea43bb66fc9da7d20d4b184307b8edf93076e530a889aa8492e",
-    "2026-12-07": "c47212cb8ff9f76bfc304573e5cc045650210aa6814c65b475d579510b14b368",
-    "2026-12-08": "e63547f206cc0ee3b2c61da0d1e7aa9fa6b1f87e81ee6920f5d3710258c2ca09",
-    "2026-12-14": "1aaff96e77726e6806401f6459012a9f599b6df1b5c302a9f7e3611b6a9c5a47",
-    "2026-12-15": "c2929f61263a2e3eb5d72ab7e5a6f9061bc793fe5ec5730def0ae6e663c3c4f9",
-    "2026-12-21": "d01403631d2807c3572b2d1aed84fe3afa1f07239f55217686c67de8da92c727",
-    "2026-12-22": "52cf3550627e5578b628bedfe1457db3171188d7e7e034fa78096709a5da83c2"
+    "2026-11-30": "5242e6fa5eef3d5364891c98e08cf574888c446712aa9af5a5761b112a02f1c1",
+    "2026-12-01": "f87a35ba65d633210fa62cf26f5ee3f66a3e7da5eb8c514c1d4518c5c73301e1",
+    "2026-12-07": "12b97bdf569ea0fecba26b02eb92cd2302a348eca76bed07875c7a7a25304073",
+    "2026-12-08": "b73952ae5661bbd9c77ff0c42556d96c0f035f738bb9e4911da9776daea7e265",
+    "2026-12-14": "1f931f5b90623d5a947bbe6bac6185d98202228f6b1512421e1a4ae28fbdf4e2",
+    "2026-12-15": "359bd9a06b734ca3c265fefa7c080636a248d697bc1e82102ad995129b35da50",
+    "2026-12-21": "cfabe82ca2d15859339226478f6b1428380b32364098cec517aab7b3db3f35fe",
+    "2026-12-22": "250ff707b2629fd7bcf6128c416fc369c8939e4ded03d0b5d89ea32c5144ae6d"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "sources": [
     "evtermine"
    ],

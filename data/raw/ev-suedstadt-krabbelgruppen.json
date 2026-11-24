@@ -75,7 +75,7 @@
    "inputHash": "b4f8666250751c3ce6a4bb064f50dd67ad6959794b8fbe30cc38f3520b00393a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "8fdc3a8a582919153c413399f039f64479ccfa6fed10791255713e99ba7f3951"
   },
@@ -83,7 +83,6 @@
    "events": [],
    "inputHash": "0f93a49928c2a4cdfdc9ab4e4d3f64090f762076d5f4ffbedef552f213aa2657",
    "dated": {
-    "2026-11-23": "26b80248e3c043ab5105c2cf71a8ef8cfa7986c92d5e8d0b4c0e11a9870d318d",
     "2026-11-24": "c8aedc7023f3c18ce0299913fb59532e041a5d99de797d17bb181ab9f2d7d559",
     "2026-11-25": "0b25e7f627a6e4863f5a6b2f0241ce9040c41894986ae08e10eb22ff9b3830a8",
     "2026-11-26": "db99eafee78b6cffe1a8e995de5299f2bd0d0cf017614b7f4c553400f7ecab90",
@@ -196,24 +195,61 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "8fdc3a8a582919153c413399f039f64479ccfa6fed10791255713e99ba7f3951"
   },
   "kandidaten": {
-   "events": [],
+   "events": [
+    {
+     "providerId": "ev-suedstadt-krabbelgruppen",
+     "venueId": "ev-suedstadt-krabbelgruppen-christuskirche-steinbuehl",
+     "title": "Eltern-Kind-Gruppe, dienstags 9 Uhr (Christuskirche Steinbühl)",
+     "summary": "Regelmäßige Eltern-Kind-Gruppe im Gemeindesaal der Christuskirche Steinbühl, dienstags um 9 Uhr. Angegeben sind Termine im Dezember 2026. Anmeldung und Kosten stehen in der Quelle nicht, bitte bei der Gemeinde nachfragen.",
+     "topics": [
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8289395",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8289395",
+     "category": "krabbel-spielgruppen",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe. Anfrage über die Christuskirche Steinbühl (Kontakt laut Quelle)."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-01T09:00"
+       },
+       {
+        "start": "2026-12-08T09:00"
+       },
+       {
+        "start": "2026-12-15T09:00"
+       },
+       {
+        "start": "2026-12-22T09:00"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
+   ],
    "inputHash": "894a8cdafbf52c2aa0388a6a7b87933b61e9d738d571165ff0a59a375765cea3",
    "dated": {
-    "2026-11-24": "225f05617c04f111ed505d38dfe763a58a29cffdf561f9e36d73766018d204df",
-    "2026-12-01": "0de7c80612e23b2ac0cae872ae4b3ae9bf398a91cfdbf1f5c9eafd372a9a7f6c",
-    "2026-12-08": "fedb0235756be0f38bda3ce595a52d57b8658c5f0bbdbcc3e4bd4c8b4f11da97",
-    "2026-12-15": "006060ace2c940599ef9bfe3a2d94b6351b6fe2d149ff77ef41f33596878e97a",
-    "2026-12-22": "0964382ed811de35437fcef983d91d49c7a1549a98d5ac3fbacb8616fce1d813"
+    "2026-12-01": "e4c8606366626f1757b3c602bb37c922fa80ba90b256a4fbafc8f0d099584c44",
+    "2026-12-08": "210df11e1d53014b12a57ab5ff30516bb00593b47edb90da1ff19b5b41abccb2",
+    "2026-12-15": "3a431573ffaed5a58a6d3c2c19a4b9bcf4e345f67f98c5ec639fbd6e785642ad",
+    "2026-12-22": "459a96a5567c41c70981bb37f1300123febaabbbaae762d867be8ec17325f1ab"
    },
    "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-03T09:27:26+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "sources": [
     "evtermine"
    ],

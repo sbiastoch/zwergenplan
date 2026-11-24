@@ -6,15 +6,16 @@
     {
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
-     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags 9:30)",
-     "summary": "Wöchentliches Treffen für Eltern mit Kindern von 0 bis 3 Jahren im Gemeindehaus der Melanchthonkirche. Anmeldung und Preis sind in der Quelle nicht angegeben; bei Fragen an die Gemeinde wenden.",
+     "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren (dienstags)",
+     "summary": "Wöchentliche Eltern-Kind-Gruppe im Gemeindehaus für Eltern mit Kindern von 0 bis 3 Jahren. Laut Kalender ist keine Anmeldung nötig; in den Ferien findet sie nicht statt.",
      "topics": [
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109714.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109715.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=574",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -23,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung in der Quelle; Anfrage bei der Gemeinde"
+      "note": "Keine Platzangabe im Kalender; bei Fragen über die Gemeinde anfragen."
      },
      "schedule": {
       "kind": "weekly",
@@ -32,22 +33,22 @@
       ],
       "start": "09:30",
       "end": "11:00",
-      "from": "2026-11-24",
+      "from": "2026-12-01",
       "skipHolidays": true
      }
     },
     {
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
-     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags)",
-     "summary": "Regelmäßige Eltern-Kind-Gruppe im Gemeindehaus für Familien mit Kindern von 0 bis 3 Jahren, dienstags 9:30 bis 11:00 Uhr. Im Kalender sind die Termine bis 27. Juli 2027 eingetragen, im Mai fehlen die Dienstage 18. und 25.",
+     "title": "Eltern-Kind-Gruppe 0–3 Jahre (dienstags, Gemeindehaus)",
+     "summary": "Offene Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren im Gemeindehaus, dienstags 9:30–11:00 Uhr. Der Kalendereintrag nennt weder Kosten noch Anmeldung; bitte bei der Gemeinde nachfragen.",
      "topics": [
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8300927.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8300929.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=574",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -56,19 +57,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung im Kalendereintrag; bei der Gemeinde nachfragen."
+      "note": "Keine Angaben zu Plätzen oder Anmeldung im Kalender; bei der Gemeinde nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2027-04-13T09:30",
-        "end": "2027-04-13T11:00"
-       },
-       {
-        "start": "2027-04-20T09:30",
-        "end": "2027-04-20T11:00"
-       },
        {
         "start": "2027-04-27T09:30",
         "end": "2027-04-27T11:00"
@@ -123,9 +116,9 @@
    ],
    "inputHash": "e7e200d6e8a22eb245aeae6783534cf554ac015a072d78fc5f8e45aa693359d3",
    "dated": {
-    "2026-11-23": "cccaa3a4e36f3da1a7ed327d8beb3e6f9bf611e15c8904fffe4b277fa6393b1e",
-    "2026-11-24": "37577817fe63e3008d7c981d356fa6906ee893d135545ef816bbb915c9abe577",
+    "2026-11-24": "dfcc783bc80a06c8e5f3bbba6f467b7aa95224e5425f4f8f0660225872c98576",
     "2026-11-26": "3ba0c69981ea86983c5e97319a3f38b5df2f4529a77c53062bad8acd1f0f5d47",
+    "2026-11-27": "2efa116a6ef0c00c6a7f7f1d7beb8ea9480b7a6d61e4c1819b64c7855cfaab28",
     "2026-11-29": "fb5c035133b9e6961607dbc1423ab4c8ca64708b0a9f0e707db37a8f91e9f1fd",
     "2026-11-30": "ecf4e220659af668e916d0bcfc0e02e02434a08b3c72cf5364343915b5b8a918",
     "2026-12-01": "056737d12e95df8ff3305a0be2813f2f39d33661102adda556d8962d1ce9c444",
@@ -223,8 +216,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "7a588f5684743d34f43b434b2b4bca9b975902153d2249675e9a712e6c1c9142"
   },
   "kandidaten": {
@@ -233,7 +226,7 @@
      "providerId": "ev-melanchthon-ziegelstein",
      "venueId": "ev-melanchthon-ziegelstein",
      "title": "Eltern-Kind-Gruppe für Kinder von 0 bis 3 Jahren",
-     "summary": "Regelmäßige Gruppe der Melanchthonkirche: Eltern tauschen sich über den Erziehungsalltag aus und erhalten Anregungen, die Kinder spielen zusammen und hören Lieder und Geschichten. Kosten und Anmeldung stehen nicht in der Quelle; bitte bei der Gemeinde nachfragen.",
+     "summary": "Eltern und Kinder treffen sich im Gemeindehaus Ziegelstein zum Spielen, Singen und Vorlesen, dazu Austausch über Erziehungsfragen. Anmeldung ist auf der Quelle nicht angegeben; Nachfragen bei der Gemeinde.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
@@ -241,24 +234,20 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109714",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109714",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109715",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109715",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
       "maxMonths": 36
      },
      "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Fragen an die Kirchengemeinde Melanchthonkirche Ziegelstein."
+      "status": "ohne-anmeldung",
+      "note": "Auf der Quelle keine Anmeldung oder Platzangabe genannt"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-24T09:30",
-        "end": "2026-11-24T11:00"
-       },
        {
         "start": "2026-12-01T09:30",
         "end": "2026-12-01T11:00"
@@ -346,6 +335,10 @@
        {
         "start": "2027-06-15T09:30",
         "end": "2027-06-15T11:00"
+       },
+       {
+        "start": "2027-06-22T09:30",
+        "end": "2027-06-22T11:00"
        }
       ]
      },
@@ -354,34 +347,34 @@
    ],
    "inputHash": "abbcb2cdebefa3ab4545071ba62eb4c5bf09db228038b3a92a97b8f31f6b5964",
    "dated": {
-    "2026-11-24": "deb8ab97ed1185496daa2532df28811c271caecb75f0940857c5d28746b4af20",
-    "2026-12-01": "a17b92f0c0d2bd1bf5eab4217fd3564942cacb559a4fd8234a4a5567f47eb85e",
-    "2026-12-08": "705fb9575dd248bbbcdd16749ed940b9e8eae2e0a30ec6011d18baa203fcdb5f",
-    "2026-12-15": "f7a7095aa102808bf19033671fe2ee4cef3795047290871c53622ed7c9be8230",
-    "2026-12-22": "8b12b6eb2c44181fadf6f9d75a4a994899b461a02fd05c34320c737351b30163",
-    "2027-01-12": "f72ad6455a70c1a8d05371d1e8cc3c6ce08a25af706f21d47cb9775eab31d3d8",
-    "2027-01-19": "2206fed378f6acd2c3fbaa6a3373f9cd64168703f65169409109cd82b8a5287c",
-    "2027-01-26": "00d90981dfe92638dbc536c7016a7255a2b7e30569234cd3ce2903d555da1897",
-    "2027-02-02": "19ace90b49394290c420e0a48b02cd9284abbb74b119176a0f3a73d1c0cca88d",
-    "2027-02-16": "cef5c369f7455e488b53991e9aea2dad6addd0fdca207d1204de1f40d5352c2d",
-    "2027-02-23": "5f35cc06101252f06631e2e38992327f0d99abe27bfcab1f61c9062e594a1b46",
-    "2027-03-02": "a09935d4e28c811d978a3b880f4072c5519f86f6b0b029699b784a9fb1e0bd8d",
-    "2027-03-09": "eb723a8a3dfd2075824099e38dec2e130e025a1e6911dd87dcd1dfed3d952176",
-    "2027-03-16": "fbddf77ae41b26e71b7d11960af8a23ab6add8fc941641e1995166f0199157b3",
-    "2027-04-06": "c396d0eaad5c11ee9b4ab0e6e61e814ed1b9dfae7375b0c5a0409b644531c9a1",
-    "2027-04-13": "66ade084d2dc31f2cde0d330bfaa5c0742dbdfc8a02ddd0296fb9ecb429a7824",
-    "2027-04-20": "2475b4b7c1e8c433117df98c383ff6c3e4a13447ce7345d82782350f2670ff0f",
-    "2027-04-27": "def732cbd7f208896958ea8cc5ce2d153ff22f842984c8c17595ae782d2de4af",
-    "2027-05-04": "7a1e480f9fb44f5e2d017c96acea0ab4f0af7cb72398485d9e28e71757fa1182",
-    "2027-05-11": "f493a03c14595c586068db5951090b3fa0d44345fb11b89d81c0d4399d4099d1",
-    "2027-06-01": "2ec8258eb9c043c4394161d17b18f84d9a2e1069a1483bad3dbe50e8474e9d58",
-    "2027-06-08": "81415fd938eb88fdb6957dfc2c5f2d4d263120e69c41d6a028fe415a2987a086",
-    "2027-06-15": "94b447f3d007d7a7c6361ec8cfec852e73e2ceb2795021db42140705fb13d1c0"
+    "2026-12-01": "9e45688b544205c1c8055896778bb44bfbd2426797a061d139387aa9174caf60",
+    "2026-12-08": "9edc9b61241a1149b62cae0cd93cc272ce2b5675146840e8f0b8980007040788",
+    "2026-12-15": "f7b6e673d05f7a13186ac619824fdffe913a76584923530f0109e22f065c2268",
+    "2026-12-22": "2d0e1df3fd4958070b999986e27df051a707356f5be9945eb8ba81445769d6d0",
+    "2027-01-12": "65fbca93c4393c96346dcb1bdb4e9a7f80b63dd14f142450028c0085202b1a9b",
+    "2027-01-19": "dbd8f159a0b6e2b85a93fb9dd3fc40b702409bb3b9ec4132c080e4b3cb27b745",
+    "2027-01-26": "6b07fa0086cebed0b75ca413b0b3c976632f2eb42d83ea72d65cfca18ff0782d",
+    "2027-02-02": "44cb6f630d84c3dc1ccef80c97905924516ad52a5615459e00b058b3623b3573",
+    "2027-02-16": "3f9cfd4c5975df2aae3aa7b0b1fdd1908a59a5bb0f5c6a7f3e7e72df80e0a61a",
+    "2027-02-23": "0fa3089c47d5de1ec66ea003c8bc9762f0fabd85e79cc06b9de79658cf63a0fd",
+    "2027-03-02": "969d1ff8bba94c634f503dad653a00fc72dd105529e5987a517740543700af7a",
+    "2027-03-09": "31ea5e22485745a220b178066092fa1975b851ec893f2f59282dbe608162ebcf",
+    "2027-03-16": "965a1e74651037cf716474de54c0ed6952e9400ec2dd4d2693cc6f32c5ca120c",
+    "2027-04-06": "2b0abd105e9d6c559bd5be007566649c318086313979825697a9a4f166a0ba60",
+    "2027-04-13": "3e5043a7b727bb3da8db099f0d4bcc02929cf61b448976890fcc9ca26f995815",
+    "2027-04-20": "9656641eb16350c5ae304e7f0d8f85849513e1cd1bc802d59c4ad287c4cb23a0",
+    "2027-04-27": "8be3143a6c3d3a7301cc706252812f6db60bc15b02aef014de41ecf35bdaf0e0",
+    "2027-05-04": "d0bc1f8251399e7b28482833bab4ece684336c2229105371277d0147a49682f8",
+    "2027-05-11": "b9b9ad47bac650eb0e944fe26afa20571f3da2564bc1be8ab2004b4b2f0f36c6",
+    "2027-06-01": "1173c6f5d6e6c41991e8a35c86a6b402ecb8962f8532a66e305b7b7a14b29912",
+    "2027-06-08": "1f21f504645677a2d49ade2540a777c2f0400a69622340686e2b223d37a63986",
+    "2027-06-15": "69880417a4ee35dd729a7d1024aad31ae83a74f5f49cd1381c9d889c942d5188",
+    "2027-06-22": "4596dbf958b04b644aa9bd9927f03ec6b0c0ed8cca926b3f3ad21ea4207446e9"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "sources": [
     "evtermine"
    ],

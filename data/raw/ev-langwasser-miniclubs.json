@@ -58,7 +58,6 @@
    ],
    "inputHash": "19e18430b75108533aca76fc7eaf290e1c9a7906384a518c8591c7a09f468f92",
    "dated": {
-    "2026-11-23": "796246885d185d59fe31bb10c6f7c79182c956c25be9c23019827fc13e4c5259",
     "2026-11-24": "8e5696da17bc49e3173679a9ebbf622535c64f054c680cb24aa41f3c2e8a2b6d",
     "2026-11-25": "49e817317fdc16c08fc553d6d4b18b4697f132b9af3f95530d24ae5c26535332",
     "2026-11-29": "2f31df71cfb6239072134426d9e7592d24d613dbab8324111a8097a6f6b61d75",
@@ -175,7 +174,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-11-12T09:45:21+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -304,7 +303,6 @@
    ],
    "inputHash": "65acb1193277cc55ced981affa2dcf8c05d2a94de948b400998a3d4465db67d3",
    "dated": {
-    "2026-11-23": "a8bafcf4b2c82c5dd908d8b096f5b21583b77794c69a5b4cc6668cee9096816e",
     "2026-11-24": "cfd809087b096559b17064b663fe8b8a62861270546ce27fb7857965ef259249",
     "2026-11-25": "2229e94e49be8b8f7efaae8f2295e0fd24139bcc25c812b4e6a93021376959d5",
     "2026-11-26": "1231425a891588125ee1310e5b3c86c747763aeec264fb1bc0ee2a1423863055",
@@ -595,7 +593,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-11-22T09:38:14+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -635,7 +633,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -676,7 +674,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -684,76 +682,22 @@
    "events": [
     {
      "providerId": "ev-langwasser-miniclubs",
-     "venueId": "ev-langwasser-miniclubs",
-     "title": "MiniClub Montag 15–17 Uhr (Dietrich-Bonhoeffer-Kirche)",
-     "summary": "Eltern-Kind-Gruppe im Gemeindezentrum: gemeinsames Spiel, erste Lieder und Reime, Austausch unter Eltern. Die Termine sind bis Ende Dezember 2026 bekannt. Kosten und Anmeldung beim Anbieter erfragen.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "spielgruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelisch-in-langwasser.de",
-     "sourceUrl": "https://www.evangelisch-in-langwasser.de",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe. Anfrage beim Anbieter (Kontakt über die Gemeinde)."
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-23T15:00",
-        "end": "2026-11-23T17:00"
-       },
-       {
-        "start": "2026-11-30T15:00",
-        "end": "2026-11-30T17:00"
-       },
-       {
-        "start": "2026-12-07T15:00",
-        "end": "2026-12-07T17:00"
-       },
-       {
-        "start": "2026-12-14T15:00",
-        "end": "2026-12-14T17:00"
-       },
-       {
-        "start": "2026-12-21T15:00",
-        "end": "2026-12-21T17:00"
-       }
-      ]
-     },
-     "via": "evtermine"
-    },
-    {
-     "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs-gemeindehaus-passionskirche",
-     "title": "Mini-Club Donnerstag 9–10:30 Uhr (Passionskirche)",
-     "summary": "Eltern-Kind-Gruppe im Bühnenraum des Gemeindehauses: Spiel, erste Lieder und Reime unter Anleitung, Kontakt zu anderen Kindern und Eltern. Kosten und Anmeldung beim Anbieter erfragen.",
+     "title": "Mini-Club Passionskirche (Do 9–10:30 Uhr)",
+     "summary": "Eltern-Kind-Gruppe im Bühnenraum des Gemeindehauses: erste Lieder und Reime, Spiel mit Gleichaltrigen und Austausch für Eltern. Der Kalender nennt weder Anmeldung noch Kosten; bitte bei der Gemeinde nachfragen.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/detail-bt?ID=8009821",
      "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8009821",
      "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 0,
-      "maxMonths": 36
-     },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe. Anfrage beim Anbieter (Kontakt über die Gemeinde)."
+      "note": "Keine Platzangabe im Kalendereintrag; bei der Gemeinde Passionskirche nachfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -909,19 +853,60 @@
       ]
      },
      "via": "evtermine"
+    },
+    {
+     "providerId": "ev-langwasser-miniclubs",
+     "venueId": "ev-langwasser-miniclubs",
+     "title": "Mini-Club Dietrich-Bonhoeffer-Kirche (Mo 15–17 Uhr)",
+     "summary": "Eltern-Kind-Gruppe im Gemeindezentrum (Blaues Sofa): Spiel, erste Lieder und Reime und Austausch unter Eltern. Der Kalender nennt Termine bis 21. Dezember; Anmeldung und Kosten sind nicht angegeben, bitte nachfragen.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "spielgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelisch-in-langwasser.de",
+     "sourceUrl": "https://www.evangelisch-in-langwasser.de",
+     "category": "krabbel-spielgruppen",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe im Kalendereintrag; bei der Gemeinde Dietrich-Bonhoeffer-Kirche nachfragen."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-11-30T15:00",
+        "end": "2026-11-30T17:00"
+       },
+       {
+        "start": "2026-12-07T15:00",
+        "end": "2026-12-07T17:00"
+       },
+       {
+        "start": "2026-12-14T15:00",
+        "end": "2026-12-14T17:00"
+       },
+       {
+        "start": "2026-12-21T15:00",
+        "end": "2026-12-21T17:00"
+       }
+      ]
+     },
+     "via": "evtermine"
     }
    ],
    "inputHash": "6f986df1dae2b4e4a05686667a4f52adb4c1faa34770a470fa535f36669437eb",
    "dated": {
-    "2026-11-23": "52c95a1e91f08311c10e32cacbc5ac7dcbf93a5a4cd99bbc4ee31f3bc20f8a78",
     "2026-11-26": "e6f7cd91bed0ffab0728392057e8468da08794ff583a8fac0e85fc0bdf2a4506",
-    "2026-11-30": "6197cc7438dfc5f213382080486df31f0077b95bb14074f7aa3b44874d0fb213",
+    "2026-11-30": "b6be35b0ac840b7cbc1ac58847e97ecf74002da36644322141242f3a93d51d95",
     "2026-12-03": "01f62fb6c8a71b982c0d982b7bb665fbe05f7c557fe3b409c175c0b4b1bd5655",
-    "2026-12-07": "7ba60b4409fb3d2d28a35e41bac0629c7727d9615e14e11ddff579e97113bcac",
+    "2026-12-07": "2b5bb9e7e64de08910ea2ba136120cf53b28b99c3e817731ebf050ba805fb138",
     "2026-12-10": "92e17dae7e4536bc7a145e67eb3058427c37386c85e60d9ec0bdcec7707b5682",
-    "2026-12-14": "aea5af73eafc9c0f00d1d6c9207911a685b1103af2803113995aa8a05f88a104",
+    "2026-12-14": "d8b5b0e73e06fb58e114d99d79a0eb582f83016f4e495142dbe7c791fa8855d9",
     "2026-12-17": "952fd06757fa9b79b11b194ce3d96614add44857ea404398d10ba4cc3459ab2b",
-    "2026-12-21": "0732535b8483cf2f38149a1c20a15b5149cc4e769e187a4114d4858f9617c292",
+    "2026-12-21": "e2ac5b68a59e53e82e57ca6b2dedafce61003d5b127f21089980a241058eac8c",
     "2027-01-07": "c095badd68bc868215001850135e90209b36a77675241840c3a95814044255e5",
     "2027-01-14": "da0880da84a87f5ba0ab2d61993666f750a2457e55b99c073cce7545aebc5796",
     "2027-01-21": "8f4bd3ad9291a0cc1713ecda036e801ed9761bee529e5799064df59cc73beb47",
@@ -959,8 +944,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "sources": [
     "evtermine"
    ],

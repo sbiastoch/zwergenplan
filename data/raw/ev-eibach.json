@@ -91,7 +91,6 @@
    ],
    "inputHash": "0e82dc602ad5f902758163a29689aad3a66dcd1920d7ba797a7ba71d5f956701",
    "dated": {
-    "2026-11-23": "db09f9e49a501773b5c43a8524ceac915f61c782d2ea67f59fedae81e606ee17",
     "2026-11-24": "d7858288e74b39529bf6aa942ddbe5f64fe218dcfa023584a3672ca85d7b11e1",
     "2026-11-25": "54456e284440c849069b1f95f44ee34ea0c627171ddfa432e1b1344e27dce2f1",
     "2026-11-26": "7c589e7c860f6f14fef7c36ca29bb4b507faaf4e707f3a0d6c8069384fa0e56d",
@@ -185,7 +184,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-11-20T10:02:41+01:00",
    "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
   }

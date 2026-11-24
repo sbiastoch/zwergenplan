@@ -6,8 +6,8 @@
     {
      "providerId": "ev-lutherkirche-hasenbuck",
      "venueId": "ev-lutherkirche-hasenbuck",
-     "title": "Krabbelgruppe (dienstags, Pfarramt-Keller Lutherkirche)",
-     "summary": "Regelmäßige Krabbelgruppe im Keller des Pfarramts (Zugang vom Garten), dienstags 10:30–11:30 Uhr. Der Kalender listet die Termine bis Ende Dezember 2026; Anmeldung und Kosten stehen dort nicht.",
+     "title": "Krabbelgruppe (dienstags 10:30–11:30)",
+     "summary": "Wöchentliche Krabbelgruppe im Keller der Lutherkirche (Zugang vom Garten). Im Kalender stehen Termine bis 22.12.; Fortsetzung ab Januar bitte bei der Gemeinde erfragen. Anmeldung und Kosten sind nicht angegeben.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -15,7 +15,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8146747.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8146748.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=571",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -24,15 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalender; Rückfragen über www.lutherkirche-nuernberg.de"
+      "note": "Keine Angaben zur Verfügbarkeit; bei der Gemeinde nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-24T10:30",
-        "end": "2026-11-24T11:30"
-       },
        {
         "start": "2026-12-01T10:30",
         "end": "2026-12-01T11:30"
@@ -55,7 +51,6 @@
    ],
    "inputHash": "a0108ccb4f8fe493aff87dbcab8df70cdbb41277343519898856532532a985f6",
    "dated": {
-    "2026-11-24": "5b75cf80793fd3bc8a907ac287c322411d6eebd7bead6308063ac9d5709965e2",
     "2026-11-25": "9bc5227822fdb6434229f24d5658a360712b2690f68df8333f2dbe6184f8f2c0",
     "2026-11-26": "0e2cd5b12196d67d6d041cedcf60ded7f3b7fa0c926e11e9d17193c4ee8ccc31",
     "2026-11-29": "aa9385d26e6824afd6adae7f5469e3b5aa3bd18ab265be5a45ade4bddf378be4",
@@ -96,8 +91,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "4997115d57eea8441ea456e2b3761ec206a77bdc46a1b3ec23688c24be8d9b27"
   },
   "kandidaten": {
@@ -105,8 +100,8 @@
     {
      "providerId": "ev-lutherkirche-hasenbuck",
      "venueId": "ev-lutherkirche-hasenbuck",
-     "title": "Krabbelgruppe im Pfarramt der Lutherkirche Hasenbuck",
-     "summary": "Regelmäßige Krabbelgruppe für Babys und Kleinkinder im Keller des Pfarramts (Zugang vom Garten). Zu Anmeldung und Kosten macht die Quelle keine Angaben; beim Pfarramt nachfragen.",
+     "title": "Krabbelgruppe Lutherkirche Hasenbuck (Dezember 2026)",
+     "summary": "Treffen für Eltern mit Kleinkindern im Keller des Pfarramts, Zugang vom Garten. Termine im Dezember 2026 laut Kalender; zur Anmeldung und zu Kosten macht der Eintrag keine Angaben.",
      "topics": [
       "krabbelgruppe",
       "eltern-kind-gruppe"
@@ -114,8 +109,8 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8146747",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146747",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8146748",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8146748",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -123,14 +118,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung – beim Pfarramt Lutherkirche nachfragen"
+      "note": "Keine Angabe zur Anmeldung im Eintrag; Pfarramt Lutherkirche fragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-24T10:30"
-       },
        {
         "start": "2026-12-01T10:30"
        },
@@ -150,16 +142,15 @@
    ],
    "inputHash": "8abadccc4fbb77c2f471edc1b73b050678b7a11fa93db672c1960d276885a17b",
    "dated": {
-    "2026-11-24": "568530cb229079aa6aff38ac9b2524e9cb11118125dae3b9c1dc36497818c8aa",
-    "2026-12-01": "8b301d6701b2cf3713a309be9850b4d70bb6dd00017c810c87d6169005a4503d",
-    "2026-12-08": "40c4251f82a6574e11414e563fbf2c5432989e76599b5bd95f457e2faf3e6fd2",
-    "2026-12-15": "c3246e60b27941ab5ce076015b174f567cec3a7f2e55c8b18238ec56023a2b58",
-    "2026-12-22": "40923feda6e70b2b0604ca8bea761dfc119a5c0c49928f91c32e24af1f3b08b3"
+    "2026-12-01": "5a731773e91a2bbd2d98e8a64bcbbaeafdd1f70f5fa13fc5ec8e232912df5e14",
+    "2026-12-08": "20b3b10f9b9f51a2c6ccca45184fc48c371e80a26ecd34bffa5e2f9eede8f2aa",
+    "2026-12-15": "8979a30bd63674fddfa17045cdcdc473a9fb145e25c8640bec91ddb60bfc9dba",
+    "2026-12-22": "f6af7c76370e7d22ed7d9ee746537f4f73f5b7d6abd1ba05e283950d233ad486"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-17T10:40:21+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "sources": [
     "evtermine"
    ],

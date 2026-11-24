@@ -6,8 +6,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monate, Sa 9:30 (Start 23.01.2027)",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten an Samstagen in den Kliniken Dr. Erler, Kontumazgarten 4-19. Die Kursreihe läuft bis Mitte März 2027. Anmeldung über das Buchungssystem; laut Quelle sind Plätze frei.",
+     "title": "Babyschwimmen ab 3 Monaten – Sa 9:30 (Start Jan. 2027)",
+     "summary": "Wöchentlicher Babyschwimmkurs ab 3 Monaten, samstags um 9:30 Uhr, acht Termine ab 23.01.2027 bei den Kliniken Dr. Erler. Anmeldung über das Buchungssystem.",
      "topics": [
       "babyschwimmen"
      ],
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Online buchbar, Plätze laut Buchungssystem frei"
+      "note": "Im Buchungssystem als buchbar ausgewiesen"
      },
      "schedule": {
       "kind": "weekly",
@@ -33,15 +33,15 @@
       ],
       "start": "09:30",
       "from": "2027-01-23",
-      "until": "2027-03-13",
+      "count": 8,
       "skipHolidays": false
      }
     },
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Start 23.01.2027)",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten an Samstagen in den Kliniken Dr. Erler, Kontumazgarten 4-19. Die Kursreihe läuft bis Mitte März 2027. Anmeldung über das Buchungssystem; laut Quelle sind Plätze frei.",
+     "title": "Babyschwimmen ab 3 Monaten – Sa 10:15 (Start Jan. 2027)",
+     "summary": "Wöchentlicher Babyschwimmkurs ab 3 Monaten, samstags um 10:15 Uhr, acht Termine ab 23.01.2027 bei den Kliniken Dr. Erler. Anmeldung über das Buchungssystem.",
      "topics": [
       "babyschwimmen"
      ],
@@ -58,7 +58,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Online buchbar, Plätze laut Buchungssystem frei"
+      "note": "Im Buchungssystem als buchbar ausgewiesen"
      },
      "schedule": {
       "kind": "weekly",
@@ -67,15 +67,15 @@
       ],
       "start": "10:15",
       "from": "2027-01-23",
-      "until": "2027-03-13",
+      "count": 8,
       "skipHolidays": false
      }
     },
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Babyschwimmen ab 3 Monate, Sa 10:15 (Start 20.03.2027)",
-     "summary": "Babyschwimmkurs für Babys ab 3 Monaten an Samstagen in den Kliniken Dr. Erler, Kontumazgarten 4-19. Die Kursreihe läuft von Ende März bis Ende Mai 2027. Anmeldung über das Buchungssystem; laut Quelle sind Plätze frei.",
+     "title": "Babyschwimmen ab 3 Monaten – Sa 10:15 (Start März 2027)",
+     "summary": "Wöchentlicher Babyschwimmkurs ab 3 Monaten, samstags um 10:15 Uhr, zehn Termine ab 20.03.2027 bei den Kliniken Dr. Erler. Anmeldung über das Buchungssystem.",
      "topics": [
       "babyschwimmen"
      ],
@@ -92,7 +92,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Online buchbar, Plätze laut Buchungssystem frei"
+      "note": "Im Buchungssystem als buchbar ausgewiesen"
      },
      "schedule": {
       "kind": "weekly",
@@ -101,16 +101,16 @@
       ],
       "start": "10:15",
       "from": "2027-03-20",
-      "until": "2027-05-22",
+      "count": 10,
       "skipHolidays": false
      }
     }
    ],
-   "inputHash": "2baccc248894a8cb08434610ecf02ad907fc27b7cdb481e5165052b254843b2b",
+   "inputHash": "32e52f3a91dcb7bd6dbd2e29db1cf95ca364b3088dada5ae03118d2e0cfb36a1",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "af30022381f70d519ba33965e65b3cf352e86a32734bb09c23c093e407046922"
   },
   "seite:https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20291": {
@@ -118,8 +118,8 @@
     {
      "providerId": "schwimmschule-ohana-nuernberg",
      "venueId": "schwimmschule-ohana-nuernberg",
-     "title": "Minis ab 1 Jahr (Samstag 9:30, Kliniken Dr. Erler)",
-     "summary": "Schwimmkurs für Kinder ab 1 Jahr, samstags 9:30 Uhr, vom 20.03. bis 22.05.2027 im Kontumazgarten. Laut Buchungssystem sind Plätze frei; ob Eltern dabei sind, steht in der Quelle nicht.",
+     "title": "Minis ab 1 Jahr – Schwimmkurs samstags 9:30 (Kliniken Dr. Erler)",
+     "summary": "Wasserkurs für Kleinkinder ab einem Jahr in den Kliniken Dr. Erler, samstags um 9:30 Uhr, Laufzeit bis Ende Mai 2027. Ob Eltern im Wasser dabei sind, steht auf der Seite nicht; bitte beim Anbieter erfragen.",
      "topics": [
       "kleinkindschwimmen"
      ],
@@ -136,7 +136,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Im Kursolino-System buchbar (JSON-LD: InStock)"
+      "note": "Online buchbar (Buchungsseite zeigt die Kursinstanz als verfügbar)"
      },
      "schedule": {
       "kind": "weekly",
@@ -150,11 +150,11 @@
      }
     }
    ],
-   "inputHash": "9866a3bddc11a80a39b119a5992e4534c35dc7ee9f9941a30e42893c66686faa",
+   "inputHash": "8edea06613aef796f5eb27e79c2f82004108c37ff3f04e01d30620d63dab128c",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "a84bb2ed546ae4814a96439cd5b0b540a11301612e87220b19845c91708fd1a7"
   },
   "seite:https://buchung.schwimmschule-ohana.de/iframe/?module=courses&location=9697&layout-index=3&submodule=show&ia=show&id=20292": {
@@ -231,7 +231,7 @@
    "inputHash": "650b02b9484d91041df1c5f66abe27b325799a59a6678230a318c587b40edc67",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-11-15T09:18:13+01:00",
    "partsHash": "2dbca5b3382f77e652ff85c49279a49db4118d6b0d169dda8535979136d77bff"
   }

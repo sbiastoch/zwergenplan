@@ -41,7 +41,7 @@
    "inputHash": "4a186bc1fae5c375b8e1192157a03608e9e83545993dfdd997a5d4cf8dbe555f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "f1ffeccaeeb1caca965d9eb8005c30dba92183ec292df8bacd70319e29fbd01c"
   },
@@ -50,11 +50,46 @@
     {
      "providerId": "cvjm-gostenhof-miniclub",
      "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club für Kinder von 1 bis 3 Jahren",
-     "summary": "Wöchentliche Gruppe dienstags von 10:00 bis 11:30 Uhr im Kinderraum des CVJM Gostenhof. Zu Anmeldung, Kosten und Begleitung durch Eltern machen die Quellen keine Angaben; bitte beim Anbieter nachfragen.",
+     "title": "Mini-Club (1–3 Jahre, dienstags)",
+     "summary": "Regelmäßiger Treff für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, jeweils dienstags von 10 bis 11:30 Uhr. Die Anmeldung und Platzfragen bitte direkt beim CVJM klären.",
      "topics": [
+      "krabbelgruppe",
       "spielgruppe",
       "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 12,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzanzeige. Fragen zur Teilnahme bitte beim CVJM Gostenhof stellen."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:00",
+      "end": "11:30",
+      "from": "2026-12-01",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "cvjm-gostenhof-miniclub",
+     "venueId": "cvjm-gostenhof-miniclub",
+     "title": "Mini-Club für Kinder von 1 bis 3 Jahren (dienstags)",
+     "summary": "Regelmäßige Spielgruppe für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags 10:00–11:30 Uhr. Preis und Anmeldung stehen im Kalendereintrag nicht; bitte beim CVJM nachfragen.",
+     "topics": [
+      "krabbelgruppe",
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -68,119 +103,22 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anmeldung bitte beim CVJM Gostenhof erfragen."
+      "note": "keine Platzanzeige; Anfrage beim CVJM Nürnberg-Gostenhof"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-26T10:00",
-        "end": "2027-01-26T11:30"
-       },
-       {
-        "start": "2027-02-02T10:00",
-        "end": "2027-02-02T11:30"
-       },
-       {
-        "start": "2027-02-16T10:00",
-        "end": "2027-02-16T11:30"
-       },
-       {
-        "start": "2027-02-23T10:00",
-        "end": "2027-02-23T11:30"
-       },
-       {
-        "start": "2027-03-02T10:00",
-        "end": "2027-03-02T11:30"
-       },
-       {
-        "start": "2027-03-09T10:00",
-        "end": "2027-03-09T11:30"
-       },
-       {
-        "start": "2027-03-16T10:00",
-        "end": "2027-03-16T11:30"
-       },
-       {
-        "start": "2027-04-06T10:00",
-        "end": "2027-04-06T11:30"
-       },
-       {
-        "start": "2027-04-13T10:00",
-        "end": "2027-04-13T11:30"
-       },
-       {
-        "start": "2027-04-20T10:00",
-        "end": "2027-04-20T11:30"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "cvjm-gostenhof-miniclub",
-     "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club (Kinder 1–3 Jahre)",
-     "summary": "Wöchentlicher Treff für Kinder von 1 bis 3 Jahren im Kinderraum des CVJM Gostenhof, dienstags 10:00–11:30 Uhr. Die Termine laut Veranstaltungskalender reichen bis Ende Juni 2027.",
-     "topics": [
-      "spielgruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=1496",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzanzeige; Anfrage direkt beim CVJM Nürnberg-Gostenhof."
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-04-27T10:00",
-        "end": "2027-04-27T11:30"
-       },
-       {
-        "start": "2027-05-04T10:00",
-        "end": "2027-05-04T11:30"
-       },
-       {
-        "start": "2027-05-11T10:00",
-        "end": "2027-05-11T11:30"
-       },
-       {
-        "start": "2027-06-01T10:00",
-        "end": "2027-06-01T11:30"
-       },
-       {
-        "start": "2027-06-08T10:00",
-        "end": "2027-06-08T11:30"
-       },
-       {
-        "start": "2027-06-15T10:00",
-        "end": "2027-06-15T11:30"
-       },
-       {
-        "start": "2027-06-22T10:00",
-        "end": "2027-06-22T11:30"
-       },
-       {
-        "start": "2027-06-29T10:00",
-        "end": "2027-06-29T11:30"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:00",
+      "end": "11:30",
+      "from": "2027-02-23",
+      "skipHolidays": true
      }
     }
    ],
    "inputHash": "fea4d2e45168a93803dd204edfa7a651d799184d3d18d2418917a5a3e676bd55",
    "dated": {
-    "2026-11-23": "35546e5b9ce1bd5e2bdd89c683d76bac452145537702dc0835cc5f00f1dd7057",
-    "2026-11-24": "91dd03540dace279f34204d9286e56d9f17211237cba26aaf2ff52d8b04a8d12",
     "2026-11-26": "af4dbda4c9879cd8728f2950841e762e76694d0b6986de2bc052e74fce28b22b",
     "2026-11-27": "485d6a97f79026a2c3cd8e55bfe536990076fb0cab4ac8d514a97621534d9598",
     "2026-11-29": "9dd11a9644e46942ad9fa8f9a0a282da16188353838ca992653d9e5489b63f49",
@@ -303,8 +241,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "c25088f3bc444367c5ff4fef08df8eb68bdc3b19e8c10e56c7f87453ed56cbb2"
   },
   "kandidaten": {
@@ -312,17 +250,18 @@
     {
      "providerId": "cvjm-gostenhof-miniclub",
      "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club (18 Monate bis 3 Jahre, dienstags)",
-     "summary": "Dienstags treffen sich Eltern mit Kindern zu Kniereitern, Fingerspielen und Bewegungsliedern, dazu Freispiel und Kaffee. Feste Einheit wie Bilderbuch oder Klanggeschichte. In den Schulferien keine Treffen.",
+     "title": "Mini-Club für Kinder 18 Monate–3 Jahre (dienstags)",
+     "summary": "Dienstags Kniereiter, Fingerspiele und Bewegungslieder gemeinsam mit Eltern, danach Freispielzeit und Austausch bei Kaffee. Findet nicht in den Schulferien statt.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "singen",
+      "bewegung"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
      "url": "https://www.cvjm-nuernberg-gostenhof.de/website/de/v/gostenhof/gruppen/kinder/mini-club",
-     "sourceUrl": "https://www.cvjm-nuernberg-gostenhof.de/",
+     "sourceUrl": "https://www.frankenkids.de/veranstaltungen/mini-club-kniereiter-bewegungslieder-3/2026-11-10/",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 18,
@@ -330,171 +269,76 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzanzeige. Anfragen bei Alexandra Gußner, Tel. 0151/56071708, alexandra.gussner@cvjm-nuernberg-gostenhof.de"
+      "note": "Keine Platzanzeige. Info und Anmeldung bei Alexandra Gußner, 0151/56071708."
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-24T10:00",
-        "end": "2026-11-24T11:30"
-       },
-       {
-        "start": "2026-12-01T10:00",
-        "end": "2026-12-01T11:30"
-       },
-       {
-        "start": "2026-12-08T10:00",
-        "end": "2026-12-08T11:30"
-       },
-       {
-        "start": "2026-12-15T10:00",
-        "end": "2026-12-15T11:30"
-       },
-       {
-        "start": "2026-12-22T10:00",
-        "end": "2026-12-22T11:30"
-       },
-       {
-        "start": "2027-01-12T10:00",
-        "end": "2027-01-12T11:30"
-       },
-       {
-        "start": "2027-01-19T10:00",
-        "end": "2027-01-19T11:30"
-       },
-       {
-        "start": "2027-01-26T10:00",
-        "end": "2027-01-26T11:30"
-       },
-       {
-        "start": "2027-02-02T10:00",
-        "end": "2027-02-02T11:30"
-       },
-       {
-        "start": "2027-02-16T10:00",
-        "end": "2027-02-16T11:30"
-       },
-       {
-        "start": "2027-02-23T10:00",
-        "end": "2027-02-23T11:30"
-       },
-       {
-        "start": "2027-03-02T10:00",
-        "end": "2027-03-02T11:30"
-       },
-       {
-        "start": "2027-03-09T10:00",
-        "end": "2027-03-09T11:30"
-       },
-       {
-        "start": "2027-03-16T10:00",
-        "end": "2027-03-16T11:30"
-       },
-       {
-        "start": "2027-04-06T10:00",
-        "end": "2027-04-06T11:30"
-       },
-       {
-        "start": "2027-04-13T10:00",
-        "end": "2027-04-13T11:30"
-       },
-       {
-        "start": "2027-04-20T10:00",
-        "end": "2027-04-20T11:30"
-       },
-       {
-        "start": "2027-04-27T10:00",
-        "end": "2027-04-27T11:30"
-       },
-       {
-        "start": "2027-05-04T10:00",
-        "end": "2027-05-04T11:30"
-       },
-       {
-        "start": "2027-05-11T10:00",
-        "end": "2027-05-11T11:30"
-       },
-       {
-        "start": "2027-06-01T10:00",
-        "end": "2027-06-01T11:30"
-       },
-       {
-        "start": "2027-06-08T10:00",
-        "end": "2027-06-08T11:30"
-       },
-       {
-        "start": "2027-06-15T10:00",
-        "end": "2027-06-15T11:30"
-       },
-       {
-        "start": "2027-06-22T10:00",
-        "end": "2027-06-22T11:30"
-       },
-       {
-        "start": "2027-06-29T10:00",
-        "end": "2027-06-29T11:30"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "TU"
+      ],
+      "start": "10:00",
+      "end": "11:30",
+      "from": "2026-11-24",
+      "skipHolidays": true
      },
-     "via": "evtermine"
+     "via": "frankenkids"
     }
    ],
    "inputHash": "b2f015530a27b6680925b396c4fac3c2860637aec1c82ce6b3cd7040f08c71ea",
    "dated": {
-    "2026-11-23": "dd8614c8814cb6b923424a45d86d3c96b4f99873cf4941e65d4930bd2b12ded7",
-    "2026-11-24": "5af5194edd141330200779bfa0f5e3eee782f5c31e75976e2b2753561d1161ea",
-    "2026-11-30": "77cc3b1b60e4326fd0eb4ef8b5ea036b02f686742daa762383dc858f217c5c2d",
-    "2026-12-01": "502903a3f46ab166ad5e50a58015059bd530af0fecba5bdd4f2f8b5d208948c9",
-    "2026-12-07": "5880597b557a06b685c36472c5d4a0b3110631eb820a3824a01158921608cdfe",
-    "2026-12-08": "900977277fdbaf7e077a4cdc5f0225a74029194531e5fc0db973f2e049c23cca",
-    "2026-12-14": "360ed306a1696dc649bb51f96eea8eac7502c9ff78ec22dc142de256267f1ac1",
-    "2026-12-15": "dbab0aa9ccf9609c45d19388624aeadfcaab2d0f20a13a4a31024572316158d1",
-    "2026-12-21": "f468f6620217e6696aa540445a4e00d3e5e880b6142befb2fae6c333fb519fe1",
-    "2026-12-22": "ba3ffe3eb294422940dbc9d39bbeebaf322a213f63a699347dec423c5be2dca1",
-    "2027-01-11": "49a84af27ee8f34f6cd0e6eba9f81c93359ef7c16cff0a957452922d77853c2f",
-    "2027-01-12": "783fe80beabb2723d8eea03553296926fde308a5de67b8abfc69e34ec60894e5",
-    "2027-01-18": "3c65d0967bf07135a632481400b04bfa571405b6b22c7a261069ceccaf1f02bd",
-    "2027-01-19": "c03063e0f16facbef368a61ebfeac29c85a8035bc75e3c9b0eed818814db7612",
-    "2027-01-25": "286d4fca19dd9cdbc9ebaef77378042ba160485be99ea401a29e32af761ca0e2",
-    "2027-01-26": "25a5d1f4a85d593fe3251ea95c0ad3620418c9674def4e261dcb3f477249d0cf",
-    "2027-02-01": "ae2599ac5884d1fe374f86c955cfe9fdbe2c0e2cafa1b8bddf66f9c4bad3189c",
-    "2027-02-02": "1f439cfb2d696560955358a5a40bfd6478b45b042aab5505a0fff8e97c0fc99e",
-    "2027-02-15": "13585be43998410cfc3f915474dcc8a5e73bae0cac30d8d385cab733b7fb7061",
-    "2027-02-16": "e9e94bbb09a575e7b705c922b44b409d3d45b9a51f8092d02b3319e0da4563c4",
-    "2027-02-22": "57abfeb94130a9f60d5b8f71ea9d4bdd8c21c2c6975df327c52b97a243671d05",
-    "2027-02-23": "c50a84189fb19dfdf34d0cced18037bddbceb3f46dd0709f0cfe16aa244d756e",
-    "2027-03-01": "4df2b7fc61dd6e3b59cd6f2363bcbcf2821277dba4b25cc8f1075027a0aa391a",
-    "2027-03-02": "cd568feee028b947d382d1e59fcf4a02ef1ed7ca8d6c6ddf558431d183c36da0",
-    "2027-03-08": "dc0c02458a904028a0e92dd79464f71ade7697f1a5209712afebbe8d3107a815",
-    "2027-03-09": "a7caab27d60d8f003135c868b1eca0cd52d148c45332255b2beed2c2a529fdab",
-    "2027-03-15": "c05f0d5e0321737a344913442991924d9335b3f3ace8b21f1e94af9f9f193d3b",
-    "2027-03-16": "35e7c8d7811db0f32b9931ea9747c4d9c09a899d0cf55ae1abd330129e6f936e",
-    "2027-04-05": "9a5fc62e2a80570e21912aa9375f505755cf6d7bca7461949655e55cfd8a7069",
-    "2027-04-06": "8912d04517c9646574f21ba011e860cbc805dbe4595e4f342fdd7e6acb29ba2e",
-    "2027-04-12": "5c18955465f30f271003f4e0502a0b69d8df863757fc8677f4f050e73a1df7e0",
-    "2027-04-13": "d035156ed881647b09e964b9fbf43467ae205a6f804e4d41841e3f958dd227e0",
-    "2027-04-19": "54ade2ec5e0b732f572e5190cdaf334c6f01f55b28374b207bd4cd2d4763313f",
-    "2027-04-20": "6a1403432545a37be46ac40fa92f9c5b415da204b2fbca5de40016a248a2d62d",
-    "2027-04-26": "6ae2d8f3f5009d8857df873920a8d068e4f570563d48d23f72f982b64709ec34",
-    "2027-04-27": "d337d9986018a4f40e75d928681e6d5e90a4221b66761c65ea14cedae18b28b9",
-    "2027-05-03": "5b0063d4dd97e98527775cc4c5c4f2b3a44a9fd23b2966299653b06b1a706867",
-    "2027-05-04": "c904ad066a4841c101b80826dce9c937975ba50c8a018e50ce457f22b15b513a",
-    "2027-05-10": "0a0379a66ce12960be643e7f7a9884056127adcdb98f338e7c8631b5faf0f436",
-    "2027-05-11": "f88dae8a8bd68161c539f1c876657db81301d548188bc616648b4bcfe5a05afd",
-    "2027-05-31": "ce9565c2272ae6caa982757011ee4d70e23aac69e18cee7f938e0fb2d7518efb",
-    "2027-06-01": "56ddcf66e2041410bed1ec71c60a6a17c22da5e31282113c76c95a018ed15870",
-    "2027-06-07": "59d92f5c5f8b14e50f9c57a497a62c0a18457289181484d323430b7a6074235a",
-    "2027-06-08": "5f84cb38629e9f5156b4cd8aa8260881cb018e0448e035f27696183225f1a230",
-    "2027-06-14": "167fae0cb63785d35c0b31fa76593e17bdf9aa8d825e07c4d0ac9e9c578507f6",
-    "2027-06-15": "fa8e85de24a896b808feb9462aff51809022268b0743fb374a19867efba9c05a",
-    "2027-06-22": "b962bfe9c5e1309dd0235e1002ea4a8ca511e0e219ba2d754a51b6d0ef4e3b37",
-    "2027-06-29": "f257e17bf40e35c6bc7022c3d4113c62c4773716e22ef94e4e7ef49ac3dbf0bd"
+    "2026-11-24": "3f68244d0248630ac895ad623fddad0aeceec86a93ce839dcfb34933a2b02414",
+    "2026-11-30": "20727093865fbdcc9b775b9f9e5283a37f97aa9d6158fc29357be3e6a8119022",
+    "2026-12-01": "6d219e53e2531a60e652264deece5ad35602a7eb2473c75599cc5d209fd5378c",
+    "2026-12-07": "4aea52bb1e6ad9dcf2656518d05b01ebd60caf4ecabb9d658dbea034f3e01d0f",
+    "2026-12-08": "0a81a1ecd0848279902aae31b86184b31244bba6e20d384e4e74b89b9862f4a8",
+    "2026-12-14": "930e0c960b395e13ce98136a5e3a7e43e2f8ca69694769dfa559d4c4735fb4ec",
+    "2026-12-15": "23809fad0641a85286a7af9a8293a1b36d39fb915bae61578b5dd7902048ce00",
+    "2026-12-21": "904095db19cb435b22c7154844fa2f18b86d7eb78e5ae471dcf2ae73c6ba0677",
+    "2026-12-22": "f0e8382f68fe8a0f7ca60b8df77e5f60e6579aaaccdce4847ca851b750643dd4",
+    "2027-01-11": "20d17b92a06a610e660ca74b543411a8b063ec812e3f908cb479dad139954ff8",
+    "2027-01-12": "36391d426a00523bf0e199262e7d8efa5f46370f5d128f2e32d7f69c3fecc920",
+    "2027-01-18": "b2e9d169cecc637fbb742124e281430c9f6c9d18cdd48417fe606a7e2ae33c2d",
+    "2027-01-19": "f709022d52ecd697e3953be8cb06852635ef81f5e5898679d9edaf8be13838f1",
+    "2027-01-25": "b149e3e681969c549d82430291d771bd2f488ff8dc4a0df2b12cff3dd267ca89",
+    "2027-01-26": "b1c09192b9666d91b116e300be0d853be4d2306df002ddc869a3108ff2cf08f7",
+    "2027-02-01": "a335e9657dcdc89594691edae6881aa9b4065dbc3193bf7aa33cb6869e723ade",
+    "2027-02-02": "388593c3d365191041166e207a4d6810bf21b4a717aa868fc14a86df95b0d4c6",
+    "2027-02-15": "1e58a50c8be1aaceb2ecb1e9684cee5fe63b059eb178a33470f8fc5f7fd8869a",
+    "2027-02-16": "45cc5f27f10428f5084409180fbbd248f3de7ff453d34ab7305d788d599e1413",
+    "2027-02-22": "d2bb1f6d3a1d9ac58c3178c030485a27b48f7a28e0743cbe92ae82d699f33bcc",
+    "2027-02-23": "94e8b07188ed8aec0e254f05f215069cb19939cfcf561a34296b5ac8b900a7c8",
+    "2027-03-01": "cbfd5a054f186628af032229577b22f76663e9737fb3cbca59e967d8d891dc25",
+    "2027-03-02": "22c1f80ee5332272001b256aa907f0fba63cd0cb68a5bf1d92fffb2d23e69c60",
+    "2027-03-08": "cda0aefaffb6708f2ebc6ec5bfdfba1f44188e7a786e35992d2ed2a5c57f3ab9",
+    "2027-03-09": "77956fa9f53f7444a4743a173c61f3006181a1156208249240a94f6ee3c55627",
+    "2027-03-15": "7d888a07b7fa6e57face2ef9a0d58fbc79927e9a368817aa4d614133d28c2ff3",
+    "2027-03-16": "7cf8ca70b3ba9d4f893e89ef528e7bebacfedff1b4215f8a83a7603a25c03f7b",
+    "2027-04-05": "a85b714bb0d4f72311a736e05ba05cda0df36f08800065afce5010eccf264af4",
+    "2027-04-06": "9a8bbb861578454054e55cf70956e12f817de1fb06797046ee867ff8acc4ee5d",
+    "2027-04-12": "1a791190306aaaffc0a4f6d1133afe524d61f9ec6edad89830c3890f2051bdc3",
+    "2027-04-13": "4e14101f36448c5d2520f22671079d1c66964064469fcbbbb7d088b0af7fd2f0",
+    "2027-04-19": "0f0dc3e97df3db75ce6e0a41e2683f854a2d74a90b031185519c123c0265db11",
+    "2027-04-20": "f8c42391002fd6af401f50033a1478ab4ca0cff83aecde09ba578768621949e0",
+    "2027-04-26": "ac85fdebb26b4c5541b0d5a2ca96417668f7ba01574cb3ce04f86a4e01fb4591",
+    "2027-04-27": "147f8330ddd3ec717195b12e1b2ef2fa4ed8b3eab1c51df01922af513407b803",
+    "2027-05-03": "e504d550bafce7777ebf0150bce678459d250a2a09eafe4181c6c79e71293518",
+    "2027-05-04": "609868fa269262349ae93098e3dd18acbbe33b8f8dc8bbb50e16ea7a1afdeaf7",
+    "2027-05-10": "dfb02be07b1b4fb5e4801a07d9c8d34c5a3dc2197f73f70ab9af4b21e9a2c5be",
+    "2027-05-11": "c8a9ddffc2f2bb18042e02de23ec61245b4b2f9106e5807e9ad3467900384868",
+    "2027-05-31": "febb436bd2b2a903da3a0d33e7ae272644acb863184fb7c6a319ab7028b95152",
+    "2027-06-01": "7b8bdb75edcd0161cb6eb7c1408fb70e691e3a8ca68fa7447b8600e378715aa0",
+    "2027-06-07": "c92a218109e10123639688f618c6056ce8d526920a0c0866338239492495cf50",
+    "2027-06-08": "31bd94d267f6e9f11dbd3c83790664aae01f839257cea5241c34c6570cfef58b",
+    "2027-06-14": "32679f2e8f0699019821559a4df7915676ba0773edb0ce09a519de6403a14d51",
+    "2027-06-15": "4f86e01383104994a66142fcf937dd57e2862a37f569d3fe35cdfb21a211e090",
+    "2027-06-21": "93d188c133b4edee820ed4f7d9dfcf047cc49b82db6adc36a4c5aa75e190422c",
+    "2027-06-22": "a6bbdfbc8ee92d059c9bc420880031c360e41fbecaafdcc21e9f0d7a741742ac",
+    "2027-06-29": "4eb9c1d2f4a428ccb96903e4a2d069ae07e35b047fbdac44384d93bbd1a02a77"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
    "sources": [
     "evtermine",
     "frankenkids"
