@@ -40,13 +40,9 @@
    ],
    "inputHash": "5c2416da815d536c96c32b269f6475258ef0cb5e3a87b1fa4552ff8b0d1676e3",
    "model": "haiku",
-   "status": "fehler",
-   "reason": "https://www.atv1873frankonia.de/de/sportangebot/sportangebote-und-abteilungen/individualsport/turnen-und-gymnastik/kinderturnen/: robots.txt nicht erreichbar (The operation was aborted due to timeout)",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
+   "status": "ok",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-22T09:38:14+01:00",
-   "failingSince": "2026-11-24T12:31:01+01:00",
-   "klasse": "voruebergehend",
-   "klasseSince": "2026-11-24T12:31:01+01:00",
    "partsHash": "8b93f18bbe067398ab950a4cd95b714b4a79f521dccb1ab23195a626b421e409"
   }
  }

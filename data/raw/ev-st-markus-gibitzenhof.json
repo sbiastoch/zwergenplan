@@ -37,7 +37,6 @@
    ],
    "inputHash": "e1098639d45764dc73b636f609f698e2ca7a27eb3205654c45294b033eb0cccd",
    "dated": {
-    "2026-11-24": "613b806d9a564d9c024707b3e3331d242aaff37a3d3f7e3e2eb1aff25673e04e",
     "2026-11-25": "e29b409ad0730d4c6e3aec076c481fb5212da5368d88aec39723f125cc1b0737",
     "2026-11-26": "362631d63e21cb255bdf425ea1d8c71e9211790cb1d41fd800d4bc02cfb9fbf5",
     "2026-11-27": "ae0ec885df399698ec7688c1a60ba03a45d88fa31e85ffed83d45e0b851ca52c",
@@ -191,7 +190,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -200,10 +199,11 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Café für Alle – offener Dienstagstreff mit Kinderprogramm",
-     "summary": "Offener Treff für Familien und Nachbarn, bei schönem Wetter auf dem Platz vor der Markuskirche, sonst im FreiRaum. Kaffee und Kuchen gegen Spende, ab und zu Bastelaktion oder Bilderbuchkino. Die Seite nennt zwei Zeiten (14–17 bzw. 15–18 Uhr), bitte vorher nachfragen.",
+     "title": "Café für Alle – Familiencafe im FreiRaum (dienstags)",
+     "summary": "Offenes Café für Familien und alle Interessierten im FreiRaum der Markuskirche, bei Sonne auf dem Platz davor. Kinderprogramm wie Basteln und Bilderbuchkino. Einstieg jederzeit möglich. Die Seite nennt widersprüchlich 14–17 Uhr und 15–18 Uhr, daher vorab prüfen.",
      "topics": [
-      "elterncafe"
+      "elterncafe",
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -214,7 +214,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offener Treff, einfach vorbeikommen"
+      "note": "Einfach vorbeikommen, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -223,116 +223,44 @@
       ],
       "start": "14:00",
       "end": "17:00",
-      "from": "2026-11-24",
+      "from": "2026-12-01",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "8237b436f04a8223b82d1ef4d6db8391bc1bc48fed97195b2efbd44fc4373d8b",
+   "inputHash": "4b19abf2f4564da1977dac99f5d176b36420757bf5a01116cb5fb197f1f0bd45",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
-   "changedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
+   "changedAt": "2026-11-25T11:17:44+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familien-kinder/": {
    "events": [],
-   "inputHash": "78c4bfd850db6553f0f4633ffc7b944722d11509d173a4aad087ecd6e216b569",
+   "inputHash": "22ea43209a6eb41c2628d9f476a5480472648f0202bfdc4681b14bab0bc3db80",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
   "kandidaten": {
-   "events": [
-    {
-     "providerId": "ev-st-markus-gibitzenhof",
-     "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Offene Tür für Groß und Klein – Montagvormittag-Café",
-     "summary": "Offener Vormittagstreff im FreiRaum der Markuskirche mit Spielzeit für Kleinkinder, Kaffee und Austausch. Einfach vorbeikommen, keine Anmeldung nötig. Die Termine ruhen über Weihnachten und Neujahr.",
-     "topics": [
-      "elterncafe"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8113805",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8113805",
-     "category": "treffs-cafes",
-     "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Offener Treff, einfach vorbeikommen"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-23T09:00",
-        "end": "2026-11-23T11:00"
-       },
-       {
-        "start": "2026-11-30T09:00",
-        "end": "2026-11-30T11:00"
-       },
-       {
-        "start": "2026-12-07T09:00",
-        "end": "2026-12-07T11:00"
-       },
-       {
-        "start": "2026-12-14T09:00",
-        "end": "2026-12-14T11:00"
-       },
-       {
-        "start": "2026-12-21T09:00",
-        "end": "2026-12-21T11:00"
-       },
-       {
-        "start": "2027-01-11T09:00",
-        "end": "2027-01-11T11:00"
-       },
-       {
-        "start": "2027-01-18T09:00",
-        "end": "2027-01-18T11:00"
-       },
-       {
-        "start": "2027-01-25T09:00",
-        "end": "2027-01-25T11:00"
-       }
-      ]
-     },
-     "via": "evtermine"
-    }
-   ],
+   "events": [],
    "inputHash": "f9ea0e425d4417eab8d3936b51459581f40e8f4e8112f3228d94159ca084b7a8",
    "dated": {
-    "2026-11-23": "eedc720463a94a45b45c214a3daafb0a1ddd8f127b8df39ab92ba33b7e2a7886",
-    "2026-11-30": "d0a92892cae7872aae2433024a20c99fef47d867237d0e5a7a5d65d2e27a5621",
-    "2026-12-07": "9364a2f71e5b65535525ea5c963f7f010d48c37d7ae6d95226f47dcba2002cfd",
-    "2026-12-14": "6e8dd90a390d9e0e9659d3600edd25db7ed4c3a3a7182f9ef40c93fa11a8d466",
-    "2026-12-21": "ad6b415ae3a7dd4aae2cd7ea927b8c69ed5f18c5b0867b06e9673d0c80397678",
-    "2027-01-11": "30ed974e91bd7dbb22ec79caf3effd92b76dbfb5b385128fd939f8cfd6990b15",
-    "2027-01-18": "84a321785cc482e6b08d45f12cc674137232f43a31a29d23ffa4d86a22d2dbf8",
-    "2027-01-25": "a36046800f5b091f99ff46de6eb99d0b956dae8607b5f6142babdee6f204f014"
+    "2026-11-30": "24ba61260a79dc3bdb5e1963dbdff69be1d4096191d23e3d182be70e6ce65b40",
+    "2026-12-07": "75cd2a5b249bc6867d57ea980975b83ccd302454a8d864bda156f4d32326e1a5",
+    "2026-12-14": "02ee13487bc493202c0406634ee93c272b29a0261fcb7ba6a26be404431038c4",
+    "2026-12-21": "af595a3da5e4eb0b93ca949578d678577bb9bca6debed3bf2df6511137fd11e1",
+    "2027-01-11": "40e5b2ce20407cc2237d2dc8030b51280f538af39706ebaa822731e6dc0d370a",
+    "2027-01-18": "6b54e09d6036603b78120f79ff0decc12b3905016f79ed7976b707b58668c2a8",
+    "2027-01-25": "61d78196cb65336d00320bd578c4b1c83d2ddb184565b2b74e1659e3c3eedf08"
    },
    "model": "haiku",
-   "status": "ok",
-   "checkedAt": "2026-11-23T10:37:03+01:00",
-   "changedAt": "2026-11-17T10:40:21+01:00",
-   "pending": {
-    "inputHash": "f9ea0e425d4417eab8d3936b51459581f40e8f4e8112f3228d94159ca084b7a8",
-    "dated": {
-     "2026-11-30": "24ba61260a79dc3bdb5e1963dbdff69be1d4096191d23e3d182be70e6ce65b40",
-     "2026-12-07": "75cd2a5b249bc6867d57ea980975b83ccd302454a8d864bda156f4d32326e1a5",
-     "2026-12-14": "02ee13487bc493202c0406634ee93c272b29a0261fcb7ba6a26be404431038c4",
-     "2026-12-21": "af595a3da5e4eb0b93ca949578d678577bb9bca6debed3bf2df6511137fd11e1",
-     "2027-01-11": "40e5b2ce20407cc2237d2dc8030b51280f538af39706ebaa822731e6dc0d370a",
-     "2027-01-18": "6b54e09d6036603b78120f79ff0decc12b3905016f79ed7976b707b58668c2a8",
-     "2027-01-25": "61d78196cb65336d00320bd578c4b1c83d2ddb184565b2b74e1659e3c3eedf08"
-    },
-    "model": "haiku",
-    "events": []
-   },
+   "status": "keine-termine",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
+   "changedAt": "2026-11-25T11:17:44+01:00",
+   "emptySince": "2026-11-25T11:17:44+01:00",
    "sources": [
     "evtermine"
    ],

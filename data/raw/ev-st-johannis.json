@@ -206,7 +206,7 @@
    "inputHash": "e7d26bf95617435bfa52011f668f1c35a48a85889e1e9040e323839c5b704d4f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-20T10:02:41+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
@@ -215,10 +215,12 @@
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Mutter-Kind-Gruppe für Kinder von 1–3 Jahren (mittwochs)",
-     "summary": "Krabbelgruppe für Kinder von etwa 1 bis 3 Jahren mit ihren Müttern oder Eltern, zum Spielen, Kennenlernen und Austausch. Jeden Mittwoch 14:30–17:00 Uhr im TabeaHaus; die Quelle nennt keine Platzangabe.",
+     "title": "Mutter-Kind-Gruppe für Kinder von 1 bis 3 Jahren, mittwochs",
+     "summary": "Offene Krabbelgruppe zum Kennenlernen und Austausch unter Eltern, mittwochs 14:30–17:00 Uhr im TabeaHaus. Ob eine Anmeldung nötig ist, geht aus den Terminen nicht hervor; bei der Gemeinde nachfragen.",
      "topics": [
-      "krabbelgruppe"
+      "krabbelgruppe",
+      "elterntreff",
+      "muetter"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -231,8 +233,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Anmeldung nicht genannt, bei Fragen direkt bei der Gemeinde nachfragen."
+      "status": "ohne-anmeldung",
+      "note": "Keine Platzangabe in den Terminen; Anfrage bei der Gemeinde"
      },
      "schedule": {
       "kind": "weekly",
@@ -248,10 +250,11 @@
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder (donnerstags)",
-     "summary": "Spiel- und Austauschgruppe für Eltern mit Säuglingen und Kleinkindern am Donnerstagvormittag im TabeaHaus, 9:30–11:30 Uhr. Die Quelle nennt keine Platzangabe.",
+     "title": "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder, donnerstags",
+     "summary": "Vormittags zum Spielen und Austauschen für Eltern mit Babys und Kleinkindern, donnerstags 9:30–11:30 Uhr im TabeaHaus. Ob eine Anmeldung nötig ist, geht aus den Terminen nicht hervor; bei der Gemeinde nachfragen.",
      "topics": [
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "spielgruppe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -264,8 +267,8 @@
       "maxMonths": 36
      },
      "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Anmeldung nicht genannt, bei Fragen direkt bei der Gemeinde nachfragen."
+      "status": "ohne-anmeldung",
+      "note": "Keine Platzangabe in den Terminen; Anfrage bei der Gemeinde"
      },
      "schedule": {
       "kind": "weekly",
@@ -281,8 +284,8 @@
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Gottesdienst Kirche Kunterbunt Mini (20.12.)",
-     "summary": "Kurzer Gottesdienst für die Kleinsten mit ihren Eltern im TabeaHaus am 20.12. von 10:30 bis 11:30 Uhr. Die Quelle nennt keine Anmeldung.",
+     "title": "Kirche Kunterbunt Mini, Gottesdienst am 20.12.2026",
+     "summary": "Gottesdienst für die Kleinsten im TabeaHaus, 10:30–11:30 Uhr. Weitere Termine der Reihe stehen gegebenenfalls auf anderen Seiten des Anbieters.",
      "topics": [
       "krabbelgottesdienst"
      ],
@@ -294,7 +297,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Gottesdienst, laut Quelle keine Anmeldung angegeben."
+      "note": "Gottesdienst ohne Platzangabe"
      },
      "schedule": {
       "kind": "dates",
@@ -305,54 +308,20 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "ev-st-johannis",
-     "venueId": "ev-st-johannis",
-     "title": "Mutter-Kind-Gruppe für Kinder von 1 bis 3 Jahren (TabeaHaus)",
-     "summary": "Treff für Mütter mit Kindern von 1 bis 3 Jahren zum Kennenlernen und Austausch über Alltagsthemen. Im Kalender steht bislang nur der Termin am 23.12.2026; Plätze sind nicht angegeben.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8125927.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=583",
-     "category": "krabbel-spielgruppen",
-     "age": {
-      "minMonths": 12,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe im Kalender; Anfrage über die Gemeinde"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-23T14:30",
-        "end": "2026-12-23T17:00"
-       }
-      ]
-     }
     }
    ],
    "inputHash": "4db80008ccb6d7489adb771a1cd005a997de3b2c66fce9bbc3b1ffd291e3db4a",
    "dated": {
-    "2026-11-24": "9f7d38fda61cf69693e2c3efccca215f327af86fd17f074685561faad1490168",
-    "2026-11-25": "e1b13d69e5b614126203cbc3e8683c9d756574965b52ef8c32d64d5277093d47",
+    "2026-11-25": "17d9289a912073306dbc02be477fb13a65746ac1d4f77b3f9908e5c0de78b7e6",
     "2026-11-26": "e7cbe7d89c65471dbb8554c1822900725956efe65bd0bdb27e720395e622ee38",
     "2026-11-27": "cda8660617c44906683826e657241391c9fccfe4f28cd3ae9de683d2eee0e720",
-    "2026-11-29": "66dbfe6a8826ea78081e83282aef68704cae2f9b50a40ecc558a0adf5da72621",
+    "2026-11-29": "a85d7c8851c29208504d028a9d4bb19a97340a378a84aeb07b3e4482d650076c",
     "2026-11-30": "8783c451135b2cc164a0b374097840f8e445e02439f386690b0cbcaa8e068354",
     "2026-12-01": "5caab8cd723757a3e74fe75a70cd555bf0473e2ffeabcc2e7fe0bb9feb4ad2ce",
     "2026-12-02": "fd846dfa2888f987422d488a739ba4ee5822ef221841cc14dae627ffc5e15a81",
     "2026-12-03": "9e401ab41e7ce1e9ab744f60845d5156ca4e8e05e598eb34501de929d8d3ce74",
     "2026-12-04": "a7e9bc1dff04c940b0a97c8b0e33359d980c6ac1c2bef5b03ca9e5af462ab0ac",
-    "2026-12-06": "fbdc7619de24f667f8f557a4680b343f5bf62f8f0ba3d595a5763e66f800a6df",
+    "2026-12-06": "4e8ad3461f852117ce665f706d622d34c5785b42500bbfde9d465e0aa331c475",
     "2026-12-07": "c0e18e39761edd52cdf3bba75d746d3850fad833643f12ad8c6cf75e26a85f6a",
     "2026-12-08": "c74ba26b0c059245cfe667668b840145a99f25c1525394c499e383502e5af377",
     "2026-12-09": "e62d7b421671f7c30f189bd87edd223b2cc99d871aecea420bc770cc3559d99d",
@@ -361,11 +330,11 @@
     "2026-12-13": "421ce1fafa2182b832bb6d1d45819413176c0d3c49681e8ca7e10bc7be3f2db9",
     "2026-12-14": "1a65124b65a5eb8b47897e35e44187568d5e936538cecc6872cea822ddc30f6d",
     "2026-12-15": "e6a3d6b9afafeae3c353f7dee356a921fc498065677474c276e5a0548b675756",
-    "2026-12-16": "76f1dcc36b2639a68ce61050528387715404c04b5bfa8ba854210c242e9a62ab",
+    "2026-12-16": "c578b57ae2685a630aa85357e1366f3649e9ee1514faacfef08ed9186b6f85ed",
     "2026-12-17": "a1c0b71e69d93a7cef6baec0ef856d49660a6142405fe54c08d81b7c2244aaa0",
     "2026-12-18": "cf32c9d0d18d660475012cc0b8032480a7762bf18dbd4b152f601cefd73aa264",
     "2026-12-20": "015f78479cfa8e432d86771b561c0f4b37a220d32eb42e7e3f5a248674ccad30",
-    "2026-12-21": "2bf4c75fe8a8797d0b68ec28a63aea576bbcd9f9ec4cce4f9a2bf656445890cf",
+    "2026-12-21": "f7aaafcbe2806da0b7d805f9c25986e462218e583e842d4bd8f9acf80739a7c3",
     "2026-12-22": "710064444ab731c73560656f96e21d6ddfa724f9459d060973aa6d546101d9cb",
     "2026-12-23": "440b424e7607b35b14637523ad97d3a2e46cf3f26c4292d7b72e9bb6c0673e80",
     "2026-12-24": "34c4936158869b29056758c0dadc18aeafb908ac2384b7bc53246e8449fc97b9",
@@ -384,8 +353,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
-   "changedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
+   "changedAt": "2026-11-25T11:17:44+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
   "kandidaten": {
@@ -497,7 +466,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-20T10:02:41+01:00",
    "sources": [
     "evtermine"

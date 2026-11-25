@@ -79,7 +79,7 @@
    "inputHash": "b8d802c77ec4b570c43eb8fd5570c3919b8afea8a0cc8392da9718104533d5cf",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "b4408454223744e1cabb6cfccfa7afaa03f47f44ce922a35969476682f6e8f37"
   },
@@ -88,8 +88,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Dienstag 10:00 (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs für Kinder ab 18 Monaten bis 3 Jahren mit Bezugsperson: Singen, Bewegungs- und Klangspiele, einfache Instrumente. 15 Einheiten à 35 Minuten, in den Schulferien pausiert. Der Kurs läuft bereits; ein späterer Einstieg ist auf der Seite nicht genannt.",
+     "title": "Musikgarten Dienstag 10:00 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten, 15 Termine à 35 Minuten. Pausiert in den Schulferien; der Kurs läuft bereits und endet im Februar 2027.",
      "topics": [
       "musik",
       "singen"
@@ -107,7 +107,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über „Jetzt anmelden“ möglich"
+      "note": "Anmeldung über „Jetzt anmelden“ (Onlinebuchung)"
      },
      "schedule": {
       "kind": "weekly",
@@ -116,16 +116,16 @@
       ],
       "start": "10:00",
       "end": "10:35",
-      "from": "2026-11-17",
-      "until": "2027-02-02",
+      "from": "2026-12-01",
+      "until": "2027-02-16",
       "skipHolidays": true
      }
     },
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Mittwoch 15:15 (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs für Kinder ab 18 Monaten bis 3 Jahren mit Bezugsperson: Singen, Bewegungs- und Klangspiele, einfache Instrumente. 15 Einheiten à 35 Minuten, in den Schulferien pausiert. Der Kurs läuft bereits und ist derzeit nur auf der Warteliste buchbar.",
+     "title": "Musikgarten Mittwoch 15:15 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten, 15 Termine à 35 Minuten. Pausiert in den Schulferien; der Kurs ist belegt und nur noch über die Warteliste buchbar.",
      "topics": [
       "musik",
       "singen"
@@ -143,7 +143,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "belegt – klicken für Warteliste"
+      "note": "belegt – Eintrag auf die Warteliste über die Kursseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -152,7 +152,7 @@
       ],
       "start": "15:15",
       "end": "15:50",
-      "from": "2026-11-11",
+      "from": "2026-12-02",
       "until": "2027-02-03",
       "skipHolidays": true
      }
@@ -160,8 +160,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Mittwoch 15:30 (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs für Kinder ab 18 Monaten bis 3 Jahren mit Bezugsperson: Singen, Bewegungs- und Klangspiele, einfache Instrumente. 15 Einheiten à 35 Minuten, in den Schulferien pausiert. Der Kurs läuft bereits und ist derzeit nur auf der Warteliste buchbar.",
+     "title": "Musikgarten Mittwoch 15:30 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten, 15 Termine à 35 Minuten. Pausiert in den Schulferien; der Kurs ist belegt und nur noch über die Warteliste buchbar.",
      "topics": [
       "musik",
       "singen"
@@ -179,7 +179,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "belegt – klicken für Warteliste"
+      "note": "belegt – Eintrag auf die Warteliste über die Kursseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -188,7 +188,7 @@
       ],
       "start": "15:30",
       "end": "16:05",
-      "from": "2026-11-11",
+      "from": "2026-12-02",
       "until": "2027-01-27",
       "skipHolidays": true
      }
@@ -196,8 +196,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Donnerstag 15:45 (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs für Kinder ab 18 Monaten bis 3 Jahren mit Bezugsperson: Singen, Bewegungs- und Klangspiele, einfache Instrumente. 15 Einheiten à 35 Minuten, in den Schulferien pausiert. Der Kurs läuft bereits und ist derzeit nur auf der Warteliste buchbar.",
+     "title": "Musikgarten Donnerstag 15:45 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten, 15 Termine à 35 Minuten. Pausiert in den Schulferien; der Kurs ist belegt und nur noch über die Warteliste buchbar.",
      "topics": [
       "musik",
       "singen"
@@ -215,7 +215,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "belegt – klicken für Warteliste"
+      "note": "belegt – Eintrag auf die Warteliste über die Kursseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -224,7 +224,7 @@
       ],
       "start": "15:45",
       "end": "16:20",
-      "from": "2026-11-12",
+      "from": "2026-11-26",
       "until": "2027-02-04",
       "skipHolidays": true
      }
@@ -232,8 +232,8 @@
     {
      "providerId": "musication-musikgarten",
      "venueId": "musication-musikgarten",
-     "title": "Musikgarten Donnerstag 16:15 (18 Monate–3 Jahre)",
-     "summary": "Eltern-Kind-Musikkurs für Kinder ab 18 Monaten bis 3 Jahren mit Bezugsperson: Singen, Bewegungs- und Klangspiele, einfache Instrumente. 15 Einheiten à 35 Minuten, in den Schulferien pausiert. Der Kurs läuft bereits und ist derzeit nur auf der Warteliste buchbar.",
+     "title": "Musikgarten Donnerstag 16:15 Uhr (18 Monate–3 Jahre)",
+     "summary": "Eltern-Kind-Musikkurs mit Singen, Bewegen und einfachen Instrumenten, 15 Termine à 35 Minuten. Pausiert in den Schulferien; der Kurs ist belegt und nur noch über die Warteliste buchbar.",
      "topics": [
       "musik",
       "singen"
@@ -251,7 +251,7 @@
      },
      "availability": {
       "status": "warteliste",
-      "note": "belegt – klicken für Warteliste"
+      "note": "belegt – Eintrag auf die Warteliste über die Kursseite"
      },
      "schedule": {
       "kind": "weekly",
@@ -260,17 +260,17 @@
       ],
       "start": "16:15",
       "end": "16:50",
-      "from": "2026-11-12",
+      "from": "2026-11-26",
       "until": "2027-02-04",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "65376a2f319510367087a00e2b7c2582aef02ddf5b5a6bd7b96dfa7a1967eec7",
+   "inputHash": "8e959e2a9f34113b0bc5a18f3c53df026b3073dd38eeca5374a84ace3745703e",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
-   "changedAt": "2026-11-11T09:09:51+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
+   "changedAt": "2026-11-25T11:17:44+01:00",
    "partsHash": "b4408454223744e1cabb6cfccfa7afaa03f47f44ce922a35969476682f6e8f37"
   },
   "seite:https://musication.de/kinder-musik/musikgarten-englisch-singing-english/": {
@@ -316,7 +316,7 @@
    "inputHash": "22e5aed1755dbcdb8aa05d0af7eb65d003fc38da814cdfd6e8695011fc711bd8",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "b4408454223744e1cabb6cfccfa7afaa03f47f44ce922a35969476682f6e8f37"
   },
@@ -325,7 +325,7 @@
    "inputHash": "738c41b048bf4e5c3bcd6c7f51dea4dca87e65e8c56d11f622c9a0e991b6d0d0",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "b4408454223744e1cabb6cfccfa7afaa03f47f44ce922a35969476682f6e8f37"
   }

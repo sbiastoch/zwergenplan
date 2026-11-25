@@ -312,7 +312,7 @@
    "inputHash": "58bc52e6202ee0d80ea95455adec1a8f7d5a7c4ce26da242fb0f90d33535c91d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-21T09:41:55+01:00",
    "partsHash": "934c3dd4db5beb92773e1e4b19222db4464586cc4e901262f24f1cbc915a47e3"
   },
@@ -321,11 +321,10 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse",
-     "title": "Musikzwerge I, Montag 15:30 Uhr (Kurs 26-KH-K1-06, Sept.–Nov. 2026)",
-     "summary": "Musikgarten für Kinder ab ca. 18 Monaten mit Begleitperson: Singen und Musizieren mit einfachen Instrumenten, 45 Minuten pro Stunde. Der Herbstkurs ist ausgebucht; er läuft bis 16.11.2026.",
+     "title": "Musikfüchse-Musikzwerge I (18 Mon.–3 J.), montags 15:30",
+     "summary": "Musikgarten für Kinder ab ca. 18 Monaten mit Bezugsperson: Singen, Echospiele und Musizieren mit einfachen Instrumenten, 45 Min. pro Stunde. Der Kurs ist ausgebucht.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -340,69 +339,7 @@
      },
      "availability": {
       "status": "ausgebucht",
-      "note": "AUSGEBUCHT laut Kursliste"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-09-14T15:30",
-        "end": "2026-09-14T16:15"
-       },
-       {
-        "start": "2026-09-21T15:30",
-        "end": "2026-09-21T16:15"
-       },
-       {
-        "start": "2026-09-28T15:30",
-        "end": "2026-09-28T16:15"
-       },
-       {
-        "start": "2026-10-12T15:30",
-        "end": "2026-10-12T16:15"
-       },
-       {
-        "start": "2026-10-19T15:30",
-        "end": "2026-10-19T16:15"
-       },
-       {
-        "start": "2026-10-26T15:30",
-        "end": "2026-10-26T16:15"
-       },
-       {
-        "start": "2026-11-09T15:30",
-        "end": "2026-11-09T16:15"
-       },
-       {
-        "start": "2026-11-16T15:30",
-        "end": "2026-11-16T16:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse",
-     "title": "Musikzwerge I, Montag 15:30 Uhr (Kurs 26-KH-K1-07, ab 23.11.2026)",
-     "summary": "Musikgarten für Kinder ca. 18 Monate bis 3 Jahre mit Begleitperson: Singen und Musizieren mit einfachen Instrumenten, 45 Minuten. 8 Termine bis 25.01.2027; der Kurs ist ausgebucht.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 €",
-     "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "category": "musik",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "ausgebucht",
-      "note": "AUSGEBUCHT laut Kursliste"
+      "note": "Kurs ausgebucht"
      },
      "schedule": {
       "kind": "dates",
@@ -445,11 +382,10 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse I, Dienstag 15:30 Uhr (Kurs 26-PP-K1-07, Sept.–Nov. 2026)",
-     "summary": "Musikgarten für Kleinkinder ca. 18 Monate bis 3 Jahre mit Begleitperson: Echospiele, Singen und einfache Instrumente, 45 Minuten. Laufender Kurs, der letzte Termin im Horizont ist der 17.11.2026.",
+     "title": "Musikfüchse I (18 Mon.–3 J.), dienstags 15:30",
+     "summary": "Musikgarten für Kinder ca. 18 Monate bis 3 Jahre mit Bezugsperson: Singen und Musizieren mit einfachen Instrumenten, 45 Min. Der Kurs läuft seit 24.11.; Anmeldung über „Kurs buchen“.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -464,69 +400,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über Button „Kurs buchen“ (Formular)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-09-15T15:30",
-        "end": "2026-09-15T16:15"
-       },
-       {
-        "start": "2026-09-22T15:30",
-        "end": "2026-09-22T16:15"
-       },
-       {
-        "start": "2026-09-29T15:30",
-        "end": "2026-09-29T16:15"
-       },
-       {
-        "start": "2026-10-13T15:30",
-        "end": "2026-10-13T16:15"
-       },
-       {
-        "start": "2026-10-20T15:30",
-        "end": "2026-10-20T16:15"
-       },
-       {
-        "start": "2026-10-27T15:30",
-        "end": "2026-10-27T16:15"
-       },
-       {
-        "start": "2026-11-10T15:30",
-        "end": "2026-11-10T16:15"
-       },
-       {
-        "start": "2026-11-17T15:30",
-        "end": "2026-11-17T16:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse I, Dienstag 15:30 Uhr (Kurs 26-PP-K1-10, ab 24.11.2026)",
-     "summary": "Musikgarten für Kleinkinder ca. 18 Monate bis 3 Jahre mit Begleitperson: Echospiele, Singen und einfache Instrumente, 45 Minuten. 8 Termine bis 26.01.2027, Anmeldung über das Formular.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 €",
-     "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "category": "musik",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 36
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung über Button „Kurs buchen“ (Formular)"
+      "note": "Anmeldung über „Kurs buchen“; keine Platzzahl angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -569,11 +443,10 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse I & II, Dienstag 16:30 Uhr (Kurs 26-PP-K1-08, Sept.–Nov. 2026)",
-     "summary": "Musikgarten für Kinder ca. 18 Monate bis ca. 4,5 Jahre, auch für Geschwister geeignet: Singen und Musizieren mit einfachen Instrumenten, 45 Minuten. Laufender Kurs, der letzte Termin im Horizont ist der 17.11.2026.",
+     "title": "Musikfüchse I & II (18 Mon.–4,5 J.), dienstags 16:30",
+     "summary": "Musikgarten für Kinder ca. 18 Monate bis 4,5 Jahre, auch für Geschwisterkinder: Singen und Musizieren mit einfachen Instrumenten, 45 Min. Der Kurs läuft seit 24.11.; Anmeldung über „Kurs buchen“.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -588,69 +461,7 @@
      },
      "availability": {
       "status": "frei",
-      "note": "Anmeldung über Button „Kurs buchen“ (Formular)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-09-15T16:30",
-        "end": "2026-09-15T17:15"
-       },
-       {
-        "start": "2026-09-22T16:30",
-        "end": "2026-09-22T17:15"
-       },
-       {
-        "start": "2026-09-29T16:30",
-        "end": "2026-09-29T17:15"
-       },
-       {
-        "start": "2026-10-13T16:30",
-        "end": "2026-10-13T17:15"
-       },
-       {
-        "start": "2026-10-20T16:30",
-        "end": "2026-10-20T17:15"
-       },
-       {
-        "start": "2026-10-27T16:30",
-        "end": "2026-10-27T17:15"
-       },
-       {
-        "start": "2026-11-10T16:30",
-        "end": "2026-11-10T17:15"
-       },
-       {
-        "start": "2026-11-17T16:30",
-        "end": "2026-11-17T17:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse I & II, Dienstag 16:30 Uhr (Kurs 26-PP-K1-11, ab 24.11.2026)",
-     "summary": "Musikgarten für Kinder ca. 18 Monate bis ca. 4,5 Jahre, auch für Geschwister geeignet: Singen und Musizieren mit einfachen Instrumenten, 45 Minuten. 8 Termine bis 26.01.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 €",
-     "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "category": "musik",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 54
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung über Button „Kurs buchen“ (Formular)"
+      "note": "Anmeldung über „Kurs buchen“; keine Platzzahl angegeben"
      },
      "schedule": {
       "kind": "dates",
@@ -693,11 +504,10 @@
     {
      "providerId": "musikfuechse",
      "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse I & II, Donnerstag 16:30 Uhr (Kurs 26-PP-K1-09, Sept.–Nov. 2026)",
-     "summary": "Musikgarten für Kinder ca. 18 Monate bis ca. 4,5 Jahre, auch für Geschwister geeignet: Singen und Musizieren mit einfachen Instrumenten, 45 Minuten. Laufender Kurs, der letzte Termin im Horizont ist der 19.11.2026.",
+     "title": "Musikfüchse I & II (18 Mon.–4,5 J.), donnerstags 16:30",
+     "summary": "Musikgarten für Kinder ca. 18 Monate bis 4,5 Jahre, auch für Geschwisterkinder: Singen und Musizieren mit einfachen Instrumenten, 45 Min. Der Kurs ist ausgebucht.",
      "topics": [
-      "musik",
-      "singen"
+      "musik"
      ],
      "format": "kurs",
      "registration": "mit-anmeldung",
@@ -711,70 +521,8 @@
       "maxMonths": 54
      },
      "availability": {
-      "status": "frei",
-      "note": "Anmeldung über Button „Kurs buchen“ (Formular)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-09-17T16:30",
-        "end": "2026-09-17T17:15"
-       },
-       {
-        "start": "2026-09-24T16:30",
-        "end": "2026-09-24T17:15"
-       },
-       {
-        "start": "2026-10-01T16:30",
-        "end": "2026-10-01T17:15"
-       },
-       {
-        "start": "2026-10-15T16:30",
-        "end": "2026-10-15T17:15"
-       },
-       {
-        "start": "2026-10-22T16:30",
-        "end": "2026-10-22T17:15"
-       },
-       {
-        "start": "2026-10-29T16:30",
-        "end": "2026-10-29T17:15"
-       },
-       {
-        "start": "2026-11-12T16:30",
-        "end": "2026-11-12T17:15"
-       },
-       {
-        "start": "2026-11-19T16:30",
-        "end": "2026-11-19T17:15"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "musikfuechse",
-     "venueId": "musikfuechse-poppenreuth",
-     "title": "Musikfüchse I & II, Donnerstag 16:30 Uhr (Kurs 26-PP-K1-12, ab 26.11.2026)",
-     "summary": "Musikgarten für Kinder ca. 18 Monate bis ca. 4,5 Jahre, auch für Geschwister geeignet: Singen und Musizieren mit einfachen Instrumenten, 45 Minuten. 8 Termine bis 04.02.2027.",
-     "topics": [
-      "musik",
-      "singen"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "price": "120 €",
-     "url": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "sourceUrl": "https://musikfuechse.com/musikfuechse-fuer-kleinkinder/",
-     "category": "musik",
-     "age": {
-      "minMonths": 18,
-      "maxMonths": 54
-     },
-     "availability": {
-      "status": "frei",
-      "note": "Anmeldung über Button „Kurs buchen“ (Formular)"
+      "status": "ausgebucht",
+      "note": "Kurs ausgebucht"
      },
      "schedule": {
       "kind": "dates",
@@ -815,11 +563,11 @@
      }
     }
    ],
-   "inputHash": "921f7fa25f5999f51ee02ac28cc2f8e84630da9a2492ad50d060b368742bc892",
+   "inputHash": "3996cbe58cb21503139175666e7bdaa17d52c53a563d0f0635cfa170598d2f00",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
-   "changedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
+   "changedAt": "2026-11-25T11:17:44+01:00",
    "partsHash": "a421d1863f17b57b26765135d9398706a483182ee29173eaf1b1c4cfbae5c5a5"
   },
   "seite:https://musikfuechse.com/workshops/": {
@@ -827,7 +575,7 @@
    "inputHash": "4c498328f03f4de5035acf3ef6791d26e003cb7003609ef262ac4b2749deb878",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "73ff7c6dd89368375a1bb91128658250c43613d8d77b62b2ab845b8798eb97d6"
   }

@@ -112,7 +112,7 @@
    "inputHash": "bebbaaef64c2915d0bf6801d59d9e418c17b9a1079720183a777fdc184125ce9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -370,16 +370,16 @@
    "inputHash": "0bd74d66f79fbe1a62c9f8b8500f7ac241b72bf3d5497468b9d260fdec2a7dac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-06T09:24:07+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
   "seite:https://mamalea-familienbegleitung.de/sinneszauber/": {
    "events": [],
-   "inputHash": "7fc8aab5098512276b975a5164f6b90f1352ccb4b6b3eb22ca1a399b017d1c9d",
+   "inputHash": "45297fd07bb7faa675bf0027ce1c8577d85057527fa33c8ff58d743647989d1d",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -388,7 +388,7 @@
    "inputHash": "d9772f4c83b4da1f73fa770816b140e4b657498a039f356011950f270567a3c7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-31T08:26:00+01:00",
    "emptySince": "2026-10-31T08:26:00+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -398,7 +398,7 @@
    "inputHash": "f8d34b4cf4d218c28a47bd907c7b50aa9d16116ee2ff516d8c893a3eda7f7423",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1424,7 +1424,7 @@
    "inputHash": "7cae72c438fb3734ea66bf06701df59c3721260c58570e17aec2e5a485700bfc",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "partsHash": "9db45cc5a1d2c9375b1f1575385c64979b5743bda545f07e340e1eaf70618558"
   },
@@ -1618,7 +1618,7 @@
    "inputHash": "dd32db9cafdf095105c379ffac5e21d1fca5e54c084be70ec61592f6e76ad45a",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1627,7 +1627,7 @@
    "inputHash": "b4f38fb7d75557bd69d0fe4217339b2de8f3e1e020eea44eb06cac65b5c98e0b",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-18T10:00:22+01:00",
    "emptySince": "2026-11-18T10:00:22+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -1674,7 +1674,7 @@
    "inputHash": "44953f209370e8cf2c51b1aa6a5b4d70cea170393804cd32aa64ce331bc3dbe5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1683,7 +1683,7 @@
    "inputHash": "2847eb44c8c66d7222ada78ef6ad5737a4b74f7d91d9939d27a5ac44af1a4164",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1692,7 +1692,7 @@
    "inputHash": "87fdab6c0631446e594f3b21da274cfacc182ff8ef06fabca85155c74c7e34bf",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1701,7 +1701,7 @@
    "inputHash": "377e99bbba93071f9e1b9bdd829d70bfe0b4fbb3ea6c617146676afd325deea7",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-11-13T09:38:01+01:00",
    "emptySince": "2026-11-13T09:38:01+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
@@ -1711,7 +1711,7 @@
    "inputHash": "44866aecbeab9cf6c646f59eb71ca26e043b4dfb2739b687b25a0697d706c8fe",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1720,7 +1720,7 @@
    "inputHash": "c3143eb47fad600c9a4c3457fd4d746f835f7fc049066656c73c88980df3cd78",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "5f1c94e10615799396ad96aee98c62e3d42fc7fe6e55a3bd4bc6b5277fb11a4a"
   },
@@ -1767,7 +1767,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-25T11:17:44+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "sources": [
     "frankenkids"
