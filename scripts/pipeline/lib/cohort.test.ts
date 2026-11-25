@@ -18,6 +18,12 @@ describe("birthCohort (Plan 0053, E3)", () => {
     ["Krabbeln, geb. Jan. bis März 2026", "2026-01", "2026-03"],
     // nur ein Jahr am Ende, erster Monat größer: Vorjahr (E3, Jahresregel)
     ["PEKiP geb. Nov.–Feb. 2026", "2025-11", "2026-02"],
+    // ohne „geb.“: „Babys“ oder „Geburtsmonate“ direkt vor dem Monat, Monate auch mit „/“ getrennt
+    ["PEKiP-Gruppe Babys Sept./Okt. 2026, Fr, ab 15.01.2027", "2026-09", "2026-10"],
+    ["PEKiP-Gruppe Babys März/Apr. 2026, Do, bis 04.02.2027", "2026-03", "2026-04"],
+    ["PEKiP-Gruppe Babys Dez./Jan. 2027", "2026-12", "2027-01"],
+    ["PEKiP Geburtsmonate Juni–Aug. 2026, Do 11:15 (ab 29.10.)", "2026-06", "2026-08"],
+    ["PEKiP Babys geb. Juli/Aug. 2026", "2026-07", "2026-08"],
   ])("%s", (title, from, to) => {
     expect(birthCohort(title)).toEqual({ from, to });
   });
@@ -31,6 +37,12 @@ describe("birthCohort (Plan 0053, E3)", () => {
     "Krabbelgruppe für Kinder geb. ab Mai 2026",
     "PEKiP geb. 1.1.–30.6.2026",
     "Eltern-Kind-Gruppe Donnerstag (Stephanuskirche Gebersdorf) 2026",
+    // Kurszeitraum, kein Geburtszeitraum
+    "Babymassage, Fr 10:00 Uhr – Kurs Jan./Feb. 2027",
+    "Babymassagekurs (Freitags, Jan./Feb. 2027)",
+    "Mutter/Vater-Baby-Schwimmen Mo 16:30 (Jan.–Apr. 2027)",
+    "Babyschwimmen ab 3 Monaten – Sa 10:15 (Start Jan. 2027)",
+    "Kurs für Babys ab Mai 2026",
   ])("kein Geburtszeitraum: %s", (title) => {
     expect(birthCohort(title)).toBeUndefined();
   });

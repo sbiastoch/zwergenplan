@@ -36,10 +36,18 @@ const NAME = String.raw`([a-zäöü]{3,9})\.?`;
 const NUM = String.raw`(\d{1,2})`;
 const YEAR = String.raw`(20\d\d)`;
 const DASH = String.raw`\s*(?:[-–—]|bis)\s*`;
+/** zwischen Monatsnamen auch „/“ („Sept./Okt. 2026“); bei Monatszahlen trennt „/“ das Jahr ab */
+const NAME_DASH = String.raw`\s*(?:[-–—/]|bis)\s*`;
 const LEAD = String.raw`\bgeb(?:\.|oren)\s+(?:im\s+)?`;
+/**
+ * Vor Monatsnamen auch „Babys Sept./Okt. 2026“ und „Geburtsmonate Juni–Aug. 2026“: Das Modell kürzt „für Kinder, die im
+ * September – Oktober 2026 geboren sind“ so ab, ohne `age` (BRK-PEKiP, 2026-11). Ein Kurszeitraum („Kurs Jan./Feb.
+ * 2027“) steht nie direkt hinter „Babys“.
+ */
+const NAME_LEAD = String.raw`(?:${LEAD}|\b(?:babys|geburtsmonate?)\s+)`;
 
 /** Monatsname – Monatsname Jahr, das erste Jahr optional; oder ein einzelner Monat */
-const BY_NAME = new RegExp(`${LEAD}${NAME}(?:\\s+${YEAR})?(?:${DASH}${NAME})?\\s+${YEAR}`, "i");
+const BY_NAME = new RegExp(`${NAME_LEAD}${NAME}(?:\\s+${YEAR})?(?:${NAME_DASH}${NAME})?\\s+${YEAR}`, "i");
 /** 02-06/2026, 04/2024-07/2024, 03/2026 */
 const BY_NUMBER = new RegExp(`${LEAD}${NUM}(?:\\/${YEAR})?(?:${DASH}${NUM})?\\/${YEAR}`, "i");
 
