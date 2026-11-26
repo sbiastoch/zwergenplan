@@ -6,8 +6,8 @@
     {
      "providerId": "ev-st-jobst",
      "venueId": "ev-st-jobst",
-     "title": "Miniclub Eltern-Kind-Gruppe (1–2 Jahre)",
-     "summary": "Spielen, erste Gruppenerfahrung und Austausch unter Eltern im Miniclubraum des Gemeindehauses. Die Termine im Dezember 2026 finden dienstags statt; Platzangaben fehlen in der Quelle.",
+     "title": "Miniclub-Eltern-Kind-Gruppe (Kinder 1–2 Jahre)",
+     "summary": "Spielen und Austausch für Eltern mit Kindern von etwa 1 bis 2 Jahren im Miniclubraum. Die Termine im Dezember 2026 stehen einzeln im Kalender; Anmeldung und Platzzahl sind der Quelle nicht zu entnehmen.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe in der Quelle; Anfrage beim Veranstalter (Ev. St. Jobst, Miniclubraum, Äußere Sulzbacher Str. 144)."
+      "note": "Keine Platzangabe in der Quelle; Anfrage beim Veranstalter (Ev.-Luth. Gemeinde St. Jobst)"
      },
      "schedule": {
       "kind": "dates",
@@ -56,25 +56,24 @@
    ],
    "inputHash": "886b17f2f27bfa229a70d4b6082cfb9ba42cddb66b3b8f70af3a17e81d6a3e73",
    "dated": {
-    "2026-11-25": "24f28c57ac66b3a4aa94df8de92705101ae9e9e0d5ef27f096947796892b104e",
     "2026-12-01": "79f5283753bde98c2011593df9c688d926597c9ee36af83feaa280603431efe8",
-    "2026-12-02": "d13299184ca16e95cbe7b8424aec4b3a45465fcc20c9e63628cea35b7109ebe1",
+    "2026-12-02": "ca8e2bd67ac2e22fb3c43ac6ce713f55b45c1caa24901bf886b14c961bf40b74",
     "2026-12-08": "874a99baa2b15f6b085da52e16d4b88796423453dad658af1d82bc2a07f07375",
     "2026-12-15": "abcf861d2a4759fd8a721cee9d337e8be5a556b29b5538459f566e3286dc6ee1",
-    "2026-12-16": "cbc22a7e8a08a03efcfb4f53112cfe43a0a759d559f552e19e5e396ada7f31e1",
+    "2026-12-16": "030b09bd2e06365516ab5d1b79c0997484c0fc979faa6ac2128f4f388a75ebff",
     "2026-12-22": "55cc49ff791f64afe4049f978cf6439dc30c72a253873ae294488c5ffa32863f",
     "2026-12-29": "90806d9a7cecc2f01c1e5545e02b7981f247d480e3cbd50cee75f973c0f0d9e5",
-    "2027-01-13": "de9e4ff6df9070c705343edb8703692516cf9a083bc60ecbf5fd90e6b775d20f",
-    "2027-01-27": "508c19334cc871e552c37bf6c2fe72dc263771fbfe7456862e617e3ef05971fa",
-    "2027-02-03": "2611f2775fdc921f1ee33a979e6df4d52d8b4194f9f559bca9de9b9278994b01",
-    "2027-02-17": "dcefbcdf3985ffa186fd80c3af27afc916e6ca8ad3eeda7ae76db9df73447ccb",
-    "2027-03-03": "fb7ff0c2d282b0ec160a995d9f1d34dfaf589a201f71ec5f39fc3fe9a456ce59",
-    "2027-03-17": "d8c85169e902af9ded3b98a64d92c459fcb9ddcd33c87c09ffac55db6bddd1d6"
+    "2027-01-13": "e26b83d233fed0161fd8d3f983523e82c45588dc71ef5ddaf30be8e38d005d8a",
+    "2027-01-27": "84c322d7ad623fb966872d972a302ac707347fb95acafaa1f27d304ebfdc6298",
+    "2027-02-03": "7468c971bf3f304c8f8c2be0c93fe3945ebcbba5b12bc4839189092f2887e387",
+    "2027-02-17": "f0cd516e72317d30d02e1a552e67dd8b649682cf9d4221877e5335ed12a3b0f1",
+    "2027-03-03": "8cef10966c0c0ad0367193395f12a8d62b135c1602bb5a140bae44e9421db31d",
+    "2027-03-17": "c9b86cf9f4960029f281ec261604936e34c1af9d9166da70fe2718bce0318871"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
-   "changedAt": "2026-11-25T11:17:44+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "changedAt": "2026-11-26T10:59:44+01:00",
    "sources": [
     "evtermine"
    ],

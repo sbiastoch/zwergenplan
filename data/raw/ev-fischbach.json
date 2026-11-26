@@ -6,17 +6,16 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe (Kinder 3 Monate bis 3 Jahre)",
-     "summary": "Vormittagsgruppe für Mütter mit Kindern von 3 Monaten bis 3 Jahren im Haus der Begegnung, dienstags und donnerstags, teils 1, teils 2 Stunden. Die Quelle nennt Termine bis Mitte Dezember 2026; Anmeldung und Platzangaben fehlen.",
+     "title": "Mutter-Kind-Gruppe, dienstags (Kinder 3 Monate–3 Jahre)",
+     "summary": "Mutter-Kind-Gruppe für Kinder von 3 Monaten bis 3 Jahren im Haus der Begegnung, dienstags 9:30–11:30 Uhr. Der Kalender nennt Termine bis 15. Dezember 2026; Anmeldung und Kosten stehen dort nicht.",
      "topics": [
       "eltern-kind-gruppe",
-      "elterntreff",
-      "muetter"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8121952.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8109426.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=556",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -25,34 +24,59 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle; Nachfrage bei der Gemeinde über fischbach-evangelisch.de"
+      "note": "Keine Angaben zu Plätzen im Kalender; Rückfragen über fischbach-evangelisch.de."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-11-26T09:30",
-        "end": "2026-11-26T10:30"
-       },
-       {
         "start": "2026-12-01T09:30",
         "end": "2026-12-01T11:30"
-       },
-       {
-        "start": "2026-12-03T09:30",
-        "end": "2026-12-03T10:30"
        },
        {
         "start": "2026-12-08T09:30",
         "end": "2026-12-08T11:30"
        },
        {
-        "start": "2026-12-10T09:30",
-        "end": "2026-12-10T10:30"
-       },
-       {
         "start": "2026-12-15T09:30",
         "end": "2026-12-15T11:30"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "ev-fischbach",
+     "venueId": "ev-fischbach",
+     "title": "Mutter-Kind-Gruppe, donnerstags (Kinder 3 Monate–3 Jahre)",
+     "summary": "Mutter-Kind-Gruppe für Kinder von 3 Monaten bis 3 Jahren im Haus der Begegnung, donnerstags 9:30–10:30 Uhr. Der Kalender nennt Termine bis 17. Dezember 2026; Anmeldung und Kosten stehen dort nicht.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "elterntreff"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8121953.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=556",
+     "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 3,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Angaben zu Plätzen im Kalender; Rückfragen über fischbach-evangelisch.de."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-03T09:30",
+        "end": "2026-12-03T10:30"
+       },
+       {
+        "start": "2026-12-10T09:30",
+        "end": "2026-12-10T10:30"
        },
        {
         "start": "2026-12-17T09:30",
@@ -64,7 +88,6 @@
    ],
    "inputHash": "0d786924c6f71bec5dc879f39c8ed104c247624126309ab6770b95fd7b007770",
    "dated": {
-    "2026-11-26": "84c9d494e10783226c7e77d581a513a82e66949ab3b6cc253f536632bbe4050c",
     "2026-11-29": "37989a5c9770f57baf205951bff844e602bd1a332c2dda6bebce57b4957a5d6e",
     "2026-11-30": "21122ef81d71f0c52c70778b1a1970674ba11bf56e76d39f10adda3e3be7c85a",
     "2026-12-01": "242bf98c788986e7a646b3c7e138ba606780816d49f2af8f44ece7aeea90d496",
@@ -123,8 +146,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
-   "changedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "changedAt": "2026-11-26T10:59:44+01:00",
    "partsHash": "d7bdfa5dfc673ef24ea44d79155ceb596d1cdbc06557d29dc3f2f911053987ba"
   },
   "kandidaten": {
@@ -132,8 +155,8 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe, Donnerstag 9:30–10:30 Uhr",
-     "summary": "Mütter und Väter mit kleinen Kindern tauschen sich aus, bekommen Anregungen für den Alltag und die Kinder lernen erste Lieder und Gruppenspiele. Anmeldung und Kosten sind im Eintrag nicht angegeben.",
+     "title": "Mutter-Kind-Gruppe (montags, 14:30–16:30 Uhr)",
+     "summary": "Lieder, Bewegung zur Musik und Spielmöglichkeiten für die Kinder, dazu Austausch für Mütter und Väter über Erziehungsfragen. Termine im Dezember 2026 an den genannten Montagen.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
@@ -141,54 +164,12 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8121952",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8121952",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8135839",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8135839",
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe im Eintrag; bei Fragen direkt beim Veranstalter nachfragen"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-26T09:30",
-        "end": "2026-11-26T10:30"
-       },
-       {
-        "start": "2026-12-03T09:30",
-        "end": "2026-12-03T10:30"
-       },
-       {
-        "start": "2026-12-10T09:30",
-        "end": "2026-12-10T10:30"
-       },
-       {
-        "start": "2026-12-17T09:30",
-        "end": "2026-12-17T10:30"
-       }
-      ]
-     },
-     "via": "evtermine"
-    },
-    {
-     "providerId": "ev-fischbach",
-     "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe, Montag 14:30–16:30 Uhr",
-     "summary": "Mütter und Väter mit kleinen Kindern tauschen sich aus, bekommen Anregungen für den Alltag und die Kinder lernen erste Lieder und Gruppenspiele. Anmeldung und Kosten sind im Eintrag nicht angegeben.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8121952",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8121952",
-     "category": "krabbel-spielgruppen",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe im Eintrag; bei Fragen direkt beim Veranstalter nachfragen"
+      "note": "Keine Angabe zu Anmeldung oder Plätzen im Kalendereintrag; beim Anbieter erfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -216,8 +197,8 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Mutter-Kind-Gruppe, Dienstag 9:30–11:30 Uhr",
-     "summary": "Mütter und Väter mit kleinen Kindern tauschen sich aus, bekommen Anregungen für den Alltag und die Kinder lernen erste Lieder und Gruppenspiele. Anmeldung und Kosten sind im Eintrag nicht angegeben.",
+     "title": "Mutter-Kind-Gruppe (dienstags, 9:30–11:30 Uhr)",
+     "summary": "Lieder, Bewegung zur Musik und Spielmöglichkeiten für die Kinder, dazu Austausch für Mütter und Väter über Erziehungsfragen. Termine im Dezember 2026 an den genannten Dienstagen.",
      "topics": [
       "eltern-kind-gruppe",
       "elterntreff"
@@ -225,12 +206,12 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8121952",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8121952",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8135839",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8135839",
      "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe im Eintrag; bei Fragen direkt beim Veranstalter nachfragen"
+      "note": "Keine Angabe zu Anmeldung oder Plätzen im Kalendereintrag; beim Anbieter erfragen."
      },
      "schedule": {
       "kind": "dates",
@@ -254,26 +235,36 @@
     {
      "providerId": "ev-fischbach",
      "venueId": "ev-fischbach",
-     "title": "Kleinkindergottesdienst an Heiligabend",
-     "summary": "Gottesdienst für Kleinkinder am 24.12. um 15 Uhr; laut Kalender im Gemeindehaus-Umfeld Marienkirche, Fischbacher Hauptstr. 180. Beschreibung fehlt: Altersgruppe und Teilnahme der Eltern bitte beim Veranstalter prüfen.",
+     "title": "Mutter-Kind-Gruppe (donnerstags, 9:30–10:30 Uhr)",
+     "summary": "Lieder, Bewegung zur Musik und Spielmöglichkeiten für die Kinder, dazu Austausch für Mütter und Väter über Erziehungsfragen. Termine im Dezember 2026 an den genannten Donnerstagen.",
      "topics": [
-      "krabbelgottesdienst"
+      "eltern-kind-gruppe",
+      "elterntreff"
      ],
-     "format": "einmalig",
+     "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8306868",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8306868",
-     "category": "treffs-cafes",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8135839",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8135839",
+     "category": "krabbel-spielgruppen",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe oder Anmeldehinweis im Eintrag"
+      "note": "Keine Angabe zu Anmeldung oder Plätzen im Kalendereintrag; beim Anbieter erfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
        {
-        "start": "2026-12-24T15:00"
+        "start": "2026-12-03T09:30",
+        "end": "2026-12-03T10:30"
+       },
+       {
+        "start": "2026-12-10T09:30",
+        "end": "2026-12-10T10:30"
+       },
+       {
+        "start": "2026-12-17T09:30",
+        "end": "2026-12-17T10:30"
        }
       ]
      },
@@ -282,23 +273,22 @@
    ],
    "inputHash": "9d7eb439e80d9d3b7b3080f4f0c7704342c974b22af5176356a82c2b6b215b0f",
    "dated": {
-    "2026-11-26": "e9b2c36af266fbf715749c8840e9dd11354051ce43bf6a781d8c65eeb2ccdc7b",
-    "2026-11-30": "8f7caaa63344dfee090732d23008652129fbdd827b15d73d2cf28047a1132c22",
-    "2026-12-01": "06c9785ff62dc755ff68375f935c27392247d74170ab33b3c6294d18ed58d340",
-    "2026-12-03": "f2815e329615738c41457e2aa3f758842285801e783a98e24909ca5043320753",
-    "2026-12-07": "d82321268250f8a6bffa578dd196b8b1504c6a32d5d4b55e8bd5939c39fa1be3",
-    "2026-12-08": "db65e45a4b4333fa7f7cd591f60496c86bb039965b0c989dc01194c914ed58f5",
-    "2026-12-10": "56e7c968355ee8a75f266322f292b34f4362e114bcc078414477b8831365971c",
-    "2026-12-14": "ed51870a35d94c58d7c1e4239e9c6fdbab35a74e844b8aa1ed44dbe33d2cc9b2",
-    "2026-12-15": "a4e059f19c918f8541a1901c85875683db96f6d988aee5471ab3f5b0e0d39074",
-    "2026-12-17": "3a5555f07690dcbc9de91c7e0a518bb2cce0036e129a3466111b27d2759f7f1d",
-    "2026-12-21": "6141d75b029deeb14814d053554dc83afbdf3bba3a3426086c7979d5ec1dc10b",
+    "2026-11-30": "94af9e893a7f6e63da452f470d7ccaecf99d81247bfa45823bfd61ab98ffd365",
+    "2026-12-01": "ce5c3f0a57dcf4f019f1031e0624a121263a074a0d20316ef7220f74684d253c",
+    "2026-12-03": "85b28dc91a992b06bb41ecdbb6b86ba654dac6a5b5a5d08aeacfd2819618e93e",
+    "2026-12-07": "022b5824d39aa1321b17828cd57605886eec3c3fa29250ee58c9c0a7ca393ced",
+    "2026-12-08": "14c63f2c8feb2854a8adba7134d0f961e3b861c24a84a2455efd13fd5ff9854f",
+    "2026-12-10": "a6823658ff1441f9c5eae745692a1db79f1c66d5e927dfdf0b194cf6253ff74d",
+    "2026-12-14": "e433f40abc3281a089acd33dc38a5315fbf9de858c6b728b0698c456f21ac2e8",
+    "2026-12-15": "2957f6401d2007ff8c991ecdba3324f2d6313a220d0ca5e8a76d69b16158c085",
+    "2026-12-17": "24c989cecf13a42d210bdb7b5ca8f83fde34d8baa0ddd090c4b95679adb91160",
+    "2026-12-21": "a652e9a36cf92a52a0e85d1e8d82e258568daaf00b61c43b8739cb931a868336",
     "2026-12-24": "183af034b0d2375872455d40733b0d849c45e238cbba3f1e589a8ff567046977"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
-   "changedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "changedAt": "2026-11-26T10:59:44+01:00",
    "sources": [
     "evtermine"
    ],

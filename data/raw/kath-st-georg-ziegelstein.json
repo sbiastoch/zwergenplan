@@ -6,8 +6,8 @@
     {
      "providerId": "kath-st-georg-ziegelstein",
      "venueId": "kath-st-georg-ziegelstein",
-     "title": "Kleinkindergottesdienst St. Georg (20.12.)",
-     "summary": "Gottesdienst für Kleinkinder mit ihren Familien im Pfarrsaal St. Georg, Sonntag 20.12. um 10.30 Uhr. Weitere Termine sind auf der Seite nicht genannt.",
+     "title": "Kleinkindergottesdienst St. Georg (So 20.12.)",
+     "summary": "Gottesdienst für die Kleinsten im Pfarrsaal St. Georg, Sonntag 20.12. um 10.30 Uhr. Auf der Seite ist keine Anmeldung angegeben, auch keine weiteren Termine.",
      "topics": [
       "krabbelgottesdienst"
      ],
@@ -19,7 +19,7 @@
      "category": "treffs-cafes",
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Anmeldung oder Platzangabe auf der Seite genannt"
+      "note": "Keine Platzangabe; keine Anmeldung auf der Seite genannt"
      },
      "schedule": {
       "kind": "dates",
@@ -31,11 +31,11 @@
      }
     }
    ],
-   "inputHash": "f1047bf5b4c560207e1a495494011e2a4b5e83c26d5f00b9ad282ce26cbc348d",
+   "inputHash": "c29c9cb92ac288e6fb6b781bee73407b4edc7757619799d8643225556ec36839",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
-   "changedAt": "2026-11-25T11:17:44+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "changedAt": "2026-11-26T10:59:44+01:00",
    "partsHash": "3f9123c1f7cc42a865ffba25d851e443c0148030b844b8b413892c2233278c0f"
   }
  }

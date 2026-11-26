@@ -206,7 +206,7 @@
    "inputHash": "e7d26bf95617435bfa52011f668f1c35a48a85889e1e9040e323839c5b704d4f",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
    "changedAt": "2026-11-20T10:02:41+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
@@ -312,7 +312,6 @@
    ],
    "inputHash": "4db80008ccb6d7489adb771a1cd005a997de3b2c66fce9bbc3b1ffd291e3db4a",
    "dated": {
-    "2026-11-25": "17d9289a912073306dbc02be477fb13a65746ac1d4f77b3f9908e5c0de78b7e6",
     "2026-11-26": "e7cbe7d89c65471dbb8554c1822900725956efe65bd0bdb27e720395e622ee38",
     "2026-11-27": "cda8660617c44906683826e657241391c9fccfe4f28cd3ae9de683d2eee0e720",
     "2026-11-29": "a85d7c8851c29208504d028a9d4bb19a97340a378a84aeb07b3e4482d650076c",
@@ -353,7 +352,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
    "changedAt": "2026-11-25T11:17:44+01:00",
    "partsHash": "c729d3ae23e7a286023b8446d29de5e0b93b124f68594b4acd859cc7c85284cc"
   },
@@ -362,11 +361,43 @@
     {
      "providerId": "ev-st-johannis",
      "venueId": "ev-st-johannis",
-     "title": "Mutter-Kind-Gruppe für Kinder von 1–3 Jahren (mittwochs 14:30)",
-     "summary": "Krabbelgruppe für Eltern mit Kindern von 1 bis 3 Jahren im TabeaHaus: Austausch unter Eltern, Spiel und Gespräch. Anmeldung, Preis und Platzangebot stehen in der Quelle nicht; bitte bei der Gemeinde erfragen.",
+     "title": "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder (donnerstags, vormittags)",
+     "summary": "Eltern treffen sich mit Säuglingen und Kleinkindern zum Spielen, Singen und Austausch. Donnerstags 9:30–11:30 Uhr im TabeaHaus. Ob eine Anmeldung nötig ist, steht nicht in der Quelle.",
+     "topics": [
+      "eltern-kind-gruppe",
+      "krabbelgruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "mit-anmeldung",
+     "cost": "kostenlos",
+     "url": "http://www.st-johannis-nuernberg.de",
+     "sourceUrl": "http://www.st-johannis-nuernberg.de",
+     "category": "krabbel-spielgruppen",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Platzangabe. Bei der Gemeinde St. Johannis nachfragen."
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "09:30",
+      "end": "11:30",
+      "from": "2026-11-26",
+      "skipHolidays": true
+     },
+     "via": "evtermine"
+    },
+    {
+     "providerId": "ev-st-johannis",
+     "venueId": "ev-st-johannis",
+     "title": "Mutter-Kind-Krabbelgruppe für Kinder von 1–3 Jahren (mittwochs, nachmittags)",
+     "summary": "Mütter treffen sich mit ihren Kindern von 1 bis 3 Jahren zum Spielen und zum Austausch. Mittwochs 14:30–17:00 Uhr im TabeaHaus. Ob eine Anmeldung nötig ist, steht nicht in der Quelle.",
      "topics": [
       "krabbelgruppe",
-      "eltern-kind-gruppe"
+      "eltern-kind-gruppe",
+      "muetter"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
@@ -380,94 +411,36 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage bei der Kirchengemeinde St. Johannis"
+      "note": "Keine Platzangabe. Bei der Gemeinde St. Johannis nachfragen."
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-25T14:30",
-        "end": "2026-11-25T17:00"
-       },
-       {
-        "start": "2026-12-02T14:30",
-        "end": "2026-12-02T17:00"
-       },
-       {
-        "start": "2026-12-09T14:30",
-        "end": "2026-12-09T17:00"
-       },
-       {
-        "start": "2026-12-16T14:30",
-        "end": "2026-12-16T17:00"
-       },
-       {
-        "start": "2026-12-23T14:30",
-        "end": "2026-12-23T17:00"
-       }
-      ]
-     },
-     "via": "evtermine"
-    },
-    {
-     "providerId": "ev-st-johannis",
-     "venueId": "ev-st-johannis",
-     "title": "Eltern-Kind-Gruppe für Säuglinge und Kleinkinder (donnerstags 9:30)",
-     "summary": "Vormittagsgruppe im TabeaHaus für Eltern mit Säuglingen und Kleinkindern: Spiel, Singen, Reime und Austausch über Alltagsfragen. Anmeldung, Preis und Platzangebot stehen in der Quelle nicht; bitte bei der Gemeinde erfragen.",
-     "topics": [
-      "eltern-kind-gruppe",
-      "elterntreff"
-     ],
-     "format": "regelmaessig",
-     "registration": "mit-anmeldung",
-     "cost": "kostenlos",
-     "url": "http://www.st-johannis-nuernberg.de",
-     "sourceUrl": "http://www.st-johannis-nuernberg.de",
-     "category": "krabbel-spielgruppen",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Platzangabe; Anfrage bei der Kirchengemeinde St. Johannis"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-26T09:30",
-        "end": "2026-11-26T11:30"
-       },
-       {
-        "start": "2026-12-03T09:30",
-        "end": "2026-12-03T11:30"
-       },
-       {
-        "start": "2026-12-10T09:30",
-        "end": "2026-12-10T11:30"
-       },
-       {
-        "start": "2026-12-17T09:30",
-        "end": "2026-12-17T11:30"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "WE"
+      ],
+      "start": "14:30",
+      "end": "17:00",
+      "from": "2026-12-02",
+      "skipHolidays": true
      },
      "via": "evtermine"
     }
    ],
    "inputHash": "2107585a269fc2ebb86d53d358d672e272e259d5a2b1ad4b99fd90ea6873a9ba",
    "dated": {
-    "2026-11-25": "c246602cbe87212683db0314a51332740713b089341d9f13f5ff8c11457b0229",
     "2026-11-26": "42595afc120f9c411ab92a01e9ac029096bbcce68a5e07effd807d5a122454fe",
-    "2026-12-02": "77f62e7ab8b442f445a5a129e2fbe088c86de0be6b27d19118e679da2e86d09f",
+    "2026-12-02": "59a79f988155d27635e57dbbdae0bb5b3706a3982066fb41fdb240301d7ae871",
     "2026-12-03": "ad26d46d14a58d2d423646fb6530b4151f256f02bed6b8c7d286583979ef1bcf",
-    "2026-12-09": "3485d93d7c5b52569b1300888e1e03d8f42a03c946b38079d335b67724b512c5",
+    "2026-12-09": "5b446b467c67fe22823d5783244ec30ccceff9ecbb7c5ead5ff61625a6b6e75d",
     "2026-12-10": "f1359308b850a27832f18975f716b4cca94b40dc25c242dff97320232e702607",
-    "2026-12-16": "76069e49e699729849d93f2f7ff8757706b75fd816a20f81f3b4a1746cabbb42",
+    "2026-12-16": "f1866dc0afb87b8803479e44a092166a8ff87e1a10090e37da99a071d2fd0de5",
     "2026-12-17": "c2e9fee8d374f0f2953d57115ab617826beb50523d42ae6813ee96ddc087a7ad",
-    "2026-12-23": "daaedcc5c68c9bdb8d057739d7f91b6b684ec7d4b8c970c9d94139d178a78800"
+    "2026-12-23": "f310d982aef0258a480199e1820349e81dda58d37dbf5579d5ba2bf8de84def6"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
-   "changedAt": "2026-11-20T10:02:41+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "changedAt": "2026-11-26T10:59:44+01:00",
    "sources": [
     "evtermine"
    ],

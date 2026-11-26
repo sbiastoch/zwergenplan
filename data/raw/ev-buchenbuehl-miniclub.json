@@ -6,29 +6,29 @@
     {
      "providerId": "ev-buchenbuehl-miniclub",
      "venueId": "ev-buchenbuehl-miniclub",
-     "title": "Miniclub Himmelfahrtskirche Buchenbühl (Krabbelalter, mittwochs)",
-     "summary": "Spiel- und Bewegungstreff für Kinder im Krabbelalter, um Sinne, Motorik und das Miteinander zu üben. Die Termine stehen im Kalender bis Ende Dezember 2026; weitere Termine und Anmeldung bitte bei der Gemeinde erfragen.",
+     "title": "Miniclub Himmelfahrtskirche Buchenbühl (Krabbelalter)",
+     "summary": "Gemeinsames Spielen und Training von Sinnen, Motorik und Miteinander für Kleinkinder im Krabbelalter. Die Termine im Dezember 2026 sind mittwochs von 15:00 bis 16:30 Uhr. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Veranstalter nachfragen.",
      "topics": [
       "spielgruppe",
-      "krabbelgruppe"
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8231121",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8231121",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8231122",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8231122",
      "category": "krabbel-spielgruppen",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
      "availability": {
       "status": "unbekannt",
-      "note": "Im Kalendereintrag steht kein Anmeldehinweis; bei Unklarheit die Kirchengemeinde Buchenbühl fragen."
+      "note": "Keine Angaben zu Plätzen oder Anmeldung; Anfrage bei der Himmelfahrtskirche Buchenbühl."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-25T15:00",
-        "end": "2026-11-25T16:30"
-       },
        {
         "start": "2026-12-02T15:00",
         "end": "2026-12-02T16:30"
@@ -52,16 +52,15 @@
    ],
    "inputHash": "c699e5e4090d59e2d3e979ccb582d46f048a0737eeabe0eed156587d19b7cde7",
    "dated": {
-    "2026-11-25": "bd248cfb46a8d4512d52520a9dbd57dcb0a7a886c84d2d3adb9227dffd082a7a",
-    "2026-12-02": "084887e8e828de48d05ed7e32bc84f29b2d17d89d1cb3c85faa5760746cbd60c",
-    "2026-12-09": "149673c4091d9cbb141511bc03097e973a1a971bcd38c5fd9c5df2e94a7aea7a",
-    "2026-12-16": "00d83c3e1bb209d99d99d3e56b3437bb8c2130368dc31416200297dbe2f2c5fc",
-    "2026-12-23": "31a9be1a54e5d0239cd8324acbf11058cc675b42cb4e66987766ba2cfb819e0c"
+    "2026-12-02": "8755bfed9924baa4f77074030aabed3b6b81575510f515716e10881c5a0a4f6e",
+    "2026-12-09": "334353e8cc8313708b38f05599f0996bd3cb7df130bd36e62cda565aa6fdc638",
+    "2026-12-16": "46a643ea54bd05157efa188557050dc65d268618f971bb519d838f5c7aa4c71e",
+    "2026-12-23": "28d3d9fd11611c93f5c9275bab69a9be518318bb2ce5cbc8326cca16901945fd"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-25T11:17:44+01:00",
-   "changedAt": "2026-11-19T02:10:39+01:00",
+   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "changedAt": "2026-11-26T10:59:44+01:00",
    "sources": [
     "evtermine"
    ],
