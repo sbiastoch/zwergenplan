@@ -49,7 +49,7 @@
    "inputHash": "60dc269a930a17ffbfa2dc48e0d0654105256317edd099859fdedfac4d35d6d5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-22T09:38:14+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
@@ -92,7 +92,7 @@
    "inputHash": "b64e86c942c557255b64f23d181c49b347c17a415d90b2371e3e9c44892e73f0",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-22T09:38:14+01:00",
    "partsHash": "7d5fe55c994d9947d8179f4a56a599bf8607628b6a76c73b1b864b9665ef5b76"
   },
@@ -101,8 +101,8 @@
     {
      "providerId": "neues-museum-baby-museum",
      "venueId": "neues-museum-baby-museum",
-     "title": "Baby & Museum: Kurzführung mit Babys und Kaffeerunde",
-     "summary": "Entspannte Kurzführung durch das Museum für Eltern mit Babys, mit Pausen zum Füttern und Wickeln. Anschließend Austausch bei Kaffee; die Themen wechseln monatlich.",
+     "title": "Baby & Museum: gemeinsame Kurzführung mit Babys",
+     "summary": "Kurzführung im Neuen Museum zu wechselnden Themen aus Kunst, Architektur und Design, eingeplante Pausen zum Füttern und Wickeln, danach Kaffee und Austausch. Tickets über den go~mus-Shop.",
      "topics": [
       "museum",
       "elterntreff"
@@ -110,7 +110,7 @@
      "format": "einmalig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "url": "https://nmn-tickets.de/#/product/event/161?date_id=5140",
+     "url": "https://nmn-tickets.de/#/product/event/161",
      "sourceUrl": "https://www.nuernberg.de/internet/stadtportal/veranstaltung.html?vid=378173",
      "category": "buehne",
      "age": {
@@ -119,15 +119,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Tickets je Termin im go~mus-Shop (nmn-tickets.de); Verfügbarkeit ist dort nur im Shop sichtbar."
+      "note": "Tickets im go~mus-Shop buchen; Kontingent ist nur dort sichtbar"
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-13T10:30",
-        "end": "2026-11-13T11:30"
-       },
        {
         "start": "2026-11-27T10:30",
         "end": "2026-11-27T11:30"
@@ -139,6 +135,30 @@
        {
         "start": "2026-12-11T10:30",
         "end": "2026-12-11T11:30"
+       },
+       {
+        "start": "2027-01-15T10:30",
+        "end": "2027-01-15T11:30"
+       },
+       {
+        "start": "2027-01-29T10:30",
+        "end": "2027-01-29T11:30"
+       },
+       {
+        "start": "2027-02-12T10:30",
+        "end": "2027-02-12T11:30"
+       },
+       {
+        "start": "2027-02-26T10:30",
+        "end": "2027-02-26T11:30"
+       },
+       {
+        "start": "2027-03-12T10:30",
+        "end": "2027-03-12T11:30"
+       },
+       {
+        "start": "2027-03-19T10:30",
+        "end": "2027-03-19T11:30"
        }
       ]
      },
@@ -147,15 +167,24 @@
    ],
    "inputHash": "32a2f01bb91b2709ebe8d2dbf6dac25456924409c81593cc4a8dfa86ddadc905",
    "dated": {
-    "2026-11-27": "708428860f7ba415fa818653b16b68d576c6c9fe9ec4e0b27ca6a3df1d3b1d32",
-    "2026-12-04": "62b6512fa0520a45636925c6594b2c50ae087c7d2774473d1a8e880447c75567",
-    "2026-12-06": "f3d39363e90d4a4c7db1861e399d25fabb0a01cfafb4f632a797df058955aa59",
-    "2026-12-11": "bc9ef57c48aed5c881d841286842d34974d39e66760030582f78c8b3898298fa"
+    "2026-11-27": "8ff219e2577a6471488e1a056202f7121bd906161545e3ce49935f88054e2008",
+    "2026-12-04": "6f0b9d91ba0e257472a8fbf75170b547fd4c5d0c0e9e8381c4db182381e0e3ff",
+    "2026-12-06": "c08b2f28b85ec8935bdfcce1da1c824f0304fd1341198f66ee49f9e64c36e9db",
+    "2026-12-11": "d8643818a14c0b2983122b444eed5ee98aa4cc66138ec6001317fb1fd55228f0",
+    "2027-01-03": "3dd8e3ebfb9f6f877cc6f1bf3e3432176b01fe1077701bc29682aa3727eaff9e",
+    "2027-01-15": "d8baa7428b0f0e142e0a7b8e36c553c27a7e81b418d8e39f5a12ce66a1aa735b",
+    "2027-01-29": "ff685f002ace14c40daf640db38b2f7b82adb344ff12c66076b07f86621ae2c3",
+    "2027-02-07": "599f9899a1fffa390cade3501b4e159a5e515c1bde8014de7cf61ba4f4d97441",
+    "2027-02-12": "9d25ff5b7914a417f0866b0d1cee64f1a70b1400b49b8a3709fae10886d4672f",
+    "2027-02-26": "07c8485c329657b1a91247f8e7708f9b8d7f5bddd6b7219bf7b5498475115c3f",
+    "2027-03-07": "b39beb39d435eb67c82a939fd69602f323058466122ea39cbeab11161d1776ec",
+    "2027-03-12": "4472f15b89d9a9fbf2a4a27577a970d14338543a600da31933cd8f0d167c3e0a",
+    "2027-03-19": "6c755ae8dbf620b9eb3ec31901805763cdcdaad8a10627fbd0dd4a42b755de0f"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "sources": [
     "stadt-vk"
    ],

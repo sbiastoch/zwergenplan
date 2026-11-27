@@ -6,17 +6,17 @@
     {
      "providerId": "ev-laufamholz-miniclub",
      "venueId": "ev-laufamholz-miniclub",
-     "title": "Miniclub – Eltern-Kind-Gruppe Laufamholz",
-     "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz: Austausch unter Eltern, Anregungen zu Ernährung, Sprache und Entwicklung, gemeinsame Lieder und Geschichten. Kosten und Anmeldung stehen nicht in der Quelle, bitte beim Anbieter nachfragen.",
+     "title": "Miniclub Laufamholz (Eltern-Kind-Gruppe, freitags)",
+     "summary": "Eltern-Kind-Gruppe im Gemeindehaus Laufamholz mit Austausch unter Eltern, Liedern und Geschichten sowie ersten Gruppenerfahrungen für die Kinder. Anmeldung und Preis sind im Kalender nicht genannt.",
      "topics": [
       "eltern-kind-gruppe",
-      "spielgruppe"
+      "elterntreff"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109127",
-     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109127",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8109128",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8109128",
      "category": "krabbel-spielgruppen",
      "age": {
       "minMonths": 0,
@@ -24,15 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung in der Quelle"
+      "note": "Keine Angabe zur Anmeldung im Kalender; bei der Evangelischen Heilig-Geist-Kirche Laufamholz nachfragen."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-27T09:00",
-        "end": "2026-11-27T10:30"
-       },
        {
         "start": "2026-12-04T09:00",
         "end": "2026-12-04T10:30"
@@ -52,15 +48,14 @@
    ],
    "inputHash": "6f5fb68c166723310b6ad8a626bfd0ecb8c132cd8fa92e84115670af1641a160",
    "dated": {
-    "2026-11-27": "6c9b4cad809d2f5ec79c20e990ab23ba6f4a2931c05cc113cd38c93e1218f968",
-    "2026-12-04": "1a9b9fb9793bfc249ce9113a4764f9032fd97ecb3875b3eafdfe8599154dae47",
-    "2026-12-11": "3e691bf5f0b947dd73af820a8a47d6bcdd84d5ee4cfea88d773dbdc1c566210c",
-    "2026-12-18": "1da9f29292df5aef6de34db4e8a106f9a71d6bf0b22f13a3ce7fc814ac86bbb9"
+    "2026-12-04": "ae5af55ddbff1c3ccbe23f29247cc884be972f92aa8fd96b43d26be83c315198",
+    "2026-12-11": "2af312a680f3eef4593cf9c55cc85eb074a5d25de67d051c33ebf629b1be63d8",
+    "2026-12-18": "0554d8c0d3b46dad7383d26536e3baa9b19c168f467729d79a42ba683886c5e0"
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-11-21T09:41:55+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "sources": [
     "evtermine"
    ],

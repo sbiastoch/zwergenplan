@@ -6,8 +6,8 @@
     {
      "providerId": "cvjm-gostenhof-miniclub",
      "venueId": "cvjm-gostenhof-miniclub",
-     "title": "Mini-Club für Kinder von 18 Monaten bis 3 Jahren",
-     "summary": "Dienstagvormittags treffen sich Eltern mit ihren Kindern zu Fingerspielen, Bewegungsliedern, Freispiel und einer gemeinsamen Einheit wie Bilderbuch oder Basteln. Nicht in den Ferien. Kosten laut Seite nicht angegeben; Fragen an Stefanie Becker.",
+     "title": "Mini-Club Dienstagvormittag (18 Monate bis 3 Jahre)",
+     "summary": "Wöchentliche Eltern-Kind-Gruppe mit Freispielzeit, Kniereitern, Fingerspielen, Liedern und Bilderbuch sowie Kaffee für Eltern. Kosten und Anmeldung stehen nicht auf der Seite; Auskunft bei Stefanie Becker.",
      "topics": [
       "eltern-kind-gruppe",
       "spielgruppe"
@@ -24,7 +24,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe auf der Seite. Anfrage bei Stefanie Becker, 0151 65108244, stefanie.becker@cvjm-nuernberg-gostenhof.de"
+      "note": "Keine Platzangabe. Auskunft bei Stefanie Becker, Tel. 0151 65108244, stefanie.becker@cvjm-nuernberg-gostenhof.de"
      },
      "schedule": {
       "kind": "weekly",
@@ -33,16 +33,16 @@
       ],
       "start": "10:00",
       "end": "11:30",
-      "from": "2026-11-03",
+      "from": "2026-12-01",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "4a186bc1fae5c375b8e1192157a03608e9e83545993dfdd997a5d4cf8dbe555f",
+   "inputHash": "6a716c0a5a875da5857ffb7c5d18445f5a991848ea4aaed6386350d946b903c6",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-10-28T08:14:30+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "partsHash": "f1ffeccaeeb1caca965d9eb8005c30dba92183ec292df8bacd70319e29fbd01c"
   },
   "seite:https://www.evangelische-termine.de/ical?vid=1496": {
@@ -119,7 +119,6 @@
    ],
    "inputHash": "fea4d2e45168a93803dd204edfa7a651d799184d3d18d2418917a5a3e676bd55",
    "dated": {
-    "2026-11-26": "af4dbda4c9879cd8728f2950841e762e76694d0b6986de2bc052e74fce28b22b",
     "2026-11-27": "485d6a97f79026a2c3cd8e55bfe536990076fb0cab4ac8d514a97621534d9598",
     "2026-11-29": "9dd11a9644e46942ad9fa8f9a0a282da16188353838ca992653d9e5489b63f49",
     "2026-11-30": "0b6e5a2ec8911dc3174b3a9cea113af6fd7ebb58c7e6ec65f4f76cccee78e485",
@@ -241,7 +240,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-24T12:31:01+01:00",
    "partsHash": "c25088f3bc444367c5ff4fef08df8eb68bdc3b19e8c10e56c7f87453ed56cbb2"
   },
@@ -428,7 +427,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-26T10:59:44+01:00",
    "sources": [
     "evtermine",

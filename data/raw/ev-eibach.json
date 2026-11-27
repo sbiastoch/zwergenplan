@@ -5,40 +5,9 @@
    "events": [
     {
      "providerId": "ev-eibach",
-     "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
-     "title": "Waldkrabbelgruppe im Faberpark (Do 10–11 Uhr)",
-     "summary": "Eltern-Kind-Gruppe im Wald am Faberpark, donnerstags von 10 bis 11 Uhr, bei fast jedem Wetter. Pausen in den Schulferien. Treffpunkt laut Kalendereintrag in der Beschreibung.",
-     "topics": [
-      "waldgruppe",
-      "krabbelgruppe",
-      "eltern-kind-gruppe"
-     ],
-     "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
-     "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107135.html",
-     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung in der Quelle; bei der Ev. Johanneskirche Eibach nachfragen."
-     },
-     "schedule": {
-      "kind": "weekly",
-      "weekdays": [
-       "TH"
-      ],
-      "start": "10:00",
-      "end": "11:00",
-      "from": "2026-11-26",
-      "skipHolidays": true
-     }
-    },
-    {
-     "providerId": "ev-eibach",
      "venueId": "ev-eibach",
      "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags von 9:30 bis 10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach. Anmeldung laut Quelle nicht angegeben.",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach. Im Kalender stehen keine Angaben zu Platzzahl oder Anmeldung.",
      "topics": [
       "musik",
       "singen",
@@ -47,7 +16,7 @@
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107098.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107099.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
      "category": "musik",
      "age": {
@@ -56,39 +25,24 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zur Anmeldung in der Quelle; Auskunft beim Gemeindehaus Eibach."
+      "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalendereintrag"
      },
      "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-27T09:30",
-        "end": "2026-11-27T10:30"
-       },
-       {
-        "start": "2026-12-04T09:30",
-        "end": "2026-12-04T10:30"
-       },
-       {
-        "start": "2026-12-11T09:30",
-        "end": "2026-12-11T10:30"
-       },
-       {
-        "start": "2026-12-18T09:30",
-        "end": "2026-12-18T10:30"
-       },
-       {
-        "start": "2027-01-15T09:30",
-        "end": "2027-01-15T10:30"
-       }
-      ]
+      "kind": "weekly",
+      "weekdays": [
+       "FR"
+      ],
+      "start": "09:30",
+      "end": "10:30",
+      "from": "2026-12-04",
+      "until": "2027-11-27",
+      "skipHolidays": true
      }
     }
    ],
    "inputHash": "0e82dc602ad5f902758163a29689aad3a66dcd1920d7ba797a7ba71d5f956701",
    "dated": {
-    "2026-11-26": "67a98d47017f732315203a4a4d0af4b3c40b48b3d747f86dba16f6b85a27c964",
-    "2026-11-27": "dc0e22886d303a247580510db35d9024c2b3bc67d64e2f35b176aca4e382e7e3",
+    "2026-11-27": "aad2e6a736732dd7f4dd00f22c2289505d503d22b8b25b2203993edfd785d0ab",
     "2026-11-28": "d03a3a920e664f993ac09089b134329d10ee47c4070093d6b5a8c6a9b09e8926",
     "2026-11-29": "a7c6a5ca58257a46d02792bb9d596279f4f3c48a8f74d217ef65ccf52042b273",
     "2026-11-30": "e068985acace188364c5b5b00fcf316d6703fdde9a6cb1303ba8e13d399b8128",
@@ -178,8 +132,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
   }
  }

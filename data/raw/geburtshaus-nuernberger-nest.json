@@ -6,22 +6,165 @@
     {
      "providerId": "geburtshaus-nuernberger-nest",
      "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Stilltreff Milch-Café (Mamas mit Babys)",
-     "summary": "Offener Erfahrungsaustausch rund ums Stillen und das Leben mit Baby, mit Stillberaterin; die Themen richten sich nach den Fragen der Teilnehmenden. Anmeldung erforderlich, 8 € pro Treffen vor Ort. Im März und September 2027 findet kein Treff statt.",
+     "title": "Rückbildung mit/ohne Baby, Di 15 Uhr (Start Januar 2027)",
+     "summary": "Kräftigung, Lockerung und Wissen für den Alltag nach der Geburt, bei Katrina Bauersachs. Babys dürfen mit, Teilnahme ab 8 Wochen nach der Geburt. Ein ggf. ausfallender Termin wird nachgeholt.",
      "topics": [
-      "stillcafe",
-      "elterntreff"
+      "rueckbildung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://bauersachs.hebamio.de/kursliste",
+     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über bauersachs.hebamio.de, Fragen an hebammekat@gmx.de; keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-01-12T15:00",
+        "end": "2027-01-12T16:40"
+       },
+       {
+        "start": "2027-01-19T15:00",
+        "end": "2027-01-19T16:40"
+       },
+       {
+        "start": "2027-01-26T15:00",
+        "end": "2027-01-26T16:40"
+       },
+       {
+        "start": "2027-02-02T15:00",
+        "end": "2027-02-02T16:40"
+       },
+       {
+        "start": "2027-02-09T15:00",
+        "end": "2027-02-09T16:40"
+       },
+       {
+        "start": "2027-02-16T15:00",
+        "end": "2027-02-16T16:40"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "geburtshaus-nuernberger-nest",
+     "venueId": "geburtshaus-nuernberger-nest",
+     "title": "Rückbildung mit/ohne Baby, Di 15 Uhr (Start März 2027)",
+     "summary": "Kräftigung, Lockerung und Wissen für den Alltag nach der Geburt, bei Katrina Bauersachs. Babys dürfen mit, Teilnahme ab 8 Wochen nach der Geburt. Ein ggf. ausfallender Termin wird nachgeholt.",
+     "topics": [
+      "rueckbildung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://bauersachs.hebamio.de/kursliste",
+     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über bauersachs.hebamio.de, Fragen an hebammekat@gmx.de; keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2027-03-02T15:00",
+        "end": "2027-03-02T16:40"
+       },
+       {
+        "start": "2027-03-09T15:00",
+        "end": "2027-03-09T16:40"
+       },
+       {
+        "start": "2027-03-16T15:00",
+        "end": "2027-03-16T16:40"
+       },
+       {
+        "start": "2027-03-23T15:00",
+        "end": "2027-03-23T16:40"
+       },
+       {
+        "start": "2027-04-06T15:00",
+        "end": "2027-04-06T16:40"
+       },
+       {
+        "start": "2027-04-13T15:00",
+        "end": "2027-04-13T16:40"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "geburtshaus-nuernberger-nest",
+     "venueId": "geburtshaus-nuernberger-nest",
+     "title": "Rückbildung mit/ohne Baby, Mi/Do 17:20 Uhr (Start Dezember 2026)",
+     "summary": "Rückbildung bei Katrina Bauersachs, Kräftigung und Wissen für den Alltag. Mittwochs und donnerstags im Wechsel, 17:20–19 Uhr. Babys dürfen mit, Teilnahme ab 8 Wochen nach der Geburt.",
+     "topics": [
+      "rueckbildung"
+     ],
+     "format": "kurs",
+     "registration": "mit-anmeldung",
+     "cost": "kostenpflichtig",
+     "url": "https://bauersachs.hebamio.de/kursliste",
+     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
+     "category": "bewegung",
+     "availability": {
+      "status": "unbekannt",
+      "note": "Anmeldung über bauersachs.hebamio.de, Fragen an hebammekat@gmx.de; keine Platzangabe"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-02T17:20",
+        "end": "2026-12-02T19:00"
+       },
+       {
+        "start": "2026-12-03T17:20",
+        "end": "2026-12-03T19:00"
+       },
+       {
+        "start": "2026-12-09T17:20",
+        "end": "2026-12-09T19:00"
+       },
+       {
+        "start": "2026-12-10T17:20",
+        "end": "2026-12-10T19:00"
+       },
+       {
+        "start": "2026-12-16T17:20",
+        "end": "2026-12-16T19:00"
+       },
+       {
+        "start": "2026-12-17T17:20",
+        "end": "2026-12-17T19:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "geburtshaus-nuernberger-nest",
+     "venueId": "geburtshaus-nuernberger-nest",
+     "title": "Stilltreff Milch-Café (Sonja Knittel)",
+     "summary": "Offener Stilltreff mit Stillberaterin Sonja Knittel: Erfahrungsaustausch, Hilfe beim Stillen und Fragen rund ums Leben mit Baby. Anmeldung erforderlich, 8 € pro Treffen vor Ort.",
+     "topics": [
+      "stillcafe"
      ],
      "format": "regelmaessig",
      "registration": "mit-anmeldung",
      "cost": "kostenpflichtig",
-     "price": "8 € pro Treffen (vor Ort zu zahlen)",
+     "price": "8 € pro Treffen (vor Ort zahlen)",
      "url": "https://kinder-hautnah.de/termine-aktuelles/",
      "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
      "category": "treffs-cafes",
      "availability": {
       "status": "unbekannt",
-      "note": "Anmeldung per Mail an knittel@kinder-hautnah.de oder über kinder-hautnah.de"
+      "note": "Anmeldung über www.kinder-hautnah.de oder knittel@kinder-hautnah.de"
      },
      "schedule": {
       "kind": "dates",
@@ -68,205 +211,13 @@
        }
       ]
      }
-    },
-    {
-     "providerId": "geburtshaus-nuernberger-nest",
-     "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – Start November 2026",
-     "summary": "Sanfte Kräftigungs- und Lockerungsübungen für Mütter, die mindestens 8 Wochen zuvor geboren haben, mit Wissen für den Alltag. Das Baby darf mit, muss aber nicht. Termine teils mit wechselnden Wochentagen.",
-     "topics": [
-      "rueckbildung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://bauersachs.hebamio.de/kursliste",
-     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über Bauersachs.hebamio.de (Platzstand nicht angegeben)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-11-09T12:00",
-        "end": "2026-11-09T13:40"
-       },
-       {
-        "start": "2026-11-12T12:00",
-        "end": "2026-11-12T13:40"
-       },
-       {
-        "start": "2026-11-17T12:00",
-        "end": "2026-11-17T13:40"
-       },
-       {
-        "start": "2026-11-20T12:00",
-        "end": "2026-11-20T13:40"
-       },
-       {
-        "start": "2026-11-23T12:00",
-        "end": "2026-11-23T13:40"
-       },
-       {
-        "start": "2026-11-26T12:00",
-        "end": "2026-11-26T13:40"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "geburtshaus-nuernberger-nest",
-     "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – Start Dezember 2026",
-     "summary": "Sanfte Kräftigungs- und Lockerungsübungen für Mütter, die mindestens 8 Wochen zuvor geboren haben, mit Wissen für den Alltag. Das Baby darf mit, muss aber nicht. Termine teils mit wechselnden Wochentagen.",
-     "topics": [
-      "rueckbildung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://bauersachs.hebamio.de/kursliste",
-     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über Bauersachs.hebamio.de (Platzstand nicht angegeben)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2026-12-02T17:20",
-        "end": "2026-12-02T19:00"
-       },
-       {
-        "start": "2026-12-03T17:20",
-        "end": "2026-12-03T19:00"
-       },
-       {
-        "start": "2026-12-09T17:20",
-        "end": "2026-12-09T19:00"
-       },
-       {
-        "start": "2026-12-10T17:20",
-        "end": "2026-12-10T19:00"
-       },
-       {
-        "start": "2026-12-16T17:20",
-        "end": "2026-12-16T19:00"
-       },
-       {
-        "start": "2026-12-17T17:20",
-        "end": "2026-12-17T19:00"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "geburtshaus-nuernberger-nest",
-     "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – Start Januar 2027, dienstags",
-     "summary": "Sanfte Kräftigungs- und Lockerungsübungen für Mütter, die mindestens 8 Wochen zuvor geboren haben, mit Wissen für den Alltag. Das Baby darf mit, muss aber nicht.",
-     "topics": [
-      "rueckbildung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://bauersachs.hebamio.de/kursliste",
-     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über Bauersachs.hebamio.de (Platzstand nicht angegeben)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-01-12T15:00",
-        "end": "2027-01-12T16:40"
-       },
-       {
-        "start": "2027-01-19T15:00",
-        "end": "2027-01-19T16:40"
-       },
-       {
-        "start": "2027-01-26T15:00",
-        "end": "2027-01-26T16:40"
-       },
-       {
-        "start": "2027-02-02T15:00",
-        "end": "2027-02-02T16:40"
-       },
-       {
-        "start": "2027-02-09T15:00",
-        "end": "2027-02-09T16:40"
-       },
-       {
-        "start": "2027-02-16T15:00",
-        "end": "2027-02-16T16:40"
-       }
-      ]
-     }
-    },
-    {
-     "providerId": "geburtshaus-nuernberger-nest",
-     "venueId": "geburtshaus-nuernberger-nest",
-     "title": "Rückbildung mit/ohne Baby – Start März 2027, dienstags",
-     "summary": "Sanfte Kräftigungs- und Lockerungsübungen für Mütter, die mindestens 8 Wochen zuvor geboren haben, mit Wissen für den Alltag. Das Baby darf mit, muss aber nicht.",
-     "topics": [
-      "rueckbildung"
-     ],
-     "format": "kurs",
-     "registration": "mit-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://bauersachs.hebamio.de/kursliste",
-     "sourceUrl": "https://nuernberger-nest.de/kursangebot/#nach-der-geburt",
-     "category": "bewegung",
-     "availability": {
-      "status": "unbekannt",
-      "note": "Anmeldung über Bauersachs.hebamio.de (Platzstand nicht angegeben)"
-     },
-     "schedule": {
-      "kind": "dates",
-      "dates": [
-       {
-        "start": "2027-03-02T15:00",
-        "end": "2027-03-02T16:40"
-       },
-       {
-        "start": "2027-03-09T15:00",
-        "end": "2027-03-09T16:40"
-       },
-       {
-        "start": "2027-03-16T15:00",
-        "end": "2027-03-16T16:40"
-       },
-       {
-        "start": "2027-03-23T15:00",
-        "end": "2027-03-23T16:40"
-       },
-       {
-        "start": "2027-04-06T15:00",
-        "end": "2027-04-06T16:40"
-       },
-       {
-        "start": "2027-04-13T15:00",
-        "end": "2027-04-13T16:40"
-       }
-      ]
-     }
     }
    ],
-   "inputHash": "f3b20208637da1ab4877e0b1bedc63af5853f554da00bf85385386b50e3e2772",
+   "inputHash": "680bb080b8ac433937fd1d0996729ec9d9bd33720bb6d34c3ab4f6103cc9f4d9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "partsHash": "36d453cda993c6a910fc65ddae1bbb668fea46b24c3b3f2d2246c0e82d5e99c8"
   },
   "seite:https://bauersachs.hebamio.de/kursliste": {
@@ -274,7 +225,7 @@
    "inputHash": "529382906ad0fed0789cde87933de19cb63c4cc1a11abdb6b3773c04e9fbc47c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "emptySince": "2026-10-30T08:39:48+01:00",
    "partsHash": "568c4bed25570c5e0cc2590ea1e50548fc857884701ab7c78400c6d6583faa94"
@@ -284,7 +235,7 @@
    "inputHash": "d1139e2070e95d887ea363fbe259396b279122045359d1f4955735ef2f52a473",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   },
@@ -293,7 +244,7 @@
    "inputHash": "55d54e6a771bf866fe1cdfbf2ba30e23087ae95784d116232e3c1523b3325684",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   },
@@ -302,7 +253,7 @@
    "inputHash": "ef9be661b2d03a67712daf88f7c9867e82b6a3be9e6637aee60a29459cdac232",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   }

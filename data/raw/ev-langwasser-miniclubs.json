@@ -6,15 +6,16 @@
     {
      "providerId": "ev-langwasser-miniclubs",
      "venueId": "ev-langwasser-miniclubs",
-     "title": "MiniClub Montag 15–17 Uhr (Blaues Sofa, Dietrich-Bonhoeffer-Kirche)",
-     "summary": "Wöchentlicher Spiel- und Begegnungstreff für Kleinkinder bis 3 Jahre im Gemeindezentrum der Dietrich-Bonhoeffer-Kirche. Anmeldung und Kosten sind in der Quelle nicht angegeben; bitte beim Anbieter nachfragen.",
+     "title": "MiniClub Dietrich-Bonhoeffer-Kirche (montags 15–17 Uhr)",
+     "summary": "Spielgruppe für Kleinkinder in Begleitung eines Erwachsenen im Gemeindezentrum (Blaues Sofa). Im Kalender stehen vier Montage im Advent bis 21.12.; für die Zeit danach ist kein weiterer Termin gelistet, bitte bei der Gemeinde nachfragen.",
      "topics": [
-      "spielgruppe"
+      "spielgruppe",
+      "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
-     "registration": "mit-anmeldung",
+     "registration": "ohne-anmeldung",
      "cost": "kostenlos",
-     "url": "http://www.evangelisch-in-langwasser.de/bonhoeffer-gruppen.html",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8106122.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=560",
      "category": "krabbel-spielgruppen",
      "age": {
@@ -23,19 +24,11 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Platzangabe; Anmeldung bitte beim Anbieter erfragen."
+      "note": "Keine Platzangabe; Anfrage bei der Evangelischen Kirchengemeinde Langwasser."
      },
      "schedule": {
       "kind": "dates",
       "dates": [
-       {
-        "start": "2026-11-16T15:00",
-        "end": "2026-11-16T17:00"
-       },
-       {
-        "start": "2026-11-23T15:00",
-        "end": "2026-11-23T17:00"
-       },
        {
         "start": "2026-11-30T15:00",
         "end": "2026-11-30T17:00"
@@ -83,11 +76,11 @@
     "2027-01-17": "567229402d3e90b8aed0a2972904d5d1d790360a8f3c311bf405d1bd24edcf0f",
     "2027-01-19": "2c18294989e634aaba862ffff7dd33ab3c2092bfab7d10bfcba840385fbaae84",
     "2027-01-24": "bdd72cc860319b4880b1790290c32d140c9ede6108df525e3d86b48f7effe216",
-    "2027-01-25": "0cf7165e418c3552dcfd4b176f28880a7dd3de51817af8f269b4921b12bc8e05",
     "2027-01-26": "7fc5a23ecde8a9994bd8af18acc0305da987a294185da929f78bf074ab0b712e",
     "2027-01-27": "7d9e79c728da7d72c4c8581bb2f3dc61ed628fe5eee313a2f0df5b2584b20d13",
     "2027-01-31": "0ac28648791f9655c20a109f2eba00fd144415cc5aa56038b5deb16859e6da9a",
     "2027-02-02": "c5e65f9231a59306d8c3b3572eae005f8323e0276aad439f144d04b901064f8f",
+    "2027-02-08": "57f69c374ee4ae72b38b40ef803fca9288ebde5de94aa234e7e8b7cac93410bc",
     "2027-02-09": "2f88bf2c6c056b911df240ae286966cd89e6dcf449ff8b15a9f4fa89656c9bf6",
     "2027-02-14": "67822dc774a36663f64f3d3cd888e73e90401ac21a677f9230b555562976a971",
     "2027-02-15": "69243049cd8ae4f394e540c2e4785c70aa01517a1b2a6ab4c39cd2631be76fed",
@@ -172,8 +165,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-11-12T09:45:21+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
   "seite:https://www.evangelische-termine.de/ical?vid=555": {
@@ -302,7 +295,6 @@
    ],
    "inputHash": "65acb1193277cc55ced981affa2dcf8c05d2a94de948b400998a3d4465db67d3",
    "dated": {
-    "2026-11-26": "780cec4084667e31ba2193471a88c69a738f5337ed237c082c4068f9ab037202",
     "2026-11-28": "e660601870a01ed09a3c3276ab0c335ba14db95c9ddfeb34700e53d3f789f42d",
     "2026-11-29": "5e787cafbcb1efbaa39be32787c4de55183c79dae93c0375c670fab862dda4dc",
     "2026-11-30": "9a5d7a6589fef70e32bdf874da89b97aa1fcd77bc30a634e2d99f56269ba5c3d",
@@ -590,7 +582,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-26T10:59:44+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -630,7 +622,7 @@
    "inputHash": "109a72f1a39bef22740f66a490b8961c6868405cf63eb9c79bd89f51618bafa5",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -671,7 +663,7 @@
    "inputHash": "514b8310743c6612ac0c4fc82a665bbce136aa7d2605a36c3f1c1ec1595ee752",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "partsHash": "a08d8fe36ec75a4c6b79ed7020f67cb33f321fb43875ea15c1e3cb2dc395b8cc"
   },
@@ -948,7 +940,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-26T10:59:44+01:00",
    "sources": [
     "evtermine"

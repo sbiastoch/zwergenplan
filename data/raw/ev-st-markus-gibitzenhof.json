@@ -6,10 +6,9 @@
     {
      "providerId": "ev-st-markus-gibitzenhof",
      "venueId": "ev-st-markus-gibitzenhof",
-     "title": "Offene Tür für Groß und Klein (montags)",
-     "summary": "Offener Treff im FreiRaum der Markuskirche, montags 9–11 Uhr. Einfach vorbeikommen, keine Anmeldung nötig. Einzelne Termine können ausfallen.",
+     "title": "Offene Tür für Groß und Klein (montags, FreiRaum)",
+     "summary": "Offener Vormittagstreff im FreiRaum der Markuskirche für Groß und Klein. Einfach vorbeikommen, Montag 9–11 Uhr. Ein Mindestalter nennt der Eintrag nicht.",
      "topics": [
-      "eltern-kind-gruppe",
       "elterntreff"
      ],
      "format": "regelmaessig",
@@ -27,7 +26,6 @@
       "weekdays": [
        "MO"
       ],
-      "interval": 1,
       "start": "09:00",
       "end": "11:00",
       "from": "2026-12-07",
@@ -37,7 +35,6 @@
    ],
    "inputHash": "e1098639d45764dc73b636f609f698e2ca7a27eb3205654c45294b033eb0cccd",
    "dated": {
-    "2026-11-26": "362631d63e21cb255bdf425ea1d8c71e9211790cb1d41fd800d4bc02cfb9fbf5",
     "2026-11-27": "ae0ec885df399698ec7688c1a60ba03a45d88fa31e85ffed83d45e0b851ca52c",
     "2026-11-29": "0127e92f6b082aab5ba4ac472551f84a0f66867770659d9820d20e8c4038cb7b",
     "2026-11-30": "b6590a72276106004676e84683020822537faab8cfdacde50c818d012bc4501b",
@@ -64,8 +61,10 @@
     "2026-12-24": "b326beecb4bf22308e898e83cf32354b814c56f6db1fa072e3c5d67e661e6bc8",
     "2026-12-25": "e36b1aa5eb55d28f32b78aae2abb017dd0828632acd6e023fb0a39bc83764200",
     "2026-12-26": "859393f4800d10347cd4351a7ae0b61f832894dbe513aa859ff626e059e20a86",
+    "2026-12-29": "2f41c69c3f4fb20fdffebd523946ecefaf2511458f192f678d6a79dd86143c5e",
     "2027-01-01": "20314120b903fed3a657377d3e61ea686fa4a7834524f3035c4b0eb9c44ba16b",
     "2027-01-03": "a2745a750efc73ffc554e1a2c1a0eae7b0ffae32f15cd088f25dc76d516f43f1",
+    "2027-01-05": "d42ed70f7439323b85b75e071405ed3045f2424a223d454276c5835695ed91fc",
     "2027-01-08": "6b617abe175e82812556012fa5477543704a65ab139d18094401602166bf9492",
     "2027-01-10": "db4ef99f41507aa82e14571fdd39354dc3798ab69dc166549efc431c22ce8b92",
     "2027-01-11": "09b343c420de88b6187c18e2085ffb7918d372a5fb44cc45f195388539121516",
@@ -189,8 +188,8 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-11-24T12:31:01+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
   "seite:https://www.sanktmarkus-nuernberg.de/familiencafe/": {
@@ -230,7 +229,7 @@
    "inputHash": "4b19abf2f4564da1977dac99f5d176b36420757bf5a01116cb5fb197f1f0bd45",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-25T11:17:44+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -239,7 +238,7 @@
    "inputHash": "22ea43209a6eb41c2628d9f476a5480472648f0202bfdc4681b14bab0bc3db80",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "487c5bc7914e739fb6e99392287f1d0ff08b298885262cd722ece7eea8488e0f"
   },
@@ -257,7 +256,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-25T11:17:44+01:00",
    "emptySince": "2026-11-25T11:17:44+01:00",
    "sources": [

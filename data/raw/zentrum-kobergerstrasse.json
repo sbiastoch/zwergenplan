@@ -6,8 +6,8 @@
     {
      "providerId": "zentrum-kobergerstrasse",
      "venueId": "zentrum-kobergerstrasse",
-     "title": "Koberger Minis – Offener Treff für Babys 1–6 Monate",
-     "summary": "Offener Treff für Eltern mit Babys bis 6 Monate zum Austausch mit anderen Eltern; die Babys knüpfen erste Kontakte zu Gleichaltrigen. Donnerstags, nicht in den Schulferien, ohne Anmeldung einfach vorbeikommen.",
+     "title": "Koberger Minis – offener Treff (1–6 Monate)",
+     "summary": "Offener Treff für Eltern mit Babys von 1 bis 6 Monaten im Souterrain der Beratungsstelle. Eltern tauschen sich aus, Babys knüpfen erste Kontakte zu Gleichaltrigen. Einfach vorbeikommen, nicht in den Schulferien.",
      "topics": [
       "elterntreff"
      ],
@@ -22,8 +22,7 @@
       "maxMonths": 6
      },
      "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Ohne Anmeldung, einfach vorbeikommen. Preis auf der Seite nicht genannt."
+      "status": "ohne-anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -32,15 +31,15 @@
       ],
       "start": "10:30",
       "end": "11:45",
-      "from": "2026-11-19",
+      "from": "2026-12-03",
       "skipHolidays": true
      }
     },
     {
      "providerId": "zentrum-kobergerstrasse",
      "venueId": "zentrum-kobergerstrasse",
-     "title": "Koberger Midis – Offenes Café für Babys 6–12 Monate",
-     "summary": "Café-Treff für Eltern mit Babys von 6 bis 12 Monaten: Bei Tee oder Kaffee tauschen sich Eltern aus, während die Kinder im Souterrain spielen. Dienstags, nicht in den Schulferien, ohne Anmeldung.",
+     "title": "Koberger Midis – offenes Café (6–12 Monate)",
+     "summary": "Offenes Café für Eltern mit Babys von 6 bis 12 Monaten im Souterrain der Beratungsstelle, mit Tee oder Kaffee und Spielangeboten für die Kleinen. Ohne Anmeldung, nicht in den Schulferien. Am 1.12. findet kein Treff statt.",
      "topics": [
       "elterncafe"
      ],
@@ -55,8 +54,7 @@
       "maxMonths": 12
      },
      "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Ohne Anmeldung, einfach vorbeikommen. Preis auf der Seite nicht genannt."
+      "status": "ohne-anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -65,18 +63,20 @@
       ],
       "start": "15:00",
       "end": "16:15",
-      "from": "2026-11-24",
-      "skipHolidays": true
+      "from": "2026-12-08",
+      "skipHolidays": true,
+      "except": [
+       "2026-12-01"
+      ]
      }
     },
     {
      "providerId": "zentrum-kobergerstrasse",
      "venueId": "zentrum-kobergerstrasse",
-     "title": "Koberger Maxis – Offenes Café für Kleinkinder 12–24 Monate",
-     "summary": "Café-Treff für Eltern mit Kleinkindern von 12 bis 24 Monaten; die Kinder toben und klettern im Souterrain, die Eltern tauschen sich aus. Mittwochs, nicht in den Schulferien, ohne Anmeldung.",
+     "title": "Koberger Maxis – offenes Café (12–24 Monate)",
+     "summary": "Offenes Café für Eltern mit Kleinkindern von 12 bis 24 Monaten im Souterrain der Beratungsstelle, mit viel Platz zum Toben und Klettern. Eltern kommen bei Tee oder Kaffee ins Gespräch. Ohne Anmeldung, nicht in den Schulferien.",
      "topics": [
-      "elterncafe",
-      "spielgruppe"
+      "elterncafe"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -89,8 +89,7 @@
       "maxMonths": 24
      },
      "availability": {
-      "status": "ohne-anmeldung",
-      "note": "Ohne Anmeldung, einfach vorbeikommen. Preis auf der Seite nicht genannt."
+      "status": "ohne-anmeldung"
      },
      "schedule": {
       "kind": "weekly",
@@ -99,16 +98,16 @@
       ],
       "start": "15:00",
       "end": "16:15",
-      "from": "2026-11-18",
+      "from": "2026-12-02",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "7af57f6aecfe5a42e992ad74b700125a7e3175bbd9e43e8a75752dd82ba33b9a",
+   "inputHash": "0141a0c703bc6b7a04d1561cb0f0e2d5838e4ad36473a8ff17903131ce861676",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
-   "changedAt": "2026-11-18T10:00:22+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "changedAt": "2026-11-27T11:02:31+01:00",
    "partsHash": "13e11626f398ad0eb8b2b71ca8d7333aaa60a870ccb39fd46ab27533654651d2"
   },
   "seite:https://www.zentrum-koberger.de/koberger-fruehstueck-fuer-vaeter/": {
@@ -116,7 +115,7 @@
    "inputHash": "c761b311240f5ff23556b057a7d317127286062dd38d8ee778cbe5e985031729",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-14T08:57:02+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "13e11626f398ad0eb8b2b71ca8d7333aaa60a870ccb39fd46ab27533654651d2"
@@ -126,7 +125,7 @@
    "inputHash": "d4c8b6b3d7b438c52bf4e2b250accb4bc213d33e961623e5aa81880518b34774",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "13e11626f398ad0eb8b2b71ca8d7333aaa60a870ccb39fd46ab27533654651d2"
   },
@@ -278,7 +277,6 @@
    ],
    "inputHash": "890f2ddf63770d61f8696e49262f66e5ed344897821af21102234fdbe2622c35",
    "dated": {
-    "2026-11-26": "78a4ecdedc27a3ae50349b584d4b694ff0902d52644491182d77c2ca36a6f108",
     "2026-12-01": "a9b0177b9563b12fb2d3adf8eb72b424384f3be5943faa5302002fda26a185f5",
     "2026-12-03": "d05278f9eb8e9ff87717a5848d33ce788dbe28f1606017a53d2bac961b0e0ff6",
     "2026-12-08": "96f464ed083b27fbf8f041c0559eae753df5abd9bc747845728a2958f3b94181",
@@ -297,7 +295,7 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-27T11:02:31+01:00",
    "changedAt": "2026-11-01T08:58:52+01:00",
    "sources": [
     "frankenkids"
