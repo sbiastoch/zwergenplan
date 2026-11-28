@@ -6,12 +6,11 @@
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
-     "title": "Wuselwelt: offene Bewegungs- und Spielzeit für 0–3-Jährige",
-     "summary": "Freies Spielen und Toben in der Turnhalle des CVJM für Kinder bis 3 Jahre mit Eltern oder Bezugsperson, danach Austausch der Erwachsenen. Freitags 9:30–10:15 Uhr, nicht in den Ferien; Hallenschuhe oder ABS-Socken mitbringen.",
+     "title": "Wuselwelt – offenes Freispiel für Kinder 0–3 mit Eltern (freitags)",
+     "summary": "Offenes Freispiel in der Turnhalle des CVJM für Kinder von 0 bis 3 Jahren mit Eltern oder Bezugsperson, während die Erwachsenen sich austauschen. Keine Anmeldung und kostenlos; Hallenschuhe oder ABS-Socken mitbringen. Nicht in den Ferien.",
      "topics": [
       "bewegung",
-      "spielplatz-indoor",
-      "elterntreff"
+      "spielplatz-indoor"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
@@ -26,7 +25,7 @@
      },
      "availability": {
       "status": "ohne-anmeldung",
-      "note": "Offenes Angebot ohne Anmeldung"
+      "note": "Offenes Angebot, keine Anmeldung nötig"
      },
      "schedule": {
       "kind": "weekly",
@@ -35,54 +34,34 @@
       ],
       "start": "09:30",
       "end": "10:15",
-      "from": "2026-11-27",
+      "from": "2026-12-04",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "f383c6766bff5c0e5ca13153d51b8640f4af0494d85949315912429752641a22",
+   "inputHash": "17a04ffba134760f7e5eac30e50f1b1c51938cbec10f58be52f0c72ab1cc38cf",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
-   "changedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
+   "changedAt": "2026-11-28T10:18:30+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien": {
-   "events": [],
-   "inputHash": "702cf0fac8959d376279d6e098572177f2223a5fbcf07bd8628781c220505f58",
-   "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
-   "changedAt": "2026-11-13T09:38:01+01:00",
-   "emptySince": "2026-11-13T09:38:01+01:00",
-   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
-  },
-  "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
-   "events": [],
-   "inputHash": "39bf30a0289c3f3c74b3a2a51c0793f71724f70d67c8bda5dd1ba2db0781b5c6",
-   "model": "haiku",
-   "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
-   "changedAt": "2026-11-24T12:31:01+01:00",
-   "emptySince": "2026-11-24T12:31:01+01:00",
-   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
-  },
-  "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;": {
    "events": [
     {
      "providerId": "cvjm-nuernberg-wuselwelt",
      "venueId": "cvjm-nuernberg-wuselwelt",
      "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre)",
-     "summary": "Offene Bewegungs- und Spielzeit in der Turnhalle des CVJM für Kinder bis 3 Jahre mit Begleitung. Freitags, Einstieg jederzeit, ohne Anmeldung. Preis auf der Quellseite nicht angegeben, bitte vorab erfragen.",
+     "summary": "Offene Bewegungs- und Spielzeit in der Turnhalle im CVJM-Haus für Kinder bis 3 Jahre mit Eltern. Ohne Anmeldung einfach vorbeikommen. Preis laut Quelle nicht angegeben.",
      "topics": [
       "bewegung",
       "spielplatz-indoor"
      ],
      "format": "regelmaessig",
      "registration": "ohne-anmeldung",
-     "cost": "kostenpflichtig",
-     "url": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
-     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien",
+     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien",
      "category": "bewegung",
      "age": {
       "minMonths": 0,
@@ -93,29 +72,88 @@
       "note": "Offenes Angebot ohne Anmeldung"
      },
      "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-04T09:30",
+        "end": "2026-12-04T10:15"
+       },
+       {
+        "start": "2026-12-11T09:30",
+        "end": "2026-12-11T10:15"
+       },
+       {
+        "start": "2026-12-18T09:30",
+        "end": "2026-12-18T10:15"
+       }
+      ]
+     }
+    }
+   ],
+   "inputHash": "f5e9da1922554d4c8617d4622594168a7e9d348766e8a4d01e8f10f90f5353e2",
+   "model": "haiku",
+   "status": "ok",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
+   "changedAt": "2026-11-28T10:18:30+01:00",
+   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
+  },
+  "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cat=familien&page=2": {
+   "events": [],
+   "inputHash": "43984b674fb383462fa90140eee3ab9aeccfc4ccd03e83553ed6058b72637aec",
+   "model": "haiku",
+   "status": "keine-termine",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
+   "changedAt": "2026-11-24T12:31:01+01:00",
+   "emptySince": "2026-11-24T12:31:01+01:00",
+   "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
+  },
+  "seite:https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;": {
+   "events": [
+    {
+     "providerId": "cvjm-nuernberg-wuselwelt",
+     "venueId": "cvjm-nuernberg-wuselwelt",
+     "title": "Wuselwelt – offene Bewegungs- und Spielzeit (0–3 Jahre)",
+     "summary": "Offene Bewegungs- und Spielzeit für Kinder bis 3 Jahre in der Turnhalle des CVJM (2. UG), freitags 09:30–10:15. Ohne Anmeldung einfach vorbeikommen; Kosten sind auf der Seite nicht genannt.",
+     "topics": [
+      "bewegung",
+      "spielplatz-indoor"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.cvjm-nuernberg.de/website/de/v/nuernberg/programm/familien/bewegungsangebote",
+     "sourceUrl": "https://www.cvjm-nuernberg.de/eventcalendar?calendar=2&cats_as_string=kinder;familien;",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung"
+     },
+     "schedule": {
       "kind": "weekly",
       "weekdays": [
        "FR"
       ],
       "start": "09:30",
       "end": "10:15",
-      "from": "2026-11-27",
+      "from": "2026-12-04",
       "skipHolidays": true
      }
     }
    ],
-   "inputHash": "8ff625a3bac0d89f70597f06d5b48332c11623de63853a804e7cad0c30f1b00f",
+   "inputHash": "d5047fd3389c2a3369dcec37cafb1df222c15e642ee6ae507f50a2ad40419d9d",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
-   "changedAt": "2026-11-23T10:37:03+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
+   "changedAt": "2026-11-28T10:18:30+01:00",
    "partsHash": "9e0be407217f2027e8342f7c1c10707cb08be4d97cfb6adc386b908943656794"
   },
   "kandidaten": {
    "events": [],
    "inputHash": "9014d4bb27ab7dbb3157a73c8dd388cfde0e579cdb5bcae0a8ad63e084098ab1",
    "dated": {
-    "2026-11-27": "6e208ae887e397b8aa072b44c9ef8699549b6e5911fe091436d2196cd61c8f37",
     "2026-12-04": "e53d63f30e3e38d2e9adc2360d2b71b261ddb361431b4527ba8b954a56b252c8",
     "2026-12-11": "27cb4300486343c9d4f3ecc5340ad096b08dea31b2649bb78b09319da8016d87",
     "2026-12-18": "7601cd084460dc3f82b02b0fd515f6dedc1dc723b2f760037cd32453f277dd77",
@@ -125,7 +163,7 @@
    },
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-11-02T09:03:46+01:00",
    "emptySince": "2026-11-02T09:03:46+01:00",
    "sources": [

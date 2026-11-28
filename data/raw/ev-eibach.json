@@ -5,16 +5,47 @@
    "events": [
     {
      "providerId": "ev-eibach",
+     "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
+     "title": "Waldkrabbelgruppe (Eltern-Kind, donnerstags 10–11 Uhr)",
+     "summary": "Eltern-Kind-Gruppe im Wald am Faberpark, Treffpunkt laut Beschreibung Bogen an der Weiherbrücke. Jeden Donnerstag außer in den Schulferien, bei fast jedem Wetter. Einstieg jederzeit möglich.",
+     "topics": [
+      "waldgruppe",
+      "krabbelgruppe",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8333422.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+     "category": "bewegung",
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Keine Anmeldung angegeben, einfach zum Treffpunkt kommen"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2026-12-03",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "ev-eibach",
      "venueId": "ev-eibach",
      "title": "Rhythmik mit Eltern und Kindern (1–3 Jahre)",
-     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags 9:30–10:30 Uhr im Kleinen Saal des Gemeindehauses Eibach. Im Kalender stehen keine Angaben zu Platzzahl oder Anmeldung.",
+     "summary": "Lieder, Reime und Spiele für Kleinkinder in Begleitung eines Elternteils, freitags im Kleinen Saal des Gemeindehauses Eibach. Anmeldung laut Kalender nicht angegeben, bei der Gemeinde erfragen.",
      "topics": [
       "musik",
       "singen",
       "eltern-kind-gruppe"
      ],
      "format": "regelmaessig",
-     "registration": "ohne-anmeldung",
+     "registration": "mit-anmeldung",
      "cost": "kostenlos",
      "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8107099.html",
      "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
@@ -25,7 +56,7 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Keine Angabe zu Plätzen oder Anmeldung im Kalendereintrag"
+      "note": "Keine Angabe zur Anmeldung, bei der Gemeinde erfragen"
      },
      "schedule": {
       "kind": "weekly",
@@ -35,82 +66,222 @@
       "start": "09:30",
       "end": "10:30",
       "from": "2026-12-04",
-      "until": "2027-11-27",
+      "skipHolidays": true
+     }
+    },
+    {
+     "providerId": "ev-eibach",
+     "venueId": "ev-eibach",
+     "title": "Mini-Gottesdienst zu Lucia (Kinder 0–3 Jahre mit Geschwistern)",
+     "summary": "Familiengottesdienst für Kleinkinder von 0 bis 3 Jahren mit Geschwistern in der Johanneskirche. Einmaliger Termin am 17.12.2026.",
+     "topics": [
+      "krabbelgottesdienst",
+      "elterntreff"
+     ],
+     "format": "einmalig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8333378.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Keine Anmeldung angegeben"
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-17T17:00",
+        "end": "2026-12-17T18:00"
+       }
+      ]
+     }
+    },
+    {
+     "providerId": "ev-eibach",
+     "venueId": "ev-eibach-waldkrabbelgruppe-bogen-an-der",
+     "title": "Waldkrabbelgruppe im Faberpark",
+     "summary": "Eltern-Kind-Gruppe im Wald: donnerstags 10–11 Uhr am Bogen an der Weiherbrücke im Faberpark, außer in Schulferien und bei fast jedem Wetter.",
+     "topics": [
+      "waldgruppe",
+      "eltern-kind-gruppe"
+     ],
+     "format": "regelmaessig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/veranstaltung_im_detail8333426.html",
+     "sourceUrl": "https://www.evangelische-termine.de/ical?vid=569",
+     "category": "bewegung",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "ohne-anmeldung",
+      "note": "Keine Anmeldung nötig, Treffpunkt laut Katalog: Bogen an der Weiherbrücke, Faberpark"
+     },
+     "schedule": {
+      "kind": "weekly",
+      "weekdays": [
+       "TH"
+      ],
+      "start": "10:00",
+      "end": "11:00",
+      "from": "2027-01-21",
       "skipHolidays": true
      }
     }
    ],
    "inputHash": "0e82dc602ad5f902758163a29689aad3a66dcd1920d7ba797a7ba71d5f956701",
    "dated": {
-    "2026-11-27": "aad2e6a736732dd7f4dd00f22c2289505d503d22b8b25b2203993edfd785d0ab",
     "2026-11-28": "d03a3a920e664f993ac09089b134329d10ee47c4070093d6b5a8c6a9b09e8926",
     "2026-11-29": "a7c6a5ca58257a46d02792bb9d596279f4f3c48a8f74d217ef65ccf52042b273",
     "2026-11-30": "e068985acace188364c5b5b00fcf316d6703fdde9a6cb1303ba8e13d399b8128",
     "2026-12-01": "08b6ea7e631e50e3adcdc1171c02ef60b0171e1dd09e3d23f55e9337c9896254",
-    "2026-12-02": "16b0434a9719440db381b30bfb6265ab28983055a04eaf021a3398cce9512e4f",
-    "2026-12-03": "474a020b3a52671feb684f2a014537f2989f1b4ccc34675be322c03a9392f40c",
+    "2026-12-02": "dda17e7f54eb3210b695017422e5be7e0c19b0346fa672abcde5c8fab18c5feb",
+    "2026-12-03": "1a0ba40f2427724ae41361e6f5ec7ce9fe58873bb0a231174a1e19168c482376",
     "2026-12-04": "edc85741292c86feb98a784882be8c5132f3abc3289a1e2e73cf8ec2b5de38de",
-    "2026-12-06": "943f4044c419a0a0df8da2f2b22b62a2bb062eca43c6827461d08355eebf5205",
+    "2026-12-06": "4a609ceab58a914b01a2008ad2b9eafd98d413566b7663887e74700ef94b6778",
     "2026-12-07": "932ec1b6a9875b9ff16dc3f1470d6031a9be2f0bbf9ff8da54cb7bfe5b9e5006",
     "2026-12-08": "20161e25f120681403dbc11417524d067647a8354252a8b8f914d2411983b874",
     "2026-12-09": "05dad402716016ea5bae539bc4105daa085c131b79fdaf6c570054b09d374fa7",
-    "2026-12-10": "9157b6677f34574651e2aa3c37e6463997de6e93aeafc8c0469cd36230016acb",
-    "2026-12-11": "cdc26970cebaf3af88f8b8be27c1498eaa99172b6b390781733613eba0562c40",
-    "2026-12-13": "1b57444b53360498213acd72c437b865bbb547717f10d7fd30cba22e01ca8c24",
+    "2026-12-10": "80f8ca1b08807e39d6809e9482535ceb10273559b106891b715e77f2f388820b",
+    "2026-12-11": "0598135d78c9db122b1db3ba9f36e0afca46278a75c87eabb81c86edbe505d58",
+    "2026-12-13": "5d688fbc5ffb1092c46c61f9d7bc5fbc65ebe9b1fa8c57d72391e623de1cb370",
     "2026-12-14": "cf6f1d803a6a606e7b49849b0aceb3ae3109e50e1aae9d02967469717950a7a4",
     "2026-12-15": "4434bb8adc827b3f880d704c263db18a039b64ddc0616e81a87ff365f4d50f13",
     "2026-12-16": "586da4dafeca1c44b5345eb4ac9b00ca92b9352fea8c5d8a5f83956c6c00e892",
-    "2026-12-17": "f2894b223d528dac84accc0e80e2b05119cc343470227b3c031d4cba4eacdad1",
+    "2026-12-17": "3f3559b59b48a0a00eeb8d036149c439798f4421bd9902003b35d2a538a3c1c3",
     "2026-12-18": "30858836a4ffe7d17598c2cfd126d8b3d41ee60a372c8ed89433128ea69e6ece",
-    "2026-12-19": "895fca5908df2458c4924955c8b18317996114d51ef74fc7315e41aef8a763bd",
+    "2026-12-19": "33bd09d34e211fbca0968cc2d36629083d4c243ce805fa558df68154014a2fc5",
     "2026-12-20": "754b83c68ba3ae38b09755b0508d23719b3b1761b2739cc5e9095a555cd0f86a",
     "2026-12-21": "f3725d3980e396847fd42ec9d5f2e1d829e4b2ee8514ab4a197f39e7532e2ad8",
-    "2026-12-22": "bf73dbbbd86f697475db416d4f749eeb0a7937236d6a3975954e8ce5b643763b",
+    "2026-12-22": "3ce6a9db01c939df9944e3b1e3d6b6d1b8e5605a6195ebef9a6cbb6c49219655",
     "2026-12-23": "64b6bbe65a134bb837b3c983c5708844c3334f56c98aa0ef89eb22995aa9a1ee",
     "2026-12-24": "5bb49424e35aecd25750d91e83616db795861eaeb0c8dbf214ea8f0ae040a7cd",
     "2026-12-25": "a8ecad13fde16f5bac41b070f0827c413e76ec9c2a87a14caa498d6a27a37865",
-    "2026-12-26": "a1b748c4735f5be04faa41f493e2c9f2b7151d52629519119afe5950d6183369",
+    "2026-12-26": "ac7605bf2c2891f6a7b8ee9990bf1d3bba0e2144d9d547b274f70ed30e6e4878",
     "2026-12-27": "8a9defdfa0fbce632b60abbc586d7f47026778cd14f17d6ee7e0c96dfa6f75e6",
-    "2026-12-31": "3b7e3a1160a60bf19ef2c0425ae2534ff04af17b76428c8b6c9f58457415b8ca",
+    "2026-12-31": "b2fa1158ff5cd2a326108782b9e2ac68a2eab9fce6d14b011dc3af85998ec70a",
     "2027-01-01": "8dde2ab97f1bed4c4ce00d5343c079c974fdd20d9482c36dff0b4b0dad0b47e8",
     "2027-01-03": "c54426ea7927bbebc2ccc23da0f2831c0d62bd148c97058c75b109ccce027917",
-    "2027-01-06": "99019070be304b75452c8751b49aede94d1b7ecf47db12e307fae99daf70ffd2",
+    "2027-01-06": "b3998c3bc497a837e369a505098203873a6340494826200385a6ddaa5612345e",
+    "2027-01-07": "afa1833ebac7ab517ed2936a2f4e13b3dfaf5f8691a678e6f8dadf8e3c4469d4",
     "2027-01-10": "5bc920c88edba0995918e3069f01c569f0e456fdd45ebb18c96d0743e0deed9e",
     "2027-01-11": "a2bcd5778fae3dc8ddfdfc4ab533a386b2988de131b1dcd51857a6625c8dcd03",
-    "2027-01-13": "7490f9ce92b9f4e2be8b0b807f8bc1b6fe8705b6b6eea6b17903aa8d79c6cfcf",
-    "2027-01-15": "0459985f38f611640f295a3741b01eadfad1ac27950654678eb32b0c5b7774e9",
+    "2027-01-12": "55d15c49ba0ceb5df8ad0cb4cf53147a10f1ef96c74138c866d860ab8da0d6c8",
+    "2027-01-13": "1da582b458b42874108ddf5b28034e6194722f42bd189bd02140196e8c5690d1",
+    "2027-01-14": "dad25cca99145913f10732d0cdd6cc03313df911a29f0cec64f61d8b429eb228",
+    "2027-01-15": "4e169313f2537dea3400bc9a06498a3c3b65dd19ca3ba86fdc9e4bac1099235f",
+    "2027-01-16": "0b8f23282912344ebee510282a0aceaa492e871ba62fed5f3467fa2d6e681180",
     "2027-01-17": "c4976d76ae1ff8b8bb2902131bec4d5a5a0e66d06ccf000625d1adcb1e7e4874",
     "2027-01-18": "ba9632b9b99403fc742012d0d770dbeeb3a5701a2f8fa671b699f2bb8d1e31c5",
+    "2027-01-19": "38e8a5752888f681c5dc26f1473f7872b39286b7ecaf8d1d64b80ae097eb6706",
     "2027-01-20": "85a71a57578a6842e734cde3d46afbf3790098b9b35ee8a4505e9f46f20521b2",
+    "2027-01-21": "97550161afaa2d70677ad45df7f1961f45ec086ba7458b277a7793b81faa919a",
+    "2027-01-22": "724e93de241fd5f890780bc0904d93df9e72094e8bd977db6b7c72ca4d7ebbac",
     "2027-01-24": "51fbccafa191c4823511a4aa970dfa53c34d36828b50514b2bff9d27ed0fb489",
     "2027-01-25": "f35317e0714ee1aeb14e84082445d6e2b990e01ff289d46ee69bb4f9eb560601",
+    "2027-01-26": "6500ff1d0df3194f7f6b573118b0c218a8939a695fbc39b107d15d973bd5bd67",
     "2027-01-27": "d5992e83eb2eec8090e46b7eea5f9d8722801952cd1a484147d2527778ed9032",
-    "2027-01-31": "7c3e178c6a11c0ab582ba7be855e680054a0e56e6634e62ce0e872cddfb375f3",
+    "2027-01-28": "9790e0762fcae48cdf6e81066c340ceddd9a8b2efd03b6e264170d7d4ded09c2",
+    "2027-01-29": "05baad6d88c7f42ec4550b04f5877ad30f79ccf20e92de557b02f3622827fbd4",
+    "2027-01-31": "d1624bd2af6dc41f94c5b17d70300894d7e1bac76803797d696241b4e4bbaef1",
+    "2027-02-02": "94316d141695255c047b1170ba30d959f4111deb2c0e96c90efd82d4bb5b64ba",
+    "2027-02-04": "848a804a005d50d10da141fe279c81ad659b2983a049480e965487a203e69700",
+    "2027-02-05": "8ad5a1bb20e7dba4c9b605a71f66b9b74600b9a62a33b814b7631ef02578e840",
     "2027-02-07": "e872e5e0e8a23054b52d561c87e1a151fbf1d159ddc124f6a807ee5582e4701d",
     "2027-02-14": "b49574fc35ff1af461e8234969a2b6d9779b1e9b657addbeb9b0730b52314089",
+    "2027-02-16": "e57b8e0da83afa829bbbd55daa184a60c0ad5318d2ea3c53936798bb85c1899e",
+    "2027-02-18": "cc5dac2ad975ce6a579b7c4da974f9687004bc8c739ff9a1eb8141e9a941a744",
+    "2027-02-19": "1adabc53fe310e17e4ca60974aaaaefcbbe153f78f3e617add7361ca37ed8716",
     "2027-02-21": "a3935c878698129aba3e15bb5e0d3bb1f26bd2d5bbb9b4f7ac2659e2db858f02",
+    "2027-02-23": "8b8da8698e05630f7d1a674af953c07c1e0af72365df69bb14dce666a24bc164",
+    "2027-02-25": "b5ddd530ac418b4e117a37fda04dc3f1fbd7762f24fb8d56f8a72a16cb612d2d",
+    "2027-02-26": "21e8de61acaf86db6f1d7afd8b40ad7107086ee702f628f23c202b05cdc2cebf",
     "2027-02-28": "faec45b75bb7a7b28869a24283bc417ffc5be715f98e45a87861ed0ed6a55b92",
+    "2027-03-02": "e0a1ab43f2c90d58cf2d091c6c7abc33315185b84d389ea23852ceda52f9d92a",
+    "2027-03-04": "f3182bab7ac584a8025dec853a7c6b064d9df7829afb6e3bcf230cf4399eacd2",
+    "2027-03-05": "2fa7519d79ecdbf4386911e204eb04955213a737967c3cec9afc2d96d0cc14da",
     "2027-03-07": "322b1e7ba82616f3909f36836c7f18bf2a32bff3ed4cc3fa2129a5b0615cc285",
+    "2027-03-09": "70cc11d72c5d6c85ba96276249fa55fd6f59c9db5f7f71384d2bb5bf167580fd",
+    "2027-03-11": "a22d5325f224c4678acf8740db2cccf22accf390d752cabc913853b7cd2cc1e0",
+    "2027-03-12": "142acbb67a95de31454065253bb547295e726aebd8ff69e7ea5f47312bdc5e44",
     "2027-03-14": "b20179a917b23d2a73a4c384fb31b721c8258731185139e4cbe70df4082febfd",
+    "2027-03-16": "3042483b909687b74dd03513e28f87172d4f3b17c4ba88464b533cb371e77ba5",
+    "2027-03-18": "db7325c0b1cf9a11ceacb8b2c98717103c0c31cd813b4243a62cf571d7ceef05",
+    "2027-03-19": "19e18148800231bd9cf4f7ab2b0feac2467c0b509b656e7d47ae4e48f4a735f4",
     "2027-03-21": "7b231ee21ec23fa62d62354b5ae52e8e0be2dd2a8169705db6891e31b74eb5b6",
     "2027-03-28": "6a4240bc8343058ff0bc2c9ef3e3e1ee54effe06e021ff8ebc6f535432bf78b1",
+    "2027-04-01": "74d36f310fed97e082ee4ef487778bfa77c580d2ba8992f395ba008ccee419e7",
+    "2027-04-02": "0791a111b92fa48cfccfefd847a87b5c59ac3334775edf59706607e10905d0b4",
     "2027-04-04": "b3866999bc0401c8716e14e767f3a12d3d53c4788011a0ee6139ed1e2558b05a",
+    "2027-04-06": "c2a1b51a58df2a15c8b2304ea4b04a5a633fb4106b2d452e37955ee625a4cb21",
+    "2027-04-08": "ac48fc489f9992766db519812cb8298e85a17468dc2c30632b784fb0e7cdf364",
+    "2027-04-09": "e06a48d382ded850c0144ffb269c0d14cae486f35dfd99033dd406caf4daf9d1",
     "2027-04-11": "88383cb6f49be76032ed8574852bc55fca80022b6ed4ac38aadbaa2881ca4dba",
+    "2027-04-13": "0bc227d2be7e0a169cd5b887281b23ff4aafe6a97bf032762575a4296ea06ed5",
+    "2027-04-15": "cdb6abac6589fd9a5286ca065b03e93daacdb9ab3df0a0b49d67e67e1cfea074",
+    "2027-04-16": "32503f3637155c6eb47fd4a736c1628a62adfff94bf6f02516198d21eef52699",
     "2027-04-18": "c84f0b44186c313f648390c09d49e900aee2a019967eebb38b51c84133cf6651",
+    "2027-04-20": "3a4e56f0d2a4961c5083cecd3958b2bccddbae207383699da76ff012392962ce",
+    "2027-04-22": "160fedf472f804cbc977630fd91d48f048ff4ff0a7deb9c1008867f432918b72",
+    "2027-04-23": "7830ab779dad21024bae1687a2b0e8c2f13e34d0dfcc739c0d09871b50b0e1b5",
     "2027-04-25": "2e84d2743f9febe83c1ba66a5d15adcff430ed3cd76e549ca70bf3a1e4f36a80",
+    "2027-04-27": "d549d4d73d79796cc2b72cfa8af685470cb2faaa0bd9ebe694eebf43c1b3d8bd",
+    "2027-04-29": "b6ee6b28c22d4f7c98a6678cc0c5c3355d3ff2bf5750478ee87924aaeeca95cc",
+    "2027-04-30": "56f01d168e6c7ab40db3bf2a0ec0a886f83bf0b79dcc0d491ea40389582dfd34",
     "2027-05-02": "eda73b7f955276b59ae07b0a325648f98a6d08f0252f45c3919792e9fee1f85d",
+    "2027-05-04": "478763ff104802d841451ab443d315bcc38034ce62f87bbc57c4a4af20feb92d",
+    "2027-05-06": "c7e91cd51b42289c31631c15d5bb1b98854a4ab7dfb7d98d01cede8ef6ea7de8",
+    "2027-05-07": "e288ad0563f863099c39b889a2af25899d83d6ccf4e7887c598955b80df6cbd0",
     "2027-05-09": "35d23d9f40de9161a2ad72585de58ca7bf469b8148ccec645e2477df030b5f5d",
+    "2027-05-11": "3a49e8913b049ca0d8de8ad579814ee98d12ad6c72fe9001fdfa5211fc21bfa6",
+    "2027-05-13": "878e3316ce98cd2bbc818627180865fb3f13e6e607f0d42dbc93b56a0866b083",
+    "2027-05-14": "f4a636aac3ff4528ed1335092f92a2f1e87b807c215fa50ed7a0909ef82d5f71",
     "2027-05-16": "30478a8822693b650cee104c11381f5f787a4435ebf3a913ef7788372d00898a",
     "2027-05-23": "392a9dbfdbf18d810ec13aa04b02b7230ae6ee8a997c64dd11c394a7c36cc41f",
     "2027-05-30": "0ce00a98832bf7705c653113441f63e15980cbe5c6156798c17ae62b149f2a38",
+    "2027-06-01": "6e3dbfc47edbba288a1805d23b7fcdb9cf25b1c947c5da2fbdd48479d35d9458",
+    "2027-06-03": "8c62ffb746324c81b2d2b74a9ccbb6ea3bfbdb844663b041af3507ef332ea8bd",
+    "2027-06-04": "105a1adacf21df45c9f340a722ceae7d0109824ae5a60792284c19aaaa2072cd",
     "2027-06-06": "17dbc590b44cf80df0408ceeae4edeaac7b3c696180f9172f82500df142f4a64",
+    "2027-06-08": "f71e4050e05143253de540e299363b0abe5de2bec7ec4609f970145bc61b436a",
+    "2027-06-10": "0be68a7dedf1be0f4f406c140ed8c748feb58f9cf7bb0c1916a31c83b279a464",
+    "2027-06-11": "856c29e6fa95ccdb41e02eed9d7e5d533c8364ee7b07045efe9607a91ddea52a",
     "2027-06-13": "973c7d2457f1a7325c6ec45e9403c4f8eb69e14ff63c842b5785f6fac37e6871",
+    "2027-06-15": "67f1a154e27a25a040940a3a81a08afa0084ef9a37e9b10c9aab6525e4f7b6b7",
+    "2027-06-17": "7d96aae9e528e5eaa26ba96e63067382afb5410c29090e9d6cd0320cf6b2e3a6",
+    "2027-06-18": "55292891fd94d11f7fdeda0e78fbda2194e9eed057b2628bcae33bb672941629",
     "2027-06-20": "4bc0edace5c106f1c6d1cef21453326b71cc3e945e544437047fde35df457f77",
+    "2027-06-22": "d83ab225b49a5410490835fca32c95fbca2c4ec8263cdb2cd0975b21ae3a4362",
+    "2027-06-24": "e54aa9abbe4cf8efa58f202199ed38465a26e6dad4682f683b94a3debb3c3ffa",
+    "2027-06-25": "f9f637bc2a0d238a153baf8fa33875d61dec3c451110d04ca25530ce7eb2c90a",
     "2027-06-27": "1185b8ee6c19e44f5e5334c8ed57cf82ed896bf2177d8823ca66fc27582ca125",
+    "2027-06-29": "88e425d0a58d1094a39cd1e089780a68ffae3e0538f4a84fd22b7526636c5e14",
+    "2027-07-01": "5634cc390ce3237993f567580036340daacc60bb48b681bf10216d466b693722",
+    "2027-07-02": "441fd6225d37a9a62fd50224134397657833764f93e5dfe812e2b1fc1e7a4fff",
     "2027-07-04": "1c55a0bdd4c02c510a77acea7d5311fbbf0b5564604f4f3bdc7f2de520164a51",
+    "2027-07-06": "ceb2a06950a3412cb4ef5afaf9702ab1b52c8cad4b1b118a7fb9eb9077532136",
+    "2027-07-08": "a955530f88a554799b0aee3a3e5c51f344fa31eb14537f830674bfc5ba76db54",
+    "2027-07-09": "88cbb2651a28247e4232a6480db3dc27f289c550602ce57f52f65bb1c14317f2",
     "2027-07-11": "9d2f242f38dae6310d9282f8c9c2a85a2641dc59417ca6c55cd72fb127357d50",
+    "2027-07-13": "4270f061e1fbee0050d9c91cc14b0cd74457fbcbdd09d624c9495675c3cbb6b4",
+    "2027-07-15": "da56462be71a1b9f4788eaa0a53a3245d64a0697c796006ce3ea51db2d2e4808",
+    "2027-07-16": "67c03a7e069e345d4c072013b96302e6faf8e7184b96b9252c0bc21484a8b0b4",
     "2027-07-18": "06be7e94b904fecf5ed8760070de4595faad3724e1da3121743bdcaaca5c2ed1",
+    "2027-07-20": "a9658daed3ed2380247e343b0b824dbd6a4920bb2df76cf98d3552c99f10fbac",
+    "2027-07-22": "43b2443fd350ce2e43745cc9193be2de1f25b579b8155e0d71ffa2f74373236f",
+    "2027-07-23": "0bb51ffa32bc8747347750b8e4bd80787110949f545755b7478fd3c925ce9a24",
     "2027-07-25": "3cca91799180c0e508ff2e5d29c9501561fee701abc74ab7952d631dc3fcabe8",
+    "2027-07-27": "cae4bc9ac4639bf3a9b58a93ff38ab71c791fc5b019caf3ed428099277adb363",
+    "2027-07-29": "6413b361ff151cc247447696b310a73140869940af7a5bcdb005e0c8d52fe57c",
+    "2027-07-30": "a5012d7277db5283126cdc7943638a220d74e902c69561422b58f3558a8fe32e",
     "2027-08-01": "f7e8ddf72e498a7b3ca40f4e9e865f4879657b1acf9f7841bf5700dafb64e318",
     "2027-08-08": "40c94ba1ee1e5bf465a29ecb75b05b72c84d435528e337b8e5936a1a745e090d",
     "2027-08-09": "bd718251f1c7563829b2406202246de9ca881f33e07c385af99570afa2d5a8e8",
@@ -132,8 +303,56 @@
    },
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
-   "changedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
+   "changedAt": "2026-11-28T10:18:30+01:00",
+   "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
+  },
+  "kandidaten": {
+   "events": [
+    {
+     "providerId": "ev-eibach",
+     "venueId": "ev-eibach",
+     "title": "Mini-Gottesdienst „Lucia“ für Kinder von 0–3 Jahren",
+     "summary": "Kleiner Gottesdienst für Kinder von 0 bis 3 Jahren, Geschwister sind willkommen. Einzeltermin am 17.12.2026 um 17 Uhr in der Johanneskirche Eibach.",
+     "topics": [
+      "krabbelgottesdienst"
+     ],
+     "format": "einmalig",
+     "registration": "ohne-anmeldung",
+     "cost": "kostenlos",
+     "url": "https://www.evangelische-termine.de/detail-bt?ID=8333378",
+     "sourceUrl": "https://www.evangelische-termine.de/detail-bt?ID=8333378",
+     "category": "treffs-cafes",
+     "age": {
+      "minMonths": 0,
+      "maxMonths": 36
+     },
+     "availability": {
+      "status": "unbekannt",
+      "note": "Keine Angaben zur Anmeldung im Eintrag."
+     },
+     "schedule": {
+      "kind": "dates",
+      "dates": [
+       {
+        "start": "2026-12-17T17:00"
+       }
+      ]
+     },
+     "via": "evtermine"
+    }
+   ],
+   "inputHash": "090a602287c5cfe69a923a26226aa8be59d561d75ec8bb26dfe76d4abfea7937",
+   "dated": {
+    "2026-12-17": "9555fc0850da86c0af511bd2fac49e5dc19f9d23981d580a9e42d1ae42fbdb95"
+   },
+   "model": "haiku",
+   "status": "ok",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
+   "changedAt": "2026-11-28T10:18:30+01:00",
+   "sources": [
+    "evtermine"
+   ],
    "partsHash": "fba2a6efe99605faf2d92f3badbfe71942e1dd98593fb6249346c6ccbd4b1fc1"
   }
  }

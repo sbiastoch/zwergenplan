@@ -6,8 +6,8 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP (Babys geb. April–Juni 2026, Di 9:30)",
-     "summary": "Entwicklungsbegleitung für Eltern mit Babys, die von April bis Juni 2026 geboren sind. Laufende Gruppe, die dienstags noch bis 15.12.2026 stattfindet. Platzangabe auf der Detailseite prüfen.",
+     "title": "PEKiP (Babys geb. April–Juni 2026)",
+     "summary": "Entwicklungsbegleitung mit Spiel- und Bewegungsanregungen für Babys und ihre Eltern. Läuft noch bis 15. Dezember 2026; Plätze und Einstieg auf der Detailseite prüfen.",
      "topics": [
       "pekip"
      ],
@@ -19,15 +19,15 @@
      "category": "babykurse",
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe und Anmeldung auf der Detailseite"
+      "note": "Plätze auf der Detailseite prüfen (Anmeldung über das Online-Formular)"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
        "TU"
       ],
+      "interval": 1,
       "start": "09:30",
-      "end": "11:00",
       "from": "2026-12-01",
       "until": "2026-12-15",
       "skipHolidays": false
@@ -36,8 +36,8 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "PEKiP (Babys geb. Dez. 2025–Feb. 2026, Di 11:30)",
-     "summary": "Entwicklungsbegleitung für Eltern mit Babys, die von Dezember 2025 bis Februar 2026 geboren sind. Laufende Gruppe bis 15.12.2026; laut Titel ausgebucht.",
+     "title": "PEKiP (Babys geb. Dez. 2025–Feb. 2026)",
+     "summary": "Entwicklungsbegleitung mit Spiel- und Bewegungsanregungen für Babys und ihre Eltern. Laut Übersicht ausgebucht; läuft noch bis 15. Dezember 2026.",
      "topics": [
       "pekip"
      ],
@@ -49,15 +49,15 @@
      "category": "babykurse",
      "availability": {
       "status": "ausgebucht",
-      "note": "Im Titel als „Ausgebucht!“ markiert"
+      "note": "In der Übersicht als ausgebucht markiert"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
        "TU"
       ],
+      "interval": 1,
       "start": "11:30",
-      "end": "13:00",
       "from": "2026-12-01",
       "until": "2026-12-15",
       "skipHolidays": false
@@ -66,8 +66,8 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "Singen mit dem Baby (4–12 Monate, Di 15:00)",
-     "summary": "Lieder, Kniereiter und Fingerspiele für Kinder ab 4 bis 12 Monaten, gemeinsam mit Mutter oder Vater. Laufender Kurs bis 15.12.2026; Platzangabe auf der Detailseite.",
+     "title": "Singen mit dem Baby (Kinder 4–12 Monate)",
+     "summary": "Gemeinsames Singen mit dem Baby, mit Liedern für Alltagssituationen, Kniereitern und Fingerspielen. Läuft noch bis 15. Dezember 2026; Plätze auf der Detailseite prüfen.",
      "topics": [
       "musik",
       "singen"
@@ -84,15 +84,15 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe und Anmeldung auf der Detailseite"
+      "note": "Plätze auf der Detailseite prüfen (Anmeldung über das Online-Formular)"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
        "TU"
       ],
+      "interval": 1,
       "start": "15:00",
-      "end": "15:45",
       "from": "2026-12-01",
       "until": "2026-12-15",
       "skipHolidays": false
@@ -101,8 +101,8 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "Spielgruppe „Schritte ins Leben“ (10–24 Monate, Di 16:00)",
-     "summary": "Gemeinsames Spielen und Entdecken für Kinder von 10 bis 24 Monaten, mit Mutter oder Vater. Laufende Spielgruppe bis 15.12.2026; Platzangabe auf der Detailseite.",
+     "title": "Spielgruppe „Schritte ins Leben“ (10–24 Monate)",
+     "summary": "Spielgruppe, in der Kleinkinder mit allen Sinnen die Welt entdecken und in der Gemeinschaft wachsen. Läuft noch bis 15. Dezember 2026; Plätze auf der Detailseite prüfen.",
      "topics": [
       "spielgruppe"
      ],
@@ -118,15 +118,15 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe und Anmeldung auf der Detailseite"
+      "note": "Plätze auf der Detailseite prüfen (Anmeldung über das Online-Formular)"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
        "TU"
       ],
+      "interval": 1,
       "start": "16:00",
-      "end": "17:30",
       "from": "2026-12-01",
       "until": "2026-12-15",
       "skipHolidays": false
@@ -135,8 +135,8 @@
     {
      "providerId": "zoff-harmonie",
      "venueId": "zoff-harmonie",
-     "title": "Musikalische Entdeckungsreise (1–2 Jahre, Do 9:30)",
-     "summary": "Musikangebot für Eltern mit Kindern von 1 bis 2 Jahren, donnerstags bis 10.12.2026. Platzangabe auf der Detailseite.",
+     "title": "Musikalische Entdeckungsreise (1–2 Jahre)",
+     "summary": "Gruppenangebot rund um Musik für Eltern mit Kindern von 1 bis 2 Jahren. Läuft noch bis 10. Dezember 2026; Plätze auf der Detailseite prüfen.",
      "topics": [
       "musik"
      ],
@@ -152,26 +152,26 @@
      },
      "availability": {
       "status": "unbekannt",
-      "note": "Platzangabe und Anmeldung auf der Detailseite"
+      "note": "Plätze auf der Detailseite prüfen (Anmeldung über das Online-Formular)"
      },
      "schedule": {
       "kind": "weekly",
       "weekdays": [
        "TH"
       ],
+      "interval": 1,
       "start": "09:30",
-      "end": "10:30",
-      "from": "2026-11-26",
+      "from": "2026-12-03",
       "until": "2026-12-10",
       "skipHolidays": false
      }
     }
    ],
-   "inputHash": "d594a5cc5de3f2d57f24cea76fe3c988c0183014e4a93b0adc095ffaa6564857",
+   "inputHash": "9fc3b8a3fd5c58a68bee8e2da0e8be16ca77fa036735912b55b2eae7651578a2",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
-   "changedAt": "2026-11-26T10:59:44+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
+   "changedAt": "2026-11-28T10:18:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
   "seite:https://zoff-harmonie.de/programm/gemeinsam-mit-kindern-entdecken-und-erleben/pekip": {
@@ -282,7 +282,7 @@
    "inputHash": "1903487e9bf4fb659141d285ce82c9199700d3f2fe946781f634c4bb93cbafac",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-11-21T09:41:55+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -291,7 +291,7 @@
    "inputHash": "7dec4a0dda160e9dd229b8a2361e586180d08acd994edf0c3ea5e8c3f8fe8c17",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -366,7 +366,7 @@
    "inputHash": "facc50d6c038c034a21585c15da7972aa8fc5bd3e5fb4558b46a8176368c4ae7",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-11-26T10:59:44+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -445,7 +445,7 @@
    "inputHash": "e8f2b51135bc88c3162a9c7c607e9b8d8048f3f63ab5c72eebf820c0e2835097",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -488,7 +488,7 @@
    "inputHash": "b0f0cd537b118e472fefb53a675945ba581145c8531f1282738d875754fa2e11",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-28T08:14:30+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -497,7 +497,7 @@
    "inputHash": "c9452e09995dab30629b11d5c6d5a8ea4aff7f094f651daba85b4935102bfb09",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-29T08:35:39+01:00",
    "emptySince": "2026-10-29T08:35:39+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
@@ -507,7 +507,7 @@
    "inputHash": "352bcaa7d1bf11f0bebbd21b99006b92499187da1d2f418e0fcfdda8daf2a5af",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "6cdbe7eb53eee6ceee9d37716466b9751d7a61ba9156745cd8cfcad12318239b"
   },
@@ -516,7 +516,7 @@
    "inputHash": "fae2a67cf63b71b4279877b0a8ce0c70497d3495fe79bf505b7f50d0e9b2b937",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "sources": [
     "stadt-vk"

@@ -216,7 +216,7 @@
    "inputHash": "680bb080b8ac433937fd1d0996729ec9d9bd33720bb6d34c3ab4f6103cc9f4d9",
    "model": "haiku",
    "status": "ok",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-11-27T11:02:31+01:00",
    "partsHash": "36d453cda993c6a910fc65ddae1bbb668fea46b24c3b3f2d2246c0e82d5e99c8"
   },
@@ -225,7 +225,7 @@
    "inputHash": "529382906ad0fed0789cde87933de19cb63c4cc1a11abdb6b3773c04e9fbc47c",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-30T08:39:48+01:00",
    "emptySince": "2026-10-30T08:39:48+01:00",
    "partsHash": "568c4bed25570c5e0cc2590ea1e50548fc857884701ab7c78400c6d6583faa94"
@@ -235,7 +235,7 @@
    "inputHash": "d1139e2070e95d887ea363fbe259396b279122045359d1f4955735ef2f52a473",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   },
@@ -244,16 +244,16 @@
    "inputHash": "55d54e6a771bf866fe1cdfbf2ba30e23087ae95784d116232e3c1523b3325684",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   },
   "seite:https://deinkindernotfallkurs.de/": {
    "events": [],
-   "inputHash": "ef9be661b2d03a67712daf88f7c9867e82b6a3be9e6637aee60a29459cdac232",
+   "inputHash": "923bed84ba49e2cb28d2194a8986969b7d6f69aa9f606117e6326511ba1cfdba",
    "model": "haiku",
    "status": "keine-termine",
-   "checkedAt": "2026-11-27T11:02:31+01:00",
+   "checkedAt": "2026-11-28T10:18:30+01:00",
    "changedAt": "2026-10-27T09:00:54+01:00",
    "partsHash": "4108677ce74a6236f903fb48c0633d1a1e9b3f1abc52ef139cf8742db5458c81"
   }
